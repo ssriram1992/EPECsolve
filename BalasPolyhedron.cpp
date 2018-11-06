@@ -7,15 +7,17 @@
 // Define this as 0 if you don't want the equations fo each polyhedron printed out.
 #define VERBOSE 0
 
+#include<exception>
+
 using namespace std;
 
 
 // Function prototypes
-GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
-		const vector<arma::sp_mat> A, const vector<arma::vec> b);
-
-GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
-		const vector<arma::mat> A, const vector<arma::vec> b);
+// GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
+		// const vector<arma::sp_mat> A, const vector<arma::vec> b);
+// 
+// GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
+		// const vector<arma::mat> A, const vector<arma::vec> b);
 
 // These bounds exist on all variables. 
 // These ensure that the whole problem is never unbounded
@@ -86,7 +88,13 @@ int main_Balas()
 	model.setObjective(obj, GRB_MINIMIZE);
 
 	// Gurobi does the magic
+	try{
+		cout<<"Exception block try"<<endl;
 	model.optimize();
+	} catch(exception &e){
+		cout<<"Exception block catch";
+		cerr<<"Exception: "<<e.what()<<endl;
+	}
 	optimstatus = model.get(GRB_IntAttr_Status);
 
 	if(optimstatus == GRB_INFEASIBLE)
@@ -272,4 +280,153 @@ GRBModel& PolyUnion(
 	}
 
 	return model;
+}
+
+
+
+int PolyUnion(
+		// Input arguments
+		const vector<arma::sp_mat>	Ai,				// Vector containing the LHS 'A' in Ax <= b defining each polyhedron
+		const vector<arma::vec>		bi,				// Vector containing the RHS 'b' in Ax <= b defining each polyhedron 
+		// Output arguments
+		arma::sp_mat& A,
+		arma::vec &b,
+		bool Reduce
+		)
+{
+	vector<unsigned int>						sizes{};
+	const unsigned int 							N_poly = Ai.size();						// Define number of polyhedron
+	const unsigned int 							N_vars = Ai[0].n_cols;					// Number of variables
+
+	const unsigned int 							FN_vars = N_poly*N_vars + N_vars + N_poly;
+	unsigned int 								FN_cons{2+N_vars+N_poly}; // Delta sum to 1, x^i sum to x and each delta_i >= 0.
+	for(auto i:Ai)												   // Adding the number of constraints in each polyhedron description.
+		FN_cons += i.n_rows;
+
+
+	sizes = errChk_PolyUnion<arma::sp_mat>(Ai, bi);
+	A.set_size(FN_cons, FN_vars); // Setting the size of A
+	b.set_size(FN_cons); 		  // Setting the size of B
+	b.fill(0);
+
+	
+	// Populating the A, b matrices
+	unsigned int cons_count{0}, var_count{0};
+	for(unsigned int i=0; i<N_poly; i++)
+	{
+		cout<<i<<endl;
+		// A_ix^i \leq \delta_i b^i constraint in Conforti, Cornuejols, Zambelli (4.31)
+		// Add Ai(i) as the appropriate submatrix of the new A
+		A.submat(cons_count, var_count, 
+				cons_count+bi.at(i).n_rows-1, var_count+N_vars-1) = Ai.at(i);
+		// Each row also has +\delta_ib^i \leq 0
+		A.submat(cons_count, N_poly*N_vars + N_vars + i,
+			cons_count+bi.at(i).n_rows-1, N_poly*N_vars + N_vars + i) = -bi.at(i);
+		// \sum x^i = x constraint - adding the term corresponding to this polyhedra
+		A.submat(FN_cons - 2- N_poly - N_vars, var_count,
+				FN_cons - 2 - N_poly -1, var_count+N_vars-1) = arma::speye<arma::sp_mat>(N_vars, N_vars);
+		// Updating the constraint and variable count
+		cons_count += bi.at(i).n_rows;
+		var_count += N_vars;
+		cout<<i<<" over"<<endl;
+	}
+	A.submat(FN_cons - 2- N_poly - N_vars, N_poly*N_vars,
+			FN_cons - 2 - N_poly -1, N_poly*N_vars+N_vars-1) = arma::speye<arma::sp_mat>(N_vars, N_vars);
+	A.submat(FN_cons-2-N_poly,N_poly*N_vars + N_vars,
+				FN_cons-2-1, N_poly*N_vars + N_vars + N_poly-1) = -arma::speye<arma::sp_mat>(N_poly, N_poly);
+	A.submat(FN_cons-2, N_poly*N_vars+N_vars,
+			FN_cons-2,  N_poly*N_vars+N_vars+N_poly-1) = arma::ones<arma::mat>(1, N_poly);
+	b[FN_cons-2] = 1;
+	A.submat(FN_cons-1, N_poly*N_vars+N_vars,
+			FN_cons-1,  N_poly*N_vars+N_vars+N_poly-1) = -arma::ones<arma::mat>(1, N_poly);
+	b[FN_cons-1] = -1;
+
+	return 0;
+}
+
+
+/*
+
+int PolyUnion(
+		// Input arguments
+		const vector<arma::mat>	Ai,				// Vector containing the LHS 'A' in Ax <= b defining each polyhedron
+		const vector<arma::vec>		bi,				// Vector containing the RHS 'b' in Ax <= b defining each polyhedron 
+		// Output arguments
+		arma::mat A,
+		arma::vec b
+		)
+{
+	 return 0;
+}
+
+*/
+
+
+
+vector<unsigned int> makeCompactPolyhedron(const arma::sp_mat A, const arma::vec b, arma::sp_mat &Anew, arma::vec &bnew)
+{
+	GRBEnv env = GRBEnv();
+	GRBModel model = GRBModel(env);
+	model.set(GRB_IntParam_DualReductions, 0);
+		// ("DualReductions",0);
+	
+	GRBVar x[A.n_cols];
+
+	GRBConstr Constraints[A.n_rows];
+	GRBLinExpr LinExpr[A.n_rows], lin{0};
+	
+	vector<unsigned int> remainConst{};
+
+	double obj;
+	// Add all variables - objective does not matter for now.
+	for(unsigned int i = 0; i<A.n_cols; i++)
+		x[i] = model.addVar(-GRB_INFINITY, GRB_INFINITY, 0, GRB_CONTINUOUS);
+	for(unsigned int i=0; i<A.n_rows;i++)
+	{
+		for(auto j=A.begin_row(i);j!=A.end_row(i);++j)
+			LinExpr[i] += (*j)*x[j.col()];
+		Constraints[i] = model.addConstr(LinExpr[i], GRB_LESS_EQUAL, b[i]);
+	}
+	model.setObjective(lin);
+	model.optimize();
+	// model.set(GRB_IntParam_OutputFlag, 0);
+	auto optimstatus = model.get(GRB_IntAttr_Status);
+	if(optimstatus == GRB_INFEASIBLE || optimstatus== GRB_INF_OR_UNBD)
+	{
+		cout<<"Polyhedron that was cleaned is infeasible already!";
+		return remainConst;
+	}
+	// Remove constraint by constraint and see if it is required
+	for(unsigned int i=0; i<A.n_rows;i++)
+	{
+		model.setObjective(LinExpr[i], GRB_MAXIMIZE);
+		model.remove(Constraints[i]);
+		try{ model.optimize();}
+		catch(exception &e) { cerr<<"Exception: "<<e.what()<<endl; }
+		auto optimstatus = model.get(GRB_IntAttr_Status);
+		if(optimstatus != GRB_UNBOUNDED && optimstatus != 4) // 4 is for infeasible or unbounded
+		{
+			obj = model.get(GRB_DoubleAttr_ObjVal);
+			if(obj > b[i])
+			{
+				remainConst.push_back(i);
+				model.addConstr(LinExpr[i], GRB_LESS_EQUAL, b[i]);
+			}
+		}
+		else
+		{
+			remainConst.push_back(i);
+			model.addConstr(LinExpr[i], GRB_LESS_EQUAL, b[i]);
+		}
+	}
+	arma::ivec remains(remainConst.size());
+	Anew = arma::zeros<arma::mat>(remainConst.size(), A.n_cols);
+	bnew = arma::zeros<arma::vec>(remainConst.size());
+	for(unsigned int i = 0; i<remainConst.size(); i++)
+	{
+		Anew.row(i) = A.row(remainConst.at(i));
+		bnew.row(i) = b(remainConst.at(i));
+		remains[i] = remainConst.at(i);
+	}
+	return remainConst;
 }

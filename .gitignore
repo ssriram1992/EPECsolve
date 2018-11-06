@@ -1,3 +1,5 @@
 *.o
 *.swp
 EPEC
+Game
+func.c

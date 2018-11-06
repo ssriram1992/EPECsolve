@@ -33,13 +33,15 @@ int main_LCP()
 	arma::arma_rng::set_seed(seed);
 	// arma::arma_rng::set_seed_random();
 
+	/*
 	// 0/1 lattice M and q
-	// arma::sp_mat M(-arma::eye<arma::mat>(N_var,N_var));  // 0/1 lattice
-	// arma::vec q  = arma::ones<arma::vec>(N_var);
+	arma::sp_mat M(-arma::eye<arma::mat>(N_var,N_var));  // 0/1 lattice
+	arma::vec q  = arma::ones<arma::vec>(N_var);
 	
 	// Random M/q
-	// arma::sp_mat M(arma::randi<arma::mat>(N_var,N_var, arma::distr_param(-(int)MentryLim, (int)MentryLim))); // Random M
-	// arma::vec q = arma::randi<arma::vec>(N_var, arma::distr_param(-(int)MentryLim, (int)MentryLim));
+	arma::sp_mat M(arma::randi<arma::mat>(N_var,N_var, arma::distr_param(-(int)MentryLim, (int)MentryLim))); // Random M
+	arma::vec q = arma::randi<arma::vec>(N_var, arma::distr_param(-(int)MentryLim, (int)MentryLim));
+	*/
 	
 	// Nash Cournot M/q
 	arma::sp_mat M(N_var, N_var), N(N_var, N_var);
@@ -109,8 +111,10 @@ bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol)
 	if(A.n_rows != b.size()) throw("Inconsistent number of rows in A and b");
 	if(A.n_cols != sol.size()) throw("Vector of feasibility proof should have same size as number of cols of A");
 
+
 	for(unsigned int i=0; i!=N_vars; i++)
 		x[i] = model.addVar(-GRB_INFINITY, GRB_INFINITY, 0, GRB_CONTINUOUS);
+
 	for(unsigned int i=0; i!=N_cons; i++)
 	{
 		GRBLinExpr linexp{0};
@@ -119,7 +123,11 @@ bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol)
 		model.addConstr(linexp <= b(i));
 	}
 
-	model.optimize();
+	try{
+		model.optimize();
+	} catch(exception &e){
+		cerr<<"Exception: "<<e.what()<<endl;
+	}
 
 	int optimstatus;
 	optimstatus = model.get(GRB_IntAttr_Status);
@@ -173,7 +181,7 @@ int LCPasLPTree(const arma::sp_mat M, 	// 0 \leq x \perp Mx+Ny+q \geq 0 -> M
 		bool EmptyFlag{false};
 		arma::sp_mat Ai(3*n_Vars, n_Vars + n_yVars);
 		arma::vec bi(3*n_Vars, arma::fill::zeros);
-		arma::vec soli(n_Vars, arma::fill::zeros);
+		arma::vec soli(n_Vars + n_yVars, arma::fill::zeros);
 		unsigned int count = 0; // To keep track of how many constraints are added to Ai and bi
 		BinaryArr(SelecOfTwo, n_Vars, i);
 		for(unsigned int j=0; j<n_Vars; j++)
@@ -181,7 +189,7 @@ int LCPasLPTree(const arma::sp_mat M, 	// 0 \leq x \perp Mx+Ny+q \geq 0 -> M
 			// First both x_i >=0 and [Mx+q]_i >=0 constraints
 			Ai(count, j) = -1;
 			bi(count++) = 0;
-			Ai.row(count) = -M.row(j);
+			Ai.row(count) = arma::join_rows(-M.row(j), -N.row(j));
 			bi(count++) = q(j);
 			if(SelecOfTwo[j]==0) // Then include the x_i <= 0 constraint
 			{
@@ -190,10 +198,20 @@ int LCPasLPTree(const arma::sp_mat M, 	// 0 \leq x \perp Mx+Ny+q \geq 0 -> M
 			}
 			else 				// Then include the [Mx+q]_i <= constraint
 			{
-				Ai.row(count) = M.row(j);
+				Ai.row(count) = arma::join_rows(M.row(j), N.row(j));
 				bi(count++) = -q(j); 
 			}
-			if(isEmpty(Ai, bi, soli)) // If the polyhdra is already empty with few constraints
+			bool t1;
+			try
+			{
+				 t1 = isEmpty(Ai, bi, soli);
+			}
+			catch(const char* e)
+			{
+				cerr<<e<<endl;
+				exit(1);
+			}
+			if(t1) // If the polyhdra is already empty with few constraints
 			{			
 				i += (long long unsigned int)pow(2, n_Vars-j-1);
 				i--;
@@ -201,8 +219,18 @@ int LCPasLPTree(const arma::sp_mat M, 	// 0 \leq x \perp Mx+Ny+q \geq 0 -> M
 				break;	 
 			}
 		n_Solves++;
+		} 
+		bool t1;
+		try
+		{
+			 t1 = isEmpty(Ai, bi, soli);
 		}
-		if (!EmptyFlag && !isEmpty(Ai, bi, soli))
+		catch(const char* e)
+		{
+			cerr<<e<<endl;
+			exit(1);
+		}
+		if (!EmptyFlag && !t1)
 		{
 			 A.push_back(Ai);
 			 b.push_back(bi);

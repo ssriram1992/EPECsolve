@@ -2,7 +2,7 @@
 
 # File name and output name
 PROJECT=EPEC
-FILEEPEC=BalasPolyhedron.o LCPtoLP.o EPEC.o 
+FILEEPEC=BalasPolyhedron.o LCPtoLP.o EPEC.o Games.o
 OUTPUT=$(PROJECT)
 ARGS=
 
@@ -21,12 +21,13 @@ GUROPT=$(GURINC) $(GURLIB)
 
 # Generic objects not requiring changes
 GCC=g++
-OPTS=-fopenmp $(GUROPT) $(ARMAOPT) -O2 -Wall
+OTHEROPTS=-fopenmp -O2 -Wall
+OPTS= $(GUROPT) $(ARMAOPT)  $(OTHEROPTS)
 
 runEPEC: compileEPEC
 	./$(OUTPUT) $(ARGS)
 
-compileEPEC: BalasPolyhedron.o LCPtoLP.o EPEC.o func.h
+compileEPEC: BalasPolyhedron.o LCPtoLP.o EPEC.o func.h Games.o
 	$(GCC) $(FILEEPEC) $(OPTS) -o $(OUTPUT) 
 
 BalasPolyhedron.o: func.h BalasPolyhedron.cpp
@@ -38,5 +39,15 @@ LCPtoLP.o: func.h LCPtoLP.cpp
 EPEC.o: func.h EPEC.cpp
 	$(GCC) -c EPEC.cpp $(OPTS)
 
+Games.o: func.h Games.cpp
+	$(GCC) -c Games.cpp $(OPTS)
+
 clean:
 	rm -rf $(OUTPUT)
+	rm -rf *.o
+
+game: func.h Games.cpp
+	$(GCC) -c Games.cpp $(OPTS) 
+	$(GCC) Games.o LCPtoLP.o BalasPolyhedron.o func.h -o Games $(OPTS)
+	./Games
+
