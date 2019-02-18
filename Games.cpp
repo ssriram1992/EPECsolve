@@ -1,5 +1,5 @@
 #include<iostream>
-#define VERBOSE true
+#define VERBOSE false
 #include"func.h"
 #include<armadillo>
 #include<array>
@@ -8,13 +8,43 @@ using namespace std;
 
 template <class T> ostream& operator<<(ostream& ost, vector<T> v)
 {
-	for (auto elem:v)
-	{
-		 ost<<elem<<" ";
-	}
+	for (auto elem:v) ost<<elem<<" ";
 	ost<<endl;
 	return ost;
 }
+
+ostream& operator<< (ostream& os, const QP_Param &Q)
+{
+	os<<"Quadratic program with linear inequality constraints: "<<endl;
+	os<<Q.getNy()<<" decision variables parameterized by "<<Q.getNx()<<" variables"<<endl;
+	os<<Q.getb().n_rows<<" linear inequalities"<<endl<<endl;
+	if(VERBOSE)
+	{
+		Q.getQ().print("Q"); Q.getc().print("c"); Q.getC().print("C");
+		Q.getA().print("A"); Q.getB().print("B"); Q.getb().print("b");
+	}
+	return os;
+}
+
+ostream& operator<< (ostream& os, const NashGame N)
+{
+	os<<endl;
+	os<<"-----------------------------------------------------------------------"<<endl;
+	os<<"Nash Game with "<<N.Nplayers<<" players"<<endl;
+	os<<"-----------------------------------------------------------------------"<<endl;
+	os<<"Number of primal variables:\t\t\t "<<N.primal_position.back()<<endl;
+	os<<"Number of dual variables:\t\t\t "<<N.dual_position.back()-N.dual_position.front()+1<<endl;
+	os<<"Number of shadow price dual variables:\t\t "<<N.MCRHS.n_rows<<endl;
+	os<<"Number of leader variables:\t\t\t "<<N.n_LeadVar<<endl;
+	os<<"-----------------------------------------------------------------------"<<endl;
+	return os;
+}
+
+void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P) 
+{
+	
+}
+
 
 unsigned int QP_Param::size()
 {
@@ -93,13 +123,6 @@ QP_Param& QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma
 
 
 
-
-
-void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P) 
-{
-	
-}
-
 bool QP_Param::is_Playable(const QP_Param P) const
 {
 	unsigned int comp{static_cast<unsigned int>(P.getc().n_elem)};
@@ -108,14 +131,6 @@ bool QP_Param::is_Playable(const QP_Param P) const
 		return(comp <= Ny && Nx <= compcomp); // Our size should at least be enemy's competition and vice versa.
 	else return false;
 }
-
-int main22()
-{
-	QP_Param A;
-	NashGame B(4,3);
-	return 0;
-}
-
 
 NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar)
 /*
@@ -170,15 +185,9 @@ unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q) const
 	// To store the individual KKT conditions for each player.
 	vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers); 
 	vector<arma::vec> qi(Nplayers);
-	// vector<arma::sp_mat> tempM;
-	// vector<arma::vec> tempq;
 	
 	unsigned int NvarFollow{0}, NvarLead{0};
-	// Total number of lower level variables is
-	// Position where last player's duals end + 
-	// Number of lower level Market clearing duals.
-	// NvarFollow = this->dual_position.back()+this->MarketClearing.n_rows;
-	NvarLead = this->dual_position.back();//MarketClearing.n_cols; // Number of Leader variables (all variables)
+	NvarLead = this->dual_position.back(); // Number of Leader variables (all variables)
 	NvarFollow = NvarLead - this->n_LeadVar;
 	M.set_size(NvarFollow, NvarLead);
 	q.set_size(NvarFollow);

@@ -44,6 +44,7 @@ bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 /* 																														*/
 /************************************************************************************************************************/
 
+template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 class QP_Param
 /* 
  * Represents a Parameterized QP as
@@ -106,5 +107,7 @@ class NashGame
 };
 
 void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
+ostream& operator<< (ostream& os, const QP_Param &Q);
+ostream& operator<< (ostream& os, const NashGame N);
 
 #endif

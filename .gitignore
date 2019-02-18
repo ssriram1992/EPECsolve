@@ -1,5 +1,8 @@
+EPEC
+FormulateLCP
+func.c
+Game
+Games
 *.o
 *.swp
-EPEC
-Game
-func.c
+*.txt

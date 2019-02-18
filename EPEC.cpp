@@ -5,7 +5,7 @@
 #include<gurobi_c++.h>
 #include<armadillo>
 #include<iostream>
-#define VERBOSE true
+#define VERBOSE false
 
 using namespace std;
 
@@ -65,8 +65,10 @@ int main()
 	// Nash Game
 	//
 	vector<QP_Param*> L1 {L1F1, L1F2};
+	cout<<*L1F1;
 	
 	NashGame *MyGame = new NashGame(L1, MC, MCRHS, 4);
+	cout<<(*MyGame);
 	arma::sp_mat M;
 	arma::vec q;
 	MyGame->FormulateLCP(M,q);
