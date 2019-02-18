@@ -1,9 +1,20 @@
 #include<iostream>
+#define VERBOSE true
 #include"func.h"
 #include<armadillo>
 #include<array>
 
 using namespace std;
+
+template <class T> ostream& operator<<(ostream& ost, vector<T> v)
+{
+	for (auto elem:v)
+	{
+		 ost<<elem<<" ";
+	}
+	ost<<endl;
+	return ost;
+}
 
 unsigned int QP_Param::size()
 {
@@ -30,10 +41,10 @@ bool QP_Param::dataCheck(bool forcesymm) const
 unsigned int QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 /*
  * Writes the KKT condition of the parameterized QP
- * As per the convention, $y$ is the decision variable for the QP and 
+ * As per the convention, y is the decision variable for the QP and 
  * that is parameterized in x
- * The KKT conditions arre
- * 0 <= y \perp  Mx + Ny + q >= 0
+ * The KKT conditions are
+ * 0 <= y \perp  My + Nx + q >= 0
 */
 {
 	if (!this->dataCheck())
@@ -41,12 +52,13 @@ unsigned int QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 		throw "Inconsistent data for KKT of QP_Param";
 		return 0;
 	}
-	M = arma::join_cols(
-			arma::join_rows(this->Q, -this->B),
-			arma::join_rows(this->B.t(), arma::zeros<arma::sp_mat>(this->Ncons,this->Ncons))
-		   );
-	N = arma::join_rows(this->C, -this->A);
-	q = arma::join_rows(this->c, this->b);
+	M = arma::join_cols( // In armadillo join_cols(A, B) is same as [A;B] in Matlab
+			//  join_rows(A, B) is same as [A B] in Matlab
+			arma::join_rows(this->Q, this->B.t()),
+	  		arma::join_rows(-this->B, arma::zeros<arma::sp_mat>(this->Ncons, this->Ncons))
+			);
+	N = arma::join_cols(this->C, -this->A);
+	q = arma::join_cols(this->c,  this->b);
 	return M.n_rows;
 }
 
@@ -83,8 +95,9 @@ QP_Param& QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma
 
 
 
-void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P)
+void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P) 
 {
+	
 }
 
 bool QP_Param::is_Playable(const QP_Param P) const
@@ -99,35 +112,134 @@ bool QP_Param::is_Playable(const QP_Param P) const
 int main22()
 {
 	QP_Param A;
-	NashGame B(4);
+	NashGame B(4,3);
 	return 0;
 }
 
 
-unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q) const
+NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar)
+/*
+ * Have a vector of QP_Param* ready such that
+ * the variables are separated in x^{i} and x^{-i}
+ * format.
+ * In the correct ordering of variables, have the 
+ * Market clearing equations ready. 
+ * Now call this constructor.
+ * It will allocate appropriate space for the dual variables 
+ * for each player.
+ * The ordering is 
+ * [ Primal for Pl1, Primal for Pl2, ..., MarketCL duals,
+ *  Dual for Pl1, Dual for Pl2, ... ]
+ */
 {
-	vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers);
-	vector<arma::vec> qi(Nplayers);
-	vector<arma::sp_mat> tempM;
-	vector<arma::vec> tempq;
-	vector<unsigned int> PlayerSizes{};
-	//
-	// unsigned int Nvar = Players.at(0).getNx()+Players.at(0).getNy();
-	// Get the KKT conditions for each player
-	unsigned int NvarTot{0};
-	PlayerSizes.push_back(NvarTot);
-	for(unsigned int i=0; i<=Nplayers;i++)
-	{
-		this->Players[i]->KKT(Mi[i], Ni[i], qi[i]); 
-		NvarTot += qi[i].n_elem;
-		PlayerSizes.push_back(NvarTot);
-	}
-	M.set_size(NvarTot, NvarTot);
-	q.set_size(NvarTot);
+	// Setting the class variables
+	this->n_LeadVar = n_LeadVar;
+	this->Players = Players;
+	this->Nplayers = Players.size();
+	this->MarketClearing = MC;
+	this->MCRHS = MCRHS;
+	// Setting the size of class variable vectors
+	this->primal_position.resize(this->Nplayers);
+	this->dual_position.resize(this->Nplayers);
+	// Defining the variable value
+	unsigned int pr_cnt{0}, dl_cnt{0}; // Temporary variables - primal count and dual count
+	vector<unsigned int> nCons(Nplayers); // Tracking the number of constraints in each player's problem
 	for(unsigned int i=0; i<Nplayers;i++)
 	{
-		M.submat(PlayerSizes[i], PlayerSizes[i], PlayerSizes[i+1], PlayerSizes[i+1]) = Mi[i];
-		q.rows(PlayerSizes[i], PlayerSizes[i+1]) = qi[i];
-	} 
-	return NvarTot;
+		primal_position.at(i)=pr_cnt;
+		pr_cnt += Players.at(i)->getNy();
+		nCons.at(i) = Players.at(i)->getNx();
+	}
+	// Pushing back the end of primal position
+	primal_position.push_back(pr_cnt);
+	dl_cnt = pr_cnt; // From now on, the space is for dual variables.
+	this->MC_dual_position = dl_cnt;
+	this->Leader_position = dl_cnt+MCRHS.n_rows;
+	dl_cnt += (MCRHS.n_rows + n_LeadVar);
+	for(unsigned int i=0; i<Nplayers;i++)
+	{
+		dual_position.at(i) = dl_cnt;
+		dl_cnt += Players.at(i)->getb().n_rows;
+	}
+	// Pushing back the end of dual position
+	dual_position.push_back(dl_cnt);
+}
+
+unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q) const
+{
+	// To store the individual KKT conditions for each player.
+	vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers); 
+	vector<arma::vec> qi(Nplayers);
+	// vector<arma::sp_mat> tempM;
+	// vector<arma::vec> tempq;
+	
+	unsigned int NvarFollow{0}, NvarLead{0};
+	// Total number of lower level variables is
+	// Position where last player's duals end + 
+	// Number of lower level Market clearing duals.
+	// NvarFollow = this->dual_position.back()+this->MarketClearing.n_rows;
+	NvarLead = this->dual_position.back();//MarketClearing.n_cols; // Number of Leader variables (all variables)
+	NvarFollow = NvarLead - this->n_LeadVar;
+	M.set_size(NvarFollow, NvarLead);
+	q.set_size(NvarFollow);
+	M.zeros(); q.zeros(); // Make sure that the matrices don't have garbage value filled in !  
+	// Get the KKT conditions for each player
+	for(unsigned int i=0; i<Nplayers;i++)
+	{
+		this->Players[i]->KKT(Mi[i], Ni[i], qi[i]); 
+		unsigned int Nprim, Ndual;
+		Nprim = this->Players[i]->getNy();
+		Ndual = this->Players[i]->getA().n_rows;
+		// Adding the primal equations
+		// Region 1 in Formulate LCP.ipe
+		if(i>0) // For the first player, no need to add anything 'before' 0-th position
+			M.submat(
+				   	this->primal_position.at(i), 0,
+					this->primal_position.at(i+1)-1, this->primal_position.at(i)-1
+					) = Ni[i].submat(0,0,Nprim-1,this->primal_position.at(i)-1);
+		// Region 2 in Formulate LCP.ipe
+		M.submat(
+				   	this->primal_position.at(i),  this->primal_position.at(i),
+					this->primal_position.at(i+1)-1, this->primal_position.at(i+1)-1
+				) = Mi[i].submat(0,0,Nprim-1,Nprim-1);
+		// Region 3 in Formulate LCP.ipe
+		M.submat(
+					this->primal_position.at(i),  this->primal_position.at(i+1),
+					this->primal_position.at(i+1)-1, this->dual_position.at(0)-1
+				) = Ni[i].submat(0,this->primal_position.at(i),Nprim-1,Ni[i].n_cols-1);
+		// Region 4 in Formulate LCP.ipe
+		M.submat(
+					this->primal_position.at(i),  this->dual_position.at(i),
+					this->primal_position.at(i+1)-1, this->dual_position.at(i+1)-1
+				) = Mi[i].submat(0, Nprim, Nprim-1, Nprim+Ndual-1);
+		// RHS
+		q.subvec(this->primal_position.at(i), this->primal_position.at(i+1)-1) = qi[i].subvec(0, Nprim-1);
+		// Adding the dual equations
+		// Region 5 in Formulate LCP.ipe
+		if(i>0) // For the first player, no need to add anything 'before' 0-th position
+			M.submat(
+				   	this->dual_position.at(i)-n_LeadVar, 0,
+					this->dual_position.at(i+1)-n_LeadVar-1, this->primal_position.at(i)-1
+					) = Ni[i].submat(Nprim,0,Ni[i].n_rows-1,this->primal_position.at(i)-1);
+		// Region 6 in Formulate LCP.ipe
+		M.submat(
+				   	this->dual_position.at(i)-n_LeadVar,  this->primal_position.at(i),
+					this->dual_position.at(i+1)-n_LeadVar-1, this->primal_position.at(i+1)-1
+				) = Mi[i].submat(Nprim,0,Nprim+Ndual-1,Nprim-1);
+		// Region 7 in Formulate LCP.ipe
+		M.submat(
+					this->dual_position.at(i)-n_LeadVar,  this->primal_position.at(i+1),
+					this->dual_position.at(i+1)-n_LeadVar-1, this->dual_position.at(0)-1
+				) = Ni[i].submat(Nprim,this->primal_position.at(i),Ni[i].n_rows-1,Ni[i].n_cols-1);
+		// Region 8 in Formulate LCP.ipe
+		M.submat(
+					this->dual_position.at(i)-n_LeadVar,  this->dual_position.at(i),
+					this->dual_position.at(i+1)-n_LeadVar-1, this->dual_position.at(i+1)-1
+				) = Mi[i].submat(Nprim, Nprim, Nprim+Ndual-1, Nprim+Ndual-1);
+		// RHS
+		q.subvec(this->dual_position.at(i)-n_LeadVar, this->dual_position.at(i+1)-n_LeadVar-1) = qi[i].subvec(Nprim, qi[i].n_rows-1);
+	}
+	M.submat(this->MC_dual_position,0,this->Leader_position-1,this->dual_position.at(0)-1) = this->MarketClearing;
+	q.subvec(this->MC_dual_position,this->Leader_position-1) = -this->MCRHS;
+	return NvarFollow;
 }

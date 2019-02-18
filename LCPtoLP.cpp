@@ -153,7 +153,7 @@ int LCPasLPTree(const arma::sp_mat M, 	// 0 \leq x \perp Mx+Ny+q \geq 0 -> M
 		)
 /*
 	Creates the matrices A_i and b_i in A_ix \leq b_i notation where each of them is a polyhedron 
-	whose union is the solution to the original LP
+	whose union is the solution to the original LCP
 */
 {
 	// Erase the vectors A and b if cleanup is given
@@ -178,7 +178,7 @@ int LCPasLPTree(const arma::sp_mat M, 	// 0 \leq x \perp Mx+Ny+q \geq 0 -> M
 	for (long long unsigned int i = 0; i< n_Poly;i++)
 	{
 		int SelecOfTwo[n_Vars];
-		bool EmptyFlag{false};
+		bool EmptyFlag {false};
 		arma::sp_mat Ai(3*n_Vars, n_Vars + n_yVars);
 		arma::vec bi(3*n_Vars, arma::fill::zeros);
 		arma::vec soli(n_Vars + n_yVars, arma::fill::zeros);

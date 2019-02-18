@@ -38,21 +38,19 @@ int LCPasLP(const arma::sp_mat M,	const arma::vec q,	vector<arma::sp_mat> &A,vec
 int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i);
 bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 
-
-
 /************************************************************************************************************************/
 /* 																														*/
 /******************************************			FROM GAMES.CPP				*****************************************/ 
 /* 																														*/
 /************************************************************************************************************************/
 
-
 class QP_Param
 /* 
  * Represents a Parameterized QP as
- * \max_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y
+ * \min_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y
  * Subject to
  * Ax + By <= b
+ * y >= 0
 */
 {
 	private: // Data representing the parameterized QP
@@ -67,8 +65,8 @@ class QP_Param
 		QP_Param(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 		{
 			this->set(Q, C, A, B, c, b);
+			this->size();
 		}
-		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
 	public: // Set some data
 		QP_Param& set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Copy data into this
 		QP_Param& setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Move data into this
@@ -77,24 +75,27 @@ class QP_Param
 		arma::sp_mat getB() const; arma::vec getc() const; arma::vec getb() const;
 		unsigned int getNx() const; unsigned int getNy() const;
 	public: // Other methods
-		bool is_Playable(QP_Param P const) const;
+		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
+		bool is_Playable(const QP_Param P) const;
 };
-
-
 
 class NashGame
 {
 	public: // Variables
 		unsigned int Nplayers;
 		vector<QP_Param*> Players;
-		arma::mat MarketClearing;
+		arma::sp_mat MarketClearing;
+		arma::vec MCRHS;			// RHS to the Market Clearing constraints
 		// In the vector of variables of all players,
 		// which position does the variable corrresponding to this player starts.
 		vector<unsigned int> primal_position; 
 		vector<unsigned int> dual_position; 
-		vecor<unsigned int> MC_dual_position;
+		unsigned int MC_dual_position;
+		unsigned int Leader_position; // Position from where leader's vars start
+		unsigned int n_LeadVar;
 	public: // Constructors
-		NashGame(unsigned int Nplayers):Nplayers{Nplayers} 
+		NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar=0);
+		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0):Nplayers{Nplayers} , n_LeadVar{n_LeadVar}
 		{
 			Players.resize(this->Nplayers); 
 			primal_position.resize(this->Nplayers);
@@ -105,11 +106,5 @@ class NashGame
 };
 
 void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
-
-
-
-
-
-
 
 #endif

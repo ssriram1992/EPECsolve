@@ -5,7 +5,7 @@
 #include<gurobi_c++.h>
 #include<armadillo>
 #include<iostream>
-#define VERBOSE 0
+#define VERBOSE true
 
 using namespace std;
 
@@ -14,13 +14,70 @@ const int L1F = 2;
 const int L2F = 2;
 
 array<double, L1F> CL1F{5,7};
-array<double, L2F> CL2F{5,7};
+array<double, L2F> CL2F{4,8};
+array<double, L1F> CapL1F{500,700};
+array<double, L2F> CapL2F{400,800};
 
 const double L1F_alph = 1000;
 const double L1F_beta = 1;
 
+const double L2F_alph = 1200;
+const double L2F_beta = 1.5;
 
 int main()
+{
+	QP_Param *L1F1 = new QP_Param();
+	QP_Param *L1F2 = new QP_Param();
+	// For L1F1
+	arma::sp_mat Q(1,1);
+	Q(0,0) = L1F_beta;
+	arma::vec c(1);
+	c(0) = CL1F[0]-L1F_alph;
+	arma::sp_mat C(1, 6);
+	// Order Sould be: Other follower's variable, MC dual, q_imp^a, q_imp^B, t1, t2 
+	C(0,0) = L1F_beta;
+	C(0,4) = 1;
+	C(0,2) = L1F_beta;
+	// Constraints of L1F1
+	arma::vec b(1);
+	b(0)=CapL1F[0];
+	arma::sp_mat A(1,6), B(1,1);
+	B(0,0) = 1;
+	L1F1->setMove(Q, C, A, B, c, b);
+	// For L1F2
+	Q.zeros(); c.zeros(); C.zeros(); A.zeros(); B.zeros(); b.zeros();
+	Q(0,0) = L1F_beta;
+	c(0) = CL1F[1]-L1F_alph;
+	C(0,0) = L1F_beta;
+	C(0,5) = 1;
+	C(0,3) = L1F_beta;
+	// Constraints of L1F1
+	b(0)=CapL1F[1];
+	B(0,0) = 1;
+	L1F2->setMove(Q, C, A, B, c, b);
+
+	// Market clearing constraints
+	arma::sp_mat MC(1,7);
+	MC(0,3)=1;MC(0,4)=-1;
+	arma::vec MCRHS(1);
+	MCRHS.zeros();
+
+	// Nash Game
+	//
+	vector<QP_Param*> L1 {L1F1, L1F2};
+	
+	NashGame *MyGame = new NashGame(L1, MC, MCRHS, 4);
+	arma::sp_mat M;
+	arma::vec q;
+	MyGame->FormulateLCP(M,q);
+	M.print_dense("M"); 
+	q.print();
+	M.save("M.txt", arma::coord_ascii);
+	q.save("q.txt", arma::arma_ascii);
+	return 0;
+}
+
+int main2()
 {
 	vector<arma::sp_mat> Ai{};
 	vector<arma::vec> bi{};
@@ -65,7 +122,9 @@ int main()
 	cout<<endl;
 	Anew.impl_print_dense("A");
 	bnew.print("b");
+	Anew.save("Anew.txt",arma::coord_ascii);
 	// A.print("A");
 	// b.print("b");
 	// 0 \leq x \perp Mx + Ny + q \geq 0 constraints in the MPEC.
+	return 0;
 }
