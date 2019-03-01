@@ -1,8 +1,12 @@
 #ifndef FUNC_H
 #define FUNC_H
 
+#define VERBOSE false
+#include<algorithm>
 #include<iostream>
 #include<ctime>
+#include<vector>
+#include<utility>
 #include<cstdlib>
 #include<gurobi_c++.h>
 #include<armadillo>
@@ -33,8 +37,84 @@ vector<unsigned int> makeCompactPolyhedron(const arma::sp_mat A, const arma::vec
 /******************************************			FROM LCPTOLP.CPP			*****************************************/ 
 /* 																														*/
 /************************************************************************************************************************/
-int LCPasLPTree(const arma::sp_mat M, const arma::sp_mat N,	const arma::vec q,	vector<arma::sp_mat> &A,vector<arma::vec> &b, vector<arma::vec> &sol,	bool cleanup);
-int LCPasLP(const arma::sp_mat M,	const arma::vec q,	vector<arma::sp_mat> &A,vector<arma::vec> &b, vector<arma::vec> &sol,	bool cleanup , 	bool Gurobiclean );
+
+typedef vector<pair<unsigned int, unsigned int>> perps  ;
+ostream& operator<<(ostream& ost, perps C);
+bool operator < (vector<int> Fix1, vector<int> Fix2);
+bool operator == (vector<int> Fix1, vector<int> Fix2);
+template <class T> ostream& operator<<(ostream& ost, vector<T> v);
+template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
+
+
+class LCP{
+	/**
+	* A class to handle linear complementarity problems (LCP)
+	* especially as MIPs with bigM constraints
+	*/
+	private:
+	// Essential data
+		GRBEnv* env;
+		arma::sp_mat M; arma::vec q; perps Compl; /// Compl stores data in <Eqn, Var> form.
+		unsigned int LeadStart, LeadEnd, nLeader;
+	// Temporary data
+		bool madeRlxdModel;
+		unsigned int nR, nC;
+		vector<vector<int>*>* AllPolyhedra;
+	   	GRBModel RlxdModel;
+	public: 
+	// Fudgible data
+		long double bigM;
+		long double eps;
+	public:
+	/** Constructors */
+		LCP() = delete;	/// Class has no default constructors
+		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd); // Constructor with M,q,leader posn
+		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl); // Constructor with M, q, compl pairs
+	/** Return data and address */
+		arma::sp_mat getM() {return this->M;}  arma::sp_mat* getMstar() {return &(this->M);}
+		arma::vec getq() {return this->q;}  arma::vec* getqstar() {return &(this->q);}
+		unsigned int getLStart(){return LeadStart;} unsigned int getLEnd(){return LeadEnd;}
+		perps getCompl() {return this->Compl;}  
+		friend ostream& operator<<(ostream& ost, const LCP L);
+	/* Member functions */
+	private:
+		bool errorCheck(bool throwErr=true) const;
+		void defConst(GRBEnv* env);
+		int makeRelaxed();
+		template<class T> bool isZero(const T val) const { return (val>-eps && val < eps);}
+		vector<int>* solEncode(GRBModel *model)const;
+		vector<int>* solEncode(const arma::vec &z, const arma::vec &x)const;
+		void branch(int loc, const vector<int> *Fixes);
+		vector<int>* anyBranch(const vector<vector<int>*>* vecOfFixes, vector<int>* Fix) const;
+		int BranchLoc(GRBModel* m, vector<int>* Fix);
+		int BranchProcLoc(vector<int>* Fix, vector<int> *Leaf);
+	public:
+		GRBModel* LCPasMIP(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={}, bool solve=false);
+		GRBModel* LCPasMIP(vector<int> Fixes, bool solve);
+		GRBModel* LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={});
+		GRBModel* LCP_Polyhed_fixed(arma::Col<int> FixEq, arma::Col<int> FixVar);
+		bool extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ = false) const;
+
+		vector<vector<int>*> *BranchAndPrune ();
+};
+
+
+int LCPasLPTree(
+		const arma::sp_mat M,
+	   	const arma::sp_mat N,
+		const arma::vec q,
+		vector<arma::sp_mat> &A,
+		vector<arma::vec> &b,
+	   	vector<arma::vec> &sol,
+		bool cleanup);
+int LCPasLP(
+		const arma::sp_mat M,
+		const arma::vec q,
+		vector<arma::sp_mat> &A,
+		vector<arma::vec> &b,
+	   	vector<arma::vec> &sol,
+		bool cleanup ,
+		bool Gurobiclean );
 int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i);
 bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 
@@ -44,7 +124,6 @@ bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 /* 																														*/
 /************************************************************************************************************************/
 
-template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 class QP_Param
 /* 
  * Represents a Parameterized QP as
@@ -103,7 +182,7 @@ class NashGame
 			dual_position.resize(this->Nplayers);
 		}
 	public: // Members
-		unsigned int FormulateLCP(arma::sp_mat &M, arma::vec &q) const;
+		unsigned int FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const;
 };
 
 void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);

@@ -77,10 +77,10 @@ int main_LCP()
 
 
 int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i)
-	/*
-	 * Given the size of the output vector "size", and the number "i" in decimal form
-	 * converts it into a decimal string of length "size" and stores it in "selecOfTwo"
-	 */
+/*
+ * Given the size of the output vector "size", and the number "i" in decimal form
+ * converts it into a decimal string of length "size" and stores it in "selecOfTwo"
+ */
 {
 	for (unsigned int j = size-1; j!=0; j--)
 	{
@@ -123,11 +123,8 @@ bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol)
 		model.addConstr(linexp <= b(i));
 	}
 
-	try{
-		model.optimize();
-	} catch(exception &e){
-		cerr<<"Exception: "<<e.what()<<endl;
-	}
+	try{ model.optimize(); }
+   	catch(exception &e){ cerr<<"Exception: "<<e.what()<<endl; }
 
 	int optimstatus;
 	optimstatus = model.get(GRB_IntAttr_Status);

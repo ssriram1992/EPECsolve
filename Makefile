@@ -2,7 +2,7 @@
 
 # File name and output name
 PROJECT=EPEC
-FILEEPEC=BalasPolyhedron.o LCPtoLP.o EPEC.o Games.o
+FILEEPEC=BalasPolyhedron.o LCPtoLP.o EPEC.o Games.o LCPTree.o
 OUTPUT=$(PROJECT)
 ARGS=
 
@@ -21,20 +21,24 @@ GUROPT=$(GURINC) $(GURLIB)
 
 # Generic objects not requiring changes
 GCC=g++
-OTHEROPTS=-fopenmp -O2 -Wall
+OTHEROPTS=-fopenmp -O2 -Wall -std=c++11
 OPTS= $(GUROPT) $(ARMAOPT)  $(OTHEROPTS)
 
 runEPEC: compileEPEC
 	./$(OUTPUT) $(ARGS)
 
-compileEPEC: BalasPolyhedron.o LCPtoLP.o EPEC.o func.h Games.o
+compileEPEC: BalasPolyhedron.o LCPtoLP.o EPEC.o func.h Games.o LCPTree.o
 	$(GCC) $(FILEEPEC) $(OPTS) -o $(OUTPUT) 
 
 BalasPolyhedron.o: func.h BalasPolyhedron.cpp
-	$(GCC) -c BalasPolyhedron.cpp $(OPTS) 
+	@echo "Compiling BalasPolyhedron.cpp omited"
+#$(GCC) -c BalasPolyhedron.cpp $(OPTS) 
 
 LCPtoLP.o: func.h LCPtoLP.cpp
 	$(GCC) -c LCPtoLP.cpp $(OPTS) 
+
+LCPTree.o: func.h LCPtoLP.o LCPTree.cpp
+	$(GCC) -c LCPTree.cpp $(OPTS)
 
 EPEC.o: func.h EPEC.cpp
 	$(GCC) -c EPEC.cpp $(OPTS)
@@ -51,3 +55,5 @@ game: func.h Games.cpp
 	$(GCC) Games.o LCPtoLP.o BalasPolyhedron.o func.h -o Games $(OPTS)
 	./Games
 
+open: 
+	vim -p func.h Games.cpp EPEC.cpp LCPtoLP.cpp LCPTree.cpp
