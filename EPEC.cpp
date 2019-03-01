@@ -1,14 +1,15 @@
 #include<iostream>
+#include<exception>
 #include"func.h"
 #include<ctime>
 #include<cstdlib>
 #include<gurobi_c++.h>
 #include<armadillo>
 #include<iostream>
-#define VERBOSE false
 
 using namespace std;
 
+/********** DATA ***************/
 const int N_lead = 2;
 const int L1F = 2;
 const int L2F = 2;
@@ -23,8 +24,9 @@ const double L1F_beta = 1;
 
 const double L2F_alph = 1200;
 const double L2F_beta = 1.5;
+/********** DATA ***************/
 
-int main()
+int game2LCPtest(arma::sp_mat &M, arma::vec &q, perps &Compl)
 {
 	QP_Param *L1F1 = new QP_Param();
 	QP_Param *L1F2 = new QP_Param();
@@ -63,23 +65,70 @@ int main()
 	MCRHS.zeros();
 
 	// Nash Game
-	//
 	vector<QP_Param*> L1 {L1F1, L1F2};
-	cout<<*L1F1;
+	// cout<<*L1F1;
 	
 	NashGame *MyGame = new NashGame(L1, MC, MCRHS, 4);
-	cout<<(*MyGame);
-	arma::sp_mat M;
-	arma::vec q;
-	MyGame->FormulateLCP(M,q);
+	// cout<<(*MyGame);
+	MyGame->FormulateLCP(M,q, Compl);
 	M.print_dense("M"); 
-	q.print();
+	q.print("q");
 	M.save("M.txt", arma::coord_ascii);
 	q.save("q.txt", arma::arma_ascii);
+	delete MyGame;
+	delete L1F1;
+	delete L1F2;
 	return 0;
 }
 
-int main2()
+
+int main()
+{
+	GRBEnv env = GRBEnv();
+	GRBModel* model=nullptr;
+	arma::sp_mat M;		 arma::vec q;		 perps Compl;
+
+	game2LCPtest(M,q,Compl);
+	LCP MyNashGame = LCP(&env, M, q, Compl);
+	try
+	{
+		// model->set(GRB_IntParam_OutputFlag,0);
+		// model = MyNashGame.LCPasMIP();
+		// model->optimize();
+		// // model = LCPasMIP(model, M, q, 3, 6, 10000,{0},{1});
+// 
+		// for(unsigned int i=0;i<M.n_cols;i++)
+			// cout<<"x["<<i<<"]: \t"<<model->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X)<<endl;
+		// for(unsigned int i=0;i<M.n_rows;i++)
+			// cout<<model->getVarByName("z_"+to_string(i)).get(GRB_DoubleAttr_X)<<endl;
+		// cout<<"Printing by complementarity"<<endl;
+		// for(auto p:Compl)
+		// {
+			// cout<<model->getVarByName("z_"+to_string(p.first)).get(GRB_DoubleAttr_X)<<"\t"<<
+				// model->getVarByName("x_"+to_string(p.second)).get(GRB_DoubleAttr_X)<<"\t"<<
+				// "\t\t"<<p.first<<"\t"<<p.second<<endl; 
+		// }
+		auto A = MyNashGame.BranchAndPrune();
+		cout<<A->size()<<endl;
+		for(auto v:*A)
+		{
+			for(auto u:*v) cout<<u<<"\t";
+			cout<<endl;
+		}
+
+	}
+	catch(const char* e) { cout<<e<<endl; }
+	catch(string e) { cout<<"String: "<<e<<endl; }
+	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
+	delete model;
+	cout<<MyNashGame<<endl;
+	return 0;
+}
+
+
+
+int BalasTest()
 {
 	vector<arma::sp_mat> Ai{};
 	vector<arma::vec> bi{};

@@ -1,5 +1,4 @@
 #include<iostream>
-#define VERBOSE false
 #include"func.h"
 #include<armadillo>
 #include<array>
@@ -11,6 +10,18 @@ template <class T> ostream& operator<<(ostream& ost, vector<T> v)
 	for (auto elem:v) ost<<elem<<" ";
 	ost<<endl;
 	return ost;
+}
+
+template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p)
+{
+	cout<<"<"<<p.first<<", "<<p.second<<">";
+	return ost; 
+}
+ostream& operator<<(ostream& ost, perps C)
+{
+	 for (auto p:C)
+		cout<<"<"<<p.first<<", "<<p.second<<">"<<"\t";
+	return ost; 
 }
 
 ostream& operator<< (ostream& os, const QP_Param &Q)
@@ -38,11 +49,6 @@ ostream& operator<< (ostream& os, const NashGame N)
 	os<<"Number of leader variables:\t\t\t "<<N.n_LeadVar<<endl;
 	os<<"-----------------------------------------------------------------------"<<endl;
 	return os;
-}
-
-void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P) 
-{
-	
 }
 
 
@@ -180,7 +186,7 @@ NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, 
 	dual_position.push_back(dl_cnt);
 }
 
-unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q) const
+unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
 {
 	// To store the individual KKT conditions for each player.
 	vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers); 
@@ -223,6 +229,8 @@ unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q) const
 				) = Mi[i].submat(0, Nprim, Nprim-1, Nprim+Ndual-1);
 		// RHS
 		q.subvec(this->primal_position.at(i), this->primal_position.at(i+1)-1) = qi[i].subvec(0, Nprim-1);
+		for(unsigned int j=this->primal_position.at(i);j<this->primal_position.at(i+1);j++)
+			Compl.push_back({j, j});
 		// Adding the dual equations
 		// Region 5 in Formulate LCP.ipe
 		if(i>0) // For the first player, no need to add anything 'before' 0-th position
@@ -247,6 +255,8 @@ unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q) const
 				) = Mi[i].submat(Nprim, Nprim, Nprim+Ndual-1, Nprim+Ndual-1);
 		// RHS
 		q.subvec(this->dual_position.at(i)-n_LeadVar, this->dual_position.at(i+1)-n_LeadVar-1) = qi[i].subvec(Nprim, qi[i].n_rows-1);
+		for(unsigned int j=this->dual_position.at(i)-n_LeadVar;j<this->dual_position.at(i+1)-n_LeadVar;j++)
+			Compl.push_back({j, j+n_LeadVar});
 	}
 	M.submat(this->MC_dual_position,0,this->Leader_position-1,this->dual_position.at(0)-1) = this->MarketClearing;
 	q.subvec(this->MC_dual_position,this->Leader_position-1) = -this->MCRHS;

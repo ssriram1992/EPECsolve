@@ -4,8 +4,6 @@
 #include<cstdlib>
 #include<gurobi_c++.h>
 #include<armadillo>
-// Define this as 0 if you don't want the equations fo each polyhedron printed out.
-#define VERBOSE 0
 
 #include<exception>
 
@@ -403,17 +401,12 @@ vector<unsigned int> makeCompactPolyhedron(const arma::sp_mat A, const arma::vec
 		model.remove(Constraints[i]);
 		try{ model.optimize();}
 		catch(exception &e) { cerr<<"Exception: "<<e.what()<<endl; }
+		catch(GRBException &e){cerr<<"Exception: "<<e.getErrorCode()<<"; "<<e.getMessage();}
 		auto optimstatus = model.get(GRB_IntAttr_Status);
 		if(optimstatus != GRB_UNBOUNDED && optimstatus != 4) // 4 is for infeasible or unbounded
-		{
 			obj = model.get(GRB_DoubleAttr_ObjVal);
-			if(obj > b[i])
-			{
-				remainConst.push_back(i);
-				model.addConstr(LinExpr[i], GRB_LESS_EQUAL, b[i]);
-			}
-		}
-		else
+		else obj = b[i]+1; // Just set a larger objective temporarily, so we enter next "if" construct.
+		if(obj > b[i])
 		{
 			remainConst.push_back(i);
 			model.addConstr(LinExpr[i], GRB_LESS_EQUAL, b[i]);
