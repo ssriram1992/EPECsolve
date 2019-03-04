@@ -55,5 +55,13 @@ game: func.h Games.cpp
 	$(GCC) Games.o LCPtoLP.o BalasPolyhedron.o func.h -o Games $(OPTS)
 	./Games
 
+sand: sand.o
+	$(GCC) sand.o $(OPTS) -o sand
+	./sand
+
+sand.o: sand.cpp
+	$(GCC) -c sand.cpp $(OPTS)
+
+
 open: 
 	vim -p func.h Games.cpp EPEC.cpp LCPtoLP.cpp LCPTree.cpp

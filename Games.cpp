@@ -260,5 +260,7 @@ unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl)
 	}
 	M.submat(this->MC_dual_position,0,this->Leader_position-1,this->dual_position.at(0)-1) = this->MarketClearing;
 	q.subvec(this->MC_dual_position,this->Leader_position-1) = -this->MCRHS;
+	for(unsigned int j=this->MC_dual_position;j<this->Leader_position;j++)
+		Compl.push_back({j, j}); 
 	return NvarFollow;
 }

@@ -56,6 +56,7 @@ class LCP{
 		GRBEnv* env;
 		arma::sp_mat M; arma::vec q; perps Compl; /// Compl stores data in <Eqn, Var> form.
 		unsigned int LeadStart, LeadEnd, nLeader;
+		arma::sp_mat _A; arma::vec _b;		// Apart from 0 \leq x \perp Mx+q\geq 0, one needs Ax\leq b too!
 	// Temporary data
 		bool madeRlxdModel;
 		unsigned int nR, nC;
@@ -68,8 +69,8 @@ class LCP{
 	public:
 	/** Constructors */
 		LCP() = delete;	/// Class has no default constructors
-		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd); // Constructor with M,q,leader posn
-		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl); // Constructor with M, q, compl pairs
+		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={}); // Constructor with M,q,leader posn
+		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A={}, arma::vec b={}); // Constructor with M, q, compl pairs
 	/** Return data and address */
 		arma::sp_mat getM() {return this->M;}  arma::sp_mat* getMstar() {return &(this->M);}
 		arma::vec getq() {return this->q;}  arma::vec* getqstar() {return &(this->q);}
@@ -93,9 +94,10 @@ class LCP{
 		GRBModel* LCPasMIP(vector<int> Fixes, bool solve);
 		GRBModel* LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={});
 		GRBModel* LCP_Polyhed_fixed(arma::Col<int> FixEq, arma::Col<int> FixVar);
-		bool extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ = false) const;
-
+		bool extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ = false) const; 
 		vector<vector<int>*> *BranchAndPrune ();
+	public:
+		int ConvexHull(arma::sp_mat* A, arma::vec *b);
 };
 
 

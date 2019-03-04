@@ -90,24 +90,9 @@ int main()
 
 	game2LCPtest(M,q,Compl);
 	LCP MyNashGame = LCP(&env, M, q, Compl);
+	cout<<Compl;
 	try
 	{
-		// model->set(GRB_IntParam_OutputFlag,0);
-		// model = MyNashGame.LCPasMIP();
-		// model->optimize();
-		// // model = LCPasMIP(model, M, q, 3, 6, 10000,{0},{1});
-// 
-		// for(unsigned int i=0;i<M.n_cols;i++)
-			// cout<<"x["<<i<<"]: \t"<<model->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X)<<endl;
-		// for(unsigned int i=0;i<M.n_rows;i++)
-			// cout<<model->getVarByName("z_"+to_string(i)).get(GRB_DoubleAttr_X)<<endl;
-		// cout<<"Printing by complementarity"<<endl;
-		// for(auto p:Compl)
-		// {
-			// cout<<model->getVarByName("z_"+to_string(p.first)).get(GRB_DoubleAttr_X)<<"\t"<<
-				// model->getVarByName("x_"+to_string(p.second)).get(GRB_DoubleAttr_X)<<"\t"<<
-				// "\t\t"<<p.first<<"\t"<<p.second<<endl; 
-		// }
 		auto A = MyNashGame.BranchAndPrune();
 		cout<<A->size()<<endl;
 		for(auto v:*A)
@@ -133,7 +118,7 @@ int BalasTest()
 	vector<arma::sp_mat> Ai{};
 	vector<arma::vec> bi{};
 
-	// for (int i=0;i<5;i++)
+
 	// {
 		// Ai.push_back(static_cast<arma::sp_mat>(arma::randi<arma::mat>(10+ i*i - i, 50, arma::distr_param(1,10))));
 		// bi.push_back(arma::randi<arma::vec>(10 + i*i -i, arma::distr_param(1,i+2)));

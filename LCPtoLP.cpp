@@ -31,7 +31,7 @@ void LCP::defConst(GRBEnv* env)
 }
 
 
-LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl):M{M}, q{q}, RlxdModel(*env) /// Constructor with M, q, compl pairs
+LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A, arma::vec b):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) /// Constructor with M, q, compl pairs
 {
 	defConst(env);
 	this->Compl = Compl;
@@ -49,7 +49,7 @@ LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl):M{M}, q{q}, Rlxd
 		}
 }
 
-LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd):M{M}, q{q}, RlxdModel(*env) /// Constructor with M,q,leader posn
+LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A, arma::vec b):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) /// Constructor with M,q,leader posn
 {
 	defConst(env);
 	this->LeadStart = LeadStart; this->LeadEnd = LeadEnd;
@@ -74,16 +74,22 @@ int LCP::makeRelaxed()
 		{
 			GRBLinExpr expr = 0;
 			for(auto v=M.begin_row(i); v!=M.end_row(i); ++v)
-			{
 				expr += (*v) * x[v.col()];
-				if(VERBOSE)
-					cout<<(*v)<<"x["<<v.col()<<"]"<<"+";
-			}
 			expr += q(i);
-			if(VERBOSE)
-				cout<<q(i)<<" \t=\t z["<<i<<"]\n";
 			RlxdModel.addConstr(expr, GRB_EQUAL, z[i]);
 		} 
+		// If Ax \leq b constraints are there, they should be included too!
+		if(this->_A.n_nonzero != 0 || this->_b.n_rows!=0)
+		{ 
+			if(_A.n_cols != nC || _A.n_rows != _b.n_rows) throw "A and b are incompatible! Thrown from makeRelaxed()";
+			for(unsigned int i=0;i<_A.n_rows;i++)
+			{
+				GRBLinExpr expr = 0;
+				for(auto a=_A.begin_row(i); a!=M.end_row(i); ++a)
+					expr += (*a) * x[a.col()];
+				RlxdModel.addConstr(expr, GRB_LESS_EQUAL, _b(i));
+			}
+		}
 		RlxdModel.update();
 		this->madeRlxdModel = true;
 	}
@@ -160,8 +166,8 @@ GRBModel* LCP::LCPasMIP(vector<int> Fixes, bool solve)
 
 
 GRBModel* LCP::LCPasMIP(
-		vector<unsigned int> FixVar, // If any variable is to be fixed to equality
 		vector<unsigned int> FixEq,	// If any equation is to be fixed to equality
+		vector<unsigned int> FixVar, // If any variable is to be fixed to equality
 		bool solve // Whether the model should be solved in the function already!
 		)
 /**

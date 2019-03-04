@@ -20,11 +20,15 @@ bool operator == (vector<int> Fix1, vector<int> Fix2)
 bool operator < (vector<int> Fix1, vector<int> Fix2)
 /**
  * Returns true if Fix1 is (grand) child of Fix2
+ *  Defn Grand Parent:
+ *  	Either the same value as the grand child, or has 0 in that location
+ *  Defn Grand child:
+ *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
  */
 {
 	if(Fix1.size() != Fix2.size()) return false;
 	for(unsigned int i=0;i<Fix1.size();i++)
-		if(Fix1[i]!=Fix2[i] && Fix2[i]!=0)
+		if(Fix1[i]!=Fix2[i] && Fix1[i]*Fix2[i]!=0)
 			return false; // Fix1 is not a child of Fix2
 	return true;	 	// Fix1 is a child of Fix2
 }
@@ -40,7 +44,7 @@ vector<int>* LCP::anyBranch(const vector<vector<int>*>* vecOfFixes, vector<int>*
  */
 {
 	for(auto v:*vecOfFixes)
-		if(*v < *Fix||*v==*Fix) return v;
+		if(*Fix < *v||*v==*Fix) return v;
 	return NULL;
 }
 
@@ -89,15 +93,17 @@ void LCP::branch(int loc, const vector<int> *Fixes)
 	bool VarFirst=(loc<0);
 	GRBModel *FixEqMdl=nullptr, *FixVarMdl=nullptr;
 	vector<int> *FixEqLeaf, *FixVarLeaf;
-
-	loc = (loc>=0)?loc:(loc==-(int)nR?0:-loc);
 	if(VERBOSE) 
 	{
-		cout<<"Branching on Variable: "<<loc<<" with Fix as ";
+		cout<<endl<<"Branching on Variable: "<<loc<<" with Fix as ";
 		for(auto t1:*Fixes) cout<<t1<<"\t";
 		cout<<endl;
 	}
-	if(loc >=(signed int)nR) return;
+
+	loc = (loc>=0)?loc:(loc==-(int)nR?0:-loc);
+	if(loc >=(signed int)nR) {cout<<"nR: "<<nR<<"\tloc: "<<loc<<"\t Returning..."<<endl; return;}
+	else
+	{
 	GRBVar x,z;
 	vector<int> *FixesEq = new vector<int>(*Fixes);
 	vector<int> *FixesVar = new vector<int>(*Fixes);
@@ -123,6 +129,7 @@ void LCP::branch(int loc, const vector<int> *Fixes)
 		if(!FixVarLeaf) this->branch(BranchLoc(FixVarMdl, FixesVar), FixesVar); 
 		else this->branch(BranchProcLoc(FixesVar, FixVarLeaf),FixesVar); 
 	}
+	}
 }
 
 
@@ -136,14 +143,35 @@ vector<vector<int>*> *LCP::BranchAndPrune ()
 
 int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 {
+	static int GurCallCt {0};
 	m = this->LCPasMIP(*Fix, true);
+	GurCallCt++;
+	cout<<"Gurobi call\t"<<GurCallCt<<"\t";
+	for (auto a:*Fix) cout<<a<<"\t";
+	cout<<endl;
 	int pos;
 	pos = (signed int)nR;// Don't branch! You are at the leaf if pos never gets changed!!
 	arma::vec z,x;
 	if(this->extractSols(m, z, x, true)) // If already infeasible, nothing to branch!
 	{
 		vector<int> *v1 = this->solEncode(z,x);
-		this->AllPolyhedra->push_back(v1);
+		vector<int> *v2 = anyBranch(AllPolyhedra, v1);
+		if(VERBOSE)
+		{
+			cout<<"v1: \t\t\t";
+			for (auto a:*v1) cout<<a<<"\t";
+			cout<<"\t\t";
+			cout<<"v2: \t\t\t";
+			if(v2) for (auto a:*v2) cout<<a<<"\t";
+			else cout<<"NULL";
+			cout<<endl;
+		}
+		// if(v2==NULL)
+		{
+			this->AllPolyhedra->push_back(v1);
+			// cout<<"New Polyhedron found"<<endl;
+			// x.t().print("x");z.t().print("z");
+		}
 		////////////////////
 		// BRANCHING RULE //
 		////////////////////
@@ -170,6 +198,7 @@ int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 		// END OF BRANCHING RULE //
 		///////////////////////////
 	}
+	else {cout<<"Infeasible branch"<<endl;}
 	delete m;
 	return pos; 
 }
@@ -178,6 +207,12 @@ int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 int LCP::BranchProcLoc(vector<int>* Fix, vector<int> *Leaf)
 {
 	int pos = (int)nR;
+	if(VERBOSE)
+	{
+		cout<<"Processed Node \t\t";
+		for(auto a:*Fix) cout<<a<<"\t";
+		cout<<endl;
+	}
 	if(*Fix==*Leaf) return nR;
 	if(Fix->size()!=Leaf->size()) throw "Error in BranchProcLoc";
 	for(unsigned int i=0;i<Fix->size();i++)
