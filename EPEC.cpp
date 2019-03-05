@@ -90,7 +90,7 @@ int main()
 
 	game2LCPtest(M,q,Compl);
 	LCP MyNashGame = LCP(&env, M, q, Compl);
-	cout<<Compl;
+	cout<<Compl<<endl;
 	try
 	{
 		auto A = MyNashGame.BranchAndPrune();
@@ -99,8 +99,7 @@ int main()
 		{
 			for(auto u:*v) cout<<u<<"\t";
 			cout<<endl;
-		}
-
+		} 
 	}
 	catch(const char* e) { cout<<e<<endl; }
 	catch(string e) { cout<<"String: "<<e<<endl; }
@@ -113,6 +112,7 @@ int main()
 
 
 
+/*
 int BalasTest()
 {
 	vector<arma::sp_mat> Ai{};
@@ -164,3 +164,4 @@ int BalasTest()
 	// 0 \leq x \perp Mx + Ny + q \geq 0 constraints in the MPEC.
 	return 0;
 }
+*/

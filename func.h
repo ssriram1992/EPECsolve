@@ -38,10 +38,10 @@ vector<unsigned int> makeCompactPolyhedron(const arma::sp_mat A, const arma::vec
 /* 																														*/
 /************************************************************************************************************************/
 
-typedef vector<pair<unsigned int, unsigned int>> perps  ;
+using perps = vector<pair<unsigned int, unsigned int>>  ;
 ostream& operator<<(ostream& ost, perps C);
-bool operator < (vector<int> Fix1, vector<int> Fix2);
-bool operator == (vector<int> Fix1, vector<int> Fix2);
+inline bool operator < (vector<int> Fix1, vector<int> Fix2);
+inline bool operator == (vector<int> Fix1, vector<int> Fix2);
 template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
 
@@ -55,12 +55,13 @@ class LCP{
 	// Essential data
 		GRBEnv* env;
 		arma::sp_mat M; arma::vec q; perps Compl; /// Compl stores data in <Eqn, Var> form.
-		unsigned int LeadStart, LeadEnd, nLeader;
-		arma::sp_mat _A; arma::vec _b;		// Apart from 0 \leq x \perp Mx+q\geq 0, one needs Ax\leq b too!
+		unsigned int LeadStart, LeadEnd, nLeader; /// Positions and sizes of Leader variables
+		arma::sp_mat _A; arma::vec _b;		/// Apart from 0 \leq x \perp Mx+q\geq 0, one needs Ax\leq b too!
 	// Temporary data
 		bool madeRlxdModel;
 		unsigned int nR, nC;
 		vector<vector<int>*>* AllPolyhedra;
+		vector<arma::sp_mat*>* Ai; vector<arma::vec*>* bi;
 	   	GRBModel RlxdModel;
 	public: 
 	// Fudgible data
@@ -72,30 +73,37 @@ class LCP{
 		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={}); // Constructor with M,q,leader posn
 		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A={}, arma::vec b={}); // Constructor with M, q, compl pairs
 	/** Return data and address */
-		arma::sp_mat getM() {return this->M;}  arma::sp_mat* getMstar() {return &(this->M);}
-		arma::vec getq() {return this->q;}  arma::vec* getqstar() {return &(this->q);}
-		unsigned int getLStart(){return LeadStart;} unsigned int getLEnd(){return LeadEnd;}
-		perps getCompl() {return this->Compl;}  
+		inline arma::sp_mat getM() {return this->M;}  inline arma::sp_mat* getMstar() {return &(this->M);}
+		inline arma::vec getq() {return this->q;}  inline arma::vec* getqstar() {return &(this->q);}
+		inline unsigned int getLStart(){return LeadStart;} inline unsigned int getLEnd(){return LeadEnd;}
+		inline perps getCompl() {return this->Compl;}  
 		friend ostream& operator<<(ostream& ost, const LCP L);
 	/* Member functions */
 	private:
 		bool errorCheck(bool throwErr=true) const;
 		void defConst(GRBEnv* env);
 		int makeRelaxed();
-		template<class T> bool isZero(const T val) const { return (val>-eps && val < eps);}
-		vector<int>* solEncode(GRBModel *model)const;
+	public:
+		GRBModel* LCPasMIP(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={}, bool solve=false);
+		GRBModel* LCPasMIP(vector<int> Fixes, bool solve);
+		GRBModel* LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={});
+		GRBModel* LCP_Polyhed_fixed(arma::Col<int> FixEq, arma::Col<int> FixVar);
+	/* Branch and Prune Methods */
+	private:
+		template<class T> inline bool isZero(const T val) const { return (val>-eps && val < eps);}
+		inline vector<int>* solEncode(GRBModel *model)const;
 		vector<int>* solEncode(const arma::vec &z, const arma::vec &x)const;
 		void branch(int loc, const vector<int> *Fixes);
 		vector<int>* anyBranch(const vector<vector<int>*>* vecOfFixes, vector<int>* Fix) const;
 		int BranchLoc(GRBModel* m, vector<int>* Fix);
 		int BranchProcLoc(vector<int>* Fix, vector<int> *Leaf);
 	public:
-		GRBModel* LCPasMIP(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={}, bool solve=false);
-		GRBModel* LCPasMIP(vector<int> Fixes, bool solve);
-		GRBModel* LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={});
-		GRBModel* LCP_Polyhed_fixed(arma::Col<int> FixEq, arma::Col<int> FixVar);
 		bool extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ = false) const; 
 		vector<vector<int>*> *BranchAndPrune ();
+	/* Convex hull computation */
+	private:
+		void FixToPoly(const vector<int> *Fix);
+		void FixToPolies(const vector<int> *Fix);
 	public:
 		int ConvexHull(arma::sp_mat* A, arma::vec *b);
 };

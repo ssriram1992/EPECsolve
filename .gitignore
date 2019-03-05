@@ -1,3 +1,6 @@
+Archive.cpp
+sand.cpp
+sand
 EPEC
 FormulateLCP
 func.c
@@ -6,3 +9,4 @@ Games
 *.o
 *.swp
 *.txt
+LCP2LPold.cpp

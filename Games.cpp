@@ -17,6 +17,7 @@ template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p)
 	cout<<"<"<<p.first<<", "<<p.second<<">";
 	return ost; 
 }
+
 ostream& operator<<(ostream& ost, perps C)
 {
 	 for (auto p:C)

@@ -25,6 +25,7 @@ int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i)
 void LCP::defConst(GRBEnv* env)
 {
 	AllPolyhedra = new vector<vector<int>*> {};
+	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
 	if(!VERBOSE) this->RlxdModel.set(GRB_IntParam_OutputFlag,0);
 	this->env = env;  this->madeRlxdModel = false; this->bigM = 1e5; this->eps = 1e-5;
 	this->nR = this->M.n_rows; this->nC = this->M.n_cols;

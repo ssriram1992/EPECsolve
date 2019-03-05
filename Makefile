@@ -2,7 +2,7 @@
 
 # File name and output name
 PROJECT=EPEC
-FILEEPEC=BalasPolyhedron.o LCPtoLP.o EPEC.o Games.o LCPTree.o
+FILEEPEC=LCPtoLP.o EPEC.o Games.o LCPTree.o
 OUTPUT=$(PROJECT)
 ARGS=
 
@@ -27,7 +27,7 @@ OPTS= $(GUROPT) $(ARMAOPT)  $(OTHEROPTS)
 runEPEC: compileEPEC
 	./$(OUTPUT) $(ARGS)
 
-compileEPEC: BalasPolyhedron.o LCPtoLP.o EPEC.o func.h Games.o LCPTree.o
+compileEPEC: LCPtoLP.o func.h Games.o LCPTree.o EPEC.o 
 	$(GCC) $(FILEEPEC) $(OPTS) -o $(OUTPUT) 
 
 BalasPolyhedron.o: func.h BalasPolyhedron.cpp

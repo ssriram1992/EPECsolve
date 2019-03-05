@@ -4,8 +4,8 @@
 #include<gurobi_c++.h>
 #include<armadillo>
 
-#undef VERBOSE
-#define VERBOSE true
+// #undef VERBOSE
+// #define VERBOSE true
 
 using namespace std;
 
@@ -101,7 +101,12 @@ void LCP::branch(int loc, const vector<int> *Fixes)
 	}
 
 	loc = (loc>=0)?loc:(loc==-(int)nR?0:-loc);
-	if(loc >=(signed int)nR) {cout<<"nR: "<<nR<<"\tloc: "<<loc<<"\t Returning..."<<endl; return;}
+	if(loc >=(signed int)nR) 
+	{
+		if(VERBOSE)
+			cout<<"nR: "<<nR<<"\tloc: "<<loc<<"\t Returning..."<<endl; 
+		return;
+	}
 	else
 	{
 	GRBVar x,z;
@@ -146,9 +151,12 @@ int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 	static int GurCallCt {0};
 	m = this->LCPasMIP(*Fix, true);
 	GurCallCt++;
-	cout<<"Gurobi call\t"<<GurCallCt<<"\t";
-	for (auto a:*Fix) cout<<a<<"\t";
-	cout<<endl;
+	if(VERBOSE)
+	{
+		cout<<"Gurobi call\t"<<GurCallCt<<"\t";
+		for (auto a:*Fix) cout<<a<<"\t";
+		cout<<endl;
+	}
 	int pos;
 	pos = (signed int)nR;// Don't branch! You are at the leaf if pos never gets changed!!
 	arma::vec z,x;
@@ -169,8 +177,13 @@ int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 		// if(v2==NULL)
 		{
 			this->AllPolyhedra->push_back(v1);
-			// cout<<"New Polyhedron found"<<endl;
-			// x.t().print("x");z.t().print("z");
+			this->FixToPolies(v1);
+			
+			if(VERBOSE)
+			{
+				cout<<"New Polyhedron found"<<endl;
+				x.t().print("x");z.t().print("z");
+			}
 		}
 		////////////////////
 		// BRANCHING RULE //
@@ -198,7 +211,11 @@ int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 		// END OF BRANCHING RULE //
 		///////////////////////////
 	}
-	else {cout<<"Infeasible branch"<<endl;}
+	else 
+	{
+		if(VERBOSE)
+			cout<<"Infeasible branch"<<endl;
+	}
 	delete m;
 	return pos; 
 }
@@ -221,4 +238,51 @@ int LCP::BranchProcLoc(vector<int>* Fix, vector<int> *Leaf)
 		if(Fix->at(i)==0) return (l==0?-i:i*l);
 	}
 	return pos;
+}
+
+void LCP::FixToPoly(const vector<int> *Fix)
+{
+	arma::sp_mat Aii(nR, nC); arma::vec bii(nR, arma::fill::zeros);
+	for(unsigned int i=0;i<this->nR;i++)
+	{
+		if(Fix->at(i) == 0) throw "Error in FixToPoly";
+		if(Fix->at(i)==1) // Equation to be fixed top zero
+		{
+			for(auto j=this->M.begin_row(i); j!=this->M.end_row(i); ++j)
+				if(!this->isZero((*j))) Aii(i, j.col()) = (*j); // Only mess with non-zero elements of a sparse matrix!
+			bii(i) = this->q(i);
+		}
+		else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be added
+		{
+			unsigned int varpos = (i>this->LeadStart)?i+this->nLeader:i;
+			Aii(i, varpos) = 1; 
+			bii(i) = 0;
+		}
+	}
+	this->Ai->push_back(&Aii);
+	this->bi->push_back(&bii);
+	cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;
+}
+void LCP::FixToPolies(const vector<int> *Fix)
+{
+	bool flag = false;
+	vector<int> MyFix(*Fix);
+	unsigned int i;
+	for(i=0; i<this->nR;i++)
+		if(Fix->at(i)==0) { flag = true; break; }
+	if(flag)
+	{
+		MyFix[i] = 1;
+		this->FixToPolies(&MyFix);
+		MyFix[i] = -1;
+		this->FixToPolies(&MyFix);
+	}
+	else this->FixToPoly(Fix);
+}
+
+int LCP::ConvexHull(arma::sp_mat *A, arma::vec *b)
+{
+	if(VERBOSE) { A->print(""); b->print(""); }
+	
+	return 0;
 }
