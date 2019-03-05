@@ -82,7 +82,6 @@ vector<int>* LCP::solEncode(GRBModel *model) const
 	else return this->solEncode(z,x);
 }
 
-
 void LCP::branch(int loc, const vector<int> *Fixes) 
 /**
  * If loc == nR, then stop branching. We either hit infeasibility or a leaf.
@@ -136,7 +135,6 @@ void LCP::branch(int loc, const vector<int> *Fixes)
 	}
 	}
 }
-
 
 vector<vector<int>*> *LCP::BranchAndPrune ()
 {
@@ -220,7 +218,6 @@ int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 	return pos; 
 }
 
-
 int LCP::BranchProcLoc(vector<int>* Fix, vector<int> *Leaf)
 {
 	int pos = (int)nR;
@@ -240,7 +237,7 @@ int LCP::BranchProcLoc(vector<int>* Fix, vector<int> *Leaf)
 	return pos;
 }
 
-void LCP::FixToPoly(const vector<int> *Fix)
+void LCP::FixToPoly(const vector<int> *Fix, bool checkFeas)
 {
 	arma::sp_mat Aii(nR, nC); arma::vec bii(nR, arma::fill::zeros);
 	for(unsigned int i=0;i<this->nR;i++)
@@ -259,11 +256,35 @@ void LCP::FixToPoly(const vector<int> *Fix)
 			bii(i) = 0;
 		}
 	}
-	this->Ai->push_back(&Aii);
-	this->bi->push_back(&bii);
-	cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;
+	bool add = !checkFeas;
+	if(checkFeas)
+	{
+		unsigned int count{0};
+		try
+		{
+			makeRelaxed();
+			GRBModel* model = new GRBModel(this->RlxdModel);
+			for(auto i:*Fix)
+			{
+				if(i>0) // Fixing the eqn to zero
+					model->getVarByName("z_"+to_string(count)).set(GRB_DoubleAttr_UB,0);
+				if(i<0)
+					model->getVarByName("x_"+to_string(count>this->LeadStart?count+nLeader:i)).set(GRB_DoubleAttr_UB,0);
+				count++;
+			} 
+			model->optimize();
+			if(model->get(GRB_IntAttr_Status) == GRB_OPTIMAL) add = true;
+			delete model;
+		}
+		catch(const char* e) { cout<<e<<endl; }
+		catch(string e) { cout<<"String: "<<e<<endl; }
+		catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+		catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
+	}
+	if(add) { this->Ai->push_back(&Aii); this->bi->push_back(&bii); }
+	if(VERBOSE) cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;
 }
-void LCP::FixToPolies(const vector<int> *Fix)
+void LCP::FixToPolies(const vector<int> *Fix, bool checkFeas)
 {
 	bool flag = false;
 	vector<int> MyFix(*Fix);
@@ -273,16 +294,19 @@ void LCP::FixToPolies(const vector<int> *Fix)
 	if(flag)
 	{
 		MyFix[i] = 1;
-		this->FixToPolies(&MyFix);
+		this->FixToPolies(&MyFix, checkFeas);
 		MyFix[i] = -1;
-		this->FixToPolies(&MyFix);
+		this->FixToPolies(&MyFix, checkFeas);
 	}
-	else this->FixToPoly(Fix);
+	else this->FixToPoly(Fix, checkFeas);
 }
 
-int LCP::ConvexHull(arma::sp_mat *A, arma::vec *b)
+int LCP::EnumerateAll(const bool solveLP)
 {
-	if(VERBOSE) { A->print(""); b->print(""); }
-	
+	delete Ai; delete bi; // Just in case it is polluted with BranchPrune
+	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
+	vector<int> *Fix = new vector<int>(nR,0);
+	this->FixToPolies(Fix, solveLP);
 	return 0;
 }
+

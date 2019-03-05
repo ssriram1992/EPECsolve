@@ -45,12 +45,19 @@ inline bool operator == (vector<int> Fix1, vector<int> Fix2);
 template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
 
+int ConvexHull(
+		vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, // Individual constraints
+		arma::sp_mat *A, arma::vec *b, // To store outputs
+		arma::sp_mat Acom={}, arma::vec bcom={} // Common constraints.
+		);
 
-class LCP{
+class LCP
+{
 	/**
 	* A class to handle linear complementarity problems (LCP)
 	* especially as MIPs with bigM constraints
 	*/
+	friend class BranchPrune;
 	private:
 	// Essential data
 		GRBEnv* env;
@@ -97,16 +104,18 @@ class LCP{
 		vector<int>* anyBranch(const vector<vector<int>*>* vecOfFixes, vector<int>* Fix) const;
 		int BranchLoc(GRBModel* m, vector<int>* Fix);
 		int BranchProcLoc(vector<int>* Fix, vector<int> *Leaf);
+		int EnumerateAll(bool solveLP=false);
 	public:
 		bool extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ = false) const; 
 		vector<vector<int>*> *BranchAndPrune ();
 	/* Convex hull computation */
 	private:
-		void FixToPoly(const vector<int> *Fix);
-		void FixToPolies(const vector<int> *Fix);
+		void FixToPoly(const vector<int> *Fix, bool checkFeas = false);
+		void FixToPolies(const vector<int> *Fix, bool checkFeas = false);
 	public:
-		int ConvexHull(arma::sp_mat* A, arma::vec *b);
+		int ConvexHull(arma::sp_mat* A, arma::vec *b) {return ::ConvexHull(this->Ai, this->bi, A, b, _A, _b);};
 };
+
 
 
 int LCPasLPTree(
