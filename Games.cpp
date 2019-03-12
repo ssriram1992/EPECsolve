@@ -99,14 +99,6 @@ unsigned int QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 	return M.n_rows;
 }
 
-arma::sp_mat QP_Param::getQ() const { return this->Q; } 
-arma::sp_mat QP_Param::getC() const { return this->C; }
-arma::sp_mat QP_Param::getA() const { return this->A; }
-arma::sp_mat QP_Param::getB() const { return this->B; }
-arma::vec QP_Param::getc() const { return this->c; }
-arma::vec QP_Param::getb() const { return this->b; }
-unsigned int QP_Param::getNx() const { return this->Nx; }
-unsigned int QP_Param::getNy() const { return this->Ny; }
 
 QP_Param& QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 {
@@ -259,9 +251,13 @@ unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl)
 		for(unsigned int j=this->dual_position.at(i)-n_LeadVar;j<this->dual_position.at(i+1)-n_LeadVar;j++)
 			Compl.push_back({j, j+n_LeadVar});
 	}
-	M.submat(this->MC_dual_position,0,this->Leader_position-1,this->dual_position.at(0)-1) = this->MarketClearing;
-	q.subvec(this->MC_dual_position,this->Leader_position-1) = -this->MCRHS;
-	for(unsigned int j=this->MC_dual_position;j<this->Leader_position;j++)
-		Compl.push_back({j, j}); 
+	if(this->MCRHS.n_elem >= 1) // It is possible that it is a Cournot game and there are no MC conditions!
+	{
+		M.submat(this->MC_dual_position,0,this->Leader_position-1,this->dual_position.at(0)-1) = this->MarketClearing;
+		q.subvec(this->MC_dual_position,this->Leader_position-1) = -this->MCRHS;
+		for(unsigned int j=this->MC_dual_position;j<this->Leader_position;j++)
+			Compl.push_back({j, j}); 
+	}
 	return NvarFollow;
 }
+

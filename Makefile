@@ -2,7 +2,7 @@
 
 # File name and output name
 PROJECT=EPEC
-FILEEPEC=LCPtoLP.o EPEC.o Games.o LCPTree.o
+FILEEPEC=LCPtoLP.o EPEC.o Games.o 
 OUTPUT=$(PROJECT)
 ARGS=
 
@@ -27,7 +27,7 @@ OPTS= $(GUROPT) $(ARMAOPT)  $(OTHEROPTS)
 runEPEC: compileEPEC
 	./$(OUTPUT) $(ARGS)
 
-compileEPEC: LCPtoLP.o func.h Games.o LCPTree.o EPEC.o 
+compileEPEC: LCPtoLP.o func.h Games.o EPEC.o 
 	$(GCC) $(FILEEPEC) $(OPTS) -o $(OUTPUT) 
 
 BalasPolyhedron.o: func.h BalasPolyhedron.cpp
@@ -37,8 +37,8 @@ BalasPolyhedron.o: func.h BalasPolyhedron.cpp
 LCPtoLP.o: func.h LCPtoLP.cpp
 	$(GCC) -c LCPtoLP.cpp $(OPTS) 
 
-LCPTree.o: func.h LCPtoLP.o LCPTree.cpp
-	$(GCC) -c LCPTree.cpp $(OPTS)
+# LCPTree.o: func.h LCPTree.cpp
+# $(GCC) -c LCPTree.cpp $(OPTS)
 
 EPEC.o: func.h EPEC.cpp
 	$(GCC) -c EPEC.cpp $(OPTS)
@@ -64,4 +64,4 @@ sand.o: sand.cpp
 
 
 open: 
-	vim -p func.h Games.cpp EPEC.cpp LCPtoLP.cpp LCPTree.cpp
+	vim -p func.h Games.cpp EPEC.cpp LCPtoLP.cpp 

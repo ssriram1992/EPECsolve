@@ -13,11 +13,11 @@
 
 using namespace std;
 
-/************************************************************************************************************************/
-/* 																														*/
-/******************************************		FROM BALASPOLYHEDRON.CPP		*****************************************/ 
-/* 																														*/
-/************************************************************************************************************************/
+/*****************************************************/
+/* 	    										     */
+/**********		FROM BALASPOLYHEDRON.CPP		******/ 
+/* 	    										     */
+/*****************************************************/
 // Returns a Gurobi model which can optimize over the convex hull of the 
 // union of polyhedra described in A and b where A and b are dense
 GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
@@ -28,15 +28,17 @@ GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta
 GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
 		const vector<arma::mat> A, const vector<arma::vec> b);
 
-int PolyUnion(const vector<arma::sp_mat> Ai, const vector<arma::vec> bi, arma::sp_mat& A, arma::vec &b, bool Reduce=false);
+int PolyUnion(const vector<arma::sp_mat> Ai, const vector<arma::vec> bi, 
+		arma::sp_mat& A, arma::vec &b, bool Reduce=false);
 
-vector<unsigned int> makeCompactPolyhedron(const arma::sp_mat A, const arma::vec b, arma::sp_mat &Anew, arma::vec &bnew);
+vector<unsigned int> makeCompactPolyhedron(const arma::sp_mat A, 
+		const arma::vec b, arma::sp_mat &Anew, arma::vec &bnew);
 
-/************************************************************************************************************************/
-/* 																														*/
-/******************************************			FROM LCPTOLP.CPP			*****************************************/ 
-/* 																														*/
-/************************************************************************************************************************/
+/************************************************/
+/* 	 									      	*/
+/*******			FROM LCPTOLP.CPP	    *****/ 
+/* 	 									      	*/
+/************************************************/
 
 using perps = vector<pair<unsigned int, unsigned int>>  ;
 ostream& operator<<(ostream& ost, perps C);
@@ -44,6 +46,9 @@ inline bool operator < (vector<int> Fix1, vector<int> Fix2);
 inline bool operator == (vector<int> Fix1, vector<int> Fix2);
 template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
+
+arma::vec* isFeas(const arma::sp_mat* A, const arma::vec *b, 
+		const arma::vec *c, bool Positivity=false);
 
 int ConvexHull(
 		vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, // Individual constraints
@@ -77,12 +82,17 @@ class LCP
 	public:
 	/** Constructors */
 		LCP() = delete;	/// Class has no default constructors
-		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={}); // Constructor with M,q,leader posn
-		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A={}, arma::vec b={}); // Constructor with M, q, compl pairs
+		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, 
+				unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={}); // Constructor with M,q,leader posn
+		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, 
+				perps Compl, arma::sp_mat A={}, arma::vec b={}); // Constructor with M, q, compl pairs
 	/** Return data and address */
-		inline arma::sp_mat getM() {return this->M;}  inline arma::sp_mat* getMstar() {return &(this->M);}
-		inline arma::vec getq() {return this->q;}  inline arma::vec* getqstar() {return &(this->q);}
-		inline unsigned int getLStart(){return LeadStart;} inline unsigned int getLEnd(){return LeadEnd;}
+		inline arma::sp_mat getM() {return this->M;}  
+		inline arma::sp_mat* getMstar() {return &(this->M);}
+		inline arma::vec getq() {return this->q;}  
+		inline arma::vec* getqstar() {return &(this->q);}
+		inline unsigned int getLStart(){return LeadStart;} 
+		inline unsigned int getLEnd(){return LeadEnd;}
 		inline perps getCompl() {return this->Compl;}  
 		friend ostream& operator<<(ostream& ost, const LCP L);
 	/* Member functions */
@@ -91,10 +101,13 @@ class LCP
 		void defConst(GRBEnv* env);
 		int makeRelaxed();
 	public:
-		GRBModel* LCPasMIP(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={}, bool solve=false);
+		GRBModel* LCPasMIP(vector<unsigned int> FixEq={}, 
+				vector<unsigned int> FixVar={}, bool solve=false);
 		GRBModel* LCPasMIP(vector<int> Fixes, bool solve);
-		GRBModel* LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, vector<unsigned int> FixVar={});
-		GRBModel* LCP_Polyhed_fixed(arma::Col<int> FixEq, arma::Col<int> FixVar);
+		GRBModel* LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, 
+				vector<unsigned int> FixVar={});
+		GRBModel* LCP_Polyhed_fixed(arma::Col<int> FixEq, 
+				arma::Col<int> FixVar);
 	/* Branch and Prune Methods */
 	private:
 		template<class T> inline bool isZero(const T val) const { return (val>-eps && val < eps);}
@@ -106,14 +119,16 @@ class LCP
 		int BranchProcLoc(vector<int>* Fix, vector<int> *Leaf);
 		int EnumerateAll(bool solveLP=false);
 	public:
-		bool extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ = false) const; 
+		bool extractSols(GRBModel* model, arma::vec &z, 
+				arma::vec &x, bool extractZ = false) const; 
 		vector<vector<int>*> *BranchAndPrune ();
 	/* Convex hull computation */
 	private:
 		void FixToPoly(const vector<int> *Fix, bool checkFeas = false);
 		void FixToPolies(const vector<int> *Fix, bool checkFeas = false);
 	public:
-		int ConvexHull(arma::sp_mat* A, arma::vec *b) {return ::ConvexHull(this->Ai, this->bi, A, b, _A, _b);};
+		int ConvexHull(arma::sp_mat* A, arma::vec *b) 
+		{return ::ConvexHull(this->Ai, this->bi, A, b, _A, _b);};
 };
 
 
@@ -137,14 +152,14 @@ int LCPasLP(
 int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i);
 bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 
-/************************************************************************************************************************/
-/* 																														*/
-/******************************************			FROM GAMES.CPP				*****************************************/ 
-/* 																														*/
-/************************************************************************************************************************/
+/********************************************/
+/* 	    							    	*/
+/******			FROM GAMES.CPP		  *******/ 
+/* 	    							    	*/
+/********************************************/
 
 class QP_Param
-/* 
+/**
  * Represents a Parameterized QP as
  * \min_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y
  * Subject to
@@ -161,24 +176,40 @@ class QP_Param
 		unsigned int size();
 	public: // Constructors
 		QP_Param(){this->size();}
-		QP_Param(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+		QP_Param(arma::sp_mat Q, arma::sp_mat C, 
+				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 		{
 			this->set(Q, C, A, B, c, b);
 			this->size();
 		}
 	public: // Set some data
-		QP_Param& set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Copy data into this
-		QP_Param& setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Move data into this
+		QP_Param& set(arma::sp_mat Q, arma::sp_mat C, 
+				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Copy data into this
+		QP_Param& setMove(arma::sp_mat Q, arma::sp_mat C, 
+				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Move data into this
 	public: // Return some of the data as a copy
-		arma::sp_mat getQ() const; arma::sp_mat getC() const; arma::sp_mat getA() const;
-		arma::sp_mat getB() const; arma::vec getc() const; arma::vec getb() const;
-		unsigned int getNx() const; unsigned int getNy() const;
+		inline arma::sp_mat getQ() const { return this->Q; } 
+		inline arma::sp_mat getC() const { return this->C; }
+		inline arma::sp_mat getA() const { return this->A; }
+		inline arma::sp_mat getB() const { return this->B; }
+		inline arma::vec getc() const { return this->c; }
+		inline arma::vec getb() const { return this->b; }
+		inline unsigned int getNx() const { return this->Nx; }
+		inline unsigned int getNy() const { return this->Ny; }
 	public: // Other methods
 		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
 		bool is_Playable(const QP_Param P) const;
 };
 
 class NashGame
+/**
+ * NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
+				arma::vec MCRHS, unsigned int n_LeadVar=0);
+ * Construct a NashGame by giving a vector of pointers to 
+ * QP_Param, defining each player's game
+ * A set of Market clearing constraints and its RHS
+ * And if there are leader variables, the number of leader vars.
+ */
 {
 	public: // Variables
 		unsigned int Nplayers;
@@ -193,7 +224,8 @@ class NashGame
 		unsigned int Leader_position; // Position from where leader's vars start
 		unsigned int n_LeadVar;
 	public: // Constructors
-		NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar=0);
+		NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
+				arma::vec MCRHS, unsigned int n_LeadVar=0);
 		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0):Nplayers{Nplayers} , n_LeadVar{n_LeadVar}
 		{
 			Players.resize(this->Nplayers); 

@@ -249,8 +249,8 @@ int ConvexHull(
 	if (nPoly != bi->size()) 			throw "Inconsistent number of LHS and RHS for polyhedra"; 
 	for(unsigned int i=0; i!=nPoly; i++)
 	{
-		if (Ai->at(i)->n_cols != nC) 		throw "Inconsistent number of variables in the polyhedra " + to_string(i);
-		if (Ai->at(i)->n_rows != bi->at(i)->n_rows) throw "Inconsistent number of rows in LHS and RHS of polyhedra " + to_string(i);
+		if (Ai->at(i)->n_cols != nC) 		throw "Inconsistent number of variables in the polyhedra " + to_string(i) + "; " + to_string(Ai->at(i)->n_cols)+"!="+to_string(nC);
+		if (Ai->at(i)->n_rows != bi->at(i)->n_rows) throw "Inconsistent number of rows in LHS and RHS of polyhedra " + to_string(i)+";" + to_string(Ai->at(i)->n_rows) + "!=" + to_string(bi->at(i)->n_rows);
 		nFinCons += Ai->at(i)->n_rows;
 	} 	
 	unsigned int FirstCons = nFinCons;
@@ -265,10 +265,11 @@ int ConvexHull(
 	nFinCons += Acom.n_rows;
 
 	nFinVar = nPoly*nC + nPoly + nC; /// All x^i variables + delta variables+ original x variables 
-	delete A; delete b;
-	A = new arma::sp_mat(nFinCons, nFinVar); b = new arma::vec(nFinCons, arma::fill::zeros);
+	A->resize(nFinCons, nFinVar); b->resize(nFinCons);
+	A->zeros(); b->zeros();
 	// Counting rows completed
 	unsigned int complRow{0};
+	if (VERBOSE){cout<<"In Convex Hull computation!"<<endl;}
 	for(unsigned int i = 0; i<nPoly; i++)
 	{
 		unsigned int nConsInPoly = complRow+Ai->at(i)->n_rows ;
@@ -293,9 +294,350 @@ int ConvexHull(
 	b->at(FirstCons + nC*2) = 1;
 	b->at(FirstCons + nC*2+1) = -1;
 	// Common Constraints
-	A->submat(FirstCons+2*nC+2, nPoly*nC+nPoly,
-				nFinCons-1, nFinVar-1) = Acom;
-	b->subvec(FirstCons+2*nC+2, nFinCons-1) = bcom;
+	if(Acom.n_rows>0)
+	{
+		b->subvec(FirstCons+2*nC+2, nFinCons-1) = bcom;
+		A->submat(FirstCons+2*nC+2, nPoly*nC+nPoly,
+					nFinCons-1, nFinVar-1) = Acom;
+	}
 	return 0;
 }
+
+arma::vec* isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Positivity)
+{
+	unsigned int nR, nC;
+	nR = A->n_rows; nC = A->n_cols;
+	if(c->n_rows != nC) throw "Inconsistency in no of Vars in isFeas()";
+	if(b->n_rows != nR) throw "Inconsistency in no of Constr in isFeas()";
+
+	arma::vec *sol = new arma::vec(c->n_rows, arma::fill::zeros);
+	const double lb = Positivity?0:-GRB_INFINITY;
+
+	GRBEnv env;
+	GRBModel model = GRBModel(env);
+	GRBVar x[nC];
+	GRBConstr a[nR];
+	// Adding Variables
+	for(unsigned int i=0; i<nC; i++)
+		x[i] = model.addVar(lb, GRB_INFINITY, c->at(i), GRB_CONTINUOUS, "x_"+to_string(i));
+	// Adding constraints
+	for(unsigned int i=0; i<nR; i++)
+	{
+		GRBLinExpr lin{0};
+		for(auto j=A->begin_row(i); j!=A->end_row(i);++j)
+			lin += (*j)*x[j.col()];
+		a[i] = model.addConstr(lin, GRB_LESS_EQUAL, b->at(i));
+	}
+	model.set(GRB_IntParam_OutputFlag, 0 ) ;
+	model.set(GRB_IntParam_DualReductions, 0) ;
+	model.optimize();
+	if(model.get(GRB_IntAttr_Status)==GRB_OPTIMAL)
+		for(unsigned int i=0; i<nC; i++) sol->at(i) = x[i].get(GRB_DoubleAttr_X); 
+	else sol = nullptr;
+	return sol;
+}
+
+
+bool operator == (vector<int> Fix1, vector<int> Fix2)
+{
+	if(Fix1.size() != Fix2.size()) return false;
+	for(unsigned int i=0;i<Fix1.size();i++)
+		if(Fix1[i]!=Fix2[i]) return false;
+	return true;
+}
+
+bool operator < (vector<int> Fix1, vector<int> Fix2)
+/**
+ * Returns true if Fix1 is (grand) child of Fix2
+ *  Defn Grand Parent:
+ *  	Either the same value as the grand child, or has 0 in that location
+ *  Defn Grand child:
+ *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
+ */
+{
+	if(Fix1.size() != Fix2.size()) return false;
+	for(unsigned int i=0;i<Fix1.size();i++)
+		if(Fix1[i]!=Fix2[i] && Fix1[i]*Fix2[i]!=0)
+			return false; // Fix1 is not a child of Fix2
+	return true;	 	// Fix1 is a child of Fix2
+}
+
+bool operator >(vector<int> Fix1, vector<int> Fix2)
+{
+	return (Fix2<Fix1);
+}
+
+vector<int>* LCP::anyBranch(const vector<vector<int>*>* vecOfFixes, vector<int>* Fix) const
+/**
+ * Returns true if any (grand)child of Fix is in vecOfFixes!
+ */
+{
+	for(auto v:*vecOfFixes)
+		if(*Fix < *v||*v==*Fix) return v;
+	return NULL;
+}
+
+bool LCP::extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ) const
+{
+	if(model->get(GRB_IntAttr_Status) == GRB_LOADED) model->optimize();
+	if(model->get(GRB_IntAttr_Status) != GRB_OPTIMAL) return false;
+	x.set_size(nC); if(extractZ) z.set_size(nR);
+	for(unsigned int i=0; i<nR;i++)
+	{
+		x[i] = model->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X);
+		if(extractZ) z[i] = model->getVarByName("z_"+to_string(i)).get(GRB_DoubleAttr_X);
+	}
+	for(unsigned int i=nR;i<nC;i++)
+		x[i] = model->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X); 
+	return true;
+}
+
+vector<int>* LCP::solEncode(const arma::vec &z, const arma::vec &x) const
+{
+	vector<signed int>* solEncoded = new vector<signed int>(nR, 0);
+	for(auto p:Compl)
+	{
+		unsigned int i, j; i=p.first; j=p.second;
+		if(isZero(z(i))) solEncoded->at(i)++;
+		if(isZero(x(j))) solEncoded->at(i)--;
+	}; 
+	return solEncoded;
+}
+
+vector<int>* LCP::solEncode(GRBModel *model) const
+{
+	arma::vec x,z;
+	if(!this->extractSols(model, z, x, true)) return {};// If infeasible model, return empty!
+	else return this->solEncode(z,x);
+}
+
+void LCP::branch(int loc, const vector<int> *Fixes) 
+/**
+ * If loc == nR, then stop branching. We either hit infeasibility or a leaf.
+ * If loc <0, then branch at abs(loc) location and go down the branch where variable is fixed to 0
+ * else branch at abs(loc) location and go down the branch where eqn is fixed to 0
+ */
+{
+	bool VarFirst=(loc<0);
+	GRBModel *FixEqMdl=nullptr, *FixVarMdl=nullptr;
+	vector<int> *FixEqLeaf, *FixVarLeaf;
+	if(VERBOSE) 
+	{
+		cout<<endl<<"Branching on Variable: "<<loc<<" with Fix as ";
+		for(auto t1:*Fixes) cout<<t1<<"\t";
+		cout<<endl;
+	}
+
+	loc = (loc>=0)?loc:(loc==-(int)nR?0:-loc);
+	if(loc >=(signed int)nR) 
+	{
+		if(VERBOSE)
+			cout<<"nR: "<<nR<<"\tloc: "<<loc<<"\t Returning..."<<endl; 
+		return;
+	}
+	else
+	{
+	GRBVar x,z;
+	vector<int> *FixesEq = new vector<int>(*Fixes);
+	vector<int> *FixesVar = new vector<int>(*Fixes);
+	if(Fixes->at(loc) != 0) throw "Fixing an already fixed variable!";
+	FixesEq->at(loc) =1; FixesVar->at(loc)=-1;
+	if(VarFirst)
+	{
+		FixVarLeaf = anyBranch(AllPolyhedra, FixesVar);
+		if(!FixVarLeaf) this->branch(BranchLoc(FixVarMdl, FixesVar), FixesVar); 
+		else this->branch(BranchProcLoc(FixesVar, FixVarLeaf),FixesVar);
+
+		FixEqLeaf = anyBranch(AllPolyhedra, FixesEq);
+		if(!FixEqLeaf) this->branch(BranchLoc(FixEqMdl, FixesEq), FixesEq);
+		else this->branch(BranchProcLoc(FixesEq, FixEqLeaf),FixesEq);
+	}
+	else
+	{
+		FixEqLeaf = anyBranch(AllPolyhedra, FixesEq);
+		if(!FixEqLeaf) this->branch(BranchLoc(FixEqMdl, FixesEq), FixesEq);
+		else this->branch(BranchProcLoc(FixesEq, FixEqLeaf),FixesEq);
+
+		FixVarLeaf = anyBranch(AllPolyhedra, FixesVar);
+		if(!FixVarLeaf) this->branch(BranchLoc(FixVarMdl, FixesVar), FixesVar); 
+		else this->branch(BranchProcLoc(FixesVar, FixVarLeaf),FixesVar); 
+	}
+	}
+}
+
+vector<vector<int>*> *LCP::BranchAndPrune ()
+{
+	GRBModel *m = nullptr;
+	vector<int>* Fix = new vector<int>(nR,0);
+	branch(BranchLoc(m, Fix), Fix);
+	return AllPolyhedra;
+}
+
+int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
+{
+	static int GurCallCt {0};
+	m = this->LCPasMIP(*Fix, true);
+	GurCallCt++;
+	if(VERBOSE)
+	{
+		cout<<"Gurobi call\t"<<GurCallCt<<"\t";
+		for (auto a:*Fix) cout<<a<<"\t";
+		cout<<endl;
+	}
+	int pos;
+	pos = (signed int)nR;// Don't branch! You are at the leaf if pos never gets changed!!
+	arma::vec z,x;
+	if(this->extractSols(m, z, x, true)) // If already infeasible, nothing to branch!
+	{
+		vector<int> *v1 = this->solEncode(z,x);
+		vector<int> *v2 = anyBranch(AllPolyhedra, v1);
+		if(VERBOSE)
+		{
+			cout<<"v1: \t\t\t";
+			for (auto a:*v1) cout<<a<<"\t";
+			cout<<"\t\t";
+			cout<<"v2: \t\t\t";
+			if(v2) for (auto a:*v2) cout<<a<<"\t";
+			else cout<<"NULL";
+			cout<<endl;
+		}
+		// if(v2==NULL)
+		{
+			this->AllPolyhedra->push_back(v1);
+			this->FixToPolies(v1);
+			
+			if(VERBOSE)
+			{
+				cout<<"New Polyhedron found"<<endl;
+				x.t().print("x");z.t().print("z");
+			}
+		}
+		////////////////////
+		// BRANCHING RULE //
+		////////////////////
+		
+		// Branch at a large positive value
+		double maxvalx{0}; unsigned int maxposx{nR};
+		double maxvalz{0}; unsigned int maxposz{nR};
+		for (unsigned int i=0;i<nR;i++)
+		{
+			unsigned int varPos = i>=this->LeadStart?i+nLeader:i;
+			if(x(varPos) > maxvalx && Fix->at(i)==0) // If already fixed, it makes no sense!
+			{
+				maxvalx = x(varPos); 
+				maxposx = (i==0)?-nR:-i; // Negative of 0 is -nR by convention
+			}
+			if(z(i) > maxvalz && Fix->at(i)==0) // If already fixed, it makes no sense!
+			{
+				maxvalz = z(i); 
+				maxposz = i;
+			}
+		}
+		pos = maxvalz>maxvalx? maxposz:maxposx;
+		///////////////////////////
+		// END OF BRANCHING RULE //
+		///////////////////////////
+	}
+	else 
+	{
+		if(VERBOSE)
+			cout<<"Infeasible branch"<<endl;
+	}
+	delete m;
+	return pos; 
+}
+
+int LCP::BranchProcLoc(vector<int>* Fix, vector<int> *Leaf)
+{
+	int pos = (int)nR;
+	if(VERBOSE)
+	{
+		cout<<"Processed Node \t\t";
+		for(auto a:*Fix) cout<<a<<"\t";
+		cout<<endl;
+	}
+	if(*Fix==*Leaf) return nR;
+	if(Fix->size()!=Leaf->size()) throw "Error in BranchProcLoc";
+	for(unsigned int i=0;i<Fix->size();i++)
+	{
+		int l = Leaf->at(i);
+		if(Fix->at(i)==0) return (l==0?-i:i*l);
+	}
+	return pos;
+}
+
+void LCP::FixToPoly(const vector<int> *Fix, bool checkFeas)
+{
+	arma::sp_mat *Aii = new arma::sp_mat(nR, nC);
+   	arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
+	for(unsigned int i=0;i<this->nR;i++)
+	{
+		if(Fix->at(i) == 0) throw "Error in FixToPoly";
+		if(Fix->at(i)==1) // Equation to be fixed top zero
+		{
+			for(auto j=this->M.begin_row(i); j!=this->M.end_row(i); ++j)
+				if(!this->isZero((*j))) Aii->at(i, j.col()) = (*j); // Only mess with non-zero elements of a sparse matrix!
+			bii->at(i) = this->q(i);
+		}
+		else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be added
+		{
+			unsigned int varpos = (i>this->LeadStart)?i+this->nLeader:i;
+			Aii->at(i, varpos) = 1; 
+			bii->at(i) = 0;
+		}
+	}
+	bool add = !checkFeas;
+	if(checkFeas)
+	{
+		unsigned int count{0};
+		try
+		{
+			makeRelaxed();
+			GRBModel* model = new GRBModel(this->RlxdModel);
+			for(auto i:*Fix)
+			{
+				if(i>0) // Fixing the eqn to zero
+					model->getVarByName("z_"+to_string(count)).set(GRB_DoubleAttr_UB,0);
+				if(i<0)
+					model->getVarByName("x_"+to_string(count>this->LeadStart?count+nLeader:i)).set(GRB_DoubleAttr_UB,0);
+				count++;
+			} 
+			model->optimize();
+			if(model->get(GRB_IntAttr_Status) == GRB_OPTIMAL) add = true;
+			delete model;
+		}
+		catch(const char* e) { cout<<e<<endl; }
+		catch(string e) { cout<<"String: "<<e<<endl; }
+		catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+		catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
+	}
+	if(add) { this->Ai->push_back(Aii); this->bi->push_back(bii); }
+	if(VERBOSE) cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;
+}
+void LCP::FixToPolies(const vector<int> *Fix, bool checkFeas)
+{
+	bool flag = false;
+	vector<int> MyFix(*Fix);
+	unsigned int i;
+	for(i=0; i<this->nR;i++)
+		if(Fix->at(i)==0) { flag = true; break; }
+	if(flag)
+	{
+		MyFix[i] = 1;
+		this->FixToPolies(&MyFix, checkFeas);
+		MyFix[i] = -1;
+		this->FixToPolies(&MyFix, checkFeas);
+	}
+	else this->FixToPoly(Fix, checkFeas);
+}
+
+int LCP::EnumerateAll(const bool solveLP)
+{
+	delete Ai; delete bi; // Just in case it is polluted with BranchPrune
+	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
+	vector<int> *Fix = new vector<int>(nR,0);
+	this->FixToPolies(Fix, solveLP);
+	return 0;
+}
+
 

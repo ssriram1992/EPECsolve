@@ -9,77 +9,57 @@
 
 using namespace std;
 
-/********** DATA ***************/
-const int N_lead = 2;
-const int L1F = 2;
-const int L2F = 2;
 
-array<double, L1F> CL1F{5,7};
-array<double, L2F> CL2F{4,8};
-array<double, L1F> CapL1F{500,700};
-array<double, L2F> CapL2F{400,800};
-
-const double L1F_alph = 1000;
-const double L1F_beta = 1;
-
-const double L2F_alph = 1200;
-const double L2F_beta = 1.5;
-/********** DATA ***************/
-
-int game2LCPtest(arma::sp_mat &M, arma::vec &q, perps &Compl)
+NashGame* createCountry(
+		const unsigned int n_followers,
+		const vector<double> costs_quad,
+		const vector<double> costs_lin,
+		const vector<double> capacities,
+		const double alpha, const double beta, // For the demand curve P = a-bQ
+		const unsigned int LeadVars = 3 // One for tax and another for imposed cap and last for quantity imported
+		)
 {
-	QP_Param *L1F1 = new QP_Param();
-	QP_Param *L1F2 = new QP_Param();
-	// For L1F1
-	arma::sp_mat Q(1,1);
-	Q(0,0) = L1F_beta;
-	arma::vec c(1);
-	c(0) = CL1F[0]-L1F_alph;
-	arma::sp_mat C(1, 6);
-	// Order Sould be: Other follower's variable, MC dual, q_imp^a, q_imp^B, t1, t2 
-	C(0,0) = L1F_beta;
-	C(0,4) = 1;
-	C(0,2) = L1F_beta;
-	// Constraints of L1F1
-	arma::vec b(1);
-	b(0)=CapL1F[0];
-	arma::sp_mat A(1,6), B(1,1);
-	B(0,0) = 1;
-	L1F1->setMove(Q, C, A, B, c, b);
-	// For L1F2
-	Q.zeros(); c.zeros(); C.zeros(); A.zeros(); B.zeros(); b.zeros();
-	Q(0,0) = L1F_beta;
-	c(0) = CL1F[1]-L1F_alph;
-	C(0,0) = L1F_beta;
-	C(0,5) = 1;
-	C(0,3) = L1F_beta;
-	// Constraints of L1F1
-	b(0)=CapL1F[1];
-	B(0,0) = 1;
-	L1F2->setMove(Q, C, A, B, c, b);
-
-	// Market clearing constraints
-	arma::sp_mat MC(1,7);
-	MC(0,3)=1;MC(0,4)=-1;
-	arma::vec MCRHS(1);
-	MCRHS.zeros();
-
-	// Nash Game
-	vector<QP_Param*> L1 {L1F1, L1F2};
-	// cout<<*L1F1;
+	/// Check Error
+	if(n_followers == 0) throw "Error in createCountry(). 0 Followers?";
+	if (costs_lin.size()!=n_followers ||
+			costs_quad.size() != n_followers ||
+			capacities.size() != n_followers 
+	   )
+		throw "Error in createCountry(). Size Mismatch";
+	if (alpha <= 0 || beta <=0 ) throw "Error in createCountry(). Invalid demand curve params";
+	if (LeadVars < 3) throw "Error in createCountry(). At least 2 leader variables are there for cap and tax!";
+	// Error checks over
+	arma::sp_mat Q(1,1), C(1, LeadVars + n_followers - 1);
+	/// Two constraints. One saying that you should be less than capacity
+	// Another saying that you should be less than leader imposed cap!
+	arma::sp_mat A(2, LeadVars + n_followers - 1), B(2, 1); 
+	arma::vec c(1), b(2); 
 	
-	NashGame *MyGame = new NashGame(L1, MC, MCRHS, 4);
-	// cout<<(*MyGame);
-	MyGame->FormulateLCP(M,q, Compl);
-	M.print_dense("M"); 
-	q.print("q");
-	M.save("M.txt", arma::coord_ascii);
-	q.save("q.txt", arma::arma_ascii);
-	delete MyGame;
-	delete L1F1;
-	delete L1F2;
-	return 0;
+	vector<QP_Param*> Players{};
+	/// Create the QP_Param* for each follower
+	for(unsigned int follower = 0; follower < n_followers; follower++)
+	{
+		c.fill(0); b.fill(0);
+		A.zeros(); B.zeros(); C.zeros(); b.zeros(); Q.zeros(); c.zeros();
+		QP_Param* Foll = new QP_Param();
+		Q(0, 0) = costs_quad.at(follower) + 2*beta;
+		c(0) = costs_lin.at(follower) - alpha;
+		arma::mat Ctemp(1, LeadVars+n_followers-1); 
+		Ctemp.fill(beta); Ctemp.tail_cols(2).fill(0); Ctemp.tail_cols(1) = 1;
+		C = Ctemp;
+		A(1, (n_followers-1)+2-1) = -1;
+		B(0,0)=1; B(1,0) = 1;
+		b(0) = capacities.at(follower);
+		Foll->setMove(Q, C, A, B, c, b);
+		Players.push_back(Foll);
+	}
+	arma::sp_mat MC(0, LeadVars+n_followers);
+	arma::vec MCRHS(0, arma::fill::zeros);
+	NashGame* N = new NashGame(Players, MC, MCRHS, LeadVars);
+	return N;
 }
+
+
 
 
 int main()
@@ -88,8 +68,26 @@ int main()
 	GRBModel* model=nullptr;
 	arma::sp_mat M;		 arma::vec q;		 perps Compl;
 
-	game2LCPtest(M,q,Compl);
+	NashGame *Country = createCountry(3, {3,2,1}, {1,2,3}, {1000, 1000, 1000}, 100, 5);
+	bool Error{true};
+	try{
+	Country->FormulateLCP(M, q, Compl);
+	Error = false;
+	} 
+	catch(const char* e) { cout<<e<<endl; }
+	catch(string e) { cout<<"String: "<<e<<endl; }
+	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
+	if(Error) throw -1;
+	M.print_dense("M"); 
+	q.print("q");
+	M.save("M.txt", arma::coord_ascii);
+	q.save("q.txt", arma::arma_ascii);
+
+	// game2LCPtest(M,q,Compl);
 	LCP MyNashGame = LCP(&env, M, q, Compl);
+	arma::sp_mat Aa ;//= new arma::sp_mat();
+	arma::vec b ;//= new arma::vec();
 	cout<<Compl<<endl;
 	try
 	{
@@ -100,13 +98,21 @@ int main()
 			for(auto u:*v) cout<<u<<"\t";
 			cout<<endl;
 		} 
+		cout<<MyNashGame<<endl;
+		cout<<"************************************"<<endl;
+		MyNashGame.ConvexHull(&Aa, &b);
+		cout<<"************************************"<<endl;
+		// delete Aa; delete b;
 	}
 	catch(const char* e) { cout<<e<<endl; }
 	catch(string e) { cout<<"String: "<<e<<endl; }
 	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
 	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
 	delete model;
-	cout<<MyNashGame<<endl;
+	delete Country;
+	b.save("b.txt", arma::arma_ascii);
+	Aa.save("A.txt", arma::coord_ascii);
+	cout<<Aa.n_rows<<", "<<Aa.n_cols<<endl;
 	return 0;
 }
 
