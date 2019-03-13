@@ -10,3 +10,4 @@ Games
 *.swp
 *.txt
 LCP2LPold.cpp
+LCPTree.cpp

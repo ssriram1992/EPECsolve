@@ -27,6 +27,9 @@ OPTS= $(GUROPT) $(ARMAOPT)  $(OTHEROPTS)
 runEPEC: compileEPEC
 	./$(OUTPUT) $(ARGS)
 
+valgrind: compileEPEC
+	valgrind --leak-check=full --show-leak-kinds=all  -v ./$(OUTPUT) $(ARGS)
+
 compileEPEC: LCPtoLP.o func.h Games.o EPEC.o 
 	$(GCC) $(FILEEPEC) $(OPTS) -o $(OUTPUT) 
 

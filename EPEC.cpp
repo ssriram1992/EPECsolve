@@ -70,9 +70,10 @@ int main()
 
 	NashGame *Country = createCountry(3, {3,2,1}, {1,2,3}, {1000, 1000, 1000}, 100, 5);
 	bool Error{true};
-	try{
-	Country->FormulateLCP(M, q, Compl);
-	Error = false;
+	try
+	{
+		Country->FormulateLCP(M, q, Compl);
+		Error = false;
 	} 
 	catch(const char* e) { cout<<e<<endl; }
 	catch(string e) { cout<<"String: "<<e<<endl; }
@@ -98,11 +99,10 @@ int main()
 			for(auto u:*v) cout<<u<<"\t";
 			cout<<endl;
 		} 
-		cout<<MyNashGame<<endl;
+		MyNashGame.print();
 		cout<<"************************************"<<endl;
 		MyNashGame.ConvexHull(&Aa, &b);
 		cout<<"************************************"<<endl;
-		// delete Aa; delete b;
 	}
 	catch(const char* e) { cout<<e<<endl; }
 	catch(string e) { cout<<"String: "<<e<<endl; }
@@ -113,6 +113,8 @@ int main()
 	b.save("b.txt", arma::arma_ascii);
 	Aa.save("A.txt", arma::coord_ascii);
 	cout<<Aa.n_rows<<", "<<Aa.n_cols<<endl;
+	/*
+	*/
 	return 0;
 }
 

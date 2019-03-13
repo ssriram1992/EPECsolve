@@ -179,6 +179,12 @@ NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, 
 	dual_position.push_back(dl_cnt);
 }
 
+NashGame::~NashGame()
+{
+	for(auto a:this->Players)
+		delete a;
+}
+
 unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
 {
 	// To store the individual KKT conditions for each player.

@@ -63,6 +63,15 @@ LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsig
 	}
 }
 
+LCP::~LCP()
+{
+	for(auto p:*(this->AllPolyhedra)) delete p;
+	delete this->AllPolyhedra;
+	for(auto a:*(this->Ai)) delete a; 
+	for(auto b:*(this->bi)) delete b;
+	delete Ai; delete bi;
+}
+
 int LCP::makeRelaxed()
 {
 	try
@@ -107,7 +116,7 @@ GRBModel* LCP::LCP_Polyhed_fixed(
 		vector<unsigned int> FixVar  		// If non zero, equality imposed on equation
 		)			
 /**
- * Returs a model 
+ 
  * The returned model has constraints
  * corresponding to the non-zero elements of FixEq set to equality
  * and variables corresponding to the non-zero
@@ -226,10 +235,9 @@ bool LCP::errorCheck(bool throwErr) const
 }
 
 
-ostream& operator<<(ostream& ost, const LCP L)
+void LCP::print(string end)
 {
-	ost<<"LCP with "<<L.nR<<" rows and "<<L.nC<<" columns.";
-	return ost;
+	cout<<"LCP with "<<this->nR<<" rows and "<<this->nC<<" columns."<<end;
 }
 
 int ConvexHull(
@@ -462,6 +470,8 @@ void LCP::branch(int loc, const vector<int> *Fixes)
 		if(!FixVarLeaf) this->branch(BranchLoc(FixVarMdl, FixesVar), FixesVar); 
 		else this->branch(BranchProcLoc(FixesVar, FixVarLeaf),FixesVar); 
 	}
+	delete FixesEq;
+	delete FixesVar;
 	}
 }
 
@@ -470,6 +480,7 @@ vector<vector<int>*> *LCP::BranchAndPrune ()
 	GRBModel *m = nullptr;
 	vector<int>* Fix = new vector<int>(nR,0);
 	branch(BranchLoc(m, Fix), Fix);
+	delete Fix;
 	return AllPolyhedra;
 }
 

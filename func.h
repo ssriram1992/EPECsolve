@@ -62,7 +62,6 @@ class LCP
 	* A class to handle linear complementarity problems (LCP)
 	* especially as MIPs with bigM constraints
 	*/
-	friend class BranchPrune;
 	private:
 	// Essential data
 		GRBEnv* env;
@@ -86,6 +85,8 @@ class LCP
 				unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={}); // Constructor with M,q,leader posn
 		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, 
 				perps Compl, arma::sp_mat A={}, arma::vec b={}); // Constructor with M, q, compl pairs
+	/** Destructor - to delete the objects created with new operator */
+		~LCP();
 	/** Return data and address */
 		inline arma::sp_mat getM() {return this->M;}  
 		inline arma::sp_mat* getMstar() {return &(this->M);}
@@ -94,7 +95,7 @@ class LCP
 		inline unsigned int getLStart(){return LeadStart;} 
 		inline unsigned int getLEnd(){return LeadEnd;}
 		inline perps getCompl() {return this->Compl;}  
-		friend ostream& operator<<(ostream& ost, const LCP L);
+		void print(string end="\n");
 	/* Member functions */
 	private:
 		bool errorCheck(bool throwErr=true) const;
@@ -128,7 +129,7 @@ class LCP
 		void FixToPolies(const vector<int> *Fix, bool checkFeas = false);
 	public:
 		int ConvexHull(arma::sp_mat* A, arma::vec *b) 
-		{return ::ConvexHull(this->Ai, this->bi, A, b, _A, _b);};
+		{return ::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
 };
 
 
@@ -232,6 +233,7 @@ class NashGame
 			primal_position.resize(this->Nplayers);
 			dual_position.resize(this->Nplayers);
 		}
+		~NashGame();
 	public: // Members
 		unsigned int FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const;
 };
