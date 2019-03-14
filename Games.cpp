@@ -131,7 +131,9 @@ bool QP_Param::is_Playable(const QP_Param P) const
 	else return false;
 }
 
-NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar)
+
+
+NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /*
  * Have a vector of QP_Param* ready such that
  * the variables are separated in x^{i} and x^{-i}
@@ -267,3 +269,27 @@ unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl)
 	return NvarFollow;
 }
 
+arma::sp_mat NashGame::RewriteLeadCons() const
+{
+	arma::sp_mat A_in = this->LeaderConstraints;
+	arma::sp_mat A_out;
+	unsigned int  NvarLead{0};
+	NvarLead = this->dual_position.back(); // Number of Leader variables (all variables)
+	// NvarFollow = NvarLead - this->n_LeadVar;
+	
+	unsigned int n_Row, n_Col;
+	n_Row = A_in.n_rows; n_Col = A_in.n_cols;
+	A_out.zeros(n_Row, NvarLead);
+
+	try
+	{
+		A_out.cols(0, this->MC_dual_position-1)  = A_in.cols(0, this->MC_dual_position-1);
+		A_out.cols(this->Leader_position, this->dual_position.at(0)-1) = A_in.cols(this->MC_dual_position, n_Col-1);
+		return A_out;
+	}
+	catch(const char* e) { cout<<e<<endl; }
+	catch(string e) { cout<<"String: "<<e<<endl; }
+	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+	throw "Error in NashGame::RewriteLeadCons";
+	return A_in;
+}

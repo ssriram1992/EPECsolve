@@ -63,6 +63,12 @@ LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsig
 	}
 }
 
+LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
+{
+	arma::sp_mat M; arma::vec q; perps Compl;
+	N.FormulateLCP(M, q, Compl);
+}
+
 LCP::~LCP()
 {
 	for(auto p:*(this->AllPolyhedra)) delete p;
@@ -107,7 +113,7 @@ int LCP::makeRelaxed()
 	catch(string e) { cout<<"String: "<<e<<endl; }
 	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
 	catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
-	if(!this->madeRlxdModel) throw "STOP!!! STOP!!! STOP!!!";
+	if(!this->madeRlxdModel) throw "Error in LCP::makeRelaxed";
 	return 0;
 }
 
@@ -213,12 +219,14 @@ GRBModel* LCP::LCPasMIP(
 		for(auto i:FixEq) model->addConstr(z[i], GRB_EQUAL, 0.0);
 		model->update();
 		if(solve) model->optimize();
+		return model;
 	}
 	catch(const char* e) { cout<<e<<endl; }
 	catch(string e) { cout<<"String: "<<e<<endl; }
 	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
 	catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
-	return model;
+	throw "Error in LCP::LCPasMIP";
+	return nullptr;
 }
 
 bool LCP::errorCheck(bool throwErr) const
@@ -600,6 +608,7 @@ void LCP::FixToPoly(const vector<int> *Fix, bool checkFeas)
 	bool add = !checkFeas;
 	if(checkFeas)
 	{
+		bool Error{true};
 		unsigned int count{0};
 		try
 		{
@@ -616,11 +625,13 @@ void LCP::FixToPoly(const vector<int> *Fix, bool checkFeas)
 			model->optimize();
 			if(model->get(GRB_IntAttr_Status) == GRB_OPTIMAL) add = true;
 			delete model;
+			Error = false;
 		}
 		catch(const char* e) { cout<<e<<endl; }
 		catch(string e) { cout<<"String: "<<e<<endl; }
 		catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
 		catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
+		if(Error) throw "Error in LCP::FixToPoly";
 	}
 	if(add) { this->Ai->push_back(Aii); this->bi->push_back(bii); }
 	if(VERBOSE) cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;

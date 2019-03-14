@@ -34,11 +34,11 @@ int PolyUnion(const vector<arma::sp_mat> Ai, const vector<arma::vec> bi,
 vector<unsigned int> makeCompactPolyhedron(const arma::sp_mat A, 
 		const arma::vec b, arma::sp_mat &Anew, arma::vec &bnew);
 
-/************************************************/
-/* 	 									      	*/
-/*******			FROM LCPTOLP.CPP	    *****/ 
-/* 	 									      	*/
-/************************************************/
+/********************************************/
+/* 	    							    	*/
+/******			FROM GAMES.CPP		  *******/ 
+/* 	    							    	*/
+/********************************************/
 
 using perps = vector<pair<unsigned int, unsigned int>>  ;
 ostream& operator<<(ostream& ost, perps C);
@@ -46,6 +46,100 @@ inline bool operator < (vector<int> Fix1, vector<int> Fix2);
 inline bool operator == (vector<int> Fix1, vector<int> Fix2);
 template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
+
+
+class QP_Param
+/**
+ * Represents a Parameterized QP as
+ * \min_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y
+ * Subject to
+ * Ax + By <= b
+ * y >= 0
+*/
+{
+	private: // Data representing the parameterized QP
+		arma::sp_mat Q, C, A, B;
+		arma::vec c, b;
+	private: // Other private objects
+		unsigned int Nx, Ny, Ncons;
+		bool dataCheck(bool forcesymm=true) const;
+		unsigned int size();
+	public: // Constructors
+		QP_Param(){this->size();}
+		QP_Param(arma::sp_mat Q, arma::sp_mat C, 
+				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+		{
+			this->set(Q, C, A, B, c, b);
+			this->size();
+		}
+	public: // Set some data
+		QP_Param& set(arma::sp_mat Q, arma::sp_mat C, 
+				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Copy data into this
+		QP_Param& setMove(arma::sp_mat Q, arma::sp_mat C, 
+				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Move data into this
+	public: // Return some of the data as a copy
+		inline arma::sp_mat getQ() const { return this->Q; } 
+		inline arma::sp_mat getC() const { return this->C; }
+		inline arma::sp_mat getA() const { return this->A; }
+		inline arma::sp_mat getB() const { return this->B; }
+		inline arma::vec getc() const { return this->c; }
+		inline arma::vec getb() const { return this->b; }
+		inline unsigned int getNx() const { return this->Nx; }
+		inline unsigned int getNy() const { return this->Ny; }
+	public: // Other methods
+		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
+		bool is_Playable(const QP_Param P) const;
+};
+
+class NashGame
+/**
+ * NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
+				arma::vec MCRHS, unsigned int n_LeadVar=0);
+ * Construct a NashGame by giving a vector of pointers to 
+ * QP_Param, defining each player's game
+ * A set of Market clearing constraints and its RHS
+ * And if there are leader variables, the number of leader vars.
+ */
+{
+	public: // Variables
+		arma::sp_mat LeaderConstraints;
+		arma::vec LeaderConsRHS;
+		unsigned int Nplayers;
+		vector<QP_Param*> Players;
+		arma::sp_mat MarketClearing;
+		arma::vec MCRHS;			// RHS to the Market Clearing constraints
+		// In the vector of variables of all players,
+		// which position does the variable corrresponding to this player starts.
+		vector<unsigned int> primal_position; 
+		vector<unsigned int> dual_position; 
+		unsigned int MC_dual_position;
+		unsigned int Leader_position; // Position from where leader's vars start
+		unsigned int n_LeadVar;
+	public: // Constructors
+		NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
+				arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={});
+		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={}): LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar}
+		{
+			Players.resize(this->Nplayers); 
+			primal_position.resize(this->Nplayers);
+			dual_position.resize(this->Nplayers);
+		}
+		~NashGame();
+	public: // Members
+		unsigned int FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const;
+		arma::sp_mat RewriteLeadCons() const;
+};
+
+// void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
+ostream& operator<< (ostream& os, const QP_Param &Q);
+ostream& operator<< (ostream& os, const NashGame N);
+
+
+/************************************************/
+/* 	 									      	*/
+/*******			FROM LCPTOLP.CPP	    *****/ 
+/* 	 									      	*/
+/************************************************/
 
 arma::vec* isFeas(const arma::sp_mat* A, const arma::vec *b, 
 		const arma::vec *c, bool Positivity=false);
@@ -85,6 +179,7 @@ class LCP
 				unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={}); // Constructor with M,q,leader posn
 		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, 
 				perps Compl, arma::sp_mat A={}, arma::vec b={}); // Constructor with M, q, compl pairs
+		LCP(GRBEnv* env, NashGame N);
 	/** Destructor - to delete the objects created with new operator */
 		~LCP();
 	/** Return data and address */
@@ -152,94 +247,5 @@ int LCPasLP(
 		bool Gurobiclean );
 int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i);
 bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
-
-/********************************************/
-/* 	    							    	*/
-/******			FROM GAMES.CPP		  *******/ 
-/* 	    							    	*/
-/********************************************/
-
-class QP_Param
-/**
- * Represents a Parameterized QP as
- * \min_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y
- * Subject to
- * Ax + By <= b
- * y >= 0
-*/
-{
-	private: // Data representing the parameterized QP
-		arma::sp_mat Q, C, A, B;
-		arma::vec c, b;
-	private: // Other private objects
-		unsigned int Nx, Ny, Ncons;
-		bool dataCheck(bool forcesymm=true) const;
-		unsigned int size();
-	public: // Constructors
-		QP_Param(){this->size();}
-		QP_Param(arma::sp_mat Q, arma::sp_mat C, 
-				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
-		{
-			this->set(Q, C, A, B, c, b);
-			this->size();
-		}
-	public: // Set some data
-		QP_Param& set(arma::sp_mat Q, arma::sp_mat C, 
-				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Copy data into this
-		QP_Param& setMove(arma::sp_mat Q, arma::sp_mat C, 
-				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Move data into this
-	public: // Return some of the data as a copy
-		inline arma::sp_mat getQ() const { return this->Q; } 
-		inline arma::sp_mat getC() const { return this->C; }
-		inline arma::sp_mat getA() const { return this->A; }
-		inline arma::sp_mat getB() const { return this->B; }
-		inline arma::vec getc() const { return this->c; }
-		inline arma::vec getb() const { return this->b; }
-		inline unsigned int getNx() const { return this->Nx; }
-		inline unsigned int getNy() const { return this->Ny; }
-	public: // Other methods
-		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
-		bool is_Playable(const QP_Param P) const;
-};
-
-class NashGame
-/**
- * NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
-				arma::vec MCRHS, unsigned int n_LeadVar=0);
- * Construct a NashGame by giving a vector of pointers to 
- * QP_Param, defining each player's game
- * A set of Market clearing constraints and its RHS
- * And if there are leader variables, the number of leader vars.
- */
-{
-	public: // Variables
-		unsigned int Nplayers;
-		vector<QP_Param*> Players;
-		arma::sp_mat MarketClearing;
-		arma::vec MCRHS;			// RHS to the Market Clearing constraints
-		// In the vector of variables of all players,
-		// which position does the variable corrresponding to this player starts.
-		vector<unsigned int> primal_position; 
-		vector<unsigned int> dual_position; 
-		unsigned int MC_dual_position;
-		unsigned int Leader_position; // Position from where leader's vars start
-		unsigned int n_LeadVar;
-	public: // Constructors
-		NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
-				arma::vec MCRHS, unsigned int n_LeadVar=0);
-		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0):Nplayers{Nplayers} , n_LeadVar{n_LeadVar}
-		{
-			Players.resize(this->Nplayers); 
-			primal_position.resize(this->Nplayers);
-			dual_position.resize(this->Nplayers);
-		}
-		~NashGame();
-	public: // Members
-		unsigned int FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const;
-};
-
-void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
-ostream& operator<< (ostream& os, const QP_Param &Q);
-ostream& operator<< (ostream& os, const NashGame N);
 
 #endif
