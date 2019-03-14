@@ -5,27 +5,35 @@
 
 using namespace std;
 
-template <class T> ostream& operator<<(ostream& ost, vector<T> v)
+template 
+<class T> 
+ostream& 
+operator<<(ostream& ost, vector<T> v)
 {
 	for (auto elem:v) ost<<elem<<" ";
 	ost<<endl;
 	return ost;
 }
 
-template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p)
+template 
+<class T, class S> 
+ostream& 
+operator<<(ostream& ost, pair<T,S> p)
 {
 	cout<<"<"<<p.first<<", "<<p.second<<">";
 	return ost; 
 }
 
-ostream& operator<<(ostream& ost, perps C)
+ostream& 
+operator<<(ostream& ost, perps C)
 {
 	 for (auto p:C)
 		cout<<"<"<<p.first<<", "<<p.second<<">"<<"\t";
 	return ost; 
 }
 
-ostream& operator<< (ostream& os, const QP_Param &Q)
+ostream& 
+operator<< (ostream& os, const QP_Param &Q)
 {
 	os<<"Quadratic program with linear inequality constraints: "<<endl;
 	os<<Q.getNy()<<" decision variables parameterized by "<<Q.getNx()<<" variables"<<endl;
@@ -38,7 +46,8 @@ ostream& operator<< (ostream& os, const QP_Param &Q)
 	return os;
 }
 
-ostream& operator<< (ostream& os, const NashGame N)
+ostream& 
+operator<< (ostream& os, const NashGame N)
 {
 	os<<endl;
 	os<<"-----------------------------------------------------------------------"<<endl;
@@ -53,7 +62,8 @@ ostream& operator<< (ostream& os, const NashGame N)
 }
 
 
-unsigned int QP_Param::size()
+unsigned int 
+QP_Param::size()
 {
 	this->Ny = this->Q.n_rows;
 	this->Nx = this->C.n_cols;
@@ -61,7 +71,8 @@ unsigned int QP_Param::size()
 	return Ny;
 }
 
-bool QP_Param::dataCheck(bool forcesymm) const
+bool 
+QP_Param::dataCheck(bool forcesymm) const
 {
 	if(forcesymm && !this->Q.is_symmetric()) 
 		return false; // Q should be symmetric if forcesymm is true
@@ -75,14 +86,15 @@ bool QP_Param::dataCheck(bool forcesymm) const
 }
 
 		
-unsigned int QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
-/*
+/**
  * Writes the KKT condition of the parameterized QP
  * As per the convention, y is the decision variable for the QP and 
  * that is parameterized in x
  * The KKT conditions are
- * 0 <= y \perp  My + Nx + q >= 0
+ * \f$0 \leq y \perp  My + Nx + q \geq 0\f$
 */
+unsigned int 
+QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 {
 	if (!this->dataCheck())
 	{
@@ -100,7 +112,8 @@ unsigned int QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 }
 
 
-QP_Param& QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+QP_Param& 
+QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 {
 	this->Q = (Q); this->C = (C); this->A = (A);
 	this->B = (B); this->c = (c); this->b = (b);
@@ -111,7 +124,8 @@ QP_Param& QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp
 
 
 
-QP_Param& QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+QP_Param& 
+QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 {
 	this->Q = move(Q); this->C = move(C); this->A = move(A);
 	this->B = move(B); this->c = move(c); this->b = move(b);
@@ -122,7 +136,8 @@ QP_Param& QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma
 
 
 
-bool QP_Param::is_Playable(const QP_Param P) const
+bool 
+QP_Param::is_Playable(const QP_Param P) const
 {
 	unsigned int comp{static_cast<unsigned int>(P.getc().n_elem)};
 	unsigned int compcomp {static_cast<unsigned int>(P.getB().n_cols)};
@@ -133,8 +148,7 @@ bool QP_Param::is_Playable(const QP_Param P) const
 
 
 
-NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
-/*
+/**
  * Have a vector of QP_Param* ready such that
  * the variables are separated in x^{i} and x^{-i}
  * format.
@@ -147,6 +161,7 @@ NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, 
  * [ Primal for Pl1, Primal for Pl2, ..., MarketCL duals,
  *  Dual for Pl1, Dual for Pl2, ... ]
  */
+NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 {
 	// Setting the class variables
 	this->n_LeadVar = n_LeadVar;
@@ -187,7 +202,8 @@ NashGame::~NashGame()
 		delete a;
 }
 
-unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
+unsigned int 
+NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
 {
 	// To store the individual KKT conditions for each player.
 	vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers); 
@@ -269,7 +285,8 @@ unsigned int NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl)
 	return NvarFollow;
 }
 
-arma::sp_mat NashGame::RewriteLeadCons() const
+arma::sp_mat 
+NashGame::RewriteLeadCons() const
 {
 	arma::sp_mat A_in = this->LeaderConstraints;
 	arma::sp_mat A_out;

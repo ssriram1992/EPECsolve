@@ -18,13 +18,13 @@ using namespace std;
 /**********		FROM BALASPOLYHEDRON.CPP		******/ 
 /* 	    										     */
 /*****************************************************/
-// Returns a Gurobi model which can optimize over the convex hull of the 
-// union of polyhedra described in A and b where A and b are dense
+/// Returns a Gurobi model which can optimize over the convex hull of the 
+/// union of polyhedra described in A and b where A and b are dense
 GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
 		const vector<arma::sp_mat> A, const vector<arma::vec> b);
 
-// Returns a Gurobi model which can optimize over the convex hull of the 
-// union of polyhedra described in A and b where A and b are sparse
+/// Returns a Gurobi model which can optimize over the convex hull of the 
+/// union of polyhedra described in A and b where A and b are sparse
 GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
 		const vector<arma::mat> A, const vector<arma::vec> b);
 
@@ -50,11 +50,14 @@ template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
 
 class QP_Param
 /**
- * Represents a Parameterized QP as
+ * Represents a Parameterized QP as \f[
  * \min_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y
+ * \f]
  * Subject to
- * Ax + By <= b
- * y >= 0
+ * \f{eqnarray}{
+ * Ax + By &\leq& b \\
+ * y &\geq& 0
+ * \f}
 */
 {
 	private: // Data representing the parameterized QP
@@ -62,10 +65,15 @@ class QP_Param
 		arma::vec c, b;
 	private: // Other private objects
 		unsigned int Nx, Ny, Ncons;
+		/// Check that the data for the QP_Param class is valid
 		bool dataCheck(bool forcesymm=true) const;
+		/// Initializes the size related private variables
+		/// @returns Number of variables in the quadratic program, QP
 		unsigned int size();
 	public: // Constructors
+		/// Initialize only the size. Everything else is empty (can be updated later)
 		QP_Param(){this->size();}
+		/// Set data at construct time
 		QP_Param(arma::sp_mat Q, arma::sp_mat C, 
 				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 		{
@@ -73,41 +81,54 @@ class QP_Param
 			this->size();
 		}
 	public: // Set some data
+		/// Setting the data, while keeping the input objects intact
 		QP_Param& set(arma::sp_mat Q, arma::sp_mat C, 
 				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Copy data into this
+		/// Faster means to set data. But the input objects might be corrupted now.
 		QP_Param& setMove(arma::sp_mat Q, arma::sp_mat C, 
 				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Move data into this
 	public: // Return some of the data as a copy
+		/// Read-only access to the private variable Q
 		inline arma::sp_mat getQ() const { return this->Q; } 
+		/// Read-only access to the private variable C
 		inline arma::sp_mat getC() const { return this->C; }
+		/// Read-only access to the private variable A
 		inline arma::sp_mat getA() const { return this->A; }
+		/// Read-only access to the private variable B
 		inline arma::sp_mat getB() const { return this->B; }
+		/// Read-only access to the private variable c
 		inline arma::vec getc() const { return this->c; }
+		/// Read-only access to the private variable b
 		inline arma::vec getb() const { return this->b; }
+		/// Read-only access to the private variable Nx
 		inline unsigned int getNx() const { return this->Nx; }
+		/// Read-only access to the private variable Ny
 		inline unsigned int getNy() const { return this->Ny; }
 	public: // Other methods
+		/// Compute the KKT conditions for the given QP
 		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
 		bool is_Playable(const QP_Param P) const;
 };
 
 class NashGame
-/**
- * NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
-				arma::vec MCRHS, unsigned int n_LeadVar=0);
- * Construct a NashGame by giving a vector of pointers to 
- * QP_Param, defining each player's game
- * A set of Market clearing constraints and its RHS
- * And if there are leader variables, the number of leader vars.
- */
 {
-	public: // Variables
+	private:
+		/// Upper level leader constraints LHS
 		arma::sp_mat LeaderConstraints;
+		/// Upper level leader constraints RHS
 		arma::vec LeaderConsRHS;
+	public: // Variables
+		/// Number of players in the Nash Game
 		unsigned int Nplayers;
+		/// The QP that each player solves
 		vector<QP_Param*> Players;
+		/// Market clearing constraints
 		arma::sp_mat MarketClearing;
-		arma::vec MCRHS;			// RHS to the Market Clearing constraints
+		/// RHS to the Market Clearing constraints
+		arma::vec MCRHS;			
+		/// To print the Nash Game!
+		friend ostream& operator<< (ostream& os, const NashGame N);
+	private:
 		// In the vector of variables of all players,
 		// which position does the variable corrresponding to this player starts.
 		vector<unsigned int> primal_position; 
@@ -116,6 +137,12 @@ class NashGame
 		unsigned int Leader_position; // Position from where leader's vars start
 		unsigned int n_LeadVar;
 	public: // Constructors
+		/**
+		 * Construct a NashGame by giving a vector of pointers to 
+		 * QP_Param, defining each player's game
+		 * A set of Market clearing constraints and its RHS
+		 * And if there are leader variables, the number of leader vars.
+		 */
 		NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
 				arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={});
 		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={}): LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar}
@@ -124,15 +151,25 @@ class NashGame
 			primal_position.resize(this->Nplayers);
 			dual_position.resize(this->Nplayers);
 		}
+		/// Destructors to `delete` the QP_Param objects that might have been used.
 		~NashGame();
 	public: // Members
-		unsigned int FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const;
+		/// Formulates the LCP corresponding to the Nash game. 
+		/// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
+		unsigned int FormulateLCP(
+				/// Returns the `M` corresponding to `Mx+q`
+				arma::sp_mat &M, 
+				/// Returns the `q` corresponding to `Mx+q`
+			   	arma::vec &q,
+				/// There might be more variables than equations. In this case pairs the equations with variables
+			   	perps &Compl) const;
+		/// Rewrites leader constraints given earlier with added empty columns and spaces corresponding to
+		/// Market clearing duals and other equation duals.
 		arma::sp_mat RewriteLeadCons() const;
 };
 
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
 ostream& operator<< (ostream& os, const QP_Param &Q);
-ostream& operator<< (ostream& os, const NashGame N);
 
 
 /************************************************/
@@ -141,40 +178,74 @@ ostream& operator<< (ostream& os, const NashGame N);
 /* 	 									      	*/
 /************************************************/
 
+/// Checks if the polyhedron given by @f$ Ax\leq b@f$ is feasible.
+/// If yes, returns the point @f$x@f$ in the polyhedron that minimizes @f$c^Tx@f$
 arma::vec* isFeas(const arma::sp_mat* A, const arma::vec *b, 
 		const arma::vec *c, bool Positivity=false);
 
+/** 
+ * Computes the convex hull of a finite union of polyhedra where 
+ * each polyhedra @f$P_i@f$ is of the form
+ * @f{eqnarray}{
+ * A^ix &\leq& b^i\\
+ * x &\geq& 0
+ * @f}
+*/
 int ConvexHull(
-		vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, // Individual constraints
-		arma::sp_mat *A, arma::vec *b, // To store outputs
-		arma::sp_mat Acom={}, arma::vec bcom={} // Common constraints.
+		/// Inequality constraints LHS that define polyhedra whose convex hull is to be found
+		vector<arma::sp_mat*> *Ai, 
+		/// Inequality constraints RHS that define polyhedra whose convex hull is to be found
+		vector<arma::vec*> *bi, 
+		/// Pointer to store the output of the convex hull LHS
+		arma::sp_mat *A, 
+		/// Pointer to store the output of the convex hull RHS
+		arma::vec *b, 
+		/// Any common constraints to ALL the polyhedra.
+		arma::sp_mat Acom={}, arma::vec bcom={} 
 		);
 
+/**
+ * @brief Class to handle and solve linear complementarity problems
+ */
+/**
+* A class to handle linear complementarity problems (LCP)
+* especially as MIPs with bigM constraints
+* Also provides the convex hull of the feasible space!
+*/
 class LCP
 {
-	/**
-	* A class to handle linear complementarity problems (LCP)
-	* especially as MIPs with bigM constraints
-	*/
 	private:
 	// Essential data
+		/// Gurobi environment for MIP/LP solves
 		GRBEnv* env;
-		arma::sp_mat M; arma::vec q; perps Compl; /// Compl stores data in <Eqn, Var> form.
-		unsigned int LeadStart, LeadEnd, nLeader; /// Positions and sizes of Leader variables
-		arma::sp_mat _A; arma::vec _b;		/// Apart from 0 \leq x \perp Mx+q\geq 0, one needs Ax\leq b too!
+		/// M in @f$Mx+q@f$ that defines the LCP
+		arma::sp_mat M; 
+		/// q in @f$Mx+q@f$ that defines the LCP
+		arma::vec q; 
+		/// Compl stores data in <Eqn, Var> form.
+		perps Compl; 
+		unsigned int LeadStart, LeadEnd, nLeader; 
+		/// Apart from 0 \leq x \perp Mx+q\geq 0, one needs Ax\leq b too!
+		arma::sp_mat _A; arma::vec _b;		
 	// Temporary data
+		/// Keep track if LCP::RlxdModel is made
 		bool madeRlxdModel;
 		unsigned int nR, nC;
+		/// LCP feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra
 		vector<vector<short int>*>* AllPolyhedra;
 		vector<arma::sp_mat*>* Ai; vector<arma::vec*>* bi;
+		// A gurobi model with all complementarity constraints removed.
 	   	GRBModel RlxdModel;
 	public: 
 	// Fudgible data
+		/// bigM used to rewrite the LCP as MIP
 		long double bigM;
+		/// The threshold, below which a number would be considered to be zero.
 		long double eps;
 	public:
 	/** Constructors */
-		LCP() = delete;	/// Class has no default constructors
+		/// Class has no default constructors
+		LCP() = delete;	
 		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, 
 				unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={}); // Constructor with M,q,leader posn
 		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, 
@@ -183,13 +254,21 @@ class LCP
 	/** Destructor - to delete the objects created with new operator */
 		~LCP();
 	/** Return data and address */
+		/// Read-only access to LCP::M
 		inline arma::sp_mat getM() {return this->M;}  
+		/// Pointer access to LCP::M
 		inline arma::sp_mat* getMstar() {return &(this->M);}
+		/// Read-only access to LCP::q
 		inline arma::vec getq() {return this->q;}  
+		/// Pointer access to LCP::q
 		inline arma::vec* getqstar() {return &(this->q);}
+		/// Read-only access to LCP::LeadStart
 		inline unsigned int getLStart(){return LeadStart;} 
+		/// Read-only access to LCP::LeadEnd
 		inline unsigned int getLEnd(){return LeadEnd;}
+		/// Read-only access to LCP::Compl
 		inline perps getCompl() {return this->Compl;}  
+		/// Print a summary of the LCP
 		void print(string end="\n");
 	/* Member functions */
 	private:
@@ -223,30 +302,19 @@ class LCP
 		void FixToPoly(const vector<short int> *Fix, bool checkFeas = false);
 		void FixToPolies(const vector<short int> *Fix, bool checkFeas = false);
 	public:
-		int ConvexHull(arma::sp_mat* A, arma::vec *b) 
+		/**
+		 * Computes the convex hull of the feasible region of the LCP
+		 * @warning To be run only after LCP::BranchAndPrune is run. Otherwise this can give errors
+		 */
+		int ConvexHull(
+				/// Convex hull inequality description LHS to be stored here
+				arma::sp_mat* A,
+				/// Convex hull inequality description RHS to be stored here
+			   	arma::vec *b) 
 		{return ::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
 };
 
 
-
-int LCPasLPTree(
-		const arma::sp_mat M,
-	   	const arma::sp_mat N,
-		const arma::vec q,
-		vector<arma::sp_mat> &A,
-		vector<arma::vec> &b,
-	   	vector<arma::vec> &sol,
-		bool cleanup);
-int LCPasLP(
-		const arma::sp_mat M,
-		const arma::vec q,
-		vector<arma::sp_mat> &A,
-		vector<arma::vec> &b,
-	   	vector<arma::vec> &sol,
-		bool cleanup ,
-		bool Gurobiclean );
-int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i);
-bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 
 /************************************************/
 /* 	 									      	*/
@@ -254,47 +322,35 @@ bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 /* 	 									      	*/
 /************************************************/
 namespace Models{
-/******************************************************************************************************
- *  
- * INPUTS:
- * 		n_followers			: (int) Number of followers in the country
- * 		costs_quad			: (vector<double>) Quadratic coefficient of i-th follower's
- * 							  cost. Size of this vector should be equal to n_followers
- * 		costs_lin			: (vector<double>) Linear  coefficient of i-th follower's
- * 							  cost. Size of this vector should be equal to n_followers
- * 		capacities			: (vector<double>) Production capacity of each follower.
- * 							  cost. Size of this vector should be equal to n_followers
- *		alpha, beta			: (double, double) Parameters of the demand curve. Written 
- *							  as: Price = alpha - beta*(Total quantity in domestic market) 							  
- *		import_limit		: (double) Maximum net import in the country.
- *							  If no limit, set the value as -1;
- *		export_limit		: (double) Maximum net export in the country.
- *							  If no limit, set the value as -1;
- *		max_tax_perc		: (double) Government decided increase in the shift in costs_lin
- *							  of any player cannot exceed this value
- *		addnlLeadVars		: (unsigned int) Create columns with 0s in it. To handle additional
- *							  dummy leader variables.
- *							  
- * OUTPUTS:					: No output arguments
- * RETURNS:
- * 		NashGame* object	: Points to an object created using "new". A Nash cournot game is played
- * 							  among the followers, for the leader-decided values of import
- * 							  export, caps and taxations on all players. 
- * 							  The total quantity used in the demand equation (See defn of INPUTS: alpha,
- * 							  beta) is the sum of quantity produced by all followers + any import
- * 							  - any export.
- *
- *****************************************************************************************************/
-NashGame* createCountry(
-		const unsigned int n_followers,
-		const vector<double> costs_quad,
-		const vector<double> costs_lin,
-		const vector<double> capacities,
-		const double alpha, const double beta, /// For the demand curve P = a-bQ
-		const double import_limit = -1, /// Negative number implies no limit
-		const double export_limit = -1,  /// Negative number implies no limit
-		const double max_tax_perc = 0.30,
-		const unsigned int addnlLeadVars = 0
+/**
+ *  A Nash cournot game is played among the followers, for the leader-decided values of import export, caps and taxations on all players. The total quantity used in the demand equation is the sum of quantity produced by all followers + any import - any export.  
+ * @return Pointer to LCP object created using "new".  * *
+ */
+LCP* createCountry(
+		/// A gurobi environment to create and process the resulting LCP object.
+		GRBEnv env, 
+		/// Number of followers in the country
+		const unsigned int n_followers, 
+		/// Quadratic coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
+		const vector<double> costs_quad, 
+		/// Linear  coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
+		const vector<double> costs_lin, 
+		/// Production capacity of each follower. Size of this vector should be equal to n_followers
+		const vector<double> capacities, 
+		/// Parameters of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 							  
+		const double alpha, const double beta, 
+		/// Maximum net import in the country. If no limit, set the value as -1;
+		const double import_limit = -1, 
+		/// Maximum net export in the country. If no limit, set the value as -1;
+		const double export_limit = -1,  
+		/// Government decided increase in the shift in costs_lin of any player cannot exceed this value
+		const double max_tax_perc = 0.30, 
+		/// Create columns with 0s in it. To handle additional dummy leader variables.
+		const unsigned int addnlLeadVars = 0 
 		);
+
+
+
+
 }; // End of namespace Models {
 #endif

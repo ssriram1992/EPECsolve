@@ -2,8 +2,11 @@
 #include<vector>
 #include<armadillo>
 #include<iostream>
+#include<gurobi_c++.h>
 
-NashGame* Models::createCountry(
+LCP* 
+Models::createCountry(
+		GRBEnv env,
 		const unsigned int n_followers,
 		const vector<double> costs_quad,
 		const vector<double> costs_lin,
@@ -15,18 +18,20 @@ NashGame* Models::createCountry(
 		const unsigned int addnlLeadVars
 		)
 {
-	/// Check Error
 	const unsigned int LeadVars = 2 + 2*n_followers + addnlLeadVars;// two for quantity imported and exported, n for imposed cap and last n for tax
+	/// @throw const char* - 0 followers
 	if(n_followers == 0) throw "Error in createCountry(). 0 Followers?";
+	/// @throw const char* - Not equal sizes of vectors
 	if (costs_lin.size()!=n_followers ||
 			costs_quad.size() != n_followers ||
 			capacities.size() != n_followers 
 	   )
 		throw "Error in createCountry(). Size Mismatch";
+	/// @throw const char* - Invalid alpha or beta value
 	if (alpha <= 0 || beta <=0 ) throw "Error in createCountry(). Invalid demand curve params";
 	// Error checks over
 	arma::sp_mat Q(1,1), C(1, LeadVars + n_followers - 1);
-	/// Two constraints. One saying that you should be less than capacity
+	// Two constraints. One saying that you should be less than capacity
 	// Another saying that you should be less than leader imposed cap!
 	arma::sp_mat A(2, LeadVars + n_followers - 1), B(2, 1); 
 	arma::vec c(1), b(2); 
@@ -40,7 +45,7 @@ NashGame* Models::createCountry(
 	LeadCons.zeros();
 
 	vector<QP_Param*> Players{};
-	/// Create the QP_Param* for each follower
+	// Create the QP_Param* for each follower
 	for(unsigned int follower = 0; follower < n_followers; follower++)
 	{
 		c.fill(0); b.fill(0);
@@ -87,8 +92,14 @@ NashGame* Models::createCountry(
 	arma::vec MCRHS(0, arma::fill::zeros);
 
 	NashGame* N = new NashGame(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
-	// NashGame* N = new NashGame(Players, MC, MCRHS, LeadVars); 
-	return N;
+	arma::sp_mat LeadConsReWrit = N->RewriteLeadCons();
+	arma::sp_mat M; arma::vec q; perps Compl;
+	N->FormulateLCP(M, q, Compl);
+	LCP* country = new LCP(&env, M, q, Compl, LeadConsReWrit, LeadRHS);
+	country->print();
+	cout<<M.n_rows<<", "<<M.n_cols<<endl<<q.n_rows<<endl<<LeadConsReWrit.n_rows<<", "<<LeadConsReWrit.n_cols<<endl;
+	delete N;
+	return country;
 }
 
 
