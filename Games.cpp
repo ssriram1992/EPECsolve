@@ -149,17 +149,20 @@ QP_Param::is_Playable(const QP_Param P) const
 
 
 /**
- * Have a vector of QP_Param* ready such that
- * the variables are separated in x^{i} and x^{-i}
+ * Have a vector of pointers to QP_Param ready such that
+ * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
+ *
  * In the correct ordering of variables, have the 
  * Market clearing equations ready. 
+ *
  * Now call this constructor.
  * It will allocate appropriate space for the dual variables 
  * for each player.
- * The ordering is 
- * [ Primal for Pl1, Primal for Pl2, ..., MarketCL duals,
- *  Dual for Pl1, Dual for Pl2, ... ]
+ *
+ * The ordering is according to the columns of
+	 @image html FormulateLCP.png
+	 @image latex FormulateLCP.png
  */
 NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 {
@@ -216,6 +219,10 @@ NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
 	q.set_size(NvarFollow);
 	M.zeros(); q.zeros(); // Make sure that the matrices don't have garbage value filled in !  
 	// Get the KKT conditions for each player
+	/// The way the variables of the players get distributed is shown in the image below
+	/// @image html FormulateLCP.png
+	/// @image latex FormulateLCP.png
+	
 	for(unsigned int i=0; i<Nplayers;i++)
 	{
 		this->Players[i]->KKT(Mi[i], Ni[i], qi[i]); 

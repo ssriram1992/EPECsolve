@@ -18,6 +18,31 @@ Models::createCountry(
 		const unsigned int addnlLeadVars
 		)
 {
+	/**
+	 *  A Nash cournot game is played among the followers, for the leader-decided values of import export, caps and taxations on all players. The total quantity used in the demand equation is the sum of quantity produced by all followers + any import - any export.  
+	 */
+	/**
+	 * @details Use \f$l_i\f$ to denote the \f$i\f$-th element in `costs_lin` and \f$q_i\f$ for the \f$i\f$-th element in `costs_quad`. Then to produce quantity \f$x_i\f$, the \f$i\f$-th producer's cost will be 
+	 * \f\[ l_ix_i + \frac{1}{2}q_ix_i^2 \f\]
+	 * In addition to this, the leader may impose "tax", which could increase \f$l_i\f$ for each player.
+	 *
+	 * Total quantity in the market is given by sum of quantities produced by all producers adjusted by imports and exports
+	 * \f\[{Total\quad  Quantity} = \sum_i x_i + x_{imp} - x_{exp} \f\]
+	 * The demand curve in the market is given by
+	 * \f\[{Price} = a-b({Total\quad  Quantity})\f\]
+	 *
+	 * Each follower is also constrained by a maximum production capacity her infrastructure allows. And each follower is constrained by a cap on their production, that is imposed by the leader.
+	 *
+	 * Each follower decides \f$x_i\f$ noncooperatively maximizing profits.
+	 *
+	 * The leader decides quantity imported \f$q_{imp}\f$, quantity exported \f$q_{exp}\f$, cap on each player, \f$\tilde{x_i}\f$, and the tax for each player \f$t_i\f$.
+	 *
+	 * The leader is also constrained to not export or import anything more than the limits set by `export_limit` and `import_limit`. A negative value to these input variables imply that there is no such limit.
+	 * 
+	 * Similarly the leader cannot also impose tax on any player greater than what is dictated by the input variable `max_tax_perc`.
+	 *
+	 * @return Pointer to LCP object dynamically created using `new`.  * *
+	 */
 	const unsigned int LeadVars = 2 + 2*n_followers + addnlLeadVars;// two for quantity imported and exported, n for imposed cap and last n for tax
 	/// @throw const char* - 0 followers
 	if(n_followers == 0) throw "Error in createCountry(). 0 Followers?";

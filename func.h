@@ -48,6 +48,7 @@ template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
 
 
+///@brief Class to handle parameterized quadratic programs(QP)
 class QP_Param
 /**
  * Represents a Parameterized QP as \f[
@@ -110,6 +111,19 @@ class QP_Param
 		bool is_Playable(const QP_Param P) const;
 };
 
+/**
+ * @brief Class to model Nash-cournot games with each player playing a QP
+ */
+/**
+ * Stores a vector of QPs with each player's optimization problem.
+ * Potentially common (leader) constraints can be stored too.
+ *
+ * Helpful in rewriting the Nash-Cournot game as an LCP
+ * Helpful in rewriting leader constraints after incorporating dual variables etc
+ * @warning This has public fields which if accessed and changed can cause
+ * undefined behavior! 
+ * \todo Better implementation which will make the above warning go away!
+ */
 class NashGame
 {
 	private:
@@ -129,12 +143,15 @@ class NashGame
 		/// To print the Nash Game!
 		friend ostream& operator<< (ostream& os, const NashGame N);
 	private:
-		// In the vector of variables of all players,
-		// which position does the variable corrresponding to this player starts.
+		///@internal In the vector of variables of all players,which position does the variable corrresponding to this player starts.
 		vector<unsigned int> primal_position; 
+		///@internal In the vector of variables of all players,which position do the DUAL variable corrresponding to this player starts.
 		vector<unsigned int> dual_position; 
+		///@internal Manages the position of Market clearing constraints' duals
 		unsigned int MC_dual_position;
-		unsigned int Leader_position; // Position from where leader's vars start
+		/// @internal Manages the position of where the leader's variables start
+		unsigned int Leader_position; 
+		/// Number of leader variables. These many variables will not have a matching complementary equation.
 		unsigned int n_LeadVar;
 	public: // Constructors
 		/**
@@ -157,9 +174,9 @@ class NashGame
 		/// Formulates the LCP corresponding to the Nash game. 
 		/// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
 		unsigned int FormulateLCP(
-				/// Returns the `M` corresponding to `Mx+q`
+				///@internal Returns the \f$M\f$ corresponding to \f$Mx+q\f$
 				arma::sp_mat &M, 
-				/// Returns the `q` corresponding to `Mx+q`
+				///@internal Returns the \f$q\f$ corresponding to \f$Mx+q\f$
 			   	arma::vec &q,
 				/// There might be more variables than equations. In this case pairs the equations with variables
 			   	perps &Compl) const;
@@ -200,8 +217,10 @@ int ConvexHull(
 		arma::sp_mat *A, 
 		/// Pointer to store the output of the convex hull RHS
 		arma::vec *b, 
-		/// Any common constraints to ALL the polyhedra.
-		arma::sp_mat Acom={}, arma::vec bcom={} 
+		/// Any common constraints to ALL the polyhedra - LHS.
+		arma::sp_mat Acom={},
+		/// Any common constraints to ALL the polyhedra - RHS.
+	   	arma::vec bcom={} 
 		);
 
 /**
@@ -322,10 +341,7 @@ class LCP
 /* 	 									      	*/
 /************************************************/
 namespace Models{
-/**
- *  A Nash cournot game is played among the followers, for the leader-decided values of import export, caps and taxations on all players. The total quantity used in the demand equation is the sum of quantity produced by all followers + any import - any export.  
- * @return Pointer to LCP object created using "new".  * *
- */
+	///@brief %Models a Standard Nash-Cournot game within a country
 LCP* createCountry(
 		/// A gurobi environment to create and process the resulting LCP object.
 		GRBEnv env, 
@@ -337,8 +353,10 @@ LCP* createCountry(
 		const vector<double> costs_lin, 
 		/// Production capacity of each follower. Size of this vector should be equal to n_followers
 		const vector<double> capacities, 
-		/// Parameters of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 							  
-		const double alpha, const double beta, 
+		/// Intercept of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 							  
+		const double alpha, 
+		/// Slope of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 							  
+		const double beta, 
 		/// Maximum net import in the country. If no limit, set the value as -1;
 		const double import_limit = -1, 
 		/// Maximum net export in the country. If no limit, set the value as -1;

@@ -7,22 +7,6 @@
 using namespace std;
 
 
-int 
-BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i)
-/**
- * Given the size of the output vector "size", and the number "i" in decimal form
- * converts it into a decimal string of length "size" and stores it in "selecOfTwo"
- */
-{
-	for (unsigned int j = size-1; j!=0; j--)
-	{
-		selecOfTwo[j] = i%2;
-		i/=2;
-	}
-	selecOfTwo[0] = i%2;
-	return 0;
-}
-
 void 
 LCP::defConst(GRBEnv* env)
 {

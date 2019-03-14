@@ -68,7 +68,7 @@ sand: sand.o
 sand.o: sand.cpp
 	$(GCC) -c sand.cpp $(OPTS)
 
-doc:
+docSimple:
 	doxygen refConf
 
 docDetailed:
