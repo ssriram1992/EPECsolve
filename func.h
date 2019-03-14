@@ -248,4 +248,53 @@ int LCPasLP(
 int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i);
 bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 
+/************************************************/
+/* 	 									      	*/
+/*******			FROM Models.CPP	        *****/ 
+/* 	 									      	*/
+/************************************************/
+namespace Models{
+/******************************************************************************************************
+ *  
+ * INPUTS:
+ * 		n_followers			: (int) Number of followers in the country
+ * 		costs_quad			: (vector<double>) Quadratic coefficient of i-th follower's
+ * 							  cost. Size of this vector should be equal to n_followers
+ * 		costs_lin			: (vector<double>) Linear  coefficient of i-th follower's
+ * 							  cost. Size of this vector should be equal to n_followers
+ * 		capacities			: (vector<double>) Production capacity of each follower.
+ * 							  cost. Size of this vector should be equal to n_followers
+ *		alpha, beta			: (double, double) Parameters of the demand curve. Written 
+ *							  as: Price = alpha - beta*(Total quantity in domestic market) 							  
+ *		import_limit		: (double) Maximum net import in the country.
+ *							  If no limit, set the value as -1;
+ *		export_limit		: (double) Maximum net export in the country.
+ *							  If no limit, set the value as -1;
+ *		max_tax_perc		: (double) Government decided increase in the shift in costs_lin
+ *							  of any player cannot exceed this value
+ *		addnlLeadVars		: (unsigned int) Create columns with 0s in it. To handle additional
+ *							  dummy leader variables.
+ *							  
+ * OUTPUTS:					: No output arguments
+ * RETURNS:
+ * 		NashGame* object	: Points to an object created using "new". A Nash cournot game is played
+ * 							  among the followers, for the leader-decided values of import
+ * 							  export, caps and taxations on all players. 
+ * 							  The total quantity used in the demand equation (See defn of INPUTS: alpha,
+ * 							  beta) is the sum of quantity produced by all followers + any import
+ * 							  - any export.
+ *
+ *****************************************************************************************************/
+NashGame* createCountry(
+		const unsigned int n_followers,
+		const vector<double> costs_quad,
+		const vector<double> costs_lin,
+		const vector<double> capacities,
+		const double alpha, const double beta, /// For the demand curve P = a-bQ
+		const double import_limit = -1, /// Negative number implies no limit
+		const double export_limit = -1,  /// Negative number implies no limit
+		const double max_tax_perc = 0.30,
+		const unsigned int addnlLeadVars = 0
+		);
+}; // End of namespace Models {
 #endif
