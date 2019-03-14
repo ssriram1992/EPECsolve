@@ -165,7 +165,7 @@ class LCP
 	// Temporary data
 		bool madeRlxdModel;
 		unsigned int nR, nC;
-		vector<vector<int>*>* AllPolyhedra;
+		vector<vector<short int>*>* AllPolyhedra;
 		vector<arma::sp_mat*>* Ai; vector<arma::vec*>* bi;
 	   	GRBModel RlxdModel;
 	public: 
@@ -199,7 +199,7 @@ class LCP
 	public:
 		GRBModel* LCPasMIP(vector<unsigned int> FixEq={}, 
 				vector<unsigned int> FixVar={}, bool solve=false);
-		GRBModel* LCPasMIP(vector<int> Fixes, bool solve);
+		GRBModel* LCPasMIP(vector<short int> Fixes, bool solve);
 		GRBModel* LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, 
 				vector<unsigned int> FixVar={});
 		GRBModel* LCP_Polyhed_fixed(arma::Col<int> FixEq, 
@@ -207,21 +207,21 @@ class LCP
 	/* Branch and Prune Methods */
 	private:
 		template<class T> inline bool isZero(const T val) const { return (val>-eps && val < eps);}
-		inline vector<int>* solEncode(GRBModel *model)const;
-		vector<int>* solEncode(const arma::vec &z, const arma::vec &x)const;
-		void branch(int loc, const vector<int> *Fixes);
-		vector<int>* anyBranch(const vector<vector<int>*>* vecOfFixes, vector<int>* Fix) const;
-		int BranchLoc(GRBModel* m, vector<int>* Fix);
-		int BranchProcLoc(vector<int>* Fix, vector<int> *Leaf);
+		inline vector<short int>* solEncode(GRBModel *model)const;
+		vector<short int>* solEncode(const arma::vec &z, const arma::vec &x)const;
+		void branch(int loc, const vector<short int> *Fixes);
+		vector<short int>* anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const;
+		int BranchLoc(GRBModel* m, vector<short int>* Fix);
+		int BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf);
 		int EnumerateAll(bool solveLP=false);
 	public:
 		bool extractSols(GRBModel* model, arma::vec &z, 
 				arma::vec &x, bool extractZ = false) const; 
-		vector<vector<int>*> *BranchAndPrune ();
+		vector<vector<short int>*> *BranchAndPrune ();
 	/* Convex hull computation */
 	private:
-		void FixToPoly(const vector<int> *Fix, bool checkFeas = false);
-		void FixToPolies(const vector<int> *Fix, bool checkFeas = false);
+		void FixToPoly(const vector<short int> *Fix, bool checkFeas = false);
+		void FixToPolies(const vector<short int> *Fix, bool checkFeas = false);
 	public:
 		int ConvexHull(arma::sp_mat* A, arma::vec *b) 
 		{return ::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};

@@ -24,7 +24,7 @@ int BinaryArr(int *selecOfTwo, unsigned int size, long long unsigned int i)
 
 void LCP::defConst(GRBEnv* env)
 {
-	AllPolyhedra = new vector<vector<int>*> {};
+	AllPolyhedra = new vector<vector<short int>*> {};
 	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
 	if(!VERBOSE) this->RlxdModel.set(GRB_IntParam_OutputFlag,0);
 	this->env = env;  this->madeRlxdModel = false; this->bigM = 1e5; this->eps = 1e-5;
@@ -168,7 +168,7 @@ GRBModel* LCP::LCP_Polyhed_fixed(
 	return model;
 }
 
-GRBModel* LCP::LCPasMIP(vector<int> Fixes, bool solve)
+GRBModel* LCP::LCPasMIP(vector<short int> Fixes, bool solve)
 {
 	if(Fixes.size()!=this->nR) throw "Bad size for Fixes in LCP::LCPasMIP";
 	vector<unsigned int> FixVar, FixEq; 
@@ -383,7 +383,7 @@ bool operator >(vector<int> Fix1, vector<int> Fix2)
 	return (Fix2<Fix1);
 }
 
-vector<int>* LCP::anyBranch(const vector<vector<int>*>* vecOfFixes, vector<int>* Fix) const
+vector<short int>* LCP::anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const
 /**
  * Returns true if any (grand)child of Fix is in vecOfFixes!
  */
@@ -408,9 +408,9 @@ bool LCP::extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ
 	return true;
 }
 
-vector<int>* LCP::solEncode(const arma::vec &z, const arma::vec &x) const
+vector<short int>* LCP::solEncode(const arma::vec &z, const arma::vec &x) const
 {
-	vector<signed int>* solEncoded = new vector<signed int>(nR, 0);
+	vector<signed short int>* solEncoded = new vector<signed short int>(nR, 0);
 	for(auto p:Compl)
 	{
 		unsigned int i, j; i=p.first; j=p.second;
@@ -420,14 +420,14 @@ vector<int>* LCP::solEncode(const arma::vec &z, const arma::vec &x) const
 	return solEncoded;
 }
 
-vector<int>* LCP::solEncode(GRBModel *model) const
+vector<short int>* LCP::solEncode(GRBModel *model) const
 {
 	arma::vec x,z;
 	if(!this->extractSols(model, z, x, true)) return {};// If infeasible model, return empty!
 	else return this->solEncode(z,x);
 }
 
-void LCP::branch(int loc, const vector<int> *Fixes) 
+void LCP::branch(int loc, const vector<short int> *Fixes) 
 /**
  * If loc == nR, then stop branching. We either hit infeasibility or a leaf.
  * If loc <0, then branch at abs(loc) location and go down the branch where variable is fixed to 0
@@ -436,7 +436,7 @@ void LCP::branch(int loc, const vector<int> *Fixes)
 {
 	bool VarFirst=(loc<0);
 	GRBModel *FixEqMdl=nullptr, *FixVarMdl=nullptr;
-	vector<int> *FixEqLeaf, *FixVarLeaf;
+	vector<short int> *FixEqLeaf, *FixVarLeaf;
 	if(VERBOSE) 
 	{
 		cout<<endl<<"Branching on Variable: "<<loc<<" with Fix as ";
@@ -454,8 +454,8 @@ void LCP::branch(int loc, const vector<int> *Fixes)
 	else
 	{
 	GRBVar x,z;
-	vector<int> *FixesEq = new vector<int>(*Fixes);
-	vector<int> *FixesVar = new vector<int>(*Fixes);
+	vector<short int> *FixesEq = new vector<short int>(*Fixes);
+	vector<short int> *FixesVar = new vector<short int>(*Fixes);
 	if(Fixes->at(loc) != 0) throw "Fixing an already fixed variable!";
 	FixesEq->at(loc) =1; FixesVar->at(loc)=-1;
 	if(VarFirst)
@@ -483,16 +483,16 @@ void LCP::branch(int loc, const vector<int> *Fixes)
 	}
 }
 
-vector<vector<int>*> *LCP::BranchAndPrune ()
+vector<vector<short int>*> *LCP::BranchAndPrune ()
 {
 	GRBModel *m = nullptr;
-	vector<int>* Fix = new vector<int>(nR,0);
+	vector<short int>* Fix = new vector<short int>(nR,0);
 	branch(BranchLoc(m, Fix), Fix);
 	delete Fix;
 	return AllPolyhedra;
 }
 
-int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
+int LCP::BranchLoc(GRBModel* m, vector<short int>* Fix)
 {
 	static int GurCallCt {0};
 	m = this->LCPasMIP(*Fix, true);
@@ -508,8 +508,8 @@ int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 	arma::vec z,x;
 	if(this->extractSols(m, z, x, true)) // If already infeasible, nothing to branch!
 	{
-		vector<int> *v1 = this->solEncode(z,x);
-		vector<int> *v2 = anyBranch(AllPolyhedra, v1);
+		vector<short int> *v1 = this->solEncode(z,x);
+		vector<short int> *v2 = anyBranch(AllPolyhedra, v1);
 		if(VERBOSE)
 		{
 			cout<<"v1: \t\t\t";
@@ -566,7 +566,7 @@ int LCP::BranchLoc(GRBModel* m, vector<int>* Fix)
 	return pos; 
 }
 
-int LCP::BranchProcLoc(vector<int>* Fix, vector<int> *Leaf)
+int LCP::BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf)
 {
 	int pos = (int)nR;
 	if(VERBOSE)
@@ -585,7 +585,7 @@ int LCP::BranchProcLoc(vector<int>* Fix, vector<int> *Leaf)
 	return pos;
 }
 
-void LCP::FixToPoly(const vector<int> *Fix, bool checkFeas)
+void LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas)
 {
 	arma::sp_mat *Aii = new arma::sp_mat(nR, nC);
    	arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
@@ -636,10 +636,10 @@ void LCP::FixToPoly(const vector<int> *Fix, bool checkFeas)
 	if(add) { this->Ai->push_back(Aii); this->bi->push_back(bii); }
 	if(VERBOSE) cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;
 }
-void LCP::FixToPolies(const vector<int> *Fix, bool checkFeas)
+void LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas)
 {
 	bool flag = false;
-	vector<int> MyFix(*Fix);
+	vector<short int> MyFix(*Fix);
 	unsigned int i;
 	for(i=0; i<this->nR;i++)
 		if(Fix->at(i)==0) { flag = true; break; }
@@ -657,7 +657,7 @@ int LCP::EnumerateAll(const bool solveLP)
 {
 	delete Ai; delete bi; // Just in case it is polluted with BranchPrune
 	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
-	vector<int> *Fix = new vector<int>(nR,0);
+	vector<short int> *Fix = new vector<short int>(nR,0);
 	this->FixToPolies(Fix, solveLP);
 	return 0;
 }
