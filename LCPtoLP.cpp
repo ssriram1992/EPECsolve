@@ -101,7 +101,7 @@ int LCP::makeRelaxed()
 			for(unsigned int i=0;i<_A.n_rows;i++)
 			{
 				GRBLinExpr expr = 0;
-				for(auto a=_A.begin_row(i); a!=M.end_row(i); ++a)
+				for(auto a=_A.begin_row(i); a!=_A.end_row(i); ++a)
 					expr += (*a) * x[a.col()];
 				RlxdModel.addConstr(expr, GRB_LESS_EQUAL, _b(i));
 			}

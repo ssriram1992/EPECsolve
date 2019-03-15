@@ -254,6 +254,51 @@ bool isEmpty(const arma::sp_mat A, const arma::vec b, arma::vec &sol);
 /* 	 									      	*/
 /************************************************/
 namespace Models{
+
+typedef struct FollPar FollPar; 
+typedef struct DemPar DemPar;
+typedef struct LeadPar LeadPar;
+typedef struct LeadAllPar LeadAllPar;
+
+struct FollPar
+{
+	vector<double> costs_quad;
+	vector<double> costs_lin;
+	vector<double> capacities;
+};
+
+struct DemPar
+{
+
+	double alpha = 100;
+	double beta = 2;
+	DemPar(double alpha=100, double beta=2):alpha{alpha}, beta{beta}{};
+};
+
+struct LeadPar
+{
+	double import_limit = -1; /// Negative number implies no limit
+	double export_limit = -1; /// Negative number implies no limit
+	double max_tax_perc = 0.3;
+	LeadPar(double max_tax_perc=0.3, double imp_lim=-1, double exp_lim=-1):import_limit{imp_lim}, export_limit{exp_lim}, max_tax_perc{max_tax_perc}{}
+};
+
+struct LeadAllPar
+{
+	unsigned int n_followers;
+	Models::FollPar FollowerParam = {};
+	Models::DemPar DemandParam = {};
+	Models::LeadPar LeaderParam = {};
+	LeadAllPar(unsigned int n, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}):n_followers{n}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}{};
+};
+
+
+ostream& operator<<(ostream& ost, const FollPar P);
+ostream& operator<<(ostream& ost, const DemPar P);
+ostream& operator<<(ostream& ost, const LeadPar P);
+ostream& operator<<(ostream& ost, const LeadAllPar P);
+
+
 /******************************************************************************************************
  *  
  * INPUTS:
@@ -296,5 +341,17 @@ NashGame* createCountry(
 		const double max_tax_perc = 0.30,
 		const unsigned int addnlLeadVars = 0
 		);
-}; // End of namespace Models {
+
+NashGame* createCountry(
+		LeadAllPar Params, 
+		const unsigned int addnlLeadVars  = 0
+		);
+};
+
+
+
+
+
+
+// End of namespace Models {
 #endif
