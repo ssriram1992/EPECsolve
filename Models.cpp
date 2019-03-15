@@ -136,7 +136,7 @@ ostream& Models::operator<<(ostream& ost, const Models::DemPar P)
 {
 	ost<<"Demand Parameters: "<<endl;
 	ost<<"******************"<<endl;
-	ost<<"Price\t\t =\t\t "<<P.alpha<<"\t\t-\t\t"<<P.beta<<"\tx\t Quantity"<<endl;
+	ost<<"Price\t\t =\t\t "<<P.alpha<<"\t-\t"<<P.beta<<"  x   Quantity"<<endl;
 	return ost;
 }
 ostream& Models::operator<<(ostream& ost, const Models::LeadPar P)
@@ -156,11 +156,11 @@ ostream& Models::operator<<(ostream& ost, const Models::LeadPar P)
 ostream& Models::operator<<(ostream& ost, const Models::LeadAllPar P)
 {
 	ost<<"\n\n";
-	ost<<"***************************"<<"\n "<<"\n";
-	ost<<"Leader Complete Description"<<"\n "<<"\n";
-	ost<<"***************************"<<"\n "<<"\n";
+	ost<<"***************************"<<"\n";
+	ost<<"Leader Complete Description"<<"\n";
+	ost<<"***************************"<<"\n"<<"\n";
 	ost<<"Number of followers: \t\t\t"<<P.n_followers<<"\n "<<"\n";
-	ost<<P.LeaderParam<<P.FollowerParam<<P.DemandParam<<"\n";
+	ost<<endl<<P.LeaderParam<<endl<<P.FollowerParam<<endl<<P.DemandParam<<"\n";
 	ost<<"***************************"<<"\n"<<"\n";
 	return ost;
 }

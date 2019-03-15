@@ -324,6 +324,7 @@ class LCP
 		/**
 		 * Computes the convex hull of the feasible region of the LCP
 		 * @warning To be run only after LCP::BranchAndPrune is run. Otherwise this can give errors
+		 * @todo Formally call LCP::BranchAndPrune or throw an exception if this method is not already run
 		 */
 		int ConvexHull(
 				/// Convex hull inequality description LHS to be stored here
@@ -346,6 +347,7 @@ typedef struct DemPar DemPar;
 typedef struct LeadPar LeadPar;
 typedef struct LeadAllPar LeadAllPar;
 
+/// @brief Stores the parameters of the follower in a country model
 struct FollPar
 {
 	/// Quadratic coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
@@ -356,6 +358,8 @@ struct FollPar
 	vector<double> capacities;
 };
 
+
+/// @brief Stores the parameters of the demand curve in a country model
 struct DemPar
 {
 	/// Intercept of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 
@@ -365,6 +369,7 @@ struct DemPar
 	DemPar(double alpha=100, double beta=2):alpha{alpha}, beta{beta}{};
 };
 
+/// @brief Stores the parameters of the leader in a country model
 struct LeadPar
 {
 	/// Maximum net import in the country. If no limit, set the value as -1;
@@ -376,12 +381,16 @@ struct LeadPar
 	LeadPar(double max_tax_perc=0.3, double imp_lim=-1, double exp_lim=-1):import_limit{imp_lim}, export_limit{exp_lim}, max_tax_perc{max_tax_perc}{}
 };
 
+/// @brief Stores the parameters of a country model
 struct LeadAllPar
 {
 	/// Number of followers in the country
 	unsigned int n_followers;
+	/// A struct to hold Follower Parameters
 	Models::FollPar FollowerParam = {};
+	/// A struct to hold Demand Parameters
 	Models::DemPar DemandParam = {};
+	/// A struct to hold Leader Parameters
 	Models::LeadPar LeaderParam = {};
 	LeadAllPar(unsigned int n, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}):n_followers{n}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}{};
 };

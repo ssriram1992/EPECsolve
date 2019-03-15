@@ -10,8 +10,7 @@
 using namespace std;
 
 
-/*
-int LCPtest()
+int LCPtest(Models::LeadAllPar LA)
 {
 	GRBEnv env = GRBEnv();
 	GRBModel* model=nullptr;
@@ -21,7 +20,8 @@ int LCPtest()
 	bool Error{true};
 	try
 	{
-		MyNashGame = Models::createCountry(env, 2, {3,1}, {1,5}, {100, 100}, 80, 5, 10, 10, 0.5);
+		// MyNashGame = Models::createCountry(env, 2, {3,1}, {1,5}, {100, 100}, 80, 5, 10, 10, 0.5);
+		MyNashGame = Models::createCountry(env, LA, 0);
 		Error = false;
 	} 
 	catch(const char* e) { cout<<e<<endl; }
@@ -56,7 +56,6 @@ int LCPtest()
 	delete MyNashGame;
 	return 0;
 }
-*/
 
 
 
@@ -65,12 +64,12 @@ int main()
 	Models::DemPar P;
 	Models::FollPar *FP = new Models::FollPar();
 	Models::LeadPar L;
-	Models::LeadAllPar LA(3);
-	FP->capacities = {-1, 15, 10};
+	FP->capacities = {10, 15, 10};
 	FP->costs_lin = {30, 40, 50};
 	FP->costs_quad = {60, 40, 0};
-	cout<<P<<*FP<<L;
-	cout<<"Ini Full"<<endl;
+	Models::LeadAllPar LA(3, *FP);
 	cout<<LA;
+	cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
+	LCPtest(LA);
 	return 0;
 }
