@@ -341,34 +341,67 @@ class LCP
 /* 	 									      	*/
 /************************************************/
 namespace Models{
-	///@brief %Models a Standard Nash-Cournot game within a country
+typedef struct FollPar FollPar; 
+typedef struct DemPar DemPar;
+typedef struct LeadPar LeadPar;
+typedef struct LeadAllPar LeadAllPar;
+
+struct FollPar
+{
+	/// Quadratic coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
+	vector<double> costs_quad;
+	/// Linear  coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
+	vector<double> costs_lin;
+	/// Production capacity of each follower. Size of this vector should be equal to n_followers
+	vector<double> capacities;
+};
+
+struct DemPar
+{
+	/// Intercept of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 
+	double alpha = 100;
+	/// Slope of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 
+	double beta = 2;
+	DemPar(double alpha=100, double beta=2):alpha{alpha}, beta{beta}{};
+};
+
+struct LeadPar
+{
+	/// Maximum net import in the country. If no limit, set the value as -1;
+	double import_limit = -1; 
+	/// Maximum net export in the country. If no limit, set the value as -1;
+	double export_limit = -1;
+	/// Government decided increase in the shift in costs_lin of any player cannot exceed this value
+	double max_tax_perc = 0.3;
+	LeadPar(double max_tax_perc=0.3, double imp_lim=-1, double exp_lim=-1):import_limit{imp_lim}, export_limit{exp_lim}, max_tax_perc{max_tax_perc}{}
+};
+
+struct LeadAllPar
+{
+	/// Number of followers in the country
+	unsigned int n_followers;
+	Models::FollPar FollowerParam = {};
+	Models::DemPar DemandParam = {};
+	Models::LeadPar LeaderParam = {};
+	LeadAllPar(unsigned int n, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}):n_followers{n}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}{};
+};
+
+
+ostream& operator<<(ostream& ost, const FollPar P);
+ostream& operator<<(ostream& ost, const DemPar P);
+ostream& operator<<(ostream& ost, const LeadPar P);
+ostream& operator<<(ostream& ost, const LeadAllPar P);
+
+
+///@brief %Models a Standard Nash-Cournot game within a country
 LCP* createCountry(
 		/// A gurobi environment to create and process the resulting LCP object.
 		GRBEnv env, 
-		/// Number of followers in the country
-		const unsigned int n_followers, 
-		/// Quadratic coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
-		const vector<double> costs_quad, 
-		/// Linear  coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
-		const vector<double> costs_lin, 
-		/// Production capacity of each follower. Size of this vector should be equal to n_followers
-		const vector<double> capacities, 
-		/// Intercept of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 							  
-		const double alpha, 
-		/// Slope of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 							  
-		const double beta, 
-		/// Maximum net import in the country. If no limit, set the value as -1;
-		const double import_limit = -1, 
-		/// Maximum net export in the country. If no limit, set the value as -1;
-		const double export_limit = -1,  
-		/// Government decided increase in the shift in costs_lin of any player cannot exceed this value
-		const double max_tax_perc = 0.30, 
+		/// The Parameter structure for the leader
+		LeadAllPar Params, 
 		/// Create columns with 0s in it. To handle additional dummy leader variables.
-		const unsigned int addnlLeadVars = 0 
+		const unsigned int addnlLeadVars  = 0
 		);
-
-
-
-
-}; // End of namespace Models {
+};
+// End of namespace Models {
 #endif

@@ -10,8 +10,8 @@
 using namespace std;
 
 
-
-int main()
+/*
+int LCPtest()
 {
 	GRBEnv env = GRBEnv();
 	GRBModel* model=nullptr;
@@ -56,6 +56,21 @@ int main()
 	delete MyNashGame;
 	return 0;
 }
+*/
 
 
 
+int main()
+{
+	Models::DemPar P;
+	Models::FollPar *FP = new Models::FollPar();
+	Models::LeadPar L;
+	Models::LeadAllPar LA(3);
+	FP->capacities = {-1, 15, 10};
+	FP->costs_lin = {30, 40, 50};
+	FP->costs_quad = {60, 40, 0};
+	cout<<P<<*FP<<L;
+	cout<<"Ini Full"<<endl;
+	cout<<LA;
+	return 0;
+}
