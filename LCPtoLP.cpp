@@ -55,6 +55,9 @@ LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
 	N.FormulateLCP(M, q, Compl);
 }
 
+/** @brief Destructor of LCP */
+/** LCP object owns the pointers to definitions of its polyhedra that it owns
+ It has to be deleted and freed. */
 LCP::~LCP()
 {
 	for(auto p:*(this->AllPolyhedra)) delete p;
@@ -64,6 +67,9 @@ LCP::~LCP()
 	delete Ai; delete bi;
 }
 
+/** @brief Makes a Gurobi object that relaxes complementarity constraints in an LCP */
+/** @details A Gurobi object is stored in the LCP object, that has all complementarity constraints removed.
+ * A copy of this object is used by other member functions */
 int 
 LCP::makeRelaxed()
 {
@@ -81,7 +87,7 @@ LCP::makeRelaxed()
 			expr += q(i);
 			RlxdModel.addConstr(expr, GRB_EQUAL, z[i]);
 		} 
-		// If Ax \leq b constraints are there, they should be included too!
+		// If @f$Ax \leq b@f$ constraints are there, they should be included too!
 		if(this->_A.n_nonzero != 0 || this->_b.n_rows!=0)
 		{ 
 			if(_A.n_cols != nC || _A.n_rows != _b.n_rows) throw "A and b are incompatible! Thrown from makeRelaxed()";
@@ -104,17 +110,20 @@ LCP::makeRelaxed()
 	return 0;
 }
 
-/**
- 
+/** 
  * The returned model has constraints
- * corresponding to the non-zero elements of FixEq set to equality
- * and variables corresponding to the non-zero
- * elements of FixVar set to equality (=0)
+ * corresponding to the indices in FixEq set to equality
+ * and variables corresponding to the indices
+ * present in FixVar set to equality (=0)
  */
+/// @warning The FixEq and FixVar variables are used under a different convention here!
+/// @warning This member function is public for the moment. But this will be converted to a private method soon.
 GRBModel* 
 LCP::LCP_Polyhed_fixed(
-		vector<unsigned int> FixEq,  		// If non zero, equality imposed on variable
-		vector<unsigned int> FixVar  		// If non zero, equality imposed on equation
+        /// If index is present, equality imposed on that variable
+		vector<unsigned int> FixEq,  		
+        /// If index is present, equality imposed on that equation
+		vector<unsigned int> FixVar  		
 		)			
 {
 	makeRelaxed();
@@ -141,8 +150,10 @@ LCP::LCP_Polyhed_fixed(
  */
 GRBModel* 
 LCP::LCP_Polyhed_fixed(
-		arma::Col<int> FixEq,  		// If non zero, equality imposed on variable
-		arma::Col<int> FixVar  		// If non zero, equality imposed on equation
+        /// If non zero, equality imposed on variable
+		arma::Col<int> FixEq,  		
+        /// If non zero, equality imposed on equation
+		arma::Col<int> FixVar  		
 		)			
 {
 	makeRelaxed();
@@ -157,6 +168,10 @@ LCP::LCP_Polyhed_fixed(
 	return model;
 }
 
+/**
+ * Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in Fixes in 0/+1/-1 notation
+ * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
+ */
 GRBModel* 
 LCP::LCPasMIP(vector<short int> Fixes, bool solve)
 {
@@ -173,8 +188,7 @@ LCP::LCPasMIP(vector<short int> Fixes, bool solve)
 
 /**
  * Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in FixVar and FixEq.
- * CAVEAT:
- * Note that the model returned by this function has to be explicitly deleted using the delete operator.
+ * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
  */
 GRBModel* 
 LCP::LCPasMIP(
@@ -220,8 +234,14 @@ LCP::LCPasMIP(
 	return nullptr;
 }
 
+/**
+ * Checks if the `M` and `q` given to create the LCP object are of 
+ * compatible size, given the number of leader variables
+ */
 bool 
-LCP::errorCheck(bool throwErr) const
+LCP::errorCheck(
+        /// If this is true, function throws an error, else, it just returns false
+        bool throwErr) const
 {
 
 	const unsigned int nR = M.n_rows;
@@ -241,6 +261,7 @@ LCP::print(string end)
 	cout<<"LCP with "<<this->nR<<" rows and "<<this->nC<<" columns."<<end;
 }
 
+/** @warning Computes convex hull of LCP feasible region */
 int 
 ConvexHull(
 		vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, // Individual constraints
@@ -381,8 +402,13 @@ operator >(vector<int> Fix1, vector<int> Fix2)
 	return (Fix2<Fix1);
 }
 
+/** @brief Returns true if any (grand)child of Fix is in vecOfFixes!  */
 /**
- * Returns true if any (grand)child of Fix is in vecOfFixes!
+ *  Defn Grand Parent:
+ *  	Either the same value as the grand child, or has 0 in that location
+ *
+ *  Defn Grand child:
+ *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
  */
 vector<short int>* 
 LCP::anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const
@@ -392,8 +418,17 @@ LCP::anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* 
 	return NULL;
 }
 
+/** @brief Extracts variable and equation values from a solved Gurobi model for LCP */
 bool 
-LCP::extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ) const
+LCP::extractSols(
+        /// The Gurobi Model that was solved (perhaps using LCP::LCPasMIP)
+        GRBModel* model, 
+        /// Output variable - where the equation values are stored
+        arma::vec &z, 
+        /// Output variable - where the variable values are stored
+        arma::vec &x, 
+        /// z values are filled only if this is true
+        bool extractZ) const
 {
 	if(model->get(GRB_IntAttr_Status) == GRB_LOADED) model->optimize();
 	if(model->get(GRB_IntAttr_Status) != GRB_OPTIMAL) return false;
@@ -408,6 +443,7 @@ LCP::extractSols(GRBModel* model, arma::vec &z, arma::vec &x, bool extractZ) con
 	return true;
 }
 
+/// @brief Given variable values and equation values, encodes it in 0/+1/-1 format and returns it.
 vector<short int>* 
 LCP::solEncode(const arma::vec &z, const arma::vec &x) const
 {
@@ -421,6 +457,7 @@ LCP::solEncode(const arma::vec &z, const arma::vec &x) const
 	return solEncoded;
 }
 
+/// @brief Given a Gurobi model, extracts variable values and equation values, encodes it in 0/+1/-1 format and returns it.
 vector<short int>* 
 LCP::solEncode(GRBModel *model) const
 {
@@ -429,7 +466,7 @@ LCP::solEncode(GRBModel *model) const
 	else return this->solEncode(z,x);
 }
 
-/**
+/** @internal
  * If loc == nR, then stop branching. We either hit infeasibility or a leaf.
  * If loc <0, then branch at abs(loc) location and go down the branch where variable is fixed to 0
  * else branch at abs(loc) location and go down the branch where eqn is fixed to 0

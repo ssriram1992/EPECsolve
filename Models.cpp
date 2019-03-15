@@ -23,13 +23,13 @@ Models::createCountry(
 	 */
 	/**
 	 * @details Use \f$l_i\f$ to denote the \f$i\f$-th element in `costs_lin` and \f$q_i\f$ for the \f$i\f$-th element in `costs_quad`. Then to produce quantity \f$x_i\f$, the \f$i\f$-th producer's cost will be 
-	 * \f\[ l_ix_i + \frac{1}{2}q_ix_i^2 \f\]
+	 * \f[ l_ix_i + \frac{1}{2}q_ix_i^2 \f]
 	 * In addition to this, the leader may impose "tax", which could increase \f$l_i\f$ for each player.
 	 *
 	 * Total quantity in the market is given by sum of quantities produced by all producers adjusted by imports and exports
-	 * \f\[{Total\quad  Quantity} = \sum_i x_i + x_{imp} - x_{exp} \f\]
+	 * \f[{Total\quad  Quantity} = \sum_i x_i + x_{imp} - x_{exp} \f]
 	 * The demand curve in the market is given by
-	 * \f\[{Price} = a-b({Total\quad  Quantity})\f\]
+	 * \f[{Price} = a-b({Total\quad  Quantity})\f]
 	 *
 	 * Each follower is also constrained by a maximum production capacity her infrastructure allows. And each follower is constrained by a cap on their production, that is imposed by the leader.
 	 *

@@ -244,7 +244,7 @@ class LCP
 		/// Compl stores data in <Eqn, Var> form.
 		perps Compl; 
 		unsigned int LeadStart, LeadEnd, nLeader; 
-		/// Apart from 0 \leq x \perp Mx+q\geq 0, one needs Ax\leq b too!
+		/// Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$ Ax\le b@f$ too!
 		arma::sp_mat _A; arma::vec _b;		
 	// Temporary data
 		/// Keep track if LCP::RlxdModel is made
