@@ -29,9 +29,18 @@ int LCPtest(Models::LeadAllPar LA)
 	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
 	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
 	if(Error) throw -1;
-	// game2LCPtest(M,q,Compl);
 	try
 	{
+		// Solving using LCPasQP
+		GRBModel* Model2 = MyNashGame->LCPasQP(true);
+		arma::vec z,x;
+		MyNashGame->extractSols(Model2, z, x, true);
+		cout<<"Sample solution"<<endl;
+		x.print("x"); z.print("z");
+		cout<<"*************************"<<endl;
+
+
+		// Branch and prune solving and getting Conv hull
 		auto A = MyNashGame->BranchAndPrune();
 		cout<<A->size()<<endl;
 		for(auto v:*A)

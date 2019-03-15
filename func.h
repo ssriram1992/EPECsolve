@@ -179,7 +179,14 @@ class NashGame
 				///@internal Returns the \f$q\f$ corresponding to \f$Mx+q\f$
 			   	arma::vec &q,
 				/// There might be more variables than equations. In this case pairs the equations with variables
-			   	perps &Compl) const;
+			   	perps &Compl, 
+				/// If the solution M and q should be written to a file
+				bool writeToFile = false,
+				/// File names for the output M 
+				string M_name = "M.txt", 
+				/// File names for the output q
+				string q_name = "q.txt"
+				) const;
 		/// Rewrites leader constraints given earlier with added empty columns and spaces corresponding to
 		/// Market clearing duals and other equation duals.
 		arma::sp_mat RewriteLeadCons() const;
@@ -316,6 +323,7 @@ class LCP
 		bool extractSols(GRBModel* model, arma::vec &z, 
 				arma::vec &x, bool extractZ = false) const; 
 		vector<vector<short int>*> *BranchAndPrune ();
+		GRBModel* LCPasQP(bool solve = false);
 	/* Convex hull computation */
 	private:
 		void FixToPoly(const vector<short int> *Fix, bool checkFeas = false);
@@ -411,6 +419,12 @@ LCP* createCountry(
 		/// Create columns with 0s in it. To handle additional dummy leader variables.
 		const unsigned int addnlLeadVars  = 0
 		);
+
+LCP* playCountry(
+		vector<LCP*> countries,
+		vector<Models::LeadAllPar> Pi
+		);
+
 };
 // End of namespace Models {
 #endif

@@ -710,3 +710,43 @@ LCP::EnumerateAll(const bool solveLP)
 }
 
 
+GRBModel* 
+LCP::LCPasQP(bool solve)
+/** @brief Solves the LCP as a QP using Gurobi */
+/** Removes all complementarity constraints from the QP's constraints. Instead, the sum of products of complementarity pairs is minimized. If the optimal value turns out to be 0, then it is actually a solution of the LCP. Else the LCP is infeasible.   */
+{
+	this->makeRelaxed();
+	GRBModel *model = new GRBModel(this->RlxdModel); 
+	GRBQuadExpr obj = 0;
+	GRBVar *x = new GRBVar [this->nR];
+	GRBVar *z = new GRBVar [this->nR];
+	for(auto p:this->Compl)
+	{
+		unsigned int i=p.first; unsigned int j = p.second;
+		z[i] = model->getVarByName("z_"+to_string(i));
+		x[i] = model->getVarByName("x_"+to_string(j));
+		obj += x[i]*z[i];
+	}
+	model->setObjective(obj, GRB_MINIMIZE);
+	bool Error{false};
+	if(solve) 
+	{
+		Error = true;
+		try
+		{
+			model->optimize();
+			int status = model->get(GRB_IntAttr_Status);
+			if(status!=GRB_OPTIMAL || model->get(GRB_DoubleAttr_ObjVal) > this->eps)
+				throw "LCP infeasible";
+			Error = false;
+		}
+		catch(const char* e) { cout<<e<<endl; }
+		catch(string e) { cout<<"String: "<<e<<endl; }
+		catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+		catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
+		if(Error) throw "Error in LCP::LCP as QP";
+	}
+	delete[] x;
+	delete[] z;
+	return model;
+}

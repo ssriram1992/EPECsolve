@@ -4,6 +4,51 @@
 #include<iostream>
 #include<gurobi_c++.h>
 
+ostream& Models::operator<<(ostream& ost, const Models::FollPar P)
+{
+	ost<<"Follower Parameters: "<<endl;
+	ost<<"********************"<<endl;
+	ost<<"Linear Costs: \t\t\t\t";
+	for(auto a:P.costs_lin) ost<<a<<"\t";
+	ost<<endl<<"Quadratic costs: \t\t\t";
+	for(auto a:P.costs_quad) ost<<a<<"\t";
+	ost<<endl<<"Production capacities: \t\t\t";
+	for(auto a:P.capacities) ost<<(a<0?string("Inf"):to_string(a))<<"\t";
+	ost<<endl;
+	return ost;
+}
+ostream& Models::operator<<(ostream& ost, const Models::DemPar P)
+{
+	ost<<"Demand Parameters: "<<endl;
+	ost<<"******************"<<endl;
+	ost<<"Price\t\t =\t\t "<<P.alpha<<"\t-\t"<<P.beta<<"  x   Quantity"<<endl;
+	return ost;
+}
+ostream& Models::operator<<(ostream& ost, const Models::LeadPar P)
+{
+	ost<<"Leader Parameters: "<<endl;
+	ost<<"******************"<<endl;
+	ost<<"Export Limit: \t\t\t"<<(P.export_limit<0?string("Inf"):to_string(P.export_limit));
+	ost<<endl;
+	ost<<"Import Limit: \t\t\t"<<(P.import_limit<0?string("Inf"):to_string(P.import_limit));
+	ost<<endl;
+	ost<<"Maximum tax percentage: \t"<<P.max_tax_perc;
+	ost<<endl;
+	return ost;
+}
+ostream& Models::operator<<(ostream& ost, const Models::LeadAllPar P)
+{
+	ost<<"\n\n";
+	ost<<"***************************"<<"\n";
+	ost<<"Leader Complete Description"<<"\n";
+	ost<<"***************************"<<"\n"<<"\n";
+	ost<<"Number of followers: \t\t\t"<<P.n_followers<<"\n "<<"\n";
+	ost<<endl<<P.LeaderParam<<endl<<P.FollowerParam<<endl<<P.DemandParam<<"\n";
+	ost<<"***************************"<<"\n"<<"\n";
+	return ost;
+}
+
+
 LCP* Models::createCountry(
 		GRBEnv env,
 		Models::LeadAllPar Params,
@@ -118,51 +163,14 @@ LCP* Models::createCountry(
 }
 
 
-ostream& Models::operator<<(ostream& ost, const Models::FollPar P)
+LCP* Models::playCountry(
+		vector<LCP*> countries,
+		vector<Models::LeadAllPar> Pi
+		)
 {
-	ost<<"Follower Parameters: "<<endl;
-	ost<<"********************"<<endl;
-	ost<<"Linear Costs: \t\t\t\t";
-	for(auto a:P.costs_lin) ost<<a<<"\t";
-	ost<<endl<<"Quadratic costs: \t\t\t";
-	for(auto a:P.costs_quad) ost<<a<<"\t";
-	ost<<endl<<"Production capacities: \t\t\t";
-	for(auto a:P.capacities) ost<<(a<0?string("Inf"):to_string(a))<<"\t";
-	ost<<endl;
-	return ost;
+	const unsigned int n_countries = countries.size();
+	vector<unsigned int> LeadVars(n_countries, 0);
+	for(unsigned int i=0;i<n_countries;i++)
+		LeadVars.at(i) = 2 + 2*Pi.at(i).n_followers + Pi.at(i).n_followers  ;// two for quantity imported and exported, n for imposed cap and last n for tax and finally n_follower number of follower variables
+	return nullptr;
 }
-
-ostream& Models::operator<<(ostream& ost, const Models::DemPar P)
-{
-	ost<<"Demand Parameters: "<<endl;
-	ost<<"******************"<<endl;
-	ost<<"Price\t\t =\t\t "<<P.alpha<<"\t-\t"<<P.beta<<"  x   Quantity"<<endl;
-	return ost;
-}
-ostream& Models::operator<<(ostream& ost, const Models::LeadPar P)
-{
-	ost<<"Leader Parameters: "<<endl;
-	ost<<"******************"<<endl;
-	ost<<"Export Limit: \t\t\t"<<(P.export_limit<0?string("Inf"):to_string(P.export_limit));
-	ost<<endl;
-	ost<<"Import Limit: \t\t\t"<<(P.import_limit<0?string("Inf"):to_string(P.import_limit));
-	ost<<endl;
-	ost<<"Maximum tax percentage: \t"<<P.max_tax_perc;
-	ost<<endl;
-	return ost;
-}
-
-
-ostream& Models::operator<<(ostream& ost, const Models::LeadAllPar P)
-{
-	ost<<"\n\n";
-	ost<<"***************************"<<"\n";
-	ost<<"Leader Complete Description"<<"\n";
-	ost<<"***************************"<<"\n"<<"\n";
-	ost<<"Number of followers: \t\t\t"<<P.n_followers<<"\n "<<"\n";
-	ost<<endl<<P.LeaderParam<<endl<<P.FollowerParam<<endl<<P.DemandParam<<"\n";
-	ost<<"***************************"<<"\n"<<"\n";
-	return ost;
-}
-
-	

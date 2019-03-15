@@ -206,7 +206,7 @@ NashGame::~NashGame()
 }
 
 unsigned int 
-NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
+NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl, bool writeToFile, string M_name, string q_name) const
 {
 	// To store the individual KKT conditions for each player.
 	vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers); 
@@ -288,6 +288,11 @@ NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
 		q.subvec(this->MC_dual_position,this->Leader_position-1) = -this->MCRHS;
 		for(unsigned int j=this->MC_dual_position;j<this->Leader_position;j++)
 			Compl.push_back({j, j}); 
+	}
+	if(writeToFile)
+	{
+		M.save(M_name, arma::arma_ascii);
+		q.save(q_name, arma::arma_ascii);
 	}
 	return NvarFollow;
 }
