@@ -85,7 +85,66 @@ QP_Param::dataCheck(bool forcesymm) const
 	return true;
 }
 
-		
+int
+QP_Param::make_yQy()
+{
+	if(this->made_yQy) return 0;
+	GRBVar y[this->Ny];
+	for (unsigned int i=0; i<Ny; i++)
+		y[i] = QuadModel.addVar(0, GRB_INFINITY, 0, GRB_CONTINUOUS, "y_"+to_string(i));
+	GRBQuadExpr yQy{0};
+	for(auto val=Q.begin(); val!=Q.end(); ++val)
+	{
+		unsigned int i, j;
+		double value = (*val);
+		i=val.row(); j=val.col();
+		yQy += 0.5*y[i]*value*y[j];
+	}
+	QuadModel.setObjective(yQy);
+	this->made_yQy = true;
+	return 0;
+}
+
+GRBModel* 
+QP_Param::solveFixed(arma::vec x)
+{
+	this->make_yQy();
+	/// @throws error if argument vector size is not compatible with the QP_Param definition.
+	if(x.size()!=this->Nx) throw "Invalid argument size: " + to_string(x.size()) + " != "+to_string(Nx);
+	/// @warning Creates a GRBModel using dynamic memory. Should be freed by the caller.
+	bool Error{true};
+	GRBModel* model = new GRBModel(this->QuadModel);
+	try
+	{
+		GRBQuadExpr yQy = model->getObjective();
+		arma::vec Cx, Ax;
+		Cx = this->C*x;
+		Ax = this->A*x;
+		GRBVar y[this->Ny];
+		for (unsigned int i=0; i<this->Ny; i++)
+		{
+			y[i] = model->getVarByName("y_"+to_string(i));
+			yQy += (Cx[i]+c[i])*y[i];
+		}
+		model->setObjective(yQy);
+		for (unsigned int i=0; i<this->Ncons; i++)
+		{
+			GRBLinExpr LHS{0};
+			for(auto j=B.begin_row(i); j!=B.end_row(i); ++j)
+				LHS += (*j)*y[j.col()];
+			model->addConstr(LHS, GRB_LESS_EQUAL, b[i]-Ax[i]);
+		}
+		model->optimize();
+		Error = false;
+	}
+	catch(const char* e) { cout<<e<<endl; }
+	catch(string e) { cout<<"String: "<<e<<endl; }
+	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+	catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
+	if(Error) throw "Error in QP_Param::solveFixed)";
+	return model;
+}
+
 /**
  * Writes the KKT condition of the parameterized QP
  * As per the convention, y is the decision variable for the QP and 
@@ -115,6 +174,7 @@ QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 QP_Param& 
 QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 {
+	this->made_yQy = false;
 	this->Q = (Q); this->C = (C); this->A = (A);
 	this->B = (B); this->c = (c); this->b = (b);
 	this->size();
@@ -127,6 +187,7 @@ QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, ar
 QP_Param& 
 QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 {
+	this->made_yQy = false;
 	this->Q = move(Q); this->C = move(C); this->A = move(A);
 	this->B = move(B); this->c = move(c); this->b = move(b);
 	this->size();

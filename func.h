@@ -62,9 +62,12 @@ class QP_Param
 */
 {
 	private: // Data representing the parameterized QP
-		arma::sp_mat Q, C, A, B;
+		arma::sp_mat Q, A, B, C;
 		arma::vec c, b;
 	private: // Other private objects
+		GRBEnv *env;
+		GRBModel QuadModel;
+		bool made_yQy;
 		unsigned int Nx, Ny, Ncons;
 		/// Check that the data for the QP_Param class is valid
 		bool dataCheck(bool forcesymm=true) const;
@@ -73,14 +76,16 @@ class QP_Param
 		unsigned int size();
 	public: // Constructors
 		/// Initialize only the size. Everything else is empty (can be updated later)
-		QP_Param(){this->size();}
+		QP_Param(GRBEnv* env=nullptr):env{env},QuadModel{(*env)},made_yQy{false}{this->size();}
 		/// Set data at construct time
 		QP_Param(arma::sp_mat Q, arma::sp_mat C, 
-				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b, GRBEnv* env=nullptr):env{env},QuadModel{(*env)},made_yQy{false}
 		{
 			this->set(Q, C, A, B, c, b);
 			this->size();
 		}
+		/// Copy constructor
+		QP_Param(QP_Param &Qu):Q{Qu.Q}, A{Qu.A}, B{Qu.B}, C{Qu.C}, c{Qu.c}, b{Qu.b}, env{Qu.env}, QuadModel{Qu.QuadModel},made_yQy{Qu.made_yQy}{};
 	public: // Set some data
 		/// Setting the data, while keeping the input objects intact
 		QP_Param& set(arma::sp_mat Q, arma::sp_mat C, 
@@ -105,9 +110,12 @@ class QP_Param
 		inline unsigned int getNx() const { return this->Nx; }
 		/// Read-only access to the private variable Ny
 		inline unsigned int getNy() const { return this->Ny; }
+	private:
+		int make_yQy();
 	public: // Other methods
 		/// Compute the KKT conditions for the given QP
 		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
+		GRBModel* solveFixed(arma::vec x);
 		bool is_Playable(const QP_Param P) const;
 };
 
