@@ -1,4 +1,5 @@
 #include "func.h"
+#include<map>
 #include<memory>
 #include<vector>
 #include<armadillo>
@@ -49,9 +50,92 @@ ostream& Models::operator<<(ostream& ost, const Models::LeadAllPar P)
 	return ost;
 }
 
+bool Models::EPEC::ParamValid(const LeadAllPar& Params) const
+{
+	if(Params.n_followers == 0) throw "Error in EPEC::ParamValid(). 0 Followers?";
+	if (Params.FollowerParam.costs_lin.size()!=Params.n_followers ||
+			Params.FollowerParam.costs_quad.size() != Params.n_followers ||
+			Params.FollowerParam.capacities.size() != Params.n_followers 
+	   )
+		throw "Error in EPEC::ParamValid(). Size Mismatch";
+	if (Params.DemandParam.alpha <= 0 || Params.DemandParam.beta <=0 ) throw "Error in EPEC::ParamValid(). Invalid demand curve params";
+	// Country should have a unique name
+	for(const auto &p:this->AllLeadPars)
+		if(Params.name.compare(p.name) == 0) // i.e., if the strings are same
+			throw "Error in EPEC::ParamValid(). Country name repetition";
+	return true;
+}
 
-LCP* Models::createCountry(
-		GRBEnv env,
+
+void Models::EPEC::make_LL_QP(const LeadAllPar& Params, const unsigned int follower, QP_Param* Foll, const unsigned int LeadVars) const noexcept
+{
+		arma::sp_mat Q(1,1), C(1, LeadVars + Params.n_followers - 1);
+		// Two constraints. One saying that you should be less than capacity
+		// Another saying that you should be less than leader imposed cap!
+		arma::sp_mat A(2, LeadVars + Params.n_followers - 1), B(2, 1); 
+		arma::vec c(1), b(2); 
+		c.fill(0); b.fill(0);
+		A.zeros(); B.zeros(); C.zeros(); b.zeros(); Q.zeros(); c.zeros();
+		Q(0, 0) = Params.FollowerParam.costs_quad.at(follower) + 2*Params.DemandParam.beta;
+		c(0) = Params.FollowerParam.costs_lin.at(follower) - Params.DemandParam.alpha;
+
+		arma::mat Ctemp(1, LeadVars+Params.n_followers-1, arma::fill::zeros); 
+		Ctemp.cols(0, Params.n_followers-1).fill(Params.DemandParam.beta); // First n-1 entries and 1 more entry is Beta
+		Ctemp(0, Params.n_followers) = -Params.DemandParam.beta; // For q_exp
+
+		Ctemp(0, (Params.n_followers-1)+2+Params.n_followers+follower  ) = 1; // q_{-i}, then import, export, then tilde q_i, then i-th tax
+
+		C = Ctemp;
+		A(1, (Params.n_followers-1)+2 + follower) = -1;
+		B(0,0)=1; B(1,0) = 1;
+		b(0) = Params.FollowerParam.capacities.at(follower); 
+
+		Foll->setMove(Q, C, A, B, c, b);
+}
+
+
+void 
+Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
+			const LeadAllPar& Params,
+			const unsigned int import_lim_cons,
+			const unsigned int export_lim_cons,
+			const unsigned int price_lim_cons
+			) const noexcept
+{
+	for(unsigned int follower = 0; follower < Params.n_followers; follower++)
+	{
+		// Constraints of Tax limits!
+		LeadCons(follower, Params.n_followers+2+Params.n_followers + follower) = 1;
+		LeadRHS(follower) = Params.LeaderParam.max_tax_perc;
+	}
+	// Export - import <= Local Production
+	for (unsigned int i=0;i<Params.n_followers;i++) LeadCons.at(Params.n_followers, i) = -1;
+	LeadCons.at(Params.n_followers, Params.n_followers) = 1;
+	LeadCons.at(Params.n_followers, Params.n_followers+1) = -1;
+	// Import limit - In more precise terms, everything that comes in minus everything that goes out should satisfy this limit
+	if(import_lim_cons)
+	{
+		LeadCons(Params.n_followers+1, Params.n_followers) = 1;
+		LeadCons(Params.n_followers+1, Params.n_followers+1) = -1;
+		LeadRHS(Params.n_followers+1) = Params.LeaderParam.import_limit;
+	}	
+	// Export limit - In more precise terms, everything that goes out minus everything that comes in should satisfy this limit
+	if(export_lim_cons)
+	{
+		LeadCons(Params.n_followers+1+import_lim_cons, Params.n_followers+1) = 1;
+		LeadCons(Params.n_followers+1+import_lim_cons, Params.n_followers) = -1;
+		LeadRHS(Params.n_followers+1) = Params.LeaderParam.export_limit;
+	}
+	if(price_lim_cons)
+	{
+		for (unsigned int i=0;i<Params.n_followers;i++)
+			LeadCons.at(Params.n_followers+1+import_lim_cons+export_lim_cons, i) = -Params.DemandParam.beta;
+		LeadRHS(Params.n_followers+1+import_lim_cons+export_lim_cons) = Params.LeaderParam.price_limit - Params.DemandParam.alpha;
+	}
+}
+
+
+Models::EPEC& Models::EPEC::addCountry(
 		Models::LeadAllPar Params,
 		const unsigned int addnlLeadVars
 		)
@@ -81,97 +165,70 @@ LCP* Models::createCountry(
 	 * @return Pointer to LCP object dynamically created using `new`.  * *
 	 */
 {
-	// Check Error
+	bool noError=false;
+	try { noError = this->ParamValid(Params); }
+	catch(const char* e) { cout<<e<<endl; }
+	catch(string e) { cout<<"String: "<<e<<endl; }
+	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+
+	if(!noError) return *this;
+
 	const unsigned int LeadVars = 2 + 2*Params.n_followers + addnlLeadVars;// two for quantity imported and exported, n for imposed cap and last n for tax
-	if(Params.n_followers == 0) throw "Error in createCountry(). 0 Followers?";
-	if (Params.FollowerParam.costs_lin.size()!=Params.n_followers ||
-			Params.FollowerParam.costs_quad.size() != Params.n_followers ||
-			Params.FollowerParam.capacities.size() != Params.n_followers 
-	   )
-		throw "Error in createCountry(). Size Mismatch";
-	if (Params.DemandParam.alpha <= 0 || Params.DemandParam.beta <=0 ) throw "Error in createCountry(). Invalid demand curve params";
-	// Error checks over
-	arma::sp_mat Q(1,1), C(1, LeadVars + Params.n_followers - 1);
-	// Two constraints. One saying that you should be less than capacity
-	// Another saying that you should be less than leader imposed cap!
-	arma::sp_mat A(2, LeadVars + Params.n_followers - 1), B(2, 1); 
-	arma::vec c(1), b(2); 
 	
 	// Leader Constraints
-	short int import_lim_cons{0}, export_lim_cons{0};
-	if(Params.LeaderParam.import_limit < Params.DemandParam.alpha && Params.LeaderParam.import_limit >= 0) import_lim_cons=1;
-	if(Params.LeaderParam.export_limit >=0 ) export_lim_cons=1;
+	short int import_lim_cons{0}, export_lim_cons{0}, price_lim_cons{0};
+	if(Params.LeaderParam.import_limit >= 0) import_lim_cons = 1;
+	if(Params.LeaderParam.export_limit >= 0) export_lim_cons = 1;
+	if(Params.LeaderParam.price_limit  >  0) price_lim_cons  = 1; 
 
-	arma::sp_mat LeadCons(import_lim_cons+export_lim_cons+Params.n_followers, LeadVars+Params.n_followers); arma::vec LeadRHS(import_lim_cons+export_lim_cons+Params.n_followers, arma::fill::zeros);
-	LeadCons.zeros();
+	arma::sp_mat LeadCons(import_lim_cons+	// Import limit constraint
+			export_lim_cons+				// Export limit constraint
+			price_lim_cons+					// Price limit constraint
+			Params.n_followers+				// Tax limit constraint
+			1, 								// Export - import <= Domestic production
+			LeadVars+Params.n_followers); 
+	arma::vec LeadRHS(import_lim_cons+export_lim_cons+Params.n_followers+1, arma::fill::zeros);
 
 	vector<shared_ptr<QP_Param>> Players{};
 	// Create the QP_Param* for each follower
 	for(unsigned int follower = 0; follower < Params.n_followers; follower++)
 	{
-		c.fill(0); b.fill(0);
-		A.zeros(); B.zeros(); C.zeros(); b.zeros(); Q.zeros(); c.zeros();
 		shared_ptr<QP_Param> Foll{new QP_Param()};
-		Q(0, 0) = Params.FollowerParam.costs_quad.at(follower) + 2*Params.DemandParam.beta;
-		c(0) = Params.FollowerParam.costs_lin.at(follower) - Params.DemandParam.alpha;
-
-		arma::mat Ctemp(1, LeadVars+Params.n_followers-1, arma::fill::zeros); 
-		Ctemp.cols(0, Params.n_followers-1).fill(Params.DemandParam.beta); // First n-1 entries and 1 more entry is Beta
-		Ctemp(0, Params.n_followers) = -Params.DemandParam.beta; // For q_exp
-
-		Ctemp(0, (Params.n_followers-1)+2+Params.n_followers+follower  ) = 1; // q_{-i}, then import, export, then tilde q_i, then i-th tax
-
-		C = Ctemp;
-		A(1, (Params.n_followers-1)+2 + follower) = -1;
-		B(0,0)=1; B(1,0) = 1;
-		b(0) = Params.FollowerParam.capacities.at(follower);
-		Foll->setMove(Q, C, A, B, c, b);
-		Players.push_back(Foll);
-
-		// Constraints of Tax limits!
-		LeadCons(follower, Params.n_followers+2+Params.n_followers + follower) = 1;
-		LeadRHS(follower) = Params.LeaderParam.max_tax_perc;
+		this->make_LL_QP(Params, follower, Foll.get(), LeadVars);
+		Players.push_back(Foll); 
 	}
 
-	// Import limit - In more precise terms, everything that comes in minus everything that goes out should satisfy this limit
-	if(import_lim_cons)
-	{
-		LeadCons(Params.n_followers, Params.n_followers) = 1;
-		LeadCons(Params.n_followers, Params.n_followers+1) = -1;
-		LeadRHS(Params.n_followers) = Params.LeaderParam.import_limit;
-	}	
-	// Export limit - In more precise terms, everything that goes out minus everything that comes in should satisfy this limit
-	if(export_lim_cons)
-	{
-		LeadCons(Params.n_followers+import_lim_cons, Params.n_followers+1) = 1;
-		LeadCons(Params.n_followers+import_lim_cons, Params.n_followers) = -1;
-		LeadRHS(Params.n_followers) = Params.LeaderParam.export_limit;
-	}
+	// Make Leader Constraints
+	this->make_LL_LeadCons(LeadCons, LeadRHS, Params, import_lim_cons, export_lim_cons);
 
-
+	// Lower level Market clearing constraints - empty
 	arma::sp_mat MC(0, LeadVars+Params.n_followers);
 	arma::vec MCRHS(0, arma::fill::zeros);
 
-	NashGame* N = new NashGame(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
-	arma::sp_mat LeadConsReWrit = N->RewriteLeadCons();
-	arma::sp_mat M; arma::vec q; perps Compl;
-	N->FormulateLCP(M, q, Compl);
-	LCP* country = new LCP(&env, M, q, Compl, LeadConsReWrit, LeadRHS);
-	country->print();
-	cout<<M.n_rows<<", "<<M.n_cols<<endl<<q.n_rows<<endl<<LeadConsReWrit.n_rows<<", "<<LeadConsReWrit.n_cols<<endl;
-	delete N;
-	return country;
+	auto N = make_shared<NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
+	this->name2nos[Params.name] = this->countriesLL.size();
+	this->countriesLL.push_back(N);
+	this->LeadConses.push_back(N->RewriteLeadCons());
+
+	return *this;
 }
 
-
-LCP* Models::playCountry(
-		vector<LCP*> countries,
-		vector<Models::LeadAllPar> Pi
-		)
+Models::EPEC& Models::EPEC::addTranspCosts(const arma::sp_mat& costs)
 {
+	auto n = this->AllLeadPars.size();
+	if(n!=costs.n_rows || n!=costs.n_cols) throw "Error in EPEC::addTranspCosts. Invalid size of Q";
+	else this->TranspCosts = arma::sp_mat(costs);
+	return *this;
+}
+
+LCP* Models::EPEC::playCountry(vector<LCP*> countries) 
+{
+	auto Pi = this->AllLeadPars;
 	const unsigned int n_countries = countries.size();
 	vector<unsigned int> LeadVars(n_countries, 0);
 	for(unsigned int i=0;i<n_countries;i++)
 		LeadVars.at(i) = 2 + 2*Pi.at(i).n_followers + Pi.at(i).n_followers  ;// two for quantity imported and exported, n for imposed cap and last n for tax and finally n_follower number of follower variables
 	return nullptr;
 }
+
+

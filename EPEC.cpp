@@ -11,6 +11,7 @@
 using namespace std;
 
 
+/*
 int LCPtest(Models::LeadAllPar LA)
 {
 	GRBEnv env = GRBEnv();
@@ -66,6 +67,7 @@ int LCPtest(Models::LeadAllPar LA)
 	delete MyNashGame;
 	return 0;
 }
+*/
 
 
 
@@ -80,6 +82,6 @@ int main()
 	Models::LeadAllPar LA(3, *FP);
 	cout<<LA;
 	cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
-	LCPtest(LA);
+	// LCPtest(LA);
 	return 0;
 }

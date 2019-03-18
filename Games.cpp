@@ -263,8 +263,8 @@ NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::
 
 NashGame::~NashGame()
 {
-	for(auto a:this->Players)
-		delete a;
+	// for(auto a:this->Players)
+		// delete a;
 }
 
 unsigned int 

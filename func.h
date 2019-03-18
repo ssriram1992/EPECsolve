@@ -3,6 +3,7 @@
 
 #define VERBOSE false
 #include<algorithm>
+#include<map>
 #include<iostream>
 #include<ctime>
 #include<vector>
@@ -368,11 +369,13 @@ typedef struct LeadAllPar LeadAllPar;
 struct FollPar
 {
 	/// Quadratic coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
-	vector<double> costs_quad;
+	vector<double> costs_quad = {};
 	/// Linear  coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
-	vector<double> costs_lin;
+	vector<double> costs_lin = {};
 	/// Production capacity of each follower. Size of this vector should be equal to n_followers
-	vector<double> capacities;
+	vector<double> capacities = {};
+	/// Optional Names for the Followers.
+	vector<string> names = {};
 };
 
 
@@ -395,6 +398,8 @@ struct LeadPar
 	double export_limit = -1;
 	/// Government decided increase in the shift in costs_lin of any player cannot exceed this value
 	double max_tax_perc = 0.3;
+	/// Government does not want the price to exceed this limit
+	double price_limit = -1;
 	LeadPar(double max_tax_perc=0.3, double imp_lim=-1, double exp_lim=-1):import_limit{imp_lim}, export_limit{exp_lim}, max_tax_perc{max_tax_perc}{}
 };
 
@@ -409,7 +414,12 @@ struct LeadAllPar
 	Models::DemPar DemandParam = {};
 	/// A struct to hold Leader Parameters
 	Models::LeadPar LeaderParam = {};
-	LeadAllPar(unsigned int n, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}):n_followers{n}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}{};
+	/// Country Name
+	string name;
+	LeadAllPar(unsigned int n_foll, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}, string name = ""):n_followers{n_foll}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}, name{name}
+	{
+		// Nothing here
+	}
 };
 
 
@@ -419,20 +429,51 @@ ostream& operator<<(ostream& ost, const LeadPar P);
 ostream& operator<<(ostream& ost, const LeadAllPar P);
 
 
-///@brief %Models a Standard Nash-Cournot game within a country
-LCP* createCountry(
-		/// A gurobi environment to create and process the resulting LCP object.
-		GRBEnv env, 
-		/// The Parameter structure for the leader
-		LeadAllPar Params, 
-		/// Create columns with 0s in it. To handle additional dummy leader variables.
-		const unsigned int addnlLeadVars  = 0
-		);
 
-LCP* playCountry(
-		vector<LCP*> countries,
-		vector<Models::LeadAllPar> Pi
-		);
+
+class EPEC
+{
+	private:
+		vector<LeadAllPar> AllLeadPars = {};  ///< The parameters of each leader in the EPEC game
+		vector<shared_ptr<NashGame>> countriesLL = {}; ///< Stores each country's lower level Nash game
+		vector<arma::sp_mat> LeadConses = {}; ///< Stores each country's leader constraint LHS
+		vector<arma::vec> LeadRHSes = {}; ///< Stores each country's leader constraint RHS
+		arma::sp_mat TranspCosts = {};
+	private:
+		GRBEnv env;		///< A gurobi environment to create and process the resulting LCP object.
+		map<string, unsigned int> name2nos = {};
+	private:
+		/// Checks that the parameter given to add a country is valid. Does not have obvious errors
+		bool ParamValid(const LeadAllPar& Param) const;
+		/// Makes the lower level quadratic program object for each follower.
+		void make_LL_QP(const LeadAllPar& Params, 
+				const unsigned int follower, 
+				QP_Param* Foll, 
+				const unsigned int LeadVars) const noexcept;
+		/// Makes the leader constraint matrix and RHS
+		void make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
+				const LeadAllPar& Param,
+				const unsigned int import_lim_cons=1,
+				const unsigned int export_lim_cons=1,
+				const unsigned int price_lim_cons=1
+				) const noexcept;
+	public:
+		///@brief %Models a Standard Nash-Cournot game within a country
+		EPEC& addCountry(
+				/// The Parameter structure for the leader
+				LeadAllPar Params, 
+				/// Create columns with 0s in it. To handle additional dummy leader variables.
+				const unsigned int addnlLeadVars  = 0
+				);
+		EPEC& addTranspCosts(const arma::sp_mat& costs);
+	public:
+		// Data access methods
+		NashGame* get_LowerLevelNash(unsigned int i); 
+		LCP* playCountry(vector<LCP*> countries);
+};
+
+
+
 
 };
 // End of namespace Models {
