@@ -7,6 +7,7 @@
 #include<ctime>
 #include<vector>
 #include<utility>
+#include<memory>
 #include<cstdlib>
 #include<gurobi_c++.h>
 #include<armadillo>
@@ -115,7 +116,7 @@ class QP_Param
 	public: // Other methods
 		/// Compute the KKT conditions for the given QP
 		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
-		GRBModel* solveFixed(arma::vec x);
+		unique_ptr<GRBModel> solveFixed(arma::vec x);
 		bool is_Playable(const QP_Param P) const;
 };
 
@@ -143,7 +144,7 @@ class NashGame
 		/// Number of players in the Nash Game
 		unsigned int Nplayers;
 		/// The QP that each player solves
-		vector<QP_Param*> Players;
+		vector<shared_ptr<QP_Param>> Players;
 		/// Market clearing constraints
 		arma::sp_mat MarketClearing;
 		/// RHS to the Market Clearing constraints
@@ -168,7 +169,7 @@ class NashGame
 		 * A set of Market clearing constraints and its RHS
 		 * And if there are leader variables, the number of leader vars.
 		 */
-		NashGame(vector<QP_Param*> Players, arma::sp_mat MC, 
+		NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
 				arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={});
 		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={}): LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar}
 		{
@@ -212,7 +213,7 @@ ostream& operator<< (ostream& os, const QP_Param &Q);
 
 /// Checks if the polyhedron given by @f$ Ax\leq b@f$ is feasible.
 /// If yes, returns the point @f$x@f$ in the polyhedron that minimizes @f$c^Tx@f$
-arma::vec* isFeas(const arma::sp_mat* A, const arma::vec *b, 
+arma::vec isFeas(const arma::sp_mat* A, const arma::vec *b, 
 		const arma::vec *c, bool Positivity=false);
 
 /** 
@@ -229,9 +230,9 @@ int ConvexHull(
 		/// Inequality constraints RHS that define polyhedra whose convex hull is to be found
 		vector<arma::vec*> *bi, 
 		/// Pointer to store the output of the convex hull LHS
-		arma::sp_mat *A, 
+		arma::sp_mat &A, 
 		/// Pointer to store the output of the convex hull RHS
-		arma::vec *b, 
+		arma::vec &b, 
 		/// Any common constraints to ALL the polyhedra - LHS.
 		arma::sp_mat Acom={},
 		/// Any common constraints to ALL the polyhedra - RHS.
@@ -310,12 +311,12 @@ class LCP
 		void defConst(GRBEnv* env);
 		int makeRelaxed();
 	public:
-		GRBModel* LCPasMIP(vector<unsigned int> FixEq={}, 
+		unique_ptr<GRBModel> LCPasMIP(vector<unsigned int> FixEq={}, 
 				vector<unsigned int> FixVar={}, bool solve=false);
-		GRBModel* LCPasMIP(vector<short int> Fixes, bool solve);
-		GRBModel* LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, 
+		unique_ptr<GRBModel> LCPasMIP(vector<short int> Fixes, bool solve);
+		unique_ptr<GRBModel> LCP_Polyhed_fixed(vector<unsigned int> FixEq={}, 
 				vector<unsigned int> FixVar={});
-		GRBModel* LCP_Polyhed_fixed(arma::Col<int> FixEq, 
+		unique_ptr<GRBModel> LCP_Polyhed_fixed(arma::Col<int> FixEq, 
 				arma::Col<int> FixVar);
 	/* Branch and Prune Methods */
 	private:
@@ -324,14 +325,14 @@ class LCP
 		vector<short int>* solEncode(const arma::vec &z, const arma::vec &x)const;
 		void branch(int loc, const vector<short int> *Fixes);
 		vector<short int>* anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const;
-		int BranchLoc(GRBModel* m, vector<short int>* Fix);
+		int BranchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix);
 		int BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf);
 		int EnumerateAll(bool solveLP=false);
 	public:
 		bool extractSols(GRBModel* model, arma::vec &z, 
 				arma::vec &x, bool extractZ = false) const; 
 		vector<vector<short int>*> *BranchAndPrune ();
-		GRBModel* LCPasQP(bool solve = false);
+		unique_ptr<GRBModel> LCPasQP(bool solve = false);
 	/* Convex hull computation */
 	private:
 		void FixToPoly(const vector<short int> *Fix, bool checkFeas = false);
@@ -344,9 +345,9 @@ class LCP
 		 */
 		int ConvexHull(
 				/// Convex hull inequality description LHS to be stored here
-				arma::sp_mat* A,
+				arma::sp_mat& A,
 				/// Convex hull inequality description RHS to be stored here
-			   	arma::vec *b) 
+			   	arma::vec &b) 
 		{return ::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
 };
 

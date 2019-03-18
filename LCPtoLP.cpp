@@ -1,4 +1,5 @@
 #include<iostream>
+#include<memory>
 #include<string>
 #include"func.h"
 #include<gurobi_c++.h>
@@ -118,7 +119,7 @@ LCP::makeRelaxed()
  */
 /// @warning The FixEq and FixVar variables are used under a different convention here!
 /// @warning This member function is public for the moment. But this will be converted to a private method soon.
-GRBModel* 
+unique_ptr<GRBModel> 
 LCP::LCP_Polyhed_fixed(
         /// If index is present, equality imposed on that variable
 		vector<unsigned int> FixEq,  		
@@ -127,7 +128,7 @@ LCP::LCP_Polyhed_fixed(
 		)			
 {
 	makeRelaxed();
-	GRBModel* model = new GRBModel(this->RlxdModel);
+	unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
 	for(auto i:FixEq)
 	{
 		if(i>=nR) throw "Element in FixEq is greater than nC";
@@ -148,7 +149,7 @@ LCP::LCP_Polyhed_fixed(
  * and variables corresponding to the non-zero
  * elements of FixVar set to equality (=0)
  */
-GRBModel* 
+unique_ptr<GRBModel> 
 LCP::LCP_Polyhed_fixed(
         /// If non zero, equality imposed on variable
 		arma::Col<int> FixEq,  		
@@ -157,7 +158,7 @@ LCP::LCP_Polyhed_fixed(
 		)			
 {
 	makeRelaxed();
-	GRBModel* model = new GRBModel(this->RlxdModel);
+	unique_ptr<GRBModel> model{new GRBModel(this->RlxdModel)};
 	for(unsigned int i=0;i<nC;i++)
 		if(FixVar[i]) 
 			model->getVarByName("x_"+to_string(i)).set(GRB_DoubleAttr_UB,0);
@@ -172,7 +173,7 @@ LCP::LCP_Polyhed_fixed(
  * Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in Fixes in 0/+1/-1 notation
  * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
  */
-GRBModel* 
+unique_ptr<GRBModel> 
 LCP::LCPasMIP(vector<short int> Fixes, bool solve)
 {
 	if(Fixes.size()!=this->nR) throw "Bad size for Fixes in LCP::LCPasMIP";
@@ -190,7 +191,7 @@ LCP::LCPasMIP(vector<short int> Fixes, bool solve)
  * Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in FixVar and FixEq.
  * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
  */
-GRBModel* 
+unique_ptr<GRBModel> 
 LCP::LCPasMIP(
 		vector<unsigned int> FixEq,	// If any equation is to be fixed to equality
 		vector<unsigned int> FixVar, // If any variable is to be fixed to equality
@@ -198,7 +199,7 @@ LCP::LCPasMIP(
 		)
 {
 	makeRelaxed();
-	GRBModel *model = new GRBModel(this->RlxdModel);
+	unique_ptr<GRBModel> model{new GRBModel(this->RlxdModel)};
 	// Creating the model
 	try{
 		GRBVar x[nC], z[nR], u[nR];
@@ -265,7 +266,7 @@ LCP::print(string end)
 int 
 ConvexHull(
 		vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, // Individual constraints
-		arma::sp_mat *A, arma::vec *b, // To store outputs
+		arma::sp_mat &A, arma::vec &b, // To store outputs
 		arma::sp_mat Acom, arma::vec bcom // Common constraints.
 		)
 {
@@ -296,8 +297,8 @@ ConvexHull(
 	nFinCons += Acom.n_rows;
 
 	nFinVar = nPoly*nC + nPoly + nC; // All x^i variables + delta variables+ original x variables 
-	A->resize(nFinCons, nFinVar); b->resize(nFinCons);
-	A->zeros(); b->zeros();
+	A.resize(nFinCons, nFinVar); b.resize(nFinCons);
+	A.zeros(); b.zeros();
 	// Counting rows completed
 	unsigned int complRow{0};
 	if (VERBOSE){cout<<"In Convex Hull computation!"<<endl;}
@@ -305,36 +306,36 @@ ConvexHull(
 	{
 		unsigned int nConsInPoly = complRow+Ai->at(i)->n_rows ;
 		// First constraint in (4.31)
-		A->submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i);
+		A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i);
 		// First constraint RHS
-		A->submat(complRow, nPoly*nC+i, complRow+nConsInPoly-1, nPoly*nC+i) = -*bi->at(i);
+		A.submat(complRow, nPoly*nC+i, complRow+nConsInPoly-1, nPoly*nC+i) = -*bi->at(i);
 		// Second constraint in (4.31)
 		for(unsigned int j=0; j<nC;j++)
 		{
-			A->at(FirstCons+2*j,(i*nC)+j) = 1;
-			A->at(FirstCons+2*j+1,(i*nC)+j) = -1;
+			A.at(FirstCons+2*j,(i*nC)+j) = 1;
+			A.at(FirstCons+2*j+1,(i*nC)+j) = -1;
 		}
 		// Third constraint in (4.31)
-		A->at(FirstCons + nC*2, nPoly*nC + i) = 1;
-		A->at(FirstCons + nC*2 + 1, nPoly*nC + i) = -1;
+		A.at(FirstCons + nC*2, nPoly*nC + i) = 1;
+		A.at(FirstCons + nC*2 + 1, nPoly*nC + i) = -1;
 	}
 	// Second Constraint RHS
 	for(unsigned int j=0; j<nC;j++)
-		A->at(FirstCons+2*j, nPoly*nC + nPoly +j) = -1;
+		A.at(FirstCons+2*j, nPoly*nC + nPoly +j) = -1;
 	// Third Constraint RHS
-	b->at(FirstCons + nC*2) = 1;
-	b->at(FirstCons + nC*2+1) = -1;
+	b.at(FirstCons + nC*2) = 1;
+	b.at(FirstCons + nC*2+1) = -1;
 	// Common Constraints
 	if(Acom.n_rows>0)
 	{
-		b->subvec(FirstCons+2*nC+2, nFinCons-1) = bcom;
-		A->submat(FirstCons+2*nC+2, nPoly*nC+nPoly,
+		b.subvec(FirstCons+2*nC+2, nFinCons-1) = bcom;
+		A.submat(FirstCons+2*nC+2, nPoly*nC+nPoly,
 					nFinCons-1, nFinVar-1) = Acom;
 	}
 	return 0;
 }
 
-arma::vec* 
+arma::vec 
 isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Positivity)
 {
 	unsigned int nR, nC;
@@ -342,7 +343,7 @@ isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Posit
 	if(c->n_rows != nC) throw "Inconsistency in no of Vars in isFeas()";
 	if(b->n_rows != nR) throw "Inconsistency in no of Constr in isFeas()";
 
-	arma::vec *sol = new arma::vec(c->n_rows, arma::fill::zeros);
+	arma::vec sol = arma::vec(c->n_rows, arma::fill::zeros);
 	const double lb = Positivity?0:-GRB_INFINITY;
 
 	GRBEnv env;
@@ -364,8 +365,7 @@ isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Posit
 	model.set(GRB_IntParam_DualReductions, 0) ;
 	model.optimize();
 	if(model.get(GRB_IntAttr_Status)==GRB_OPTIMAL)
-		for(unsigned int i=0; i<nC; i++) sol->at(i) = x[i].get(GRB_DoubleAttr_X); 
-	else sol = nullptr;
+		for(unsigned int i=0; i<nC; i++) sol.at(i) = x[i].get(GRB_DoubleAttr_X); 
 	return sol;
 }
 
@@ -475,7 +475,8 @@ void
 LCP::branch(int loc, const vector<short int> *Fixes) 
 {
 	bool VarFirst=(loc<0);
-	GRBModel *FixEqMdl=nullptr, *FixVarMdl=nullptr;
+	unique_ptr<GRBModel> FixEqMdl, FixVarMdl;
+	// GRBModel *FixEqMdl=nullptr, *FixVarMdl=nullptr;
 	vector<short int> *FixEqLeaf, *FixVarLeaf;
 	if(VERBOSE) 
 	{
@@ -526,7 +527,7 @@ LCP::branch(int loc, const vector<short int> *Fixes)
 vector<vector<short int>*>* 
 LCP::BranchAndPrune ()
 {
-	GRBModel *m = nullptr;
+	unique_ptr<GRBModel> m;
 	vector<short int>* Fix = new vector<short int>(nR,0);
 	branch(BranchLoc(m, Fix), Fix);
 	delete Fix;
@@ -534,7 +535,7 @@ LCP::BranchAndPrune ()
 }
 
 int 
-LCP::BranchLoc(GRBModel* m, vector<short int>* Fix)
+LCP::BranchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix)
 {
 	static int GurCallCt {0};
 	m = this->LCPasMIP(*Fix, true);
@@ -548,7 +549,7 @@ LCP::BranchLoc(GRBModel* m, vector<short int>* Fix)
 	int pos;
 	pos = (signed int)nR;// Don't branch! You are at the leaf if pos never gets changed!!
 	arma::vec z,x;
-	if(this->extractSols(m, z, x, true)) // If already infeasible, nothing to branch!
+	if(this->extractSols(m.get(), z, x, true)) // If already infeasible, nothing to branch!
 	{
 		vector<short int> *v1 = this->solEncode(z,x);
 		vector<short int> *v2 = anyBranch(AllPolyhedra, v1);
@@ -604,7 +605,7 @@ LCP::BranchLoc(GRBModel* m, vector<short int>* Fix)
 		if(VERBOSE)
 			cout<<"Infeasible branch"<<endl;
 	}
-	delete m;
+	// delete m; // Since we moved to unique_ptr
 	return pos; 
 }
 
@@ -710,16 +711,16 @@ LCP::EnumerateAll(const bool solveLP)
 }
 
 
-GRBModel* 
+unique_ptr<GRBModel> 
 LCP::LCPasQP(bool solve)
 /** @brief Solves the LCP as a QP using Gurobi */
 /** Removes all complementarity constraints from the QP's constraints. Instead, the sum of products of complementarity pairs is minimized. If the optimal value turns out to be 0, then it is actually a solution of the LCP. Else the LCP is infeasible.   */
 {
 	this->makeRelaxed();
-	GRBModel *model = new GRBModel(this->RlxdModel); 
+	unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
 	GRBQuadExpr obj = 0;
-	GRBVar *x = new GRBVar [this->nR];
-	GRBVar *z = new GRBVar [this->nR];
+	GRBVar x[this->nR];
+	GRBVar z[this->nR];
 	for(auto p:this->Compl)
 	{
 		unsigned int i=p.first; unsigned int j = p.second;
@@ -746,7 +747,5 @@ LCP::LCPasQP(bool solve)
 		catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
 		if(Error) throw "Error in LCP::LCP as QP";
 	}
-	delete[] x;
-	delete[] z;
 	return model;
 }

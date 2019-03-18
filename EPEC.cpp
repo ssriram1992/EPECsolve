@@ -1,4 +1,5 @@
 #include<iostream>
+#include<memory>
 #include<exception>
 #include"func.h"
 #include<ctime>
@@ -32,9 +33,9 @@ int LCPtest(Models::LeadAllPar LA)
 	try
 	{
 		// Solving using LCPasQP
-		GRBModel* Model2 = MyNashGame->LCPasQP(true);
+		unique_ptr<GRBModel> Model2 = MyNashGame->LCPasQP(true);
 		arma::vec z,x;
-		MyNashGame->extractSols(Model2, z, x, true);
+		MyNashGame->extractSols(Model2.get(), z, x, true);
 		cout<<"Sample solution"<<endl;
 		x.print("x"); z.print("z");
 		cout<<"*************************"<<endl;
@@ -50,7 +51,7 @@ int LCPtest(Models::LeadAllPar LA)
 		} 
 		MyNashGame->print();
 		cout<<"************************************"<<endl;
-		MyNashGame->ConvexHull(&Aa, &b);
+		MyNashGame->ConvexHull(Aa, b);
 		cout<<"************************************"<<endl;
 	}
 	catch(const char* e) { cout<<e<<endl; }

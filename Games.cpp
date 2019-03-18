@@ -1,4 +1,5 @@
 #include<iostream>
+#include<memory>
 #include"func.h"
 #include<armadillo>
 #include<array>
@@ -105,7 +106,7 @@ QP_Param::make_yQy()
 	return 0;
 }
 
-GRBModel* 
+unique_ptr<GRBModel> 
 QP_Param::solveFixed(arma::vec x)
 {
 	this->make_yQy();
@@ -113,7 +114,7 @@ QP_Param::solveFixed(arma::vec x)
 	if(x.size()!=this->Nx) throw "Invalid argument size: " + to_string(x.size()) + " != "+to_string(Nx);
 	/// @warning Creates a GRBModel using dynamic memory. Should be freed by the caller.
 	bool Error{true};
-	GRBModel* model = new GRBModel(this->QuadModel);
+	unique_ptr<GRBModel> model(new GRBModel(this->QuadModel));
 	try
 	{
 		GRBQuadExpr yQy = model->getObjective();
@@ -225,7 +226,7 @@ QP_Param::is_Playable(const QP_Param P) const
 	 @image html FormulateLCP.png
 	 @image latex FormulateLCP.png
  */
-NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
+NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 {
 	// Setting the class variables
 	this->n_LeadVar = n_LeadVar;

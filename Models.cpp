@@ -1,4 +1,5 @@
 #include "func.h"
+#include<memory>
 #include<vector>
 #include<armadillo>
 #include<iostream>
@@ -104,13 +105,13 @@ LCP* Models::createCountry(
 	arma::sp_mat LeadCons(import_lim_cons+export_lim_cons+Params.n_followers, LeadVars+Params.n_followers); arma::vec LeadRHS(import_lim_cons+export_lim_cons+Params.n_followers, arma::fill::zeros);
 	LeadCons.zeros();
 
-	vector<QP_Param*> Players{};
+	vector<shared_ptr<QP_Param>> Players{};
 	// Create the QP_Param* for each follower
 	for(unsigned int follower = 0; follower < Params.n_followers; follower++)
 	{
 		c.fill(0); b.fill(0);
 		A.zeros(); B.zeros(); C.zeros(); b.zeros(); Q.zeros(); c.zeros();
-		QP_Param* Foll = new QP_Param();
+		shared_ptr<QP_Param> Foll{new QP_Param()};
 		Q(0, 0) = Params.FollowerParam.costs_quad.at(follower) + 2*Params.DemandParam.beta;
 		c(0) = Params.FollowerParam.costs_lin.at(follower) - Params.DemandParam.alpha;
 
