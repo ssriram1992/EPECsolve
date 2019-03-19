@@ -214,8 +214,7 @@ ostream& operator<< (ostream& os, const QP_Param &Q);
 
 /// Checks if the polyhedron given by @f$ Ax\leq b@f$ is feasible.
 /// If yes, returns the point @f$x@f$ in the polyhedron that minimizes @f$c^Tx@f$
-arma::vec isFeas(const arma::sp_mat* A, const arma::vec *b, 
-		const arma::vec *c, bool Positivity=false);
+arma::vec isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Positivity=false);
 
 /** 
  * Computes the convex hull of a finite union of polyhedra where 
@@ -374,6 +373,8 @@ struct FollPar
 	vector<double> costs_lin = {};
 	/// Production capacity of each follower. Size of this vector should be equal to n_followers
 	vector<double> capacities = {};
+	/// Emission costs for unit quantity of the fuel. Emission costs feature only on the leader's problem
+	vector<double> emission_costs = {};
 	/// Optional Names for the Followers.
 	vector<string> names = {};
 };

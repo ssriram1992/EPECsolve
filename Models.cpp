@@ -53,9 +53,10 @@ ostream& Models::operator<<(ostream& ost, const Models::LeadAllPar P)
 bool Models::EPEC::ParamValid(const LeadAllPar& Params) const
 {
 	if(Params.n_followers == 0) throw "Error in EPEC::ParamValid(). 0 Followers?";
-	if (Params.FollowerParam.costs_lin.size()!=Params.n_followers ||
-			Params.FollowerParam.costs_quad.size() != Params.n_followers ||
-			Params.FollowerParam.capacities.size() != Params.n_followers 
+	if (Params.FollowerParam.costs_lin.size()			!= Params.n_followers ||
+			Params.FollowerParam.costs_quad.size() 		!= Params.n_followers ||
+			Params.FollowerParam.capacities.size() 		!= Params.n_followers ||
+			Params.FollowerParam.emission_costs.size()	!= Params.n_followers
 	   )
 		throw "Error in EPEC::ParamValid(). Size Mismatch";
 	if (Params.DemandParam.alpha <= 0 || Params.DemandParam.beta <=0 ) throw "Error in EPEC::ParamValid(). Invalid demand curve params";
@@ -130,6 +131,8 @@ Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
 	{
 		for (unsigned int i=0;i<Params.n_followers;i++)
 			LeadCons.at(Params.n_followers+1+import_lim_cons+export_lim_cons, i) = -Params.DemandParam.beta;
+		LeadCons.at(Params.n_followers+1+import_lim_cons+export_lim_cons, Params.n_followers) = -Params.DemandParam.beta;
+		LeadCons.at(Params.n_followers+1+import_lim_cons+export_lim_cons, Params.n_followers+1) = Params.DemandParam.beta;
 		LeadRHS(Params.n_followers+1+import_lim_cons+export_lim_cons) = Params.LeaderParam.price_limit - Params.DemandParam.alpha;
 	}
 }
@@ -209,6 +212,7 @@ Models::EPEC& Models::EPEC::addCountry(
 	this->name2nos[Params.name] = this->countriesLL.size();
 	this->countriesLL.push_back(N);
 	this->LeadConses.push_back(N->RewriteLeadCons());
+	this->AllLeadPars.push_back(Params);
 
 	return *this;
 }
@@ -223,12 +227,10 @@ Models::EPEC& Models::EPEC::addTranspCosts(const arma::sp_mat& costs)
 
 LCP* Models::EPEC::playCountry(vector<LCP*> countries) 
 {
-	auto Pi = this->AllLeadPars;
+	auto Pi = &this->AllLeadPars;
 	const unsigned int n_countries = countries.size();
 	vector<unsigned int> LeadVars(n_countries, 0);
 	for(unsigned int i=0;i<n_countries;i++)
-		LeadVars.at(i) = 2 + 2*Pi.at(i).n_followers + Pi.at(i).n_followers  ;// two for quantity imported and exported, n for imposed cap and last n for tax and finally n_follower number of follower variables
+		LeadVars.at(i) = 2 + 2*Pi->at(i).n_followers + Pi->at(i).n_followers;		// two for quantity imported and exported, n for imposed cap and last n for tax and finally n_follower number of follower variables
 	return nullptr;
-}
-
-
+} 
