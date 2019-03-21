@@ -34,7 +34,7 @@ operator<<(ostream& ost, perps C)
 }
 
 ostream& 
-operator<< (ostream& os, const QP_Param &Q)
+operator<< (ostream& os, const Game::QP_Param &Q)
 {
 	os<<"Quadratic program with linear inequality constraints: "<<endl;
 	os<<Q.getNy()<<" decision variables parameterized by "<<Q.getNx()<<" variables"<<endl;
@@ -47,24 +47,9 @@ operator<< (ostream& os, const QP_Param &Q)
 	return os;
 }
 
-ostream& 
-operator<< (ostream& os, const NashGame N)
-{
-	os<<endl;
-	os<<"-----------------------------------------------------------------------"<<endl;
-	os<<"Nash Game with "<<N.Nplayers<<" players"<<endl;
-	os<<"-----------------------------------------------------------------------"<<endl;
-	os<<"Number of primal variables:\t\t\t "<<N.primal_position.back()<<endl;
-	os<<"Number of dual variables:\t\t\t "<<N.dual_position.back()-N.dual_position.front()+1<<endl;
-	os<<"Number of shadow price dual variables:\t\t "<<N.MCRHS.n_rows<<endl;
-	os<<"Number of leader variables:\t\t\t "<<N.n_LeadVar<<endl;
-	os<<"-----------------------------------------------------------------------"<<endl;
-	return os;
-}
-
 
 unsigned int 
-QP_Param::size()
+Game::QP_Param::size()
 {
 	this->Ny = this->Q.n_rows;
 	this->Nx = this->C.n_cols;
@@ -73,7 +58,7 @@ QP_Param::size()
 }
 
 bool 
-QP_Param::dataCheck(bool forcesymm) const
+Game::QP_Param::dataCheck(bool forcesymm) const
 {
 	if(forcesymm && !this->Q.is_symmetric()) 
 		return false; // Q should be symmetric if forcesymm is true
@@ -87,7 +72,7 @@ QP_Param::dataCheck(bool forcesymm) const
 }
 
 int
-QP_Param::make_yQy()
+Game::QP_Param::make_yQy()
 {
 	if(this->made_yQy) return 0;
 	GRBVar y[this->Ny];
@@ -107,13 +92,12 @@ QP_Param::make_yQy()
 }
 
 unique_ptr<GRBModel> 
-QP_Param::solveFixed(arma::vec x)
+Game::QP_Param::solveFixed(arma::vec x)
 {
 	this->make_yQy();
-	/// @throws error if argument vector size is not compatible with the QP_Param definition.
+	/// @throws error if argument vector size is not compatible with the Game::QP_Param definition.
 	if(x.size()!=this->Nx) throw "Invalid argument size: " + to_string(x.size()) + " != "+to_string(Nx);
 	/// @warning Creates a GRBModel using dynamic memory. Should be freed by the caller.
-	bool Error{true};
 	unique_ptr<GRBModel> model(new GRBModel(this->QuadModel));
 	try
 	{
@@ -136,13 +120,11 @@ QP_Param::solveFixed(arma::vec x)
 			model->addConstr(LHS, GRB_LESS_EQUAL, b[i]-Ax[i]);
 		}
 		model->optimize();
-		Error = false;
 	}
-	catch(const char* e) { cout<<e<<endl; }
-	catch(string e) { cout<<"String: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-	catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
-	if(Error) throw "Error in QP_Param::solveFixed)";
+	catch(const char* e) { cout<<" Error in Game::QP_Param::solveFixed: "<<e<<endl; throw;}
+	catch(string e) { cout<<"String: Error in Game::QP_Param::solveFixed: "<<e<<endl; throw;}
+	catch(exception &e) { cout<<"Exception: Error in Game::QP_Param::solveFixed: "<<e.what()<<endl; throw;}
+	catch(GRBException &e){cout<<"GRBException: Error in Game::QP_Param::solveFixed: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;throw;}
 	return model;
 }
 
@@ -154,11 +136,11 @@ QP_Param::solveFixed(arma::vec x)
  * \f$0 \leq y \perp  My + Nx + q \geq 0\f$
 */
 unsigned int 
-QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
+Game::QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 {
 	if (!this->dataCheck())
 	{
-		throw "Inconsistent data for KKT of QP_Param";
+		throw "Inconsistent data for KKT of Game::QP_Param";
 		return 0;
 	}
 	M = arma::join_cols( // In armadillo join_cols(A, B) is same as [A;B] in Matlab
@@ -172,34 +154,34 @@ QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 }
 
 
-QP_Param& 
-QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+Game::QP_Param& 
+Game::QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 {
 	this->made_yQy = false;
 	this->Q = (Q); this->C = (C); this->A = (A);
 	this->B = (B); this->c = (c); this->b = (b);
 	this->size();
-	if(!dataCheck()) throw "Bad initialization done in QP_Param::set";
+	if(!dataCheck()) throw "Bad initialization done in Game::QP_Param::set";
 	return *this;
 }
 
 
 
-QP_Param& 
-QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+Game::QP_Param& 
+Game::QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
 {
 	this->made_yQy = false;
 	this->Q = move(Q); this->C = move(C); this->A = move(A);
 	this->B = move(B); this->c = move(c); this->b = move(b);
 	this->size();
-	if(!dataCheck()) throw "Bad initialization done in QP_Param::set";
+	if(!dataCheck()) throw "Bad initialization done in Game::QP_Param::set";
 	return *this;
 }
 
 
 
 bool 
-QP_Param::is_Playable(const QP_Param P) const
+Game::QP_Param::is_Playable(const Game::QP_Param P) const
 {
 	unsigned int comp{static_cast<unsigned int>(P.getc().n_elem)};
 	unsigned int compcomp {static_cast<unsigned int>(P.getB().n_cols)};
@@ -211,7 +193,7 @@ QP_Param::is_Playable(const QP_Param P) const
 
 
 /**
- * Have a vector of pointers to QP_Param ready such that
+ * Have a vector of pointers to Game::QP_Param ready such that
  * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
  *
@@ -226,7 +208,7 @@ QP_Param::is_Playable(const QP_Param P) const
 	 @image html FormulateLCP.png
 	 @image latex FormulateLCP.png
  */
-NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
+Game::NashGame::NashGame(vector<shared_ptr<Game::QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 {
 	// Setting the class variables
 	this->n_LeadVar = n_LeadVar;
@@ -261,14 +243,14 @@ NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::
 	dual_position.push_back(dl_cnt);
 }
 
-NashGame::~NashGame()
+Game::NashGame::~NashGame()
 {
 	// for(auto a:this->Players)
 		// delete a;
 }
 
 unsigned int 
-NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl, bool writeToFile, string M_name, string q_name) const
+Game::NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl, bool writeToFile, string M_name, string q_name) const
 {
 	// To store the individual KKT conditions for each player.
 	vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers); 
@@ -360,7 +342,7 @@ NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl, bool writeTo
 }
 
 arma::sp_mat 
-NashGame::RewriteLeadCons() const
+Game::NashGame::RewriteLeadCons() const
 {
 	arma::sp_mat A_in = this->LeaderConstraints;
 	arma::sp_mat A_out;
@@ -378,9 +360,8 @@ NashGame::RewriteLeadCons() const
 		A_out.cols(this->Leader_position, this->dual_position.at(0)-1) = A_in.cols(this->MC_dual_position, n_Col-1);
 		return A_out;
 	}
-	catch(const char* e) { cout<<e<<endl; }
-	catch(string e) { cout<<"String: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-	throw "Error in NashGame::RewriteLeadCons";
+	catch(const char* e) { cout<<"Error in NashGame::RewriteLeadCons: "<<e<<endl; throw;}
+	catch(string e) { cout<<"String: Error in NashGame::RewriteLeadCons: "<<e<<endl; throw;}
+	catch(exception &e) { cout<<"Exception: Error in NashGame::RewriteLeadCons: "<<e.what()<<endl; throw;}
 	return A_in;
 }

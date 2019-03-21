@@ -68,7 +68,7 @@ bool Models::EPEC::ParamValid(const LeadAllPar& Params) const
 }
 
 
-void Models::EPEC::make_LL_QP(const LeadAllPar& Params, const unsigned int follower, QP_Param* Foll, const unsigned int LeadVars) const noexcept
+void Models::EPEC::make_LL_QP(const LeadAllPar& Params, const unsigned int follower, Game::QP_Param* Foll, const unsigned int LeadVars) const noexcept
 {
 		arma::sp_mat Q(1,1), C(1, LeadVars + Params.n_followers - 1);
 		// Two constraints. One saying that you should be less than capacity
@@ -170,9 +170,9 @@ Models::EPEC& Models::EPEC::addCountry(
 {
 	bool noError=false;
 	try { noError = this->ParamValid(Params); }
-	catch(const char* e) { cout<<e<<endl; }
-	catch(string e) { cout<<"String: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
+	catch(const char* e) { cout<<"Error in Models::EPEC::addCountry: "<<e<<endl; }
+	catch(string e) { cout<<"String: Error in Models::EPEC::addCountry: "<<e<<endl; }
+	catch(exception &e) { cout<<"Exception: Error in Models::EPEC::addCountry: "<<e.what()<<endl; }
 
 	if(!noError) return *this;
 
@@ -192,11 +192,11 @@ Models::EPEC& Models::EPEC::addCountry(
 			LeadVars+Params.n_followers); 
 	arma::vec LeadRHS(import_lim_cons+export_lim_cons+Params.n_followers+1, arma::fill::zeros);
 
-	vector<shared_ptr<QP_Param>> Players{};
+	vector<shared_ptr<Game::QP_Param>> Players{};
 	// Create the QP_Param* for each follower
 	for(unsigned int follower = 0; follower < Params.n_followers; follower++)
 	{
-		shared_ptr<QP_Param> Foll{new QP_Param()};
+		shared_ptr<Game::QP_Param> Foll{new Game::QP_Param()};
 		this->make_LL_QP(Params, follower, Foll.get(), LeadVars);
 		Players.push_back(Foll); 
 	}
@@ -208,7 +208,7 @@ Models::EPEC& Models::EPEC::addCountry(
 	arma::sp_mat MC(0, LeadVars+Params.n_followers);
 	arma::vec MCRHS(0, arma::fill::zeros);
 
-	auto N = make_shared<NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
+	auto N = make_shared<Game::NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
 	this->name2nos[Params.name] = this->countriesLL.size();
 	this->countriesLL.push_back(N);
 	this->LeadConses.push_back(N->RewriteLeadCons());
@@ -225,7 +225,7 @@ Models::EPEC& Models::EPEC::addTranspCosts(const arma::sp_mat& costs)
 	return *this;
 }
 
-LCP* Models::EPEC::playCountry(vector<LCP*> countries) 
+Game::LCP* Models::EPEC::playCountry(vector<Game::LCP*> countries) 
 {
 	auto Pi = &this->AllLeadPars;
 	const unsigned int n_countries = countries.size();

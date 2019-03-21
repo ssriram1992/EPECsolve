@@ -9,7 +9,7 @@ using namespace std;
 
 
 void 
-LCP::defConst(GRBEnv* env)
+Game::LCP::defConst(GRBEnv* env)
 {
 	AllPolyhedra = new vector<vector<short int>*> {};
 	RelAllPol = new vector<vector<short int>*> {};
@@ -20,7 +20,7 @@ LCP::defConst(GRBEnv* env)
 }
 
 
-LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A, arma::vec b):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) /// Constructor with M, q, compl pairs
+Game::LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A, arma::vec b):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) /// Constructor with M, q, compl pairs
 {
 	defConst(env);
 	this->Compl = Compl;
@@ -38,7 +38,7 @@ LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A, 
 		}
 }
 
-LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A, arma::vec b):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) /// Constructor with M,q,leader posn
+Game::LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A, arma::vec b):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) /// Constructor with M,q,leader posn
 {
 	defConst(env);
 	this->LeadStart = LeadStart; this->LeadEnd = LeadEnd;
@@ -51,7 +51,7 @@ LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsig
 	}
 }
 
-LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
+Game::LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
 {
 	arma::sp_mat M; arma::vec q; perps Compl;
 	N.FormulateLCP(M, q, Compl);
@@ -60,7 +60,7 @@ LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
 /** @brief Destructor of LCP */
 /** LCP object owns the pointers to definitions of its polyhedra that it owns
  It has to be deleted and freed. */
-LCP::~LCP()
+Game::LCP::~LCP()
 {
 	for(auto p:*(this->AllPolyhedra)) delete p;
 	for(auto p:*(this->RelAllPol)) delete p;
@@ -75,7 +75,7 @@ LCP::~LCP()
 /** @details A Gurobi object is stored in the LCP object, that has all complementarity constraints removed.
  * A copy of this object is used by other member functions */
 int 
-LCP::makeRelaxed()
+Game::LCP::makeRelaxed()
 {
 	try
 	{
@@ -106,11 +106,10 @@ LCP::makeRelaxed()
 		RlxdModel.update();
 		this->madeRlxdModel = true;
 	}
-	catch(const char* e) { cout<<e<<endl; }
-	catch(string e) { cout<<"String: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-	catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
-	if(!this->madeRlxdModel) throw "Error in LCP::makeRelaxed";
+	catch(const char* e) { cout<<"Error in Game::LCP::makeRelaxed: "<<e<<endl; throw;}
+	catch(string e) { cout<<"String: Error in Game::LCP::makeRelaxed: "<<e<<endl; throw;}
+	catch(exception &e) { cout<<"Exception: Error in Game::LCP::makeRelaxed: "<<e.what()<<endl; throw;}
+	catch(GRBException &e){cout<<"GRBException: Error in Game::LCP::makeRelaxed: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;throw;}
 	return 0;
 }
 
@@ -123,7 +122,7 @@ LCP::makeRelaxed()
 /// @warning The FixEq and FixVar variables are used under a different convention here!
 /// @warning This member function is public for the moment. But this will be converted to a private method soon.
 unique_ptr<GRBModel> 
-LCP::LCP_Polyhed_fixed(
+Game::LCP::LCP_Polyhed_fixed(
         /// If index is present, equality imposed on that variable
 		vector<unsigned int> FixEq,  		
         /// If index is present, equality imposed on that equation
@@ -153,7 +152,7 @@ LCP::LCP_Polyhed_fixed(
  * elements of FixVar set to equality (=0)
  */
 unique_ptr<GRBModel> 
-LCP::LCP_Polyhed_fixed(
+Game::LCP::LCP_Polyhed_fixed(
         /// If non zero, equality imposed on variable
 		arma::Col<int> FixEq,  		
         /// If non zero, equality imposed on equation
@@ -177,9 +176,9 @@ LCP::LCP_Polyhed_fixed(
  * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
  */
 unique_ptr<GRBModel> 
-LCP::LCPasMIP(vector<short int> Fixes, bool solve)
+Game::LCP::LCPasMIP(vector<short int> Fixes, bool solve)
 {
-	if(Fixes.size()!=this->nR) throw "Bad size for Fixes in LCP::LCPasMIP";
+	if(Fixes.size()!=this->nR) throw "Bad size for Fixes in Game::LCP::LCPasMIP";
 	vector<unsigned int> FixVar, FixEq; 
 	for(unsigned int i=0;i<nR;i++)
 	{
@@ -195,7 +194,7 @@ LCP::LCPasMIP(vector<short int> Fixes, bool solve)
  * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
  */
 unique_ptr<GRBModel> 
-LCP::LCPasMIP(
+Game::LCP::LCPasMIP(
 		vector<unsigned int> FixEq,	// If any equation is to be fixed to equality
 		vector<unsigned int> FixVar, // If any variable is to be fixed to equality
 		bool solve // Whether the model should be solved in the function already!
@@ -231,11 +230,10 @@ LCP::LCPasMIP(
 		if(solve) model->optimize();
 		return model;
 	}
-	catch(const char* e) { cout<<e<<endl; }
-	catch(string e) { cout<<"String: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-	catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
-	throw "Error in LCP::LCPasMIP";
+	catch(const char* e) { cout<<"Error in Game::LCP::LCPasMIP: "<<e<<endl; throw;}
+	catch(string e) { cout<<"String: Error in Game::LCP::LCPasMIP: "<<e<<endl; throw;}
+	catch(exception &e) { cout<<"Exception: Error in Game::LCP::LCPasMIP: "<<e.what()<<endl; throw;}
+	catch(GRBException &e){cout<<"GRBException: Error in Game::LCP::LCPasMIP: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;throw;}
 	return nullptr;
 }
 
@@ -244,7 +242,7 @@ LCP::LCPasMIP(
  * compatible size, given the number of leader variables
  */
 bool 
-LCP::errorCheck(
+Game::LCP::errorCheck(
         /// If this is true, function throws an error, else, it just returns false
         bool throwErr) const
 {
@@ -261,7 +259,7 @@ LCP::errorCheck(
 
 
 void 
-LCP::print(string end)
+Game::LCP::print(string end)
 {
 	cout<<"LCP with "<<this->nR<<" rows and "<<this->nC<<" columns."<<end;
 }
@@ -415,7 +413,7 @@ operator >(vector<int> Fix1, vector<int> Fix2)
  *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
  */
 vector<short int>* 
-LCP::anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const
+Game::LCP::anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const
 {
 	for(auto v:*vecOfFixes)
 		if(*Fix < *v||*v==*Fix) return v;
@@ -424,8 +422,8 @@ LCP::anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* 
 
 /** @brief Extracts variable and equation values from a solved Gurobi model for LCP */
 bool 
-LCP::extractSols(
-        /// The Gurobi Model that was solved (perhaps using LCP::LCPasMIP)
+Game::LCP::extractSols(
+        /// The Gurobi Model that was solved (perhaps using Game::LCP::LCPasMIP)
         GRBModel* model, 
         /// Output variable - where the equation values are stored
         arma::vec &z, 
@@ -449,7 +447,7 @@ LCP::extractSols(
 
 /// @brief Given variable values and equation values, encodes it in 0/+1/-1 format and returns it.
 vector<short int>* 
-LCP::solEncode(const arma::vec &z, const arma::vec &x) const
+Game::LCP::solEncode(const arma::vec &z, const arma::vec &x) const
 {
 	vector<signed short int>* solEncoded = new vector<signed short int>(nR, 0);
 	for(auto p:Compl)
@@ -463,7 +461,7 @@ LCP::solEncode(const arma::vec &z, const arma::vec &x) const
 
 /// @brief Given a Gurobi model, extracts variable values and equation values, encodes it in 0/+1/-1 format and returns it.
 vector<short int>* 
-LCP::solEncode(GRBModel *model) const
+Game::LCP::solEncode(GRBModel *model) const
 {
 	arma::vec x,z;
 	if(!this->extractSols(model, z, x, true)) return {};// If infeasible model, return empty!
@@ -476,7 +474,7 @@ LCP::solEncode(GRBModel *model) const
  * else branch at abs(loc) location and go down the branch where eqn is fixed to 0
  */
 void 
-LCP::branch(int loc, const vector<short int> *Fixes) 
+Game::LCP::branch(int loc, const vector<short int> *Fixes) 
 {
 	bool VarFirst=(loc<0);
 	unique_ptr<GRBModel> FixEqMdl, FixVarMdl;
@@ -529,7 +527,7 @@ LCP::branch(int loc, const vector<short int> *Fixes)
 }
 
 vector<vector<short int>*>* 
-LCP::BranchAndPrune ()
+Game::LCP::BranchAndPrune ()
 {
 	unique_ptr<GRBModel> m;
 	vector<short int>* Fix = new vector<short int>(nR,0);
@@ -539,7 +537,7 @@ LCP::BranchAndPrune ()
 }
 
 int 
-LCP::BranchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix)
+Game::LCP::BranchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix)
 {
 	static int GurCallCt {0};
 	m = this->LCPasMIP(*Fix, true);
@@ -614,7 +612,7 @@ LCP::BranchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix)
 }
 
 int 
-LCP::BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf)
+Game::LCP::BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf)
 {
 	int pos = (int)nR;
 	if(VERBOSE)
@@ -634,7 +632,7 @@ LCP::BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf)
 }
 
 void 
-LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, vector<arma::sp_mat*> *custAi, vector<arma::vec*> *custbi)
+Game::LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, vector<arma::sp_mat*> *custAi, vector<arma::vec*> *custbi)
 {
 	arma::sp_mat *Aii = new arma::sp_mat(nR, nC);
    	arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
@@ -657,7 +655,6 @@ LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, vector
 	bool add = !checkFeas;
 	if(checkFeas)
 	{
-		bool Error{true};
 		unsigned int count{0};
 		try
 		{
@@ -674,13 +671,11 @@ LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, vector
 			model->optimize();
 			if(model->get(GRB_IntAttr_Status) == GRB_OPTIMAL) add = true;
 			delete model;
-			Error = false;
 		}
-		catch(const char* e) { cout<<e<<endl; }
-		catch(string e) { cout<<"String: "<<e<<endl; }
-		catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-		catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
-		if(Error) throw "Error in LCP::FixToPoly";
+		catch(const char* e) { cout<<"Error in Game::LCP::FixToPoly: "<<e<<endl; throw;}
+		catch(string e) { cout<<"String: Error in Game::LCP::FixToPoly: "<<e<<endl; throw;}
+		catch(exception &e) { cout<<"Exception: Error in Game::LCP::FixToPoly: "<<e.what()<<endl; throw;}
+		catch(GRBException &e) {cout<<"GRBException: Error in Game::LCP::FixToPoly: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
 	}
 	if(add) 
 	{ 
@@ -691,7 +686,7 @@ LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, vector
 }
 
 void 
-LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas, bool custom, vector<arma::sp_mat*> *custAi, vector<arma::vec*> *custbi)
+Game::LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas, bool custom, vector<arma::sp_mat*> *custAi, vector<arma::vec*> *custbi)
 {
 	bool flag = false;
 	vector<short int> MyFix(*Fix);
@@ -709,7 +704,7 @@ LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas, bool custom, vect
 }
 
 int 
-LCP::EnumerateAll(const bool solveLP)
+Game::LCP::EnumerateAll(const bool solveLP)
 {
 	delete Ai; delete bi; // Just in case it is polluted with BranchPrune
 	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
@@ -718,7 +713,7 @@ LCP::EnumerateAll(const bool solveLP)
 	return 0;
 }
 
-void LCP::addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi,
+void Game::LCP::addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi,
 				const bool convHull, arma::sp_mat *A, arma::vec  *b)
 {
 	this->FixToPolies(&Fix, false, true, &custAi, &custbi);
@@ -727,7 +722,7 @@ void LCP::addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &cus
 }
 
 unique_ptr<GRBModel> 
-LCP::LCPasQP(bool solve)
+Game::LCP::LCPasQP(bool solve)
 /** @brief Solves the LCP as a QP using Gurobi */
 /** Removes all complementarity constraints from the QP's constraints. Instead, the sum of products of complementarity pairs is minimized. If the optimal value turns out to be 0, then it is actually a solution of the LCP. Else the LCP is infeasible.  
  * @warning Solves the LCP feasibility problem. Not the MPEC optimization problem.
@@ -746,36 +741,32 @@ LCP::LCPasQP(bool solve)
 		obj += x[i]*z[i];
 	}
 	model->setObjective(obj, GRB_MINIMIZE);
-	bool Error{false};
 	if(solve) 
 	{
-		Error = true;
 		try
 		{
 			model->optimize();
 			int status = model->get(GRB_IntAttr_Status);
 			if(status!=GRB_OPTIMAL || model->get(GRB_DoubleAttr_ObjVal) > this->eps)
 				throw "LCP infeasible";
-			Error = false;
 		}
-		catch(const char* e) { cout<<e<<endl; }
-		catch(string e) { cout<<"String: "<<e<<endl; }
-		catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-		catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
-		if(Error) throw "Error in LCP::LCPasQP";
+		catch(const char* e) { cout<<"Error in Game::LCP::LCPasQP: "<<e<<endl; throw;}
+		catch(string e) { cout<<"String: Error in Game::LCP::LCPasQP: "<<e<<endl; throw;}
+		catch(exception &e) { cout<<"Exception: Error in Game::LCP::LCPasQP: "<<e.what()<<endl; throw;}
+		catch(GRBException &e){cout<<"GRBException: Error in Game::LCP::LCPasQP: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;throw;}
 	}
 	return model;
 }
 
 unique_ptr<GRBModel>
-LCP::LCPasMIP(bool solve)
+Game::LCP::LCPasMIP(bool solve)
 {
 	return this->LCPasMIP({}, {}, solve);
 }
 
 
 unique_ptr<GRBModel> 
-LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve)
+Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve)
 {
 	unique_ptr<GRBModel> model = this->LCPasMIP(false);
 	arma::vec Cx(this->nC, arma::fill::zeros);
@@ -785,8 +776,8 @@ LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_mi
 		if(Cx.n_rows != this->nC) throw string("Bad size of C");
 		if(c.n_rows != this->nC) throw string("Bad size of c");
 	}
-	catch(exception &e) {cout<<"Exception in LCP::MPECasMIQP: "<<e.what()<<endl;throw;}
-	catch(string &e) {cout<<"Exception in LCP::MPECasMIQP: "<<e<<endl;throw;}
+	catch(exception &e) {cout<<"Exception in Game::LCP::MPECasMIQP: "<<e.what()<<endl;throw;}
+	catch(string &e) {cout<<"Exception in Game::LCP::MPECasMIQP: "<<e<<endl;throw;}
 	arma::vec obj = c+Cx;
 	GRBLinExpr expr{0};
 	for(unsigned int i=0; i<this->nC;i++)
@@ -797,7 +788,7 @@ LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_mi
 }
 
 unique_ptr<GRBModel> 
-LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve)
+Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve)
 {
 	auto model = this->MPECasMILP(C, c, x_minus_i, false);
 	/// Note that if the matrix Q is a zero matrix, then this returns a Gurobi MILP model as opposed to MIQP model.

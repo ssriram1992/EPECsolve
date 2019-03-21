@@ -49,7 +49,7 @@ inline bool operator == (vector<int> Fix1, vector<int> Fix2);
 template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
 
-
+namespace Game{
 ///@brief Class to handle parameterized quadratic programs(QP)
 class QP_Param
 /**
@@ -151,7 +151,19 @@ class NashGame
 		/// RHS to the Market Clearing constraints
 		arma::vec MCRHS;			
 		/// To print the Nash Game!
-		friend ostream& operator<< (ostream& os, const NashGame N);
+		friend ostream& operator<< (ostream& os, const NashGame &N)
+		{
+			os<<endl;
+			os<<"-----------------------------------------------------------------------"<<endl;
+			os<<"Nash Game with "<<N.Nplayers<<" players"<<endl;
+			os<<"-----------------------------------------------------------------------"<<endl;
+			os<<"Number of primal variables:\t\t\t "<<N.primal_position.back()<<endl;
+			os<<"Number of dual variables:\t\t\t "<<N.dual_position.back()-N.dual_position.front()+1<<endl;
+			os<<"Number of shadow price dual variables:\t\t "<<N.MCRHS.n_rows<<endl;
+			os<<"Number of leader variables:\t\t\t "<<N.n_LeadVar<<endl;
+			os<<"-----------------------------------------------------------------------"<<endl;
+			return os;
+		}
 	private:
 		///@internal In the vector of variables of all players,which position does the variable corrresponding to this player starts.
 		vector<unsigned int> primal_position; 
@@ -204,7 +216,7 @@ class NashGame
 
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
 ostream& operator<< (ostream& os, const QP_Param &Q);
-
+};
 
 /************************************************/
 /* 	 									      	*/
@@ -239,6 +251,7 @@ int ConvexHull(
 	   	arma::vec bcom={} 
 		);
 
+namespace Game{
 /**
  * @brief Class to handle and solve linear complementarity problems
  */
@@ -358,7 +371,7 @@ class LCP
 			   	arma::vec &b) 
 		{return ::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
 };
-
+};
 
 
 /************************************************/
@@ -444,7 +457,7 @@ class EPEC
 {
 	private:
 		vector<LeadAllPar> AllLeadPars = {};  ///< The parameters of each leader in the EPEC game
-		vector<shared_ptr<NashGame>> countriesLL = {}; ///< Stores each country's lower level Nash game
+		vector<shared_ptr<Game::NashGame>> countriesLL = {}; ///< Stores each country's lower level Nash game
 		vector<arma::sp_mat> LeadConses = {}; ///< Stores each country's leader constraint LHS
 		vector<arma::vec> LeadRHSes = {}; ///< Stores each country's leader constraint RHS
 		arma::sp_mat TranspCosts = {};
@@ -457,7 +470,7 @@ class EPEC
 		/// Makes the lower level quadratic program object for each follower.
 		void make_LL_QP(const LeadAllPar& Params, 
 				const unsigned int follower, 
-				QP_Param* Foll, 
+				Game::QP_Param* Foll, 
 				const unsigned int LeadVars) const noexcept;
 		/// Makes the leader constraint matrix and RHS
 		void make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
@@ -477,8 +490,8 @@ class EPEC
 		EPEC& addTranspCosts(const arma::sp_mat& costs);
 	public:
 		// Data access methods
-		NashGame* get_LowerLevelNash(unsigned int i); 
-		LCP* playCountry(vector<LCP*> countries);
+		Game::NashGame* get_LowerLevelNash(unsigned int i); 
+		Game::LCP* playCountry(vector<Game::LCP*> countries);
 };
 
 
