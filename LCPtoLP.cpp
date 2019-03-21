@@ -12,6 +12,7 @@ void
 LCP::defConst(GRBEnv* env)
 {
 	AllPolyhedra = new vector<vector<short int>*> {};
+	RelAllPol = new vector<vector<short int>*> {};
 	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
 	if(!VERBOSE) this->RlxdModel.set(GRB_IntParam_OutputFlag,0);
 	this->env = env;  this->madeRlxdModel = false; this->bigM = 1e5; this->eps = 1e-5;
@@ -62,7 +63,9 @@ LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
 LCP::~LCP()
 {
 	for(auto p:*(this->AllPolyhedra)) delete p;
+	for(auto p:*(this->RelAllPol)) delete p;
 	delete this->AllPolyhedra;
+	delete this->RelAllPol;
 	for(auto a:*(this->Ai)) delete a; 
 	for(auto b:*(this->bi)) delete b;
 	delete Ai; delete bi;
@@ -201,7 +204,8 @@ LCP::LCPasMIP(
 	makeRelaxed();
 	unique_ptr<GRBModel> model{new GRBModel(this->RlxdModel)};
 	// Creating the model
-	try{
+	try
+	{
 		GRBVar x[nC], z[nR], u[nR];
 		// Get hold of the Variables and Eqn Variables
 		for(unsigned int i=0;i <nC;i++) x[i] = model->getVarByName("x_"+to_string(i));
@@ -630,7 +634,7 @@ LCP::BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf)
 }
 
 void 
-LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas)
+LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, vector<arma::sp_mat*> *custAi, vector<arma::vec*> *custbi)
 {
 	arma::sp_mat *Aii = new arma::sp_mat(nR, nC);
    	arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
@@ -678,12 +682,16 @@ LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas)
 		catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
 		if(Error) throw "Error in LCP::FixToPoly";
 	}
-	if(add) { this->Ai->push_back(Aii); this->bi->push_back(bii); }
+	if(add) 
+	{ 
+		custom?this->Ai->push_back(Aii):custAi->push_back(Aii); 
+		custom?this->bi->push_back(bii):custbi->push_back(bii); 
+	}
 	if(VERBOSE) cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;
 }
 
 void 
-LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas)
+LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas, bool custom, vector<arma::sp_mat*> *custAi, vector<arma::vec*> *custbi)
 {
 	bool flag = false;
 	vector<short int> MyFix(*Fix);
@@ -693,11 +701,11 @@ LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas)
 	if(flag)
 	{
 		MyFix[i] = 1;
-		this->FixToPolies(&MyFix, checkFeas);
+		this->FixToPolies(&MyFix, checkFeas, custom, custAi, custbi);
 		MyFix[i] = -1;
-		this->FixToPolies(&MyFix, checkFeas);
+		this->FixToPolies(&MyFix, checkFeas, custom, custAi, custbi);
 	}
-	else this->FixToPoly(Fix, checkFeas);
+	else this->FixToPoly(Fix, checkFeas, custom, custAi, custbi);
 }
 
 int 
@@ -710,11 +718,20 @@ LCP::EnumerateAll(const bool solveLP)
 	return 0;
 }
 
+void LCP::addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi,
+				const bool convHull, arma::sp_mat *A, arma::vec  *b)
+{
+	this->FixToPolies(&Fix, false, true, &custAi, &custbi);
+	if(convHull)
+		::ConvexHull(&custAi, &custbi, *A, *b, this->_A, this->_b);
+}
 
 unique_ptr<GRBModel> 
 LCP::LCPasQP(bool solve)
 /** @brief Solves the LCP as a QP using Gurobi */
-/** Removes all complementarity constraints from the QP's constraints. Instead, the sum of products of complementarity pairs is minimized. If the optimal value turns out to be 0, then it is actually a solution of the LCP. Else the LCP is infeasible.   */
+/** Removes all complementarity constraints from the QP's constraints. Instead, the sum of products of complementarity pairs is minimized. If the optimal value turns out to be 0, then it is actually a solution of the LCP. Else the LCP is infeasible.  
+ * @warning Solves the LCP feasibility problem. Not the MPEC optimization problem.
+ * */
 {
 	this->makeRelaxed();
 	unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
@@ -745,7 +762,56 @@ LCP::LCPasQP(bool solve)
 		catch(string e) { cout<<"String: "<<e<<endl; }
 		catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
 		catch(GRBException &e){cout<<"GRBException: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;}
-		if(Error) throw "Error in LCP::LCP as QP";
+		if(Error) throw "Error in LCP::LCPasQP";
 	}
 	return model;
 }
+
+unique_ptr<GRBModel>
+LCP::LCPasMIP(bool solve)
+{
+	return this->LCPasMIP({}, {}, solve);
+}
+
+
+unique_ptr<GRBModel> 
+LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve)
+{
+	unique_ptr<GRBModel> model = this->LCPasMIP(false);
+	arma::vec Cx(this->nC, arma::fill::zeros);
+	try 
+	{
+		Cx = C*x_minus_i; 
+		if(Cx.n_rows != this->nC) throw string("Bad size of C");
+		if(c.n_rows != this->nC) throw string("Bad size of c");
+	}
+	catch(exception &e) {cout<<"Exception in LCP::MPECasMIQP: "<<e.what()<<endl;throw;}
+	catch(string &e) {cout<<"Exception in LCP::MPECasMIQP: "<<e<<endl;throw;}
+	arma::vec obj = c+Cx;
+	GRBLinExpr expr{0};
+	for(unsigned int i=0; i<this->nC;i++)
+		expr += obj.at(i)*model->getVarByName("x_"+to_string(i));
+	model->setObjective(expr, GRB_MINIMIZE);
+	if(solve) model->optimize();
+	return model;
+}
+
+unique_ptr<GRBModel> 
+LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve)
+{
+	auto model = this->MPECasMILP(C, c, x_minus_i, false);
+	/// Note that if the matrix Q is a zero matrix, then this returns a Gurobi MILP model as opposed to MIQP model.
+	/// This enables Gurobi to use its much advanced MIP solver
+	if(Q.n_nonzero != 0) // If Q is zero, then just solve MIP as opposed to MIQP!
+	{
+		GRBLinExpr linexpr = model->getObjective(0);
+		GRBQuadExpr expr{linexpr};
+		for(auto it = Q.begin(); it!=Q.end(); ++it)
+			expr += (*it)*
+					model->getVarByName("x_" + to_string(it.row()))*
+					model->getVarByName("x_" + to_string(it.col()));
+		model->setObjective(expr, GRB_MINIMIZE);
+	}
+	if(solve) model->optimize();
+	return model;
+} 

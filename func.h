@@ -267,8 +267,8 @@ class LCP
 		bool madeRlxdModel;
 		unsigned int nR, nC;
 		/// LCP feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra
-		vector<vector<short int>*>* AllPolyhedra;
-		vector<arma::sp_mat*>* Ai; vector<arma::vec*>* bi;
+		vector<vector<short int>*> *AllPolyhedra, *RelAllPol;
+		vector<arma::sp_mat*> *Ai, *Rel_Ai; vector<arma::vec*> *bi, *Rel_bi;
 		// A gurobi model with all complementarity constraints removed.
 	   	GRBModel RlxdModel;
 	public: 
@@ -310,7 +310,8 @@ class LCP
 		bool errorCheck(bool throwErr=true) const;
 		void defConst(GRBEnv* env);
 		int makeRelaxed();
-	public:
+	/* Solving relaxations and restrictions */
+	private:
 		unique_ptr<GRBModel> LCPasMIP(vector<unsigned int> FixEq={}, 
 				vector<unsigned int> FixVar={}, bool solve=false);
 		unique_ptr<GRBModel> LCPasMIP(vector<short int> Fixes, bool solve);
@@ -332,12 +333,19 @@ class LCP
 		bool extractSols(GRBModel* model, arma::vec &z, 
 				arma::vec &x, bool extractZ = false) const; 
 		vector<vector<short int>*> *BranchAndPrune ();
+	/* Getting single point solutions */
+	public:
 		unique_ptr<GRBModel> LCPasQP(bool solve = false);
+		unique_ptr<GRBModel> LCPasMIP(bool solve = false);
+		unique_ptr<GRBModel> MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve = false);
+		unique_ptr<GRBModel> MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve = false);
 	/* Convex hull computation */
 	private:
-		void FixToPoly(const vector<short int> *Fix, bool checkFeas = false);
-		void FixToPolies(const vector<short int> *Fix, bool checkFeas = false);
+		void FixToPoly(const vector<short int> *Fix, bool checkFeas = false, bool custom=false, vector<arma::sp_mat*> *custAi={}, vector<arma::vec*> *custbi={});
+		void FixToPolies(const vector<short int> *Fix, bool checkFeas = false, bool custom=false, vector<arma::sp_mat*> *custAi={}, vector<arma::vec*> *custbi={});
 	public:
+		void addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi, 
+				const bool convHull = false, arma::sp_mat *A={}, arma::vec  *b={});
 		/**
 		 * Computes the convex hull of the feasible region of the LCP
 		 * @warning To be run only after LCP::BranchAndPrune is run. Otherwise this can give errors

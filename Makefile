@@ -14,9 +14,11 @@ ARMALIB=-lblas -llapack
 ARMAOPT=$(ARMAINC) $(ARMALIB)
 
 # Gurobi stuff
+# GUR=/opt/gurobi810/linux64
 GUR=/opt/gurobi/gurobi801/linux64
 GURINC=-I $(GUR)/include 
 GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi80 -lm 
+# GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi81 -lm 
 GUROPT=$(GURINC) $(GURLIB)
 
 # Generic objects not requiring changes
