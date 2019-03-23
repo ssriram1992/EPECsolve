@@ -95,30 +95,30 @@ class QP_Param
 		/// Faster means to set data. But the input objects might be corrupted now.
 		QP_Param& setMove(arma::sp_mat Q, arma::sp_mat C, 
 				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Move data into this
-	public: // Return some of the data as a copy
-		/// Read-only access to the private variable Q
-		inline arma::sp_mat getQ() const { return this->Q; } 
-		/// Read-only access to the private variable C
-		inline arma::sp_mat getC() const { return this->C; }
-		/// Read-only access to the private variable A
-		inline arma::sp_mat getA() const { return this->A; }
-		/// Read-only access to the private variable B
-		inline arma::sp_mat getB() const { return this->B; }
-		/// Read-only access to the private variable c
-		inline arma::vec getc() const { return this->c; }
-		/// Read-only access to the private variable b
-		inline arma::vec getb() const { return this->b; }
-		/// Read-only access to the private variable Nx
-		inline unsigned int getNx() const { return this->Nx; }
-		/// Read-only access to the private variable Ny
-		inline unsigned int getNy() const { return this->Ny; }
+	public: // Return some of the data as a copy 
+		inline arma::sp_mat getQ() const { return this->Q; } 			///< Read-only access to the private variable Q 
+		inline arma::sp_mat getC() const { return this->C; }			///< Read-only access to the private variable C 
+		inline arma::sp_mat getA() const { return this->A; }			///< Read-only access to the private variable A 
+		inline arma::sp_mat getB() const { return this->B; }			///< Read-only access to the private variable B 
+		inline arma::vec getc() const { return this->c; }				///< Read-only access to the private variable c 
+		inline arma::vec getb() const { return this->b; }				///< Read-only access to the private variable b 
+		inline unsigned int getNx() const { return this->Nx; }			///< Read-only access to the private variable Nx 
+		inline unsigned int getNy() const { return this->Ny; }			///< Read-only access to the private variable Ny
 	private:
 		int make_yQy();
 	public: // Other methods
 		/// Compute the KKT conditions for the given QP
 		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
 		unique_ptr<GRBModel> solveFixed(arma::vec x);
-		bool is_Playable(const QP_Param P) const;
+		inline bool is_Playable(const QP_Param &P) const /// Checks if the current object can play a game with another Game::QP_Param object @p P.
+		{
+			bool b1, b2, b3;
+			b1 = (this->Nx + this-> Ny ) == (P.getNx()+P.getNy());
+			b2 = this->Nx >= P.getNy();
+			b3 = this->Ny <= P.getNx();
+			return b1&&b2&&b3;
+		}
+		QP_Param& addDummy(unsigned int pars, unsigned int vars = 0);
 };
 
 /**
@@ -136,22 +136,53 @@ class QP_Param
  */
 class NashGame
 {
+	private: 
+		arma::sp_mat LeaderConstraints;		///< Upper level leader constraints LHS 
+		arma::vec LeaderConsRHS;			///< Upper level leader constraints RHS 
+		unsigned int Nplayers;			///< Number of players in the Nash Game 
+		vector<shared_ptr<QP_Param>> Players;	///< The QP that each player solves 
+		arma::sp_mat MarketClearing;			///< Market clearing constraints 
+		arma::vec MCRHS;						///< RHS to the Market Clearing constraints
+
 	private:
-		/// Upper level leader constraints LHS
-		arma::sp_mat LeaderConstraints;
-		/// Upper level leader constraints RHS
-		arma::vec LeaderConsRHS;
-	public: // Variables
-		/// Number of players in the Nash Game
-		unsigned int Nplayers;
-		/// The QP that each player solves
-		vector<shared_ptr<QP_Param>> Players;
-		/// Market clearing constraints
-		arma::sp_mat MarketClearing;
-		/// RHS to the Market Clearing constraints
-		arma::vec MCRHS;			
-		/// To print the Nash Game!
-		friend ostream& operator<< (ostream& os, const NashGame &N)
+		/// @internal In the vector of variables of all players,
+		/// which position does the variable corrresponding to this player starts.
+		vector<unsigned int> primal_position; 
+		///@internal In the vector of variables of all players,
+		/// which position do the DUAL variable corrresponding to this player starts.
+		vector<unsigned int> dual_position; 
+		/// @internal Manages the position of Market clearing constraints' duals
+		unsigned int MC_dual_position;
+		/// @internal Manages the position of where the leader's variables start
+		unsigned int Leader_position; 
+		/// Number of leader variables. 
+		/// These many variables will not have a matching complementary equation.
+		unsigned int n_LeadVar;
+
+	public: // Constructors
+		/**
+		 * Construct a NashGame by giving a vector of pointers to 
+		 * QP_Param, defining each player's game
+		 * A set of Market clearing constraints and its RHS
+		 * And if there are leader variables, the number of leader vars.
+		 */
+		NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
+				arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={});
+		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={})
+			:LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar}
+		{
+			Players.resize(this->Nplayers); 
+			primal_position.resize(this->Nplayers);
+			dual_position.resize(this->Nplayers);
+		}
+		/// Destructors to `delete` the QP_Param objects that might have been used.
+		~NashGame();
+	
+	private:
+		void set_positions();
+
+	public: 
+		friend ostream& operator<< (ostream& os, const NashGame &N)		///< To print the Nash Game!
 		{
 			os<<endl;
 			os<<"-----------------------------------------------------------------------"<<endl;
@@ -164,55 +195,30 @@ class NashGame
 			os<<"-----------------------------------------------------------------------"<<endl;
 			return os;
 		}
-	private:
-		///@internal In the vector of variables of all players,which position does the variable corrresponding to this player starts.
-		vector<unsigned int> primal_position; 
-		///@internal In the vector of variables of all players,which position do the DUAL variable corrresponding to this player starts.
-		vector<unsigned int> dual_position; 
-		///@internal Manages the position of Market clearing constraints' duals
-		unsigned int MC_dual_position;
-		/// @internal Manages the position of where the leader's variables start
-		unsigned int Leader_position; 
-		/// Number of leader variables. These many variables will not have a matching complementary equation.
-		unsigned int n_LeadVar;
-	public: // Constructors
-		/**
-		 * Construct a NashGame by giving a vector of pointers to 
-		 * QP_Param, defining each player's game
-		 * A set of Market clearing constraints and its RHS
-		 * And if there are leader variables, the number of leader vars.
-		 */
-		NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
-				arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={});
-		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={}): LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar}
-		{
-			Players.resize(this->Nplayers); 
-			primal_position.resize(this->Nplayers);
-			dual_position.resize(this->Nplayers);
-		}
-		/// Destructors to `delete` the QP_Param objects that might have been used.
-		~NashGame();
+		inline unsigned int getNprimals() const { return this->Players.at(0)->getNy() + this->Players.at(0)->getNx(); }
+
+
 	public: // Members
 		/// Formulates the LCP corresponding to the Nash game. 
 		/// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
-		unsigned int FormulateLCP(
-				///@internal Returns the \f$M\f$ corresponding to \f$Mx+q\f$
-				arma::sp_mat &M, 
-				///@internal Returns the \f$q\f$ corresponding to \f$Mx+q\f$
-			   	arma::vec &q,
-				/// There might be more variables than equations. In this case pairs the equations with variables
-			   	perps &Compl, 
-				/// If the solution M and q should be written to a file
-				bool writeToFile = false,
-				/// File names for the output M 
-				string M_name = "M.txt", 
-				/// File names for the output q
-				string q_name = "q.txt"
+		unsigned int FormulateLCP( 
+				arma::sp_mat &M, 			///<@internal Returns the \f$M\f$ corresponding to \f$Mx+q\f$ 
+			   	arma::vec &q,				///<@internal Returns the \f$q\f$ corresponding to \f$Mx+q\f$ 
+			   	perps &Compl, 				///< Pairs the equations with variables for complementarity 
+				bool writeToFile = false,	///< If the solution M and q should be written to a file 
+				string M_name = "M.txt", 	///< File names for the output M 
+				string q_name = "q.txt"		///< File names for the output q
 				) const;
-		/// Rewrites leader constraints given earlier with added empty columns and spaces corresponding to
+		
+		/// Rewrites leader constraints given earlier with 
+		/// added empty columns and spaces corresponding to
 		/// Market clearing duals and other equation duals.
 		arma::sp_mat RewriteLeadCons() const;
+		NashGame& addDummy(unsigned int par=0);
+		NashGame& addLeadCons(const arma::vec &a, double b);
 };
+
+
 
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
 ostream& operator<< (ostream& os, const QP_Param &Q);
@@ -241,14 +247,10 @@ int ConvexHull(
 		vector<arma::sp_mat*> *Ai, 
 		/// Inequality constraints RHS that define polyhedra whose convex hull is to be found
 		vector<arma::vec*> *bi, 
-		/// Pointer to store the output of the convex hull LHS
-		arma::sp_mat &A, 
-		/// Pointer to store the output of the convex hull RHS
-		arma::vec &b, 
-		/// Any common constraints to ALL the polyhedra - LHS.
-		arma::sp_mat Acom={},
-		/// Any common constraints to ALL the polyhedra - RHS.
-	   	arma::vec bcom={} 
+		arma::sp_mat &A, 		///< Pointer to store the output of the convex hull LHS 
+		arma::vec &b, 			///< Pointer to store the output of the convex hull RHS 
+		arma::sp_mat Acom={},	///< Any common constraints to ALL the polyhedra - LHS.  
+	   	arma::vec bcom={} 		///< Any common constraints to ALL the polyhedra - RHS.
 		);
 
 namespace Game{
@@ -258,23 +260,18 @@ namespace Game{
 /**
 * A class to handle linear complementarity problems (LCP)
 * especially as MIPs with bigM constraints
-* Also provides the convex hull of the feasible space!
+* Also provides the convex hull of the feasible space, restricted feasible space etc.
 */
 class LCP
 {
 	private:
-	// Essential data
-		/// Gurobi environment for MIP/LP solves
-		GRBEnv* env;
-		/// M in @f$Mx+q@f$ that defines the LCP
-		arma::sp_mat M; 
-		/// q in @f$Mx+q@f$ that defines the LCP
-		arma::vec q; 
-		/// Compl stores data in <Eqn, Var> form.
-		perps Compl; 
+	// Essential data ironment for MIP/LP solves
+		GRBEnv* env;			///< Gurobi env 
+		arma::sp_mat M; 		///< M in @f$Mx+q@f$ that defines the LCP 
+		arma::vec q; 			///< q in @f$Mx+q@f$ that defines the LCP 
+		perps Compl; 			///< Compl stores data in <Eqn, Var> form.
 		unsigned int LeadStart, LeadEnd, nLeader; 
-		/// Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$ Ax\le b@f$ too!
-		arma::sp_mat _A; arma::vec _b;		
+		arma::sp_mat _A; arma::vec _b;	///< Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$ Ax\le b@f$ too!
 	// Temporary data
 		/// Keep track if LCP::RlxdModel is made
 		bool madeRlxdModel;
@@ -285,11 +282,9 @@ class LCP
 		// A gurobi model with all complementarity constraints removed.
 	   	GRBModel RlxdModel;
 	public: 
-	// Fudgible data
-		/// bigM used to rewrite the LCP as MIP
-		long double bigM;
-		/// The threshold, below which a number would be considered to be zero.
-		long double eps;
+	// Fudgible data 
+		long double bigM;	///< bigM used to rewrite the LCP as MIP 
+		long double eps;	///< The threshold, below which a number would be considered to be zero.
 	public:
 	/** Constructors */
 		/// Class has no default constructors
@@ -301,23 +296,15 @@ class LCP
 		LCP(GRBEnv* env, NashGame N);
 	/** Destructor - to delete the objects created with new operator */
 		~LCP();
-	/** Return data and address */
-		/// Read-only access to LCP::M
-		inline arma::sp_mat getM() {return this->M;}  
-		/// Pointer access to LCP::M
-		inline arma::sp_mat* getMstar() {return &(this->M);}
-		/// Read-only access to LCP::q
-		inline arma::vec getq() {return this->q;}  
-		/// Pointer access to LCP::q
-		inline arma::vec* getqstar() {return &(this->q);}
-		/// Read-only access to LCP::LeadStart
-		inline unsigned int getLStart(){return LeadStart;} 
-		/// Read-only access to LCP::LeadEnd
-		inline unsigned int getLEnd(){return LeadEnd;}
-		/// Read-only access to LCP::Compl
-		inline perps getCompl() {return this->Compl;}  
-		/// Print a summary of the LCP
-		void print(string end="\n");
+	/** Return data and address */ 
+		inline arma::sp_mat getM() {return this->M;}  			///< Read-only access to LCP::M 
+		inline arma::sp_mat* getMstar() {return &(this->M);}	///< Pointer access to LCP::M 
+		inline arma::vec getq() {return this->q;}  				///< Read-only access to LCP::q 
+		inline arma::vec* getqstar() {return &(this->q);}		///< Pointer access to LCP::q 
+		inline unsigned int getLStart(){return LeadStart;} 		///< Read-only access to LCP::LeadStart 
+		inline unsigned int getLEnd(){return LeadEnd;}			///< Read-only access to LCP::LeadEnd 
+		inline perps getCompl() {return this->Compl;}  			///< Read-only access to LCP::Compl 
+		void print(string end="\n");							///< Print a summary of the LCP
 	/* Member functions */
 	private:
 		bool errorCheck(bool throwErr=true) const;
@@ -364,11 +351,9 @@ class LCP
 		 * @warning To be run only after LCP::BranchAndPrune is run. Otherwise this can give errors
 		 * @todo Formally call LCP::BranchAndPrune or throw an exception if this method is not already run
 		 */
-		int ConvexHull(
-				/// Convex hull inequality description LHS to be stored here
-				arma::sp_mat& A,
-				/// Convex hull inequality description RHS to be stored here
-			   	arma::vec &b) 
+		int ConvexHull( 
+				arma::sp_mat& A,		///< Convex hull inequality description LHS to be stored here 
+			   	arma::vec &b) 			///< Convex hull inequality description RHS to be stored here
 		{return ::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
 };
 };
@@ -430,15 +415,15 @@ struct LeadAllPar
 {
 	/// Number of followers in the country
 	unsigned int n_followers;
+	/// Country Name
+	string name;
 	/// A struct to hold Follower Parameters
 	Models::FollPar FollowerParam = {};
 	/// A struct to hold Demand Parameters
 	Models::DemPar DemandParam = {};
 	/// A struct to hold Leader Parameters
 	Models::LeadPar LeaderParam = {};
-	/// Country Name
-	string name;
-	LeadAllPar(unsigned int n_foll, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}, string name = ""):n_followers{n_foll}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}, name{name}
+	LeadAllPar(unsigned int n_foll, string name, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}):n_followers{n_foll}, name{name}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}
 	{
 		// Nothing here
 	}
@@ -461,9 +446,14 @@ class EPEC
 		vector<arma::sp_mat> LeadConses = {}; ///< Stores each country's leader constraint LHS
 		vector<arma::vec> LeadRHSes = {}; ///< Stores each country's leader constraint RHS
 		arma::sp_mat TranspCosts = {};
+		vector<unsigned int> nImportMarkets = {};
 	private:
-		GRBEnv env;		///< A gurobi environment to create and process the resulting LCP object.
+		GRBEnv *env;		///< A gurobi environment to create and process the resulting LCP object.
 		map<string, unsigned int> name2nos = {};
+		bool finalized = false;
+	public:
+		EPEC()=delete;
+		EPEC(GRBEnv *env, arma::sp_mat TranspCosts={}):TranspCosts{TranspCosts}, env{env}{}
 	private:
 		/// Checks that the parameter given to add a country is valid. Does not have obvious errors
 		bool ParamValid(const LeadAllPar& Param) const;
@@ -488,6 +478,7 @@ class EPEC
 				const unsigned int addnlLeadVars  = 0
 				);
 		EPEC& addTranspCosts(const arma::sp_mat& costs);
+		EPEC& finalize();
 	public:
 		// Data access methods
 		Game::NashGame* get_LowerLevelNash(unsigned int i); 

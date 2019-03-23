@@ -79,7 +79,7 @@ int main()
 	FP->capacities = {10, 15, 10};
 	FP->costs_lin = {30, 40, 50};
 	FP->costs_quad = {60, 40, 0};
-	Models::LeadAllPar LA(3, *FP);
+	Models::LeadAllPar LA(3, "A", *FP);
 	cout<<LA;
 	cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
 	// LCPtest(LA);

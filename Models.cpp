@@ -60,6 +60,9 @@ bool Models::EPEC::ParamValid(const LeadAllPar& Params) const
 	   )
 		throw "Error in EPEC::ParamValid(). Size Mismatch";
 	if (Params.DemandParam.alpha <= 0 || Params.DemandParam.beta <=0 ) throw "Error in EPEC::ParamValid(). Invalid demand curve params";
+	// Country should have a name!
+	if(Params.name=="") 
+		throw "Error in EPEC::ParamValid(). Country name empty";
 	// Country should have a unique name
 	for(const auto &p:this->AllLeadPars)
 		if(Params.name.compare(p.name) == 0) // i.e., if the strings are same
@@ -95,11 +98,28 @@ void Models::EPEC::make_LL_QP(const LeadAllPar& Params, const unsigned int follo
 }
 
 
+/**
+ * Makes the leader level constraints for a country.
+ * The constraints added are as follows:
+ * @f{eqnarray}{
+ *	q^{import} - q^{export} &\leq& \bar{q^{import}}\\
+ *	q^{export} - q^{import} &\leq& \bar{q^{export}}\\
+ *	\alpha - \beta\left(q^{import} - q^{export} + \sum_i q_i \right) &\leq& \bar{\pi}\\
+ *	q^{export} &\leq& \sum_i q_i +q^{import} 
+ * @f}
+ * Here @f$\bar{q^{import}}@f$ and @f$\bar{q^{export}}@f$ denote the net import limit and export limit respectively. @f$\bar\pi@f$ is the maximum local price that the government desires to have.
+ *
+ * The first two constraints above limit net imports and exports respectively. The third constraint limits local price. These constraints are added only if the RHS parameters are given as non-negative value. A default value of -1 to any of these parameters (given in Models::LeadAllPar @p Params object) ensures that these constraints are not added. The last constraint is <i>always</i> added. It ensures that the country does not export more than what it has produced + imported!
+ */
 void 
 Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
+			/// All country specific parameters
 			const LeadAllPar& Params,
+			/// Does a constraint on import limit exist or no limit?
 			const unsigned int import_lim_cons,
+			/// Does a constraint on export limit exist or no limit?
 			const unsigned int export_lim_cons,
+			/// Does a constraint on price limit exist or no limit?
 			const unsigned int price_lim_cons
 			) const noexcept
 {
@@ -111,8 +131,8 @@ Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
 	}
 	// Export - import <= Local Production
 	for (unsigned int i=0;i<Params.n_followers;i++) LeadCons.at(Params.n_followers, i) = -1;
-	LeadCons.at(Params.n_followers, Params.n_followers) = 1;
-	LeadCons.at(Params.n_followers, Params.n_followers+1) = -1;
+	LeadCons.at(Params.n_followers, Params.n_followers+1) = 1;
+	LeadCons.at(Params.n_followers, Params.n_followers) = -1;
 	// Import limit - In more precise terms, everything that comes in minus everything that goes out should satisfy this limit
 	if(import_lim_cons)
 	{
@@ -170,9 +190,9 @@ Models::EPEC& Models::EPEC::addCountry(
 {
 	bool noError=false;
 	try { noError = this->ParamValid(Params); }
-	catch(const char* e) { cout<<"Error in Models::EPEC::addCountry: "<<e<<endl; }
-	catch(string e) { cout<<"String: Error in Models::EPEC::addCountry: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: Error in Models::EPEC::addCountry: "<<e.what()<<endl; }
+	catch(const char* e) { cerr<<"Error in Models::EPEC::addCountry: "<<e<<endl; }
+	catch(string e) { cerr<<"String: Error in Models::EPEC::addCountry: "<<e<<endl; }
+	catch(exception &e) { cerr<<"Exception: Error in Models::EPEC::addCountry: "<<e.what()<<endl; }
 
 	if(!noError) return *this;
 
@@ -217,11 +237,13 @@ Models::EPEC& Models::EPEC::addCountry(
 	return *this;
 }
 
+
 Models::EPEC& Models::EPEC::addTranspCosts(const arma::sp_mat& costs)
 {
 	auto n = this->AllLeadPars.size();
 	if(n!=costs.n_rows || n!=costs.n_cols) throw "Error in EPEC::addTranspCosts. Invalid size of Q";
 	else this->TranspCosts = arma::sp_mat(costs);
+	this->TranspCosts.diag().zeros(); 		// Doesn't make sense for it to have a nonzero diagonal!
 	return *this;
 }
 
@@ -234,3 +256,29 @@ Game::LCP* Models::EPEC::playCountry(vector<Game::LCP*> countries)
 		LeadVars.at(i) = 2 + 2*Pi->at(i).n_followers + Pi->at(i).n_followers;		// two for quantity imported and exported, n for imposed cap and last n for tax and finally n_follower number of follower variables
 	return nullptr;
 } 
+
+
+Models::EPEC& Models::EPEC::finalize()
+{
+	// To add appropriate number of additional columns to each player's Nash Game.
+	unsigned int nCountries = this->countriesLL.size();
+	/* Note that if there are n countries, there might at most be n*(n-1) variables.
+	 * Also note 
+	 */
+	for(unsigned int i=0; i<nCountries; i++)
+	{
+		int nImp = 0;
+		for(auto val=TranspCosts.begin_col(i); val!=TranspCosts.end_col(i); ++val)
+		{
+			nImp++;
+		}
+		this->nImportMarkets.push_back(nImp);
+		// Adding the constraint that the sum of imports from all countries equals total imports
+		arma::vec a(nImp + this->countriesLL.at(i)->getNprimals(), arma::fill::zeros);
+		const auto Params = this->AllLeadPars.at(i);
+		a.at(Params.n_followers) = -1;
+		a.tail(nImp) = 1;
+		this->countriesLL.at(i)->addDummy(nImp).addLeadCons(a, 0).addLeadCons(-a,0);
+	}
+	return *this;
+}
