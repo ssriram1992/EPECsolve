@@ -2,7 +2,7 @@
 
 # File name and output name
 PROJECT=EPEC
-FILEEPEC=LCPtoLP.o EPEC.o Games.o 
+FILEEPEC=LCPtoLP.o EPEC.o Games.o Models.o
 OUTPUT=$(PROJECT)
 ARGS=
 
@@ -21,7 +21,7 @@ GUROPT=$(GURINC) $(GURLIB)
 
 # Generic objects not requiring changes
 GCC=g++
-OTHEROPTS=-fopenmp -O2 -Wall -std=c++11
+OTHEROPTS= -O2 -Wall -std=c++11
 OPTS= $(GUROPT) $(ARMAOPT)  $(OTHEROPTS)
 
 runEPEC: compileEPEC
@@ -30,7 +30,7 @@ runEPEC: compileEPEC
 valgrind: compileEPEC
 	valgrind --leak-check=full --show-leak-kinds=all  -v ./$(OUTPUT) $(ARGS)
 
-compileEPEC: LCPtoLP.o func.h Games.o EPEC.o 
+compileEPEC: LCPtoLP.o func.h Games.o Models.o EPEC.o 
 	$(GCC) $(FILEEPEC) $(OPTS) -o $(OUTPUT) 
 
 BalasPolyhedron.o: func.h BalasPolyhedron.cpp
@@ -49,6 +49,9 @@ EPEC.o: func.h EPEC.cpp
 Games.o: func.h Games.cpp
 	$(GCC) -c Games.cpp $(OPTS)
 
+Models.o: func.h Models.cpp
+	$(GCC) -c Models.cpp $(OPTS)
+
 clean:
 	rm -rf $(OUTPUT)
 	rm -rf *.o
@@ -65,6 +68,11 @@ sand: sand.o
 sand.o: sand.cpp
 	$(GCC) -c sand.cpp $(OPTS)
 
+doc:
+	doxygen refConf
 
-open: 
-	vim -p func.h Games.cpp EPEC.cpp LCPtoLP.cpp 
+docDetailed:
+	doxygen refDetConf
+
+edit: 
+	vim -p func.h Games.cpp LCPtoLP.cpp  Models.cpp EPEC.cpp
