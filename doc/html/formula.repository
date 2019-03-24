@@ -1,0 +1,35 @@
+\form#0:\[ \min_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y \]
+\form#1:\begin{eqnarray} Ax + By &\leq& b \\ y &\geq& 0 \end{eqnarray}
+\form#2:$ Ax\leq b$
+\form#3:$x$
+\form#4:$c^Tx$
+\form#5:$P_i$
+\form#6:\begin{eqnarray} A^ix &\leq& b^i\\ x &\geq& 0 \end{eqnarray}
+\form#7:$Mx+q$
+\form#8:$0 \leq y \perp My + Nx + q \geq 0$
+\form#9:$M$
+\form#10:$q$
+\form#11:$x^{i}$
+\form#12:$x^{-i}$
+\form#13:$l_i$
+\form#14:$i$
+\form#15:$q_i$
+\form#16:\[ l_ix_i + \frac{1}{2}q_ix_i^2 \]
+\form#17:\[\text{Total Quantity} = \sum_i x_i + x_{imp} - x_{exp} \]
+\form#18:\[\text{Price} = a-b(\text{Total Quantity})\]
+\form#19:\[{Total\quad Quantity} = \sum_i x_i + x_{imp} - x_{exp} \]
+\form#20:\[{Price} = a-b({Total\quad Quantity})\]
+\form#21:$x_i$
+\form#22:$q_{imp}$
+\form#23:$q_{exp}$
+\form#24:$\tilde{x_i}$
+\form#25:$t_i$
+\form#26:$0 \le x \perp Mx+q\ge 0$
+\form#27:$ Ax\le b$
+\form#28:\[ 0\leq x\perp Mx+q \geq 0 \]
+\form#29:\begin{eqnarray} \min && x^T(Mx+q)\\ x &\geq& 0\\ Mx+q &\geq& 0 \end{eqnarray}
+\form#30:\begin{eqnarray} \min_x && x^T(Mx+q)\\ x &\geq& 0\\ Mx+q &\geq& 0 \end{eqnarray}
+\form#31:\begin{eqnarray} q^{import} - q^{export} &\leq& \bar{q^{import}}\\ q^{export} - q^{import} &\leq& \bar{q^{export}}\\ \alpha - \beta\left(q^{import} - q^{export} + \sum_i q_i \right) &\leq& \bar{\pi}\\ q^{export} &\leq& \sum_i q_i +q^{import} \end{eqnarray}
+\form#32:$\bar{q^{import}}$
+\form#33:$\bar{q^{export}}$
+\form#34:$\bar\pi$
