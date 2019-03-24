@@ -10,6 +10,12 @@ using namespace std;
 
 void 
 Game::LCP::defConst(GRBEnv* env)
+/**
+ * @brief Assign default values to LCP attributes
+ * @details Internal member that can be called from multiple constructors
+ * to assign default values to some attributes of the class.
+ * @todo LCP::defConst can be replaced by a private constructor
+ */
 {
 	AllPolyhedra = new vector<vector<short int>*> {};
 	RelAllPol = new vector<vector<short int>*> {};
@@ -20,7 +26,14 @@ Game::LCP::defConst(GRBEnv* env)
 }
 
 
-Game::LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A, arma::vec b):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) /// Constructor with M, q, compl pairs
+Game::LCP::LCP(GRBEnv* env, ///< Gurobi environment required 
+	   	arma::sp_mat M,		///< @p M in @f$Mx+q@f$
+	   	arma::vec q,		///< @p q in @f$Mx+q@f$
+	   	perps Compl,		///< Pairing equations and variables for complementarity
+	   	arma::sp_mat A,		///< Any equations without a complemntarity variable
+	   	arma::vec b			///< RHS of equations without complementarity variables
+		):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) 
+/// @brief Constructor with M, q, compl pairs
 {
 	defConst(env);
 	this->Compl = Compl;
@@ -38,7 +51,18 @@ Game::LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_m
 		}
 }
 
-Game::LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A, arma::vec b):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) /// Constructor with M,q,leader posn
+Game::LCP::LCP(GRBEnv* env,				///< Gurobi environment required 
+	   	arma::sp_mat M,                 ///< @p M in @f$Mx+q@f$
+	   	arma::vec q,                    ///< @p q in @f$Mx+q@f$
+	   	unsigned int LeadStart,         ///< Position where variables which are not complementary to any equation starts
+	   	unsigned LeadEnd,               ///< Position where variables which are not complementary to any equation ends
+	   	arma::sp_mat A,                 ///< Any equations without a complemntarity variable
+	   	arma::vec b                     ///< RHS of equations without complementarity variables
+		):M{M}, q{q}, _A{A}, _b{b}, RlxdModel(*env) 
+/// @brief Constructor with M,q,leader posn
+/**
+ * @warning This might be deprecated to support LCP functioning without sticking to the output format of NashGame
+ */
 {
 	defConst(env);
 	this->LeadStart = LeadStart; this->LeadEnd = LeadEnd;
@@ -52,15 +76,24 @@ Game::LCP::LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, unsigned int LeadStart,
 }
 
 Game::LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
+/**
+ *	@brief Constructer given a NashGame
+ *	@details Given a NashGame, computes the KKT of the lower levels, and makes the appropriate LCP object.
+ *
+ *	This constructor is the most suited for highlevel usage.
+ *	@note Most preferred constructor for user interface.
+ */
 {
 	arma::sp_mat M; arma::vec q; perps Compl;
 	N.FormulateLCP(M, q, Compl);
+	arma::sp_mat A; arma::vec b;
+	LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getLeadRHS());
 }
 
+Game::LCP::~LCP()
 /** @brief Destructor of LCP */
 /** LCP object owns the pointers to definitions of its polyhedra that it owns
  It has to be deleted and freed. */
-Game::LCP::~LCP()
 {
 	for(auto p:*(this->AllPolyhedra)) delete p;
 	for(auto p:*(this->RelAllPol)) delete p;
@@ -71,15 +104,15 @@ Game::LCP::~LCP()
 	delete Ai; delete bi;
 }
 
+void 
+Game::LCP::makeRelaxed()
 /** @brief Makes a Gurobi object that relaxes complementarity constraints in an LCP */
 /** @details A Gurobi object is stored in the LCP object, that has all complementarity constraints removed.
  * A copy of this object is used by other member functions */
-int 
-Game::LCP::makeRelaxed()
 {
 	try
 	{
-		if(this->madeRlxdModel) return 0;
+		if(this->madeRlxdModel) return ;
 		GRBVar x[nC], z[nR];
 		for(unsigned int i=0;i <nC;i++) x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "x_"+to_string(i));
 		for(unsigned int i=0;i <nR;i++) z[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "z_"+to_string(i));
@@ -110,24 +143,24 @@ Game::LCP::makeRelaxed()
 	catch(string e) { cerr<<"String: Error in Game::LCP::makeRelaxed: "<<e<<endl; throw;}
 	catch(exception &e) { cerr<<"Exception: Error in Game::LCP::makeRelaxed: "<<e.what()<<endl; throw;}
 	catch(GRBException &e){cerr<<"GRBException: Error in Game::LCP::makeRelaxed: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;throw;}
-	return 0;
 }
 
+unique_ptr<GRBModel> 
+Game::LCP::LCP_Polyhed_fixed( 
+		vector<unsigned int> FixEq,  			///< If index is present, equality imposed on that variable 
+		vector<unsigned int> FixVar  			///< If index is present, equality imposed on that equation
+		)			
 /** 
  * The returned model has constraints
  * corresponding to the indices in FixEq set to equality
  * and variables corresponding to the indices
  * present in FixVar set to equality (=0)
+ * @note This model returned could either be a relaxation or a restriction or neither. If every index is present in at least one of the two vectors --- @p FixEq or @p FixVar --- then it is a restriction.
+ * @note <tt>LCP::LCP_Polyhed_fixed({},{})</tt> is equivalent to accessing LCP::RlxdModel
+ * @warning The FixEq and FixVar variables are used under a different convention here!
+ * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
+ * @returns unique pointer to a GRBModel
  */
-/// @warning The FixEq and FixVar variables are used under a different convention here!
-/// @warning This member function is public for the moment. But this will be converted to a private method soon.
-unique_ptr<GRBModel> 
-Game::LCP::LCP_Polyhed_fixed(
-        /// If index is present, equality imposed on that variable
-		vector<unsigned int> FixEq,  		
-        /// If index is present, equality imposed on that equation
-		vector<unsigned int> FixVar  		
-		)			
 {
 	makeRelaxed();
 	unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
@@ -144,20 +177,22 @@ Game::LCP::LCP_Polyhed_fixed(
 	return model;
 }
 
+unique_ptr<GRBModel> 
+Game::LCP::LCP_Polyhed_fixed( 
+		arma::Col<int> FixEq,  			///< If non zero, equality imposed on variable 
+		arma::Col<int> FixVar  			///< If non zero, equality imposed on equation
+		)			
 /**
  * Returs a model created from a given model
  * The returned model has constraints
  * corresponding to the non-zero elements of FixEq set to equality
  * and variables corresponding to the non-zero
  * elements of FixVar set to equality (=0)
+ * @note This model returned could either be a relaxation or a restriction or neither.  If FixEq + FixVar is at least 1 (element-wise), then it is a restriction.
+ * @note <tt>LCP::LCP_Polyhed_fixed({0,...,0},{0,...,0})</tt> is equivalent to accessing LCP::RlxdModel
+ * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
+ * @returns unique pointer to a GRBModel
  */
-unique_ptr<GRBModel> 
-Game::LCP::LCP_Polyhed_fixed(
-        /// If non zero, equality imposed on variable
-		arma::Col<int> FixEq,  		
-        /// If non zero, equality imposed on equation
-		arma::Col<int> FixVar  		
-		)			
 {
 	makeRelaxed();
 	unique_ptr<GRBModel> model{new GRBModel(this->RlxdModel)};
@@ -171,14 +206,19 @@ Game::LCP::LCP_Polyhed_fixed(
 	return model;
 }
 
+unique_ptr<GRBModel> 
+Game::LCP::LCPasMIP(vector<short int> Fixes, ///< For each Variable, +1 fixes the equation to equality and -1 fixes the variable to equality. A value of 0 fixes neither.
+	   	bool solve ///< Whether the model is to be solved before returned
+		)
 /**
  * Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in Fixes in 0/+1/-1 notation
+ * @note Returned model is \e always a restriction. For <tt>Fixes = {0,...,0}</tt>, the returned model would solve the exact LCP (up to bigM caused restriction).
+ * @throws string if <tt> Fixes.size()!= </tt> number of equations (for complementarity).
  * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
+ * @returns unique pointer to a GRBModel
  */
-unique_ptr<GRBModel> 
-Game::LCP::LCPasMIP(vector<short int> Fixes, bool solve)
 {
-	if(Fixes.size()!=this->nR) throw "Bad size for Fixes in Game::LCP::LCPasMIP";
+	if(Fixes.size()!=this->nR) throw string("Bad size for Fixes in Game::LCP::LCPasMIP");
 	vector<unsigned int> FixVar, FixEq; 
 	for(unsigned int i=0;i<nR;i++)
 	{
@@ -189,16 +229,18 @@ Game::LCP::LCPasMIP(vector<short int> Fixes, bool solve)
 }
 
 
-/**
- * Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in FixVar and FixEq.
- * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
- */
 unique_ptr<GRBModel> 
 Game::LCP::LCPasMIP(
-		vector<unsigned int> FixEq,	// If any equation is to be fixed to equality
-		vector<unsigned int> FixVar, // If any variable is to be fixed to equality
-		bool solve // Whether the model should be solved in the function already!
+		vector<unsigned int> FixEq,	///< If any equation is to be fixed to equality
+		vector<unsigned int> FixVar, ///< If any variable is to be fixed to equality
+		bool solve ///< Whether the model should be solved in the function before returned.
 		)
+/**
+ * Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in FixVar and FixEq.
+ * @note Returned model is \e always a restriction. For <tt>FixEq = FixVar = {}</tt>, the returned model would solve the exact LCP (up to bigM caused restriction).
+ * @warning Note that the model returned by this function has to be explicitly deleted using the delete operator.
+ * @returns unique pointer to a GRBModel
+ */
 {
 	makeRelaxed();
 	unique_ptr<GRBModel> model{new GRBModel(this->RlxdModel)};
@@ -237,14 +279,14 @@ Game::LCP::LCPasMIP(
 	return nullptr;
 }
 
+bool 
+Game::LCP::errorCheck( 
+        bool throwErr	///< If this is true, function throws an error, else, it just returns false
+	) const
 /**
  * Checks if the `M` and `q` given to create the LCP object are of 
  * compatible size, given the number of leader variables
  */
-bool 
-Game::LCP::errorCheck(
-        /// If this is true, function throws an error, else, it just returns false
-        bool throwErr) const
 {
 
 	const unsigned int nR = M.n_rows;
@@ -264,13 +306,25 @@ Game::LCP::print(string end)
 	cout<<"LCP with "<<this->nR<<" rows and "<<this->nC<<" columns."<<end;
 }
 
-/** @warning Computes convex hull of LCP feasible region */
-int 
-ConvexHull(
-		vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, // Individual constraints
-		arma::sp_mat &A, arma::vec &b, // To store outputs
-		arma::sp_mat Acom, arma::vec bcom // Common constraints.
+int Game::ConvexHull( 
+		vector<arma::sp_mat*> *Ai, 	///< Inequality constraints LHS that define polyhedra whose convex hull is to be found 
+		vector<arma::vec*> *bi, 	///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
+		arma::sp_mat &A, 			///< Pointer to store the output of the convex hull LHS 
+		arma::vec &b, 				///< Pointer to store the output of the convex hull RHS 
+		arma::sp_mat Acom,			///< any common constraints to all the polyhedra - lhs.  
+	   	arma::vec bcom 				///< Any common constraints to ALL the polyhedra - RHS.
 		)
+/** @brief Computing convex hull of finite unioon of polyhedra
+ * @details Computes the convex hull of a finite union of polyhedra where 
+ * each polyhedra @f$P_i@f$ is of the form
+ * @f{eqnarray}{
+ * A^ix &\leq& b^i\\
+ * x &\geq& 0
+ * @f}
+ * This uses Balas' approach to compute the convex hull.
+ *
+ * <b>Cross reference:</b> Conforti, Michele; Cornuéjols, Gérard; and Zambelli, Giacomo. Integer programming. Vol. 271. Berlin: Springer, 2014. Refer: Eqn 4.31
+*/
 {
 	// Count number of polyhedra and the space we are in!
 	unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
@@ -338,14 +392,24 @@ ConvexHull(
 }
 
 arma::vec 
-isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Positivity)
+Game::LPSolve(const arma::sp_mat &A, ///< The constraint matrix
+		const arma::vec &b, 		///< RHS of the constraint matrix
+		const arma::vec &c, 		///< If feasible, returns a vector that minimizes along this direction
+		int &status,				///< Status of the optimization problem. If optimal, this will be GRB_OPTIMAL
+		bool Positivity				///< Should @f$x\geq0@f$ be enforced?
+		)
+/**
+ Checks if the polyhedron given by @f$ Ax\leq b@f$ is feasible.
+ If yes, returns the point @f$x@f$ in the polyhedron that minimizes @f$c^Tx@f$
+ Positivity can be enforced on the variables easily.
+*/
 {
 	unsigned int nR, nC;
-	nR = A->n_rows; nC = A->n_cols;
-	if(c->n_rows != nC) throw "Inconsistency in no of Vars in isFeas()";
-	if(b->n_rows != nR) throw "Inconsistency in no of Constr in isFeas()";
+	nR = A.n_rows; nC = A.n_cols;
+	if(c.n_rows != nC) throw "Inconsistency in no of Vars in isFeas()";
+	if(b.n_rows != nR) throw "Inconsistency in no of Constr in isFeas()";
 
-	arma::vec sol = arma::vec(c->n_rows, arma::fill::zeros);
+	arma::vec sol = arma::vec(c.n_rows, arma::fill::zeros);
 	const double lb = Positivity?0:-GRB_INFINITY;
 
 	GRBEnv env;
@@ -354,19 +418,20 @@ isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Posit
 	GRBConstr a[nR];
 	// Adding Variables
 	for(unsigned int i=0; i<nC; i++)
-		x[i] = model.addVar(lb, GRB_INFINITY, c->at(i), GRB_CONTINUOUS, "x_"+to_string(i));
+		x[i] = model.addVar(lb, GRB_INFINITY, c.at(i), GRB_CONTINUOUS, "x_"+to_string(i));
 	// Adding constraints
 	for(unsigned int i=0; i<nR; i++)
 	{
 		GRBLinExpr lin{0};
-		for(auto j=A->begin_row(i); j!=A->end_row(i);++j)
+		for(auto j=A.begin_row(i); j!=A.end_row(i);++j)
 			lin += (*j)*x[j.col()];
-		a[i] = model.addConstr(lin, GRB_LESS_EQUAL, b->at(i));
+		a[i] = model.addConstr(lin, GRB_LESS_EQUAL, b.at(i));
 	}
 	model.set(GRB_IntParam_OutputFlag, 0 ) ;
 	model.set(GRB_IntParam_DualReductions, 0) ;
 	model.optimize();
-	if(model.get(GRB_IntAttr_Status)==GRB_OPTIMAL)
+	status = model.get(GRB_IntAttr_Status);
+	if(status==GRB_OPTIMAL)
 		for(unsigned int i=0; i<nC; i++) sol.at(i) = x[i].get(GRB_DoubleAttr_X); 
 	return sol;
 }
@@ -374,6 +439,11 @@ isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Posit
 
 bool 
 operator == (vector<int> Fix1, vector<int> Fix2)
+/**
+ * @brief Checks if two vector<int> are of same size and hold same values in the same order
+ * @warning Might be deprecated, as it pollutes global namespaces
+ * @returns @p true if Fix1 and Fix2 have the same elements else @p false
+ */
 {
 	if(Fix1.size() != Fix2.size()) return false;
 	for(unsigned int i=0;i<Fix1.size();i++)
@@ -381,15 +451,17 @@ operator == (vector<int> Fix1, vector<int> Fix2)
 	return true;
 }
 
-/**
- * Returns true if Fix1 is (grand) child of Fix2
- *  Defn Grand Parent:
- *  	Either the same value as the grand child, or has 0 in that location
- *  Defn Grand child:
- *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
- */
 bool 
 operator < (vector<int> Fix1, vector<int> Fix2)
+/**
+ * @details \b GrandParent:
+ *  	Either the same value as the grand child, or has 0 in that location
+ *
+ *  \b Grandchild:
+ *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
+ * @warning Might be deprecated, as it pollutes global namespaces
+ * @returns @p true if Fix1 is (grand) child of Fix2
+ */
 {
 	if(Fix1.size() != Fix2.size()) return false;
 	for(unsigned int i=0;i<Fix1.size();i++)
@@ -398,39 +470,39 @@ operator < (vector<int> Fix1, vector<int> Fix2)
 	return true;	 	// Fix1 is a child of Fix2
 }
 
+
 bool 
 operator >(vector<int> Fix1, vector<int> Fix2)
 {
 	return (Fix2<Fix1);
 }
 
-/** @brief Returns true if any (grand)child of Fix is in vecOfFixes!  */
-/**
- *  Defn Grand Parent:
- *  	Either the same value as the grand child, or has 0 in that location
- *
- *  Defn Grand child:
- *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
- */
 vector<short int>* 
 Game::LCP::anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const
+/** @brief Returns the (grand)child if any (grand)child of @p Fix is in @p vecOfFixes else returns @c nullptr  */
+/**
+ *  \b GrandParent:
+ *  	Either the same value as the grand child, or has 0 in that location
+ *
+ *  \b Grandchild:
+ *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
+ */
 {
 	for(auto v:*vecOfFixes)
 		if(*Fix < *v||*v==*Fix) return v;
 	return NULL;
 }
 
-/** @brief Extracts variable and equation values from a solved Gurobi model for LCP */
 bool 
-Game::LCP::extractSols(
-        /// The Gurobi Model that was solved (perhaps using Game::LCP::LCPasMIP)
-        GRBModel* model, 
-        /// Output variable - where the equation values are stored
-        arma::vec &z, 
-        /// Output variable - where the variable values are stored
-        arma::vec &x, 
-        /// z values are filled only if this is true
-        bool extractZ) const
+Game::LCP::extractSols( 
+        GRBModel* model, 	///< The Gurobi Model that was solved (perhaps using Game::LCP::LCPasMIP) 
+        arma::vec &z,		///< Output variable - where the equation values are stored 
+        arma::vec &x,		///< Output variable - where the variable values are stored 
+        bool extractZ		///< z values are filled only if this is true
+	) const
+/** @brief Extracts variable and equation values from a solved Gurobi model for LCP */
+/** @warning This solves the model if the model is not already solve */
+/** @returns @p false if the model is not solved to optimality. @p true otherwise */
 {
 	if(model->get(GRB_IntAttr_Status) == GRB_LOADED) model->optimize();
 	if(model->get(GRB_IntAttr_Status) != GRB_OPTIMAL) return false;
@@ -445,9 +517,12 @@ Game::LCP::extractSols(
 	return true;
 }
 
-/// @brief Given variable values and equation values, encodes it in 0/+1/-1 format and returns it.
 vector<short int>* 
-Game::LCP::solEncode(const arma::vec &z, const arma::vec &x) const
+Game::LCP::solEncode(const arma::vec &z, ///< Equation values
+		const arma::vec &x				 ///< Variable values
+		) const
+/// @brief Given variable values and equation values, encodes it in 0/+1/-1 format and returns it.
+/// @warning Note that the vector returned by this function might have to be explicitly deleted using the delete operator. For specific uses in LCP::BranchAndPrune, this delete is handled by the class destructor.
 {
 	vector<signed short int>* solEncoded = new vector<signed short int>(nR, 0);
 	for(auto p:Compl)
@@ -459,127 +534,113 @@ Game::LCP::solEncode(const arma::vec &z, const arma::vec &x) const
 	return solEncoded;
 }
 
-/// @brief Given a Gurobi model, extracts variable values and equation values, encodes it in 0/+1/-1 format and returns it.
 vector<short int>* 
 Game::LCP::solEncode(GRBModel *model) const
+/// @brief Given a Gurobi model, extracts variable values and equation values, encodes it in 0/+1/-1 format and returns it.
+/// @warning Note that the vector returned by this function might have to be explicitly deleted using the delete operator. For specific uses in LCP::BranchAndPrune, this delete is handled by the class destructor.
 {
 	arma::vec x,z;
 	if(!this->extractSols(model, z, x, true)) return {};// If infeasible model, return empty!
 	else return this->solEncode(z,x);
 }
 
-/** @internal
- * If loc == nR, then stop branching. We either hit infeasibility or a leaf.
+void 
+Game::LCP::branch(int loc, 					///< Location (complementarity pair) to be branched at.
+		const vector<short int> *Fixes)		///< What are fixed so far.
+
+/** @brief Branches at a location defined by the caller
+ * If loc == nR, then stop branching. We either hit infeasibility or a leaf (i.e., all locations are branched)
  * If loc <0, then branch at abs(loc) location and go down the branch where variable is fixed to 0
  * else branch at abs(loc) location and go down the branch where eqn is fixed to 0
+ * @note This is just a handler for Branch and bound and obeys what other functions like LCP::branchLoc and LCP::branchProcLoc suggest it to do. No major change expected here.
  */
-void 
-Game::LCP::branch(int loc, const vector<short int> *Fixes) 
 {
 	bool VarFirst=(loc<0);
 	unique_ptr<GRBModel> FixEqMdl, FixVarMdl;
 	// GRBModel *FixEqMdl=nullptr, *FixVarMdl=nullptr;
 	vector<short int> *FixEqLeaf, *FixVarLeaf;
-	if(VERBOSE) 
-	{
-		cout<<endl<<"Branching on Variable: "<<loc<<" with Fix as ";
-		for(auto t1:*Fixes) cout<<t1<<"\t";
-		cout<<endl;
-	}
+
+	if(VERBOSE) { cout<<"\nBranching on Variable: "<<loc<<" with Fix as "; for(auto t1:*Fixes) cout<<t1<<'\t'; cout<<endl; }
 
 	loc = (loc>=0)?loc:(loc==-(int)nR?0:-loc);
-	if(loc >=(signed int)nR) 
-	{
-		if(VERBOSE)
-			cout<<"nR: "<<nR<<"\tloc: "<<loc<<"\t Returning..."<<endl; 
+	if(loc >=static_cast<signed int>(nR)) {
+		if(VERBOSE) cout<<"nR: "<<nR<<"\tloc: "<<loc<<"\t Returning..."<<endl; 
 		return;
 	}
 	else
 	{
-	GRBVar x,z;
-	vector<short int> *FixesEq = new vector<short int>(*Fixes);
-	vector<short int> *FixesVar = new vector<short int>(*Fixes);
-	if(Fixes->at(loc) != 0) throw "Fixing an already fixed variable!";
-	FixesEq->at(loc) =1; FixesVar->at(loc)=-1;
-	if(VarFirst)
-	{
-		FixVarLeaf = anyBranch(AllPolyhedra, FixesVar);
-		if(!FixVarLeaf) this->branch(BranchLoc(FixVarMdl, FixesVar), FixesVar); 
-		else this->branch(BranchProcLoc(FixesVar, FixVarLeaf),FixesVar);
+		GRBVar x,z;
+		vector<short int> *FixesEq = new vector<short int>(*Fixes);
+		vector<short int> *FixesVar = new vector<short int>(*Fixes);
+		if(Fixes->at(loc) != 0) throw string("Error in LCP::branch: Fixing an already fixed variable!");
+		FixesEq->at(loc) =1; FixesVar->at(loc)=-1;
+		if(VarFirst)
+		{
+			FixVarLeaf = anyBranch(AllPolyhedra, FixesVar); // Checking if a feasible solution is already found along this branch
+			if(!FixVarLeaf) this->branch(branchLoc(FixVarMdl, FixesVar), FixesVar); 
+			else this->branch(branchProcLoc(FixesVar, FixVarLeaf),FixesVar);
 
-		FixEqLeaf = anyBranch(AllPolyhedra, FixesEq);
-		if(!FixEqLeaf) this->branch(BranchLoc(FixEqMdl, FixesEq), FixesEq);
-		else this->branch(BranchProcLoc(FixesEq, FixEqLeaf),FixesEq);
-	}
-	else
-	{
-		FixEqLeaf = anyBranch(AllPolyhedra, FixesEq);
-		if(!FixEqLeaf) this->branch(BranchLoc(FixEqMdl, FixesEq), FixesEq);
-		else this->branch(BranchProcLoc(FixesEq, FixEqLeaf),FixesEq);
+			FixEqLeaf = anyBranch(AllPolyhedra, FixesEq);
+			if(!FixEqLeaf) this->branch(branchLoc(FixEqMdl, FixesEq), FixesEq);
+			else this->branch(branchProcLoc(FixesEq, FixEqLeaf),FixesEq);
+		}
+		else
+		{
+			FixEqLeaf = anyBranch(AllPolyhedra, FixesEq);
+			if(!FixEqLeaf) this->branch(branchLoc(FixEqMdl, FixesEq), FixesEq);
+			else this->branch(branchProcLoc(FixesEq, FixEqLeaf),FixesEq);
 
-		FixVarLeaf = anyBranch(AllPolyhedra, FixesVar);
-		if(!FixVarLeaf) this->branch(BranchLoc(FixVarMdl, FixesVar), FixesVar); 
-		else this->branch(BranchProcLoc(FixesVar, FixVarLeaf),FixesVar); 
-	}
-	delete FixesEq;
-	delete FixesVar;
+			FixVarLeaf = anyBranch(AllPolyhedra, FixesVar);
+			if(!FixVarLeaf) this->branch(branchLoc(FixVarMdl, FixesVar), FixesVar); 
+			else this->branch(branchProcLoc(FixesVar, FixVarLeaf),FixesVar); 
+		}
+		delete FixesEq;
+		delete FixesVar;
 	}
 }
 
 vector<vector<short int>*>* 
 Game::LCP::BranchAndPrune ()
+/**
+ * @brief Calls the complete branch and prune for LCP object.
+ * @returns LCP::AllPolyhedra 
+ */
 {
 	unique_ptr<GRBModel> m;
 	vector<short int>* Fix = new vector<short int>(nR,0);
-	branch(BranchLoc(m, Fix), Fix);
+	branch(branchLoc(m, Fix), Fix);
 	delete Fix;
 	return AllPolyhedra;
 }
 
 int 
-Game::LCP::BranchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix)
+Game::LCP::branchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix)
+/**
+ * @brief Defining the branching rule.
+ * @details Solves a gurobi model at some point in the branch and prune tree. From there, uses a heuristic to find the complementarity equation where the branching is to be done and information on whether the exploration is go inside the "equation" side of the branch or the "variable" side of the branch. Currently, the largest non-zero value is the value which would be forced to be zero (with the hope infeasibility would be identified fast).
+ * @note This can be vastly improved with better branching rules.
+ * @returns <tt>signed int</tt> that details where branching has to be done. A positive value implies, branching will be on equation, a negative value implies branching will be on variable. As an exception, 0 implies branching on first eqn and <tt> - LCP::nR</tt> implies branching on first equation. A return value of <tt>LCP::nR</tt> implies that the node is infeasible and that there is no point in branching.
+ */
 {
 	static int GurCallCt {0};
 	m = this->LCPasMIP(*Fix, true);
 	GurCallCt++;
-	if(VERBOSE)
-	{
-		cout<<"Gurobi call\t"<<GurCallCt<<"\t";
-		for (auto a:*Fix) cout<<a<<"\t";
-		cout<<endl;
-	}
+	if(VERBOSE) { cout<<"Gurobi call\t"<<GurCallCt<<"\t"; for (auto a:*Fix) cout<<a<<"\t"; cout<<endl; }
 	int pos;
 	pos = (signed int)nR;// Don't branch! You are at the leaf if pos never gets changed!!
 	arma::vec z,x;
 	if(this->extractSols(m.get(), z, x, true)) // If already infeasible, nothing to branch!
 	{
 		vector<short int> *v1 = this->solEncode(z,x);
-		vector<short int> *v2 = anyBranch(AllPolyhedra, v1);
-		if(VERBOSE)
-		{
-			cout<<"v1: \t\t\t";
-			for (auto a:*v1) cout<<a<<"\t";
-			cout<<"\t\t";
-			cout<<"v2: \t\t\t";
-			if(v2) for (auto a:*v2) cout<<a<<"\t";
-			else cout<<"NULL";
-			cout<<endl;
-		}
-		// if(v2==NULL)
-		{
-			this->AllPolyhedra->push_back(v1);
-			this->FixToPolies(v1);
-			
-			if(VERBOSE)
-			{
-				cout<<"New Polyhedron found"<<endl;
-				x.t().print("x");z.t().print("z");
-			}
-		}
+		if(VERBOSE) { cout<<"v1: \t\t\t"; for (auto a:*v1) cout<<a<<'\t'; cout<<'\n'; }
+		
+		this->AllPolyhedra->push_back(v1);
+		this->FixToPolies(v1);
+		
+		if(VERBOSE) { cout<<"New Polyhedron found"<<endl; x.t().print("x");z.t().print("z"); }
 		////////////////////
 		// BRANCHING RULE //
-		////////////////////
-		
+		//////////////////// 
 		// Branch at a large positive value
 		double maxvalx{0}; unsigned int maxposx{nR};
 		double maxvalz{0}; unsigned int maxposz{nR};
@@ -602,27 +663,25 @@ Game::LCP::BranchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix)
 		// END OF BRANCHING RULE //
 		///////////////////////////
 	}
-	else 
-	{
-		if(VERBOSE)
-			cout<<"Infeasible branch"<<endl;
-	}
-	// delete m; // Since we moved to unique_ptr
+	else { if(VERBOSE) cout<<"Infeasible branch"<<endl; }
 	return pos; 
 }
 
 int 
-Game::LCP::BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf)
+Game::LCP::branchProcLoc(vector<short int>* Fix, vector<short int> *Leaf)
+/**
+ * @brief Branching choice, if we are at a processed node
+ * @details When at processed node, we know that the node definitely has a feasible descendent. 
+ * This just finds the first unbranched complementarity equation and branches there. 
+ * @return Branch location if not at leaf and LCP::nR if at leaf.
+ */
 {
 	int pos = (int)nR;
-	if(VERBOSE)
-	{
-		cout<<"Processed Node \t\t";
-		for(auto a:*Fix) cout<<a<<"\t";
-		cout<<endl;
-	}
+
+	if(VERBOSE) { cout<<"Processed Node \t\t"; for(auto a:*Fix) cout<<a<<"\t"; cout<<endl; }
+
 	if(*Fix==*Leaf) return nR;
-	if(Fix->size()!=Leaf->size()) throw "Error in BranchProcLoc";
+	if(Fix->size()!=Leaf->size()) throw "Error in branchProcLoc";
 	for(unsigned int i=0;i<Fix->size();i++)
 	{
 		int l = Leaf->at(i);
@@ -631,8 +690,21 @@ Game::LCP::BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf)
 	return pos;
 }
 
-void 
-Game::LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, vector<arma::sp_mat*> *custAi, vector<arma::vec*> *custbi)
+Game::LCP& 
+Game::LCP::FixToPoly(const vector<short int> *Fix,  	///< A vector of +1 and -1 referring to which equations and variables are taking 0 value.  
+		bool checkFeas, 								///< The polyhedron is added after ensuring feasibility, if this is true 
+		bool custom, 									///< Should the polyhedra be pushed into a custom vector of polyhedra as opposed to LCP::Ai and LCP::bi 
+		vector<arma::sp_mat*> *custAi, 					///< If custom polyhedra vector is used, pointer to vector of LHS constraint matrix
+		vector<arma::vec*> *custbi						/// If custom polyhedra vector is used, pointer to vector of RHS of constraints
+		)
+/** @brief Computes the equation of the feasibility polyhedron corresponding to the given @p Fix
+ *	@details The computed polyhedron is always pushed into a vector of @p arma::sp_mat and @p arma::vec 
+ *	If @p custom is false, this is the internal attribute of LCP, which are LCP::Ai and LCP::bi.
+ *	Otherwise, the vectors can be provided as arguments.
+ *	@p true value to @checkFeas ensures that the polyhedron is pushed @e only if it is feasible.
+ *	@warning Does not entertain 0 in the elements of *Fix. Only +1/-1 are allowed to not encounter undefined behavior. As a result, 
+ *	not meant for high level code. Instead use LCP::FixToPolies.
+ */
 {
 	arma::sp_mat *Aii = new arma::sp_mat(nR, nC);
    	arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
@@ -662,10 +734,8 @@ Game::LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, 
 			GRBModel* model = new GRBModel(this->RlxdModel);
 			for(auto i:*Fix)
 			{
-				if(i>0) // Fixing the eqn to zero
-					model->getVarByName("z_"+to_string(count)).set(GRB_DoubleAttr_UB,0);
-				if(i<0)
-					model->getVarByName("x_"+to_string(count>this->LeadStart?count+nLeader:i)).set(GRB_DoubleAttr_UB,0);
+				if(i>0) model->getVarByName("z_"+to_string(count)).set(GRB_DoubleAttr_UB,0);
+				if(i<0) model->getVarByName("x_"+to_string(count>this->LeadStart?count+nLeader:i)).set(GRB_DoubleAttr_UB,0);
 				count++;
 			} 
 			model->optimize();
@@ -683,10 +753,25 @@ Game::LCP::FixToPoly(const vector<short int> *Fix, bool checkFeas, bool custom, 
 		custom?this->bi->push_back(bii):custbi->push_back(bii); 
 	}
 	if(VERBOSE) cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;
+	return *this;
 }
 
-void 
-Game::LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas, bool custom, vector<arma::sp_mat*> *custAi, vector<arma::vec*> *custbi)
+Game::LCP& 
+Game::LCP::FixToPolies(const vector<short int> *Fix, 	///< A vector of +1, 0 and -1 referring to which equations and variables are taking 0 value.  
+		bool checkFeas,                                 ///< The polyhedron is added after ensuring feasibility, if this is true 
+		bool custom,                                    ///< Should the polyhedra be pushed into a custom vector of polyhedra as opposed to LCP::Ai and LCP::bi 
+		vector<arma::sp_mat*> *custAi,                  ///< If custom polyhedra vector is used, pointer to vector of LHS constraint matrix
+		vector<arma::vec*> *custbi                      /// If custom polyhedra vector is used, pointer to vector of RHS of constraints
+		)
+/** @brief Computes the equation of the feasibility polyhedra corresponding to the given @p Fix
+ *	@details The computed polyhedroa are always pushed into a vector of @p arma::sp_mat and @p arma::vec 
+ *	If @p custom is false, this is the internal attribute of LCP, which are LCP::Ai and LCP::bi.
+ *	Otherwise, the vectors can be provided as arguments.
+ *	@p true value to @checkFeas ensures that @e each polyhedron that is pushed is feasible.
+ *	not meant for high level code. Instead use LCP::FixToPolies.
+ *	@note A value of 0 in @p *Fix implies that polyhedra corresponding to fixing the corresponding variable as well as the equation
+ *	become candidates to pushed into the vector. Hence this is preferred over LCP::FixToPoly for high-level usage.
+ */
 {
 	bool flag = false;
 	vector<short int> MyFix(*Fix);
@@ -701,24 +786,33 @@ Game::LCP::FixToPolies(const vector<short int> *Fix, bool checkFeas, bool custom
 		this->FixToPolies(&MyFix, checkFeas, custom, custAi, custbi);
 	}
 	else this->FixToPoly(Fix, checkFeas, custom, custAi, custbi);
+	return *this;
 }
 
-int 
-Game::LCP::EnumerateAll(const bool solveLP)
+Game::LCP& 
+Game::LCP::EnumerateAll(const bool solveLP ///< Should the poyhedra added be checked for feasibility?
+		)
+/**
+ * @brief Brute force computation of LCP feasible region
+ * @details Computes all @f$2^n@f$ polyhedra defining the LCP feasible region.
+ * These are always added to LCP::Ai and LCP::bi
+ */
 {
 	delete Ai; delete bi; // Just in case it is polluted with BranchPrune
 	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
 	vector<short int> *Fix = new vector<short int>(nR,0);
 	this->FixToPolies(Fix, solveLP);
-	return 0;
+	return *this;
 }
 
-void Game::LCP::addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi,
+Game::LCP& 
+Game::LCP::addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi,
 				const bool convHull, arma::sp_mat *A, arma::vec  *b)
 {
 	this->FixToPolies(&Fix, false, true, &custAi, &custbi);
 	if(convHull)
-		::ConvexHull(&custAi, &custbi, *A, *b, this->_A, this->_b);
+		Game::ConvexHull(&custAi, &custbi, *A, *b, this->_A, this->_b);
+	return *this;
 }
 
 unique_ptr<GRBModel> 

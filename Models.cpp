@@ -94,10 +94,21 @@ void Models::EPEC::make_LL_QP(const LeadAllPar& Params, const unsigned int follo
 		B(0,0)=1; B(1,0) = 1;
 		b(0) = Params.FollowerParam.capacities.at(follower); 
 
-		Foll->setMove(Q, C, A, B, c, b);
+		Foll->set(move(Q), move(C), move(A), move(B), move(c), move(b));
 }
 
 
+void 
+Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
+			/// All country specific parameters
+			const LeadAllPar& Params,
+			/// Does a constraint on import limit exist or no limit?
+			const unsigned int import_lim_cons,
+			/// Does a constraint on export limit exist or no limit?
+			const unsigned int export_lim_cons,
+			/// Does a constraint on price limit exist or no limit?
+			const unsigned int price_lim_cons
+			) const noexcept
 /**
  * Makes the leader level constraints for a country.
  * The constraints added are as follows:
@@ -111,17 +122,6 @@ void Models::EPEC::make_LL_QP(const LeadAllPar& Params, const unsigned int follo
  *
  * The first two constraints above limit net imports and exports respectively. The third constraint limits local price. These constraints are added only if the RHS parameters are given as non-negative value. A default value of -1 to any of these parameters (given in Models::LeadAllPar @p Params object) ensures that these constraints are not added. The last constraint is <i>always</i> added. It ensures that the country does not export more than what it has produced + imported!
  */
-void 
-Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
-			/// All country specific parameters
-			const LeadAllPar& Params,
-			/// Does a constraint on import limit exist or no limit?
-			const unsigned int import_lim_cons,
-			/// Does a constraint on export limit exist or no limit?
-			const unsigned int export_lim_cons,
-			/// Does a constraint on price limit exist or no limit?
-			const unsigned int price_lim_cons
-			) const noexcept
 {
 	for(unsigned int follower = 0; follower < Params.n_followers; follower++)
 	{

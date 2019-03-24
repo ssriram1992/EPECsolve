@@ -15,26 +15,6 @@
 
 using namespace std;
 
-/*****************************************************/
-/* 	    										     */
-/**********		FROM BALASPOLYHEDRON.CPP		******/ 
-/* 	    										     */
-/*****************************************************/
-/// Returns a Gurobi model which can optimize over the convex hull of the 
-/// union of polyhedra described in A and b where A and b are dense
-GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
-		const vector<arma::sp_mat> A, const vector<arma::vec> b);
-
-/// Returns a Gurobi model which can optimize over the convex hull of the 
-/// union of polyhedra described in A and b where A and b are sparse
-GRBModel& PolyUnion(GRBModel &model, GRBVar **&x, GRBVar *&xMain, GRBVar *&delta, 
-		const vector<arma::mat> A, const vector<arma::vec> b);
-
-int PolyUnion(const vector<arma::sp_mat> Ai, const vector<arma::vec> bi, 
-		arma::sp_mat& A, arma::vec &b, bool Reduce=false);
-
-vector<unsigned int> makeCompactPolyhedron(const arma::sp_mat A, 
-		const arma::vec b, arma::sp_mat &Anew, arma::vec &bnew);
 
 /********************************************/
 /* 	    							    	*/
@@ -71,46 +51,43 @@ class QP_Param
 		GRBModel QuadModel;
 		bool made_yQy;
 		unsigned int Nx, Ny, Ncons;
-		/// Check that the data for the QP_Param class is valid
 		bool dataCheck(bool forcesymm=true) const;
-		/// Initializes the size related private variables
-		/// @returns Number of variables in the quadratic program, QP
 		unsigned int size();
 	public: // Constructors
 		/// Initialize only the size. Everything else is empty (can be updated later)
 		QP_Param(GRBEnv* env=nullptr):env{env},QuadModel{(*env)},made_yQy{false}{this->size();}
 		/// Set data at construct time
-		QP_Param(arma::sp_mat Q, arma::sp_mat C, 
-				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b, GRBEnv* env=nullptr):env{env},QuadModel{(*env)},made_yQy{false}
+		QP_Param(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b, 
+				GRBEnv* env=nullptr):env{env},QuadModel{(*env)},made_yQy{false} 
 		{
 			this->set(Q, C, A, B, c, b);
 			this->size();
+			if(!this->dataCheck()) throw string("Error in QP_Param::QP_Param: Invalid data for constructor");
 		}
 		/// Copy constructor
-		QP_Param(QP_Param &Qu):Q{Qu.Q}, A{Qu.A}, B{Qu.B}, C{Qu.C}, c{Qu.c}, b{Qu.b}, env{Qu.env}, QuadModel{Qu.QuadModel},made_yQy{Qu.made_yQy}{};
+		QP_Param(QP_Param &Qu):Q{Qu.Q}, A{Qu.A}, B{Qu.B}, C{Qu.C}, c{Qu.c}, b{Qu.b}, 
+				env{Qu.env}, QuadModel{Qu.QuadModel},made_yQy{Qu.made_yQy}{this->size();};
 	public: // Set some data
-		/// Setting the data, while keeping the input objects intact
-		QP_Param& set(arma::sp_mat Q, arma::sp_mat C, 
-				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Copy data into this
-		/// Faster means to set data. But the input objects might be corrupted now.
-		QP_Param& setMove(arma::sp_mat Q, arma::sp_mat C, 
-				arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b); // Move data into this
+		QP_Param& set(arma::sp_mat &Q, arma::sp_mat &C, 
+				arma::sp_mat &A, arma::sp_mat &B, arma::vec &c, arma::vec &b); // Copy data into this
+		QP_Param& set(arma::sp_mat &&Q, arma::sp_mat &&C, 
+				arma::sp_mat &&A, arma::sp_mat &&B, arma::vec &&c, arma::vec &&b); // Move data into this
 	public: // Return some of the data as a copy 
-		inline arma::sp_mat getQ() const { return this->Q; } 			///< Read-only access to the private variable Q 
-		inline arma::sp_mat getC() const { return this->C; }			///< Read-only access to the private variable C 
-		inline arma::sp_mat getA() const { return this->A; }			///< Read-only access to the private variable A 
-		inline arma::sp_mat getB() const { return this->B; }			///< Read-only access to the private variable B 
-		inline arma::vec getc() const { return this->c; }				///< Read-only access to the private variable c 
-		inline arma::vec getb() const { return this->b; }				///< Read-only access to the private variable b 
-		inline unsigned int getNx() const { return this->Nx; }			///< Read-only access to the private variable Nx 
-		inline unsigned int getNy() const { return this->Ny; }			///< Read-only access to the private variable Ny
+		inline arma::sp_mat getQ() const { return this->Q; } 		///< Read-only access to the private variable Q 
+		inline arma::sp_mat getC() const { return this->C; }		///< Read-only access to the private variable C 
+		inline arma::sp_mat getA() const { return this->A; }		///< Read-only access to the private variable A 
+		inline arma::sp_mat getB() const { return this->B; }		///< Read-only access to the private variable B 
+		inline arma::vec getc() const { return this->c; }			///< Read-only access to the private variable c 
+		inline arma::vec getb() const { return this->b; }			///< Read-only access to the private variable b 
+		inline unsigned int getNx() const { return this->Nx; }		///< Read-only access to the private variable Nx 
+		inline unsigned int getNy() const { return this->Ny; }		///< Read-only access to the private variable Ny
 	private:
 		int make_yQy();
 	public: // Other methods
-		/// Compute the KKT conditions for the given QP
 		unsigned int KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const;
 		unique_ptr<GRBModel> solveFixed(arma::vec x);
-		inline bool is_Playable(const QP_Param &P) const /// Checks if the current object can play a game with another Game::QP_Param object @p P.
+		inline bool is_Playable(const QP_Param &P) const 
+		/// Checks if the current object can play a game with another Game::QP_Param object @p P.
 		{
 			bool b1, b2, b3;
 			b1 = (this->Nx + this-> Ny ) == (P.getNx()+P.getNy());
@@ -139,7 +116,7 @@ class NashGame
 	private: 
 		arma::sp_mat LeaderConstraints;		///< Upper level leader constraints LHS 
 		arma::vec LeaderConsRHS;			///< Upper level leader constraints RHS 
-		unsigned int Nplayers;			///< Number of players in the Nash Game 
+		unsigned int Nplayers;				///< Number of players in the Nash Game 
 		vector<shared_ptr<QP_Param>> Players;	///< The QP that each player solves 
 		arma::sp_mat MarketClearing;			///< Market clearing constraints 
 		arma::vec MCRHS;						///< RHS to the Market Clearing constraints
@@ -160,12 +137,6 @@ class NashGame
 		unsigned int n_LeadVar;
 
 	public: // Constructors
-		/**
-		 * Construct a NashGame by giving a vector of pointers to 
-		 * QP_Param, defining each player's game
-		 * A set of Market clearing constraints and its RHS
-		 * And if there are leader variables, the number of leader vars.
-		 */
 		NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
 				arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={});
 		NashGame(unsigned int Nplayers, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={})
@@ -176,7 +147,7 @@ class NashGame
 			dual_position.resize(this->Nplayers);
 		}
 		/// Destructors to `delete` the QP_Param objects that might have been used.
-		~NashGame();
+		~NashGame(){};
 	
 	private:
 		void set_positions();
@@ -195,25 +166,14 @@ class NashGame
 			os<<"-----------------------------------------------------------------------"<<endl;
 			return os;
 		}
+		/// Return the number of primal variables
 		inline unsigned int getNprimals() const { return this->Players.at(0)->getNy() + this->Players.at(0)->getNx(); }
 
 
 	public: // Members
-		/// Formulates the LCP corresponding to the Nash game. 
-		/// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
-		unsigned int FormulateLCP( 
-				arma::sp_mat &M, 			///<@internal Returns the \f$M\f$ corresponding to \f$Mx+q\f$ 
-			   	arma::vec &q,				///<@internal Returns the \f$q\f$ corresponding to \f$Mx+q\f$ 
-			   	perps &Compl, 				///< Pairs the equations with variables for complementarity 
-				bool writeToFile = false,	///< If the solution M and q should be written to a file 
-				string M_name = "M.txt", 	///< File names for the output M 
-				string q_name = "q.txt"		///< File names for the output q
-				) const;
-		
-		/// Rewrites leader constraints given earlier with 
-		/// added empty columns and spaces corresponding to
-		/// Market clearing duals and other equation duals.
+		const NashGame& FormulateLCP(arma::sp_mat &M, arma::vec &q,	perps &Compl, bool writeToFile = false,	string M_name = "M.txt", string q_name = "q.txt") const; 
 		arma::sp_mat RewriteLeadCons() const;
+		inline arma::vec getLeadRHS() const {return this->LeaderConsRHS;}
 		NashGame& addDummy(unsigned int par=0);
 		NashGame& addLeadCons(const arma::vec &a, double b);
 };
@@ -230,30 +190,12 @@ ostream& operator<< (ostream& os, const QP_Param &Q);
 /* 	 									      	*/
 /************************************************/
 
-/// Checks if the polyhedron given by @f$ Ax\leq b@f$ is feasible.
-/// If yes, returns the point @f$x@f$ in the polyhedron that minimizes @f$c^Tx@f$
-arma::vec isFeas(const arma::sp_mat* A, const arma::vec *b, const arma::vec *c, bool Positivity=false);
 
-/** 
- * Computes the convex hull of a finite union of polyhedra where 
- * each polyhedra @f$P_i@f$ is of the form
- * @f{eqnarray}{
- * A^ix &\leq& b^i\\
- * x &\geq& 0
- * @f}
-*/
-int ConvexHull(
-		/// Inequality constraints LHS that define polyhedra whose convex hull is to be found
-		vector<arma::sp_mat*> *Ai, 
-		/// Inequality constraints RHS that define polyhedra whose convex hull is to be found
-		vector<arma::vec*> *bi, 
-		arma::sp_mat &A, 		///< Pointer to store the output of the convex hull LHS 
-		arma::vec &b, 			///< Pointer to store the output of the convex hull RHS 
-		arma::sp_mat Acom={},	///< Any common constraints to ALL the polyhedra - LHS.  
-	   	arma::vec bcom={} 		///< Any common constraints to ALL the polyhedra - RHS.
-		);
 
 namespace Game{
+
+arma::vec LPSolve(const arma::sp_mat &A, const arma::vec &b, const arma::vec &c, int &status, bool Positivity=false);
+int ConvexHull( vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, arma::sp_mat &A, arma::vec &b, arma::sp_mat Acom={}, arma::vec bcom={});
 /**
  * @brief Class to handle and solve linear complementarity problems
  */
@@ -272,15 +214,13 @@ class LCP
 		perps Compl; 			///< Compl stores data in <Eqn, Var> form.
 		unsigned int LeadStart, LeadEnd, nLeader; 
 		arma::sp_mat _A; arma::vec _b;	///< Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$ Ax\le b@f$ too!
-	// Temporary data
-		/// Keep track if LCP::RlxdModel is made
-		bool madeRlxdModel;
+	// Temporary data 
+		bool madeRlxdModel;	///< Keep track if LCP::RlxdModel is made
 		unsigned int nR, nC;
 		/// LCP feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra
 		vector<vector<short int>*> *AllPolyhedra, *RelAllPol;
-		vector<arma::sp_mat*> *Ai, *Rel_Ai; vector<arma::vec*> *bi, *Rel_bi;
-		// A gurobi model with all complementarity constraints removed.
-	   	GRBModel RlxdModel;
+		vector<arma::sp_mat*> *Ai, *Rel_Ai; vector<arma::vec*> *bi, *Rel_bi; 
+	   	GRBModel RlxdModel;	///< A gurobi model with all complementarity constraints removed.
 	public: 
 	// Fudgible data 
 		long double bigM;	///< bigM used to rewrite the LCP as MIP 
@@ -309,7 +249,7 @@ class LCP
 	private:
 		bool errorCheck(bool throwErr=true) const;
 		void defConst(GRBEnv* env);
-		int makeRelaxed();
+		void makeRelaxed();
 	/* Solving relaxations and restrictions */
 	private:
 		unique_ptr<GRBModel> LCPasMIP(vector<unsigned int> FixEq={}, 
@@ -326,9 +266,9 @@ class LCP
 		vector<short int>* solEncode(const arma::vec &z, const arma::vec &x)const;
 		void branch(int loc, const vector<short int> *Fixes);
 		vector<short int>* anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const;
-		int BranchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix);
-		int BranchProcLoc(vector<short int>* Fix, vector<short int> *Leaf);
-		int EnumerateAll(bool solveLP=false);
+		int branchLoc(unique_ptr<GRBModel> &m, vector<short int>* Fix);
+		int branchProcLoc(vector<short int>* Fix, vector<short int> *Leaf);
+		LCP& EnumerateAll(bool solveLP=false);
 	public:
 		bool extractSols(GRBModel* model, arma::vec &z, 
 				arma::vec &x, bool extractZ = false) const; 
@@ -341,20 +281,20 @@ class LCP
 		unique_ptr<GRBModel> MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve = false);
 	/* Convex hull computation */
 	private:
-		void FixToPoly(const vector<short int> *Fix, bool checkFeas = false, bool custom=false, vector<arma::sp_mat*> *custAi={}, vector<arma::vec*> *custbi={});
-		void FixToPolies(const vector<short int> *Fix, bool checkFeas = false, bool custom=false, vector<arma::sp_mat*> *custAi={}, vector<arma::vec*> *custbi={});
+		LCP& FixToPoly(const vector<short int> *Fix, bool checkFeas = false, bool custom=false, vector<arma::sp_mat*> *custAi={}, vector<arma::vec*> *custbi={});
+		LCP& FixToPolies(const vector<short int> *Fix, bool checkFeas = false, bool custom=false, vector<arma::sp_mat*> *custAi={}, vector<arma::vec*> *custbi={});
 	public:
-		void addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi, 
+		LCP& addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi, 
 				const bool convHull = false, arma::sp_mat *A={}, arma::vec  *b={});
+		int ConvexHull( 
+				arma::sp_mat& A,		///< Convex hull inequality description LHS to be stored here 
+			   	arma::vec &b) 			///< Convex hull inequality description RHS to be stored here
 		/**
 		 * Computes the convex hull of the feasible region of the LCP
 		 * @warning To be run only after LCP::BranchAndPrune is run. Otherwise this can give errors
 		 * @todo Formally call LCP::BranchAndPrune or throw an exception if this method is not already run
 		 */
-		int ConvexHull( 
-				arma::sp_mat& A,		///< Convex hull inequality description LHS to be stored here 
-			   	arma::vec &b) 			///< Convex hull inequality description RHS to be stored here
-		{return ::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
+		{return Game::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
 };
 };
 
@@ -372,57 +312,41 @@ typedef struct LeadAllPar LeadAllPar;
 
 /// @brief Stores the parameters of the follower in a country model
 struct FollPar
-{
-	/// Quadratic coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
-	vector<double> costs_quad = {};
-	/// Linear  coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
-	vector<double> costs_lin = {};
-	/// Production capacity of each follower. Size of this vector should be equal to n_followers
-	vector<double> capacities = {};
-	/// Emission costs for unit quantity of the fuel. Emission costs feature only on the leader's problem
-	vector<double> emission_costs = {};
-	/// Optional Names for the Followers.
-	vector<string> names = {};
+{ 
+	vector<double> costs_quad = {};	///< Quadratic coefficient of i-th follower's cost. Size of this vector should be equal to n_followers 
+	vector<double> costs_lin = {};	///< Linear  coefficient of i-th follower's cost. Size of this vector should be equal to n_followers 
+	vector<double> capacities = {};	///< Production capacity of each follower. Size of this vector should be equal to n_followers 
+	vector<double> emission_costs = {};	///< Emission costs for unit quantity of the fuel. Emission costs feature only on the leader's problem 
+	vector<string> names = {};	///< Optional Names for the Followers.
 };
 
 
 /// @brief Stores the parameters of the demand curve in a country model
 struct DemPar
-{
-	/// Intercept of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 
-	double alpha = 100;
-	/// Slope of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 
-	double beta = 2;
+{ 
+	double alpha = 100;	///< Intercept of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 
+	double beta = 2;	///< Slope of the demand curve. Written as: Price = alpha - beta*(Total quantity in domestic market) 
 	DemPar(double alpha=100, double beta=2):alpha{alpha}, beta{beta}{};
 };
 
 /// @brief Stores the parameters of the leader in a country model
 struct LeadPar
-{
-	/// Maximum net import in the country. If no limit, set the value as -1;
-	double import_limit = -1; 
-	/// Maximum net export in the country. If no limit, set the value as -1;
-	double export_limit = -1;
-	/// Government decided increase in the shift in costs_lin of any player cannot exceed this value
-	double max_tax_perc = 0.3;
-	/// Government does not want the price to exceed this limit
-	double price_limit = -1;
+{ 
+	double import_limit = -1; 	///< Maximum net import in the country. If no limit, set the value as -1; 
+	double export_limit = -1;	///< Maximum net export in the country. If no limit, set the value as -1; 
+	double max_tax_perc = 0.3;	///< Government decided increase in the shift in costs_lin of any player cannot exceed this value 
+	double price_limit = -1;	///< Government does not want the price to exceed this limit
 	LeadPar(double max_tax_perc=0.3, double imp_lim=-1, double exp_lim=-1):import_limit{imp_lim}, export_limit{exp_lim}, max_tax_perc{max_tax_perc}{}
 };
 
 /// @brief Stores the parameters of a country model
 struct LeadAllPar
-{
-	/// Number of followers in the country
-	unsigned int n_followers;
-	/// Country Name
-	string name;
-	/// A struct to hold Follower Parameters
-	Models::FollPar FollowerParam = {};
-	/// A struct to hold Demand Parameters
-	Models::DemPar DemandParam = {};
-	/// A struct to hold Leader Parameters
-	Models::LeadPar LeaderParam = {};
+{ 
+	unsigned int n_followers;			///< Number of followers in the country 
+	string name;						///< Country Name 
+	Models::FollPar FollowerParam = {};	///< A struct to hold Follower Parameters 
+	Models::DemPar DemandParam = {};	///< A struct to hold Demand Parameters 
+	Models::LeadPar LeaderParam = {};	///< A struct to hold Leader Parameters
 	LeadAllPar(unsigned int n_foll, string name, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}):n_followers{n_foll}, name{name}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}
 	{
 		// Nothing here
