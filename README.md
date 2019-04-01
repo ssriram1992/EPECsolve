@@ -23,6 +23,7 @@ make docSimple
 ```bash
 make docDetailed
 ```
+- You can alternatively use the [online documentation](https://ssriram1992.github.io/EPECsolve/html/index.html)
 
 # Running
 - Open `Makefile`. 
