@@ -14,9 +14,11 @@ ARMALIB=-lblas -llapack
 ARMAOPT=$(ARMAINC) $(ARMALIB)
 
 # Gurobi stuff
+# GUR=/opt/gurobi810/linux64
 GUR=/opt/gurobi/gurobi801/linux64
 GURINC=-I $(GUR)/include 
 GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi80 -lm 
+# GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi81 -lm 
 GUROPT=$(GURINC) $(GURLIB)
 
 # Generic objects not requiring changes
@@ -68,7 +70,7 @@ sand: sand.o
 sand.o: sand.cpp
 	$(GCC) -c sand.cpp $(OPTS)
 
-doc:
+docSimple:
 	doxygen refConf
 
 docDetailed:
@@ -76,3 +78,7 @@ docDetailed:
 
 edit: 
 	vim -p func.h Games.cpp LCPtoLP.cpp  Models.cpp EPEC.cpp
+
+tags:
+	ctags *.cpp *.h
+	@echo "All tags done. Use Ctrl+] to follow a tag in vim and Ctrl+O to go back"

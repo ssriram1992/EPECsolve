@@ -9,19 +9,15 @@ Code to compute mixed-equilibrium in linear EPECs.
 	* ARPACK
 	* LAPACK
 - [Gurobi](https://www.gurobi.com/registration/download-reg) (Version 8.1 or later)
-- [GNU make](https://www.gnu.org/software/make/)
-- [gcc/g++](https://gcc.gnu.org/) (Tested on version 7.3. Must support C++11)
-- [DOxygen](http://www.doxygen.nl) Only if you need documentation.
-```bash
-sudo apt install doxygen
-```
- will install DOxygen on an Ubuntu machine.
+- [gcc/g++](https://gcc.gnu.org/) (Tested on version 7.3. Must support C++11) `sudo apt install gcc ` will install gcc/g++ on an Ubuntu machine.
+- [GNU make](https://www.gnu.org/software/make/) `sudo apt install make` will install GNU make on an Ubuntu machine.
+- [DOxygen](http://www.doxygen.nl) Only if you need documentation. `sudo apt install doxygen ` will install DOxygen on an Ubuntu machine.
 
 # Getting the documentation
 One can generate two versions of documentation for this project..
 - Use the simple version of documentation, if you are only interested in using this as a predefined library which you don't intend to edit. This version of the documentation gives a sufficiently detailed explanation of every class or function you might every have to use. To avail this version, run
 ```bash
-make doc
+make docSimple
 ```
 - Use the complete documentation if you are interested in every implementation detail of the code.This gives a complete description of every private member and fields in every class, all of which might be useful if you want to edit the code in here. To avail this version, run
 ```bash

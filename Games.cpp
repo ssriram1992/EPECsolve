@@ -1,4 +1,5 @@
 #include<iostream>
+#include<memory>
 #include"func.h"
 #include<armadillo>
 #include<array>
@@ -33,7 +34,7 @@ operator<<(ostream& ost, perps C)
 }
 
 ostream& 
-operator<< (ostream& os, const QP_Param &Q)
+operator<< (ostream& os, const Game::QP_Param &Q)
 {
 	os<<"Quadratic program with linear inequality constraints: "<<endl;
 	os<<Q.getNy()<<" decision variables parameterized by "<<Q.getNx()<<" variables"<<endl;
@@ -46,24 +47,18 @@ operator<< (ostream& os, const QP_Param &Q)
 	return os;
 }
 
-ostream& 
-operator<< (ostream& os, const NashGame N)
-{
-	os<<endl;
-	os<<"-----------------------------------------------------------------------"<<endl;
-	os<<"Nash Game with "<<N.Nplayers<<" players"<<endl;
-	os<<"-----------------------------------------------------------------------"<<endl;
-	os<<"Number of primal variables:\t\t\t "<<N.primal_position.back()<<endl;
-	os<<"Number of dual variables:\t\t\t "<<N.dual_position.back()-N.dual_position.front()+1<<endl;
-	os<<"Number of shadow price dual variables:\t\t "<<N.MCRHS.n_rows<<endl;
-	os<<"Number of leader variables:\t\t\t "<<N.n_LeadVar<<endl;
-	os<<"-----------------------------------------------------------------------"<<endl;
-	return os;
-}
-
 
 unsigned int 
-QP_Param::size()
+Game::QP_Param::size()
+/** @brief Calculates @p Nx, @p Ny and @p Ncons
+ *	Computes parameters in QP_Param:
+ *		- Computes @p Ny as number of rows in QP_Param::Q
+ * 		- Computes @p Nx as number of columns in QP_Param::C
+ * 		- Computes @p Ncons as number of rows in QP_Param::b, i.e., the RHS of the constraints
+ *
+ * 	For proper working, QP_Param::dataCheck() has to be run after this.
+ * 	@returns @p Ny, Number of variables in the quadratic program, QP
+ */
 {
 	this->Ny = this->Q.n_rows;
 	this->Nx = this->C.n_cols;
@@ -72,10 +67,25 @@ QP_Param::size()
 }
 
 bool 
-QP_Param::dataCheck(bool forcesymm) const
+Game::QP_Param::dataCheck(bool forcesymm ///< Check if QP_Param::Q is symmetric
+		) const
+/** @brief Check that the data for the QP_Param class is valid
+ * Always works after calls to QP_Param::size()
+ * Checks that are done:
+ * 		- Number of columns in @p Q is same as @p Ny (Q should be square)
+ * 		- Number of columns of @p A should be @p Nx
+ * 		- Number of columns of @p B should be @p Ny
+ * 		- Number of rows in @p C should be @p Ny
+ * 		- Size of @p c should be @p Ny
+ * 		- @p A and @p B should have the same number of rows, equal to @p Ncons
+ * 		- if @p forcesymm is @p true, then Q should be symmetric
+ *
+ * 	@returns true if all above checks are cleared. false otherwise.
+ */
 {
 	if(forcesymm && !this->Q.is_symmetric()) 
 		return false; // Q should be symmetric if forcesymm is true
+	if(this->Q.n_cols != Ny) return false;
 	if(this->A.n_cols != Nx) return false; 		// Rest are matrix size compatibility checks
 	if(this->B.n_cols != Ny) return false;
 	if(this->C.n_rows != Ny) return false;
@@ -85,7 +95,97 @@ QP_Param::dataCheck(bool forcesymm) const
 	return true;
 }
 
-		
+int
+Game::QP_Param::make_yQy()
+	/// Adds the Gurobi Quadratic objective to the Gurobi model @p QuadModel.
+{
+	if(this->made_yQy) return 0;
+	GRBVar y[this->Ny];
+	for (unsigned int i=0; i<Ny; i++)
+		y[i] = this->QuadModel.addVar(0, GRB_INFINITY, 0, GRB_CONTINUOUS, "y_"+to_string(i));
+	GRBQuadExpr yQy{0};
+	for(auto val=Q.begin(); val!=Q.end(); ++val)
+	{
+		unsigned int i, j;
+		double value = (*val);
+		i=val.row(); j=val.col();
+		yQy += 0.5*y[i]*value*y[j];
+	}
+	QuadModel.setObjective(yQy);
+	this->made_yQy = true;
+	return 0;
+}
+
+unique_ptr<GRBModel> 
+Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
+		)
+/**
+ * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality. 
+ *
+ * In terms of game theory, this can be viewed as <i>the best response</i> for a set of decisions by other players.
+ * 
+ */
+{
+	this->make_yQy();
+	/// @throws GRBException if argument vector size is not compatible with the Game::QP_Param definition.
+	if(x.size()!=this->Nx) throw "Invalid argument size: " + to_string(x.size()) + " != "+to_string(Nx);
+	/// @warning Creates a GRBModel using dynamic memory. Should be freed by the caller.
+	unique_ptr<GRBModel> model(new GRBModel(this->QuadModel));
+	try
+	{
+		GRBQuadExpr yQy = model->getObjective();
+		arma::vec Cx, Ax;
+		Cx = this->C*x;
+		Ax = this->A*x;
+		GRBVar y[this->Ny];
+		for (unsigned int i=0; i<this->Ny; i++)
+		{
+			y[i] = model->getVarByName("y_"+to_string(i));
+			yQy += (Cx[i]+c[i])*y[i];
+		}
+		model->setObjective(yQy);
+		for (unsigned int i=0; i<this->Ncons; i++)
+		{
+			GRBLinExpr LHS{0};
+			for(auto j=B.begin_row(i); j!=B.end_row(i); ++j)
+				LHS += (*j)*y[j.col()];
+			model->addConstr(LHS, GRB_LESS_EQUAL, b[i]-Ax[i]);
+		}
+		model->optimize();
+	}
+	catch(const char* e) { cerr<<" Error in Game::QP_Param::solveFixed: "<<e<<endl; throw;}
+	catch(string e) { cerr<<"String: Error in Game::QP_Param::solveFixed: "<<e<<endl; throw;}
+	catch(exception &e) { cerr<<"Exception: Error in Game::QP_Param::solveFixed: "<<e.what()<<endl; throw;}
+	catch(GRBException &e){cerr<<"GRBException: Error in Game::QP_Param::solveFixed: "<<e.getErrorCode()<<"; "<<e.getMessage()<<endl;throw;}
+	return model;
+}
+
+Game::QP_Param& Game::QP_Param::addDummy(unsigned int pars, unsigned int vars)
+/**
+ * @warning You might have to rerun QP_Param::KKT since you have now changed the QP.
+ * @warning This implies you might have to rerun NashGame::FormulateLCP again too.
+ */
+{
+	if(VERBOSE && (pars||vars)) cout<<"From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.\n";
+	this->Nx += pars;
+	this->Ny += vars;
+	if(vars)
+	{
+		Q.resize(this->Ny, this->Ny);
+		B.resize(this->Ncons, this->Ny);
+		c.resize(this->Ny);
+	}
+	if(pars)
+		A.resize(this->Ncons, this->Nx);
+	if(vars || pars)
+		C.resize(this->Ny, this->Nx); 
+
+	return *this;
+}
+
+unsigned int 
+Game::QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
+/// @brief Compute the KKT conditions for the given QP
 /**
  * Writes the KKT condition of the parameterized QP
  * As per the convention, y is the decision variable for the QP and 
@@ -93,12 +193,10 @@ QP_Param::dataCheck(bool forcesymm) const
  * The KKT conditions are
  * \f$0 \leq y \perp  My + Nx + q \geq 0\f$
 */
-unsigned int 
-QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 {
 	if (!this->dataCheck())
 	{
-		throw "Inconsistent data for KKT of QP_Param";
+		throw "Inconsistent data for KKT of Game::QP_Param";
 		return 0;
 	}
 	M = arma::join_cols( // In armadillo join_cols(A, B) is same as [A;B] in Matlab
@@ -112,56 +210,54 @@ QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 }
 
 
-QP_Param& 
-QP_Param::set(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+Game::QP_Param& 
+Game::QP_Param::set(arma::sp_mat &Q, arma::sp_mat &C, arma::sp_mat &A, arma::sp_mat &B, arma::vec &c, arma::vec &b)
+/// Setting the data, while keeping the input objects intact
 {
+	this->made_yQy = false;
 	this->Q = (Q); this->C = (C); this->A = (A);
 	this->B = (B); this->c = (c); this->b = (b);
 	this->size();
-	if(!dataCheck()) throw "Bad initialization done in QP_Param::set";
+	if(!dataCheck()) throw string("Error in QP_Param::set: Invalid data");
 	return *this;
 }
 
 
 
-QP_Param& 
-QP_Param::setMove(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b)
+Game::QP_Param& 
+Game::QP_Param::set(arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma::sp_mat &&B, arma::vec &&c, arma::vec &&b)
+/// Faster means to set data. But the input objects might be corrupted now.
 {
+	this->made_yQy = false;
 	this->Q = move(Q); this->C = move(C); this->A = move(A);
 	this->B = move(B); this->c = move(c); this->b = move(b);
 	this->size();
-	if(!dataCheck()) throw "Bad initialization done in QP_Param::set";
+	if(!dataCheck()) throw string("Error in QP_Param::set: Invalid data");
 	return *this;
 }
 
 
-
-bool 
-QP_Param::is_Playable(const QP_Param P) const
-{
-	unsigned int comp{static_cast<unsigned int>(P.getc().n_elem)};
-	unsigned int compcomp {static_cast<unsigned int>(P.getB().n_cols)};
-	if(this->Nx+ this->Ny == comp+ compcomp) // Total number of variables as we see as well as, as the competitor sees should be same.
-		return(comp <= Ny && Nx <= compcomp); // Our size should at least be enemy's competition and vice versa.
-	else return false;
-}
-
-
-
+Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /**
- * Have a vector of QP_Param* ready such that
- * the variables are separated in x^{i} and x^{-i}
+ * @brief
+ * Construct a NashGame by giving a vector of pointers to 
+ * QP_Param, defining each player's game
+ * A set of Market clearing constraints and its RHS
+ * And if there are leader variables, the number of leader vars.
+ */
+/**
+ * Have a vector of pointers to Game::QP_Param ready such that
+ * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
+ *
  * In the correct ordering of variables, have the 
  * Market clearing equations ready. 
+ *
  * Now call this constructor.
  * It will allocate appropriate space for the dual variables 
  * for each player.
- * The ordering is 
- * [ Primal for Pl1, Primal for Pl2, ..., MarketCL duals,
- *  Dual for Pl1, Dual for Pl2, ... ]
+ *
  */
-NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 {
 	// Setting the class variables
 	this->n_LeadVar = n_LeadVar;
@@ -172,6 +268,18 @@ NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, 
 	// Setting the size of class variable vectors
 	this->primal_position.resize(this->Nplayers);
 	this->dual_position.resize(this->Nplayers);
+
+	this->set_positions();
+}
+
+void Game::NashGame::set_positions()
+/**
+ * Stores the position of each players' primal and dual variables. Also allocates Leader's position appropriately.
+ * The ordering is according to the columns of
+	 @image html FormulateLCP.png
+	 @image latex FormulateLCP.png
+ */
+{
 	// Defining the variable value
 	unsigned int pr_cnt{0}, dl_cnt{0}; // Temporary variables - primal count and dual count
 	vector<unsigned int> nCons(Nplayers); // Tracking the number of constraints in each player's problem
@@ -196,15 +304,27 @@ NashGame::NashGame(vector<QP_Param*> Players, arma::sp_mat MC, arma::vec MCRHS, 
 	dual_position.push_back(dl_cnt);
 }
 
-NashGame::~NashGame()
+const Game::NashGame&
+Game::NashGame::FormulateLCP(
+		arma::sp_mat &M,  ///< Where the output  M is stored and returned. 
+		arma::vec &q, 		///< Where the output  q is stored and returned.
+		perps &Compl, 		///< Says which equations are complementary to which variables
+		bool writeToFile, 	///< If  true, writes  M and  q to file.k
+		string M_name, 		///< File name to be used to write  M
+		string q_name		///< File name to be used to write  M
+		) const
 {
-	for(auto a:this->Players)
-		delete a;
-}
+/// @brief Formulates the LCP corresponding to the Nash game. 
+/// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
+/**
+ * Computes the KKT conditions for each Player, calling QP_Param::KKT. Arranges them systematically to return M, q
+ * as an LCP @f$0\leq q \perp Mx+q \geq 0 @f$.
+ *
+	 The way the variables of the players get distributed is shown in the image below
+	 @image html FormulateLCP.png
+	 @image latex FormulateLCP.png
+ */
 
-unsigned int 
-NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
-{
 	// To store the individual KKT conditions for each player.
 	vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers); 
 	vector<arma::vec> qi(Nplayers);
@@ -216,6 +336,7 @@ NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
 	q.set_size(NvarFollow);
 	M.zeros(); q.zeros(); // Make sure that the matrices don't have garbage value filled in !  
 	// Get the KKT conditions for each player
+	
 	for(unsigned int i=0; i<Nplayers;i++)
 	{
 		this->Players[i]->KKT(Mi[i], Ni[i], qi[i]); 
@@ -282,11 +403,21 @@ NashGame::FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl) const
 		for(unsigned int j=this->MC_dual_position;j<this->Leader_position;j++)
 			Compl.push_back({j, j}); 
 	}
-	return NvarFollow;
+	if(writeToFile)
+	{
+		M.save(M_name, arma::arma_ascii);
+		q.save(q_name, arma::arma_ascii);
+	}
+	return *this;
 }
 
 arma::sp_mat 
-NashGame::RewriteLeadCons() const
+Game::NashGame::RewriteLeadCons() const
+/** @brief Rewrites leader constraint adjusting for dual variables.
+ * Rewrites leader constraints given earlier with added empty columns and spaces corresponding to Market clearing duals and other equation duals.
+ * 
+ * This becomes important if the Lower level complementarity problem is passed to LCP with upper level constraints.
+ */
 {
 	arma::sp_mat A_in = this->LeaderConstraints;
 	arma::sp_mat A_out;
@@ -300,13 +431,42 @@ NashGame::RewriteLeadCons() const
 
 	try
 	{
+		// Primal variables i.e., everything before MCduals are the same!
 		A_out.cols(0, this->MC_dual_position-1)  = A_in.cols(0, this->MC_dual_position-1);
 		A_out.cols(this->Leader_position, this->dual_position.at(0)-1) = A_in.cols(this->MC_dual_position, n_Col-1);
 		return A_out;
 	}
-	catch(const char* e) { cout<<e<<endl; }
-	catch(string e) { cout<<"String: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-	throw "Error in NashGame::RewriteLeadCons";
+	catch(const char* e) { cerr<<"Error in NashGame::RewriteLeadCons: "<<e<<endl; throw;}
+	catch(string e) { cerr<<"String: Error in NashGame::RewriteLeadCons: "<<e<<endl; throw;}
+	catch(exception &e) { cerr<<"Exception: Error in NashGame::RewriteLeadCons: "<<e.what()<<endl; throw;}
 	return A_in;
+}
+
+Game::NashGame& Game::NashGame::addDummy(unsigned int par)
+{
+	for(auto &q: this->Players)
+		q->addDummy(par);
+	
+	this->n_LeadVar += par;
+	if(this->LeaderConstraints.n_rows)
+	{
+		auto nnR = this->LeaderConstraints.n_rows;
+		auto nnC = this->LeaderConstraints.n_cols;
+		this->LeaderConstraints.resize(nnR , nnC+par);
+	}
+	this->set_positions();
+	return *this;
+}
+
+Game::NashGame& Game::NashGame::addLeadCons(const arma::vec &a, double b)
+{
+	auto nC = this->LeaderConstraints.n_cols;
+	if (a.n_elem != nC) throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible");
+	auto nR = this->LeaderConstraints.n_rows;
+	this->LeaderConstraints.resize(nR+1, nC);
+	// (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
+	LeaderConstraints.row(nR) = a.t(); 
+	this->LeaderConsRHS.resize(nR+1);
+	this->LeaderConsRHS(nR) = b;
+	return *this;
 }
