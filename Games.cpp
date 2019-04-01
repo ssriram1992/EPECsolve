@@ -48,15 +48,37 @@ operator<< (ostream& os, const Game::QP_Param &Q)
 }
 
 
+Game::MP_Param& Game::MP_Param::addDummy(unsigned int pars, unsigned int vars)
+/**
+ * Adds dummy variables to a parameterized mathematical program
+ */
+{
+	this->Nx += pars;
+	this->Ny += vars;
+	if(vars)
+	{
+		Q.resize(this->Ny, this->Ny);
+		B.resize(this->Ncons, this->Ny);
+		c.resize(this->Ny);
+	}
+	if(pars)
+		A.resize(this->Ncons, this->Nx);
+	if(vars || pars)
+		C.resize(this->Ny, this->Nx); 
+
+	return *this;
+}
+
+
 unsigned int 
-Game::QP_Param::size()
+Game::MP_Param::size()
 /** @brief Calculates @p Nx, @p Ny and @p Ncons
- *	Computes parameters in QP_Param:
- *		- Computes @p Ny as number of rows in QP_Param::Q
- * 		- Computes @p Nx as number of columns in QP_Param::C
- * 		- Computes @p Ncons as number of rows in QP_Param::b, i.e., the RHS of the constraints
+ *	Computes parameters in MP_Param:
+ *		- Computes @p Ny as number of rows in MP_Param::Q
+ * 		- Computes @p Nx as number of columns in MP_Param::C
+ * 		- Computes @p Ncons as number of rows in MP_Param::b, i.e., the RHS of the constraints
  *
- * 	For proper working, QP_Param::dataCheck() has to be run after this.
+ * 	For proper working, MP_Param::dataCheck() has to be run after this.
  * 	@returns @p Ny, Number of variables in the quadratic program, QP
  */
 {
@@ -66,11 +88,35 @@ Game::QP_Param::size()
 	return Ny;
 }
 
+
+Game::MP_Param& 
+Game::MP_Param::set(arma::sp_mat &Q, arma::sp_mat &C, arma::sp_mat &A, arma::sp_mat &B, arma::vec &c, arma::vec &b)
+/// Setting the data, while keeping the input objects intact
+{
+	this->Q = (Q); this->C = (C); this->A = (A);
+	this->B = (B); this->c = (c); this->b = (b);
+	if(!finalize()) throw string("Error in MP_Param::set: Invalid data");
+	return *this;
+}
+
+
+
+Game::MP_Param& 
+Game::MP_Param::set(arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma::sp_mat &&B, arma::vec &&c, arma::vec &&b)
+/// Faster means to set data. But the input objects might be corrupted now.
+{
+	this->Q = move(Q); this->C = move(C); this->A = move(A);
+	this->B = move(B); this->c = move(c); this->b = move(b);
+	if(!finalize()) throw string("Error in MP_Param::set: Invalid data");
+	return *this;
+}
+
+
 bool 
-Game::QP_Param::dataCheck(bool forcesymm ///< Check if QP_Param::Q is symmetric
+Game::MP_Param::dataCheck(bool forcesymm ///< Check if MP_Param::Q is symmetric
 		) const
-/** @brief Check that the data for the QP_Param class is valid
- * Always works after calls to QP_Param::size()
+/** @brief Check that the data for the MP_Param class is valid
+ * Always works after calls to MP_Param::size()
  * Checks that are done:
  * 		- Number of columns in @p Q is same as @p Ny (Q should be square)
  * 		- Number of columns of @p A should be @p Nx
@@ -167,18 +213,9 @@ Game::QP_Param& Game::QP_Param::addDummy(unsigned int pars, unsigned int vars)
  */
 {
 	if(VERBOSE && (pars||vars)) cout<<"From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.\n";
-	this->Nx += pars;
-	this->Ny += vars;
-	if(vars)
-	{
-		Q.resize(this->Ny, this->Ny);
-		B.resize(this->Ncons, this->Ny);
-		c.resize(this->Ny);
-	}
-	if(pars)
-		A.resize(this->Ncons, this->Nx);
-	if(vars || pars)
-		C.resize(this->Ny, this->Nx); 
+
+	// Call the superclass function
+	MP_Param::addDummy(pars, vars);
 
 	return *this;
 }
@@ -196,7 +233,7 @@ Game::QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 {
 	if (!this->dataCheck())
 	{
-		throw "Inconsistent data for KKT of Game::QP_Param";
+		throw string("Inconsistent data for KKT of Game::QP_Param");
 		return 0;
 	}
 	M = arma::join_cols( // In armadillo join_cols(A, B) is same as [A;B] in Matlab
@@ -215,10 +252,8 @@ Game::QP_Param::set(arma::sp_mat &Q, arma::sp_mat &C, arma::sp_mat &A, arma::sp_
 /// Setting the data, while keeping the input objects intact
 {
 	this->made_yQy = false;
-	this->Q = (Q); this->C = (C); this->A = (A);
-	this->B = (B); this->c = (c); this->b = (b);
-	this->size();
-	if(!dataCheck()) throw string("Error in QP_Param::set: Invalid data");
+	try { MP_Param::set(Q, C, A, B, c, b); }
+	catch(string &e) {cerr<<"String: "<<e<<endl; throw string("Error in QP_Param::set: Invalid Data");}
 	return *this;
 }
 
@@ -229,10 +264,8 @@ Game::QP_Param::set(arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma::
 /// Faster means to set data. But the input objects might be corrupted now.
 {
 	this->made_yQy = false;
-	this->Q = move(Q); this->C = move(C); this->A = move(A);
-	this->B = move(B); this->c = move(c); this->b = move(b);
-	this->size();
-	if(!dataCheck()) throw string("Error in QP_Param::set: Invalid data");
+	try { MP_Param::set(Q, C, A, B, c, b); }
+	catch(string &e) {cerr<<"String: "<<e<<endl; throw string("Error in QP_Param::set: Invalid Data");}
 	return *this;
 }
 
