@@ -30,6 +30,33 @@ template <class T> ostream& operator<<(ostream& ost, vector<T> v);
 template <class T, class S> ostream& operator<<(ostream& ost, pair<T,S> p);
 
 namespace Game{
+/*
+@brief Class to handle linear constraint(s) 
+class LinConstr
+{
+	private:
+		arma::sp_mat A = {};
+		arma::vec b = {};
+	private:
+		unsigned int nRows{0}, nCols{0};
+	public:
+		const unsigned int &n_rows{nRows}, &n_cols{nCols};
+	public:
+		LinConstr(arma::sp_mat A={}, arma::vec b={}):A{A}, b{b}
+		{
+			if (A.n_rows != b.n_rows) 
+				throw string("Error in Game::LinConstr::LinConstr(). A and b should have same number of rows");
+			nRows = b.n_rows;
+			nCols = A.n_cols;
+		} 
+		LinConstr& addConstraint(arma::vec &a, double b);
+		arma::sp_mat& getLHS() {return this->A;}
+		arma::vec& getRHS() {return this->b;}
+
+};
+
+*/
+
 ///@brief Class to handle parameterized quadratic programs(QP)
 class QP_Param
 /**
@@ -213,9 +240,9 @@ class LCP
 		arma::vec q; 			///< q in @f$Mx+q@f$ that defines the LCP 
 		perps Compl; 			///< Compl stores data in <Eqn, Var> form.
 		unsigned int LeadStart, LeadEnd, nLeader; 
-		arma::sp_mat _A; arma::vec _b;	///< Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$ Ax\le b@f$ too!
+		arma::sp_mat _A={}; arma::vec _b={};	///< Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$ Ax\le b@f$ too!
 	// Temporary data 
-		bool madeRlxdModel;	///< Keep track if LCP::RlxdModel is made
+		bool madeRlxdModel{false};	///< Keep track if LCP::RlxdModel is made
 		unsigned int nR, nC;
 		/// LCP feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra
 		vector<vector<short int>*> *AllPolyhedra, *RelAllPol;
@@ -223,8 +250,8 @@ class LCP
 	   	GRBModel RlxdModel;	///< A gurobi model with all complementarity constraints removed.
 	public: 
 	// Fudgible data 
-		long double bigM;	///< bigM used to rewrite the LCP as MIP 
-		long double eps;	///< The threshold, below which a number would be considered to be zero.
+		long double bigM {1e5};	///< bigM used to rewrite the LCP as MIP 
+		long double eps {1e-5};	///< The threshold, below which a number would be considered to be zero.
 	public:
 	/** Constructors */
 		/// Class has no default constructors
@@ -359,7 +386,25 @@ ostream& operator<<(ostream& ost, const DemPar P);
 ostream& operator<<(ostream& ost, const LeadPar P);
 ostream& operator<<(ostream& ost, const LeadAllPar P);
 
+enum class LeaderVars
+{
+	FollowerStart,
+	NetImport, 
+	NetExport,
+	CountryImport,
+	Tax,
+	Caps,
+	AddnVar,
+	ConvHullDummy,
+	End
+};
 
+using LeadLocs=map<LeaderVars,unsigned int>;
+
+class VarLocDetails
+{
+
+};
 
 
 class EPEC
@@ -369,12 +414,16 @@ class EPEC
 		vector<shared_ptr<Game::NashGame>> countriesLL = {}; ///< Stores each country's lower level Nash game
 		vector<arma::sp_mat> LeadConses = {}; ///< Stores each country's leader constraint LHS
 		vector<arma::vec> LeadRHSes = {}; ///< Stores each country's leader constraint RHS
-		arma::sp_mat TranspCosts = {};
-		vector<unsigned int> nImportMarkets = {};
+		arma::sp_mat TranspCosts = {};		///< Transportation costs between pairs of countries
+		vector<unsigned int> nImportMarkets = {}; 	///< Number of countries from which the i-th country imports
+		vector<LeadLocs> Locations;
 	private:
 		GRBEnv *env;		///< A gurobi environment to create and process the resulting LCP object.
 		map<string, unsigned int> name2nos = {};
 		bool finalized = false;
+		unsigned int nCountr = 0;
+	public: // Attributes
+		const unsigned int& nCountries{nCountr}; ///< Constant attribute for number of leaders in the EPEC
 	public:
 		EPEC()=delete;
 		EPEC(GRBEnv *env, arma::sp_mat TranspCosts={}):TranspCosts{TranspCosts}, env{env}{}
@@ -385,14 +434,18 @@ class EPEC
 		void make_LL_QP(const LeadAllPar& Params, 
 				const unsigned int follower, 
 				Game::QP_Param* Foll, 
-				const unsigned int LeadVars) const noexcept;
+				const LeadLocs& Loc) const noexcept;
 		/// Makes the leader constraint matrix and RHS
 		void make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
 				const LeadAllPar& Param,
+				const Models::LeadLocs& Loc = {},
 				const unsigned int import_lim_cons=1,
 				const unsigned int export_lim_cons=1,
 				const unsigned int price_lim_cons=1
 				) const noexcept;
+		void make_MC_leader(unsigned int i);
+	private: // Super low level
+		void add_Leaders_tradebalance_constraints(const unsigned int i);
 	public:
 		///@brief %Models a Standard Nash-Cournot game within a country
 		EPEC& addCountry(
@@ -402,7 +455,7 @@ class EPEC
 				const unsigned int addnlLeadVars  = 0
 				);
 		EPEC& addTranspCosts(const arma::sp_mat& costs);
-		EPEC& finalize();
+		const EPEC& finalize();
 	public:
 		// Data access methods
 		Game::NashGame* get_LowerLevelNash(unsigned int i); 

@@ -446,7 +446,14 @@ Game::NashGame& Game::NashGame::addDummy(unsigned int par)
 {
 	for(auto &q: this->Players)
 		q->addDummy(par);
+	
 	this->n_LeadVar += par;
+	if(this->LeaderConstraints.n_rows)
+	{
+		auto nnR = this->LeaderConstraints.n_rows;
+		auto nnC = this->LeaderConstraints.n_cols;
+		this->LeaderConstraints.resize(nnR , nnC+par);
+	}
 	this->set_positions();
 	return *this;
 }

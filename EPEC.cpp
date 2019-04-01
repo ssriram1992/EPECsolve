@@ -11,77 +11,43 @@
 using namespace std;
 
 
-/*
-int LCPtest(Models::LeadAllPar LA)
+int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 {
 	GRBEnv env = GRBEnv();
-	GRBModel* model=nullptr;
+	// GRBModel* model=nullptr;
 	arma::sp_mat M;		 arma::vec q;		 perps Compl;
-	LCP *MyNashGame = nullptr;
+	// Game::LCP *MyNashGame = nullptr;
 	arma::sp_mat Aa; arma::vec b;
-	bool Error{true};
+	Models::EPEC epec(&env);
 	try
 	{
-		// MyNashGame = Models::createCountry(env, 2, {3,1}, {1,5}, {100, 100}, 80, 5, 10, 10, 0.5);
-		MyNashGame = Models::createCountry(env, LA, 0);
-		Error = false;
+		epec.addCountry(LA, 0).addCountry(LA2, 0).addTranspCosts(TrCo).finalize();
 	} 
-	catch(const char* e) { cout<<e<<endl; }
-	catch(string e) { cout<<"String: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
-	if(Error) throw -1;
-	try
-	{
-		// Solving using LCPasQP
-		unique_ptr<GRBModel> Model2 = MyNashGame->LCPasQP(true);
-		arma::vec z,x;
-		MyNashGame->extractSols(Model2.get(), z, x, true);
-		cout<<"Sample solution"<<endl;
-		x.print("x"); z.print("z");
-		cout<<"*************************"<<endl;
-
-
-		// Branch and prune solving and getting Conv hull
-		auto A = MyNashGame->BranchAndPrune();
-		cout<<A->size()<<endl;
-		for(auto v:*A)
-		{
-			for(auto u:*v) cout<<u<<"\t";
-			cout<<endl;
-		} 
-		MyNashGame->print();
-		cout<<"************************************"<<endl;
-		MyNashGame->ConvexHull(Aa, b);
-		cout<<"************************************"<<endl;
-	}
-	catch(const char* e) { cout<<e<<endl; }
-	catch(string e) { cout<<"String: "<<e<<endl; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl; }
-	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;}
-	delete model;
-	cout<<"Writing to files..."<<endl;
-	b.save("b.txt", arma::arma_ascii);
-	Aa.save("A.txt", arma::coord_ascii);
-	cout<<Aa.n_rows<<", "<<Aa.n_cols<<endl;
-	delete MyNashGame;
+	catch(const char* e) { cout<<e<<endl;throw; }
+	catch(string e) { cout<<"String: "<<e<<endl;throw; }
+	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl;throw; }
+	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
 	return 0;
 }
-*/
 
 
 
 int main()
 {
 	Models::DemPar P;
-	Models::FollPar *FP = new Models::FollPar();
+	Models::FollPar FP;
 	Models::LeadPar L;
-	FP->capacities = {10, 15, 10};
-	FP->costs_lin = {30, 40, 50};
-	FP->costs_quad = {60, 40, 0};
-	Models::LeadAllPar LA(3, "A", *FP);
-	cout<<LA;
+	FP.capacities = {10, 15, 10};
+	FP.costs_lin = {30, 40, 50};
+	FP.costs_quad = {60, 40, 0}; 
+	FP.emission_costs = {0, 0, 0}; 
+	Models::LeadAllPar LA(3, "A", FP);
+	Models::LeadAllPar LA2(3, "B", FP, {60,1});
+	// cout<<LA<<LA2;
 	cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
-	// LCPtest(LA);
+	arma::mat TrCo(2,2); 
+	TrCo << 0 << 1<< arma::endr << 2 <<0;
+	LCPtest(LA, LA2, arma::sp_mat(TrCo));
 	return 0;
 }
+

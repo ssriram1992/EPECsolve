@@ -8,6 +8,46 @@
 using namespace std;
 
 
+bool 
+operator == (vector<int> Fix1, vector<int> Fix2)
+/**
+ * @brief Checks if two vector<int> are of same size and hold same values in the same order
+ * @warning Might be deprecated, as it pollutes global namespaces
+ * @returns @p true if Fix1 and Fix2 have the same elements else @p false
+ */
+{
+	if(Fix1.size() != Fix2.size()) return false;
+	for(unsigned int i=0;i<Fix1.size();i++)
+		if(Fix1[i]!=Fix2[i]) return false;
+	return true;
+}
+
+bool 
+operator < (vector<int> Fix1, vector<int> Fix2)
+/**
+ * @details \b GrandParent:
+ *  	Either the same value as the grand child, or has 0 in that location
+ *
+ *  \b Grandchild:
+ *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
+ * @warning Might be deprecated, as it pollutes global namespaces
+ * @returns @p true if Fix1 is (grand) child of Fix2
+ */
+{
+	if(Fix1.size() != Fix2.size()) return false;
+	for(unsigned int i=0;i<Fix1.size();i++)
+		if(Fix1[i]!=Fix2[i] && Fix1[i]*Fix2[i]!=0)
+			return false; // Fix1 is not a child of Fix2
+	return true;	 	// Fix1 is a child of Fix2
+}
+
+
+bool 
+operator >(vector<int> Fix1, vector<int> Fix2)
+{
+	return (Fix2<Fix1);
+}
+
 void 
 Game::LCP::defConst(GRBEnv* env)
 /**
@@ -20,8 +60,8 @@ Game::LCP::defConst(GRBEnv* env)
 	AllPolyhedra = new vector<vector<short int>*> {};
 	RelAllPol = new vector<vector<short int>*> {};
 	Ai = new vector<arma::sp_mat *>{}; bi = new vector<arma::vec *>{};
-	if(!VERBOSE) this->RlxdModel.set(GRB_IntParam_OutputFlag,0);
-	this->env = env;  this->madeRlxdModel = false; this->bigM = 1e5; this->eps = 1e-5;
+	this->RlxdModel.set(GRB_IntParam_OutputFlag,0);
+	this->env = env;
 	this->nR = this->M.n_rows; this->nC = this->M.n_cols;
 }
 
@@ -112,7 +152,9 @@ Game::LCP::makeRelaxed()
 {
 	try
 	{
+		cout<<this->madeRlxdModel<<"Here 1\n";
 		if(this->madeRlxdModel) return ;
+		cout<<"Here 1\n";
 		GRBVar x[nC], z[nR];
 		for(unsigned int i=0;i <nC;i++) x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "x_"+to_string(i));
 		for(unsigned int i=0;i <nR;i++) z[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "z_"+to_string(i));
@@ -124,6 +166,7 @@ Game::LCP::makeRelaxed()
 			expr += q(i);
 			RlxdModel.addConstr(expr, GRB_EQUAL, z[i]);
 		} 
+		cout<<"Here 1\n";
 		// If @f$Ax \leq b@f$ constraints are there, they should be included too!
 		if(this->_A.n_nonzero != 0 || this->_b.n_rows!=0)
 		{ 
@@ -136,6 +179,7 @@ Game::LCP::makeRelaxed()
 				RlxdModel.addConstr(expr, GRB_LESS_EQUAL, _b(i));
 			}
 		}
+		cout<<"Here 1\n";
 		RlxdModel.update();
 		this->madeRlxdModel = true;
 	}
@@ -436,46 +480,6 @@ Game::LPSolve(const arma::sp_mat &A, ///< The constraint matrix
 	return sol;
 }
 
-
-bool 
-operator == (vector<int> Fix1, vector<int> Fix2)
-/**
- * @brief Checks if two vector<int> are of same size and hold same values in the same order
- * @warning Might be deprecated, as it pollutes global namespaces
- * @returns @p true if Fix1 and Fix2 have the same elements else @p false
- */
-{
-	if(Fix1.size() != Fix2.size()) return false;
-	for(unsigned int i=0;i<Fix1.size();i++)
-		if(Fix1[i]!=Fix2[i]) return false;
-	return true;
-}
-
-bool 
-operator < (vector<int> Fix1, vector<int> Fix2)
-/**
- * @details \b GrandParent:
- *  	Either the same value as the grand child, or has 0 in that location
- *
- *  \b Grandchild:
- *  	Same val as grand parent in every location, except any val allowed, if grandparent is 0
- * @warning Might be deprecated, as it pollutes global namespaces
- * @returns @p true if Fix1 is (grand) child of Fix2
- */
-{
-	if(Fix1.size() != Fix2.size()) return false;
-	for(unsigned int i=0;i<Fix1.size();i++)
-		if(Fix1[i]!=Fix2[i] && Fix1[i]*Fix2[i]!=0)
-			return false; // Fix1 is not a child of Fix2
-	return true;	 	// Fix1 is a child of Fix2
-}
-
-
-bool 
-operator >(vector<int> Fix1, vector<int> Fix2)
-{
-	return (Fix2<Fix1);
-}
 
 vector<short int>* 
 Game::LCP::anyBranch(const vector<vector<short int>*>* vecOfFixes, vector<short int>* Fix) const
@@ -806,8 +810,13 @@ Game::LCP::EnumerateAll(const bool solveLP ///< Should the poyhedra added be che
 }
 
 Game::LCP& 
-Game::LCP::addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi,
-				const bool convHull, arma::sp_mat *A, arma::vec  *b)
+Game::LCP::addPolyhedron(const vector<short int> &Fix, 	///< +1/0/-1 Representation of the polyhedra which needed to be pushed 
+		vector<arma::sp_mat*> &custAi, 		///< Vector wait LHS of constraint matrix should be pushed.
+		vector<arma::vec*> &custbi,			///< Vector wait RHS of constraints should be pushed.
+		const bool convHull, 				///< If @p true convex hull of @e all polyhedra in custAi, custbi will be computed
+		arma::sp_mat *A, 					///< Location where convex hull LHS has to be stored
+		arma::vec  *b						///< Location where convex hull RHS has to be stored
+		)
 {
 	this->FixToPolies(&Fix, false, true, &custAi, &custbi);
 	if(convHull)
@@ -823,6 +832,7 @@ Game::LCP::LCPasQP(bool solve)
  * */
 {
 	this->makeRelaxed();
+	cout<<"Here 0\n";
 	unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
 	GRBQuadExpr obj = 0;
 	GRBVar x[this->nR];
