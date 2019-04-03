@@ -79,6 +79,6 @@ docDetailed:
 edit: 
 	vim -p func.h Games.cpp LCPtoLP.cpp  Models.cpp EPEC.cpp
 
-tags:
+tag:
 	ctags *.cpp *.h
 	@echo "All tags done. Use Ctrl+] to follow a tag in vim and Ctrl+O to go back"

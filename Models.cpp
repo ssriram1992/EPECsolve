@@ -57,8 +57,58 @@ Models::operator<<(ostream& ost, const Models::LeadAllPar P)
 	return ost;
 }
 
+
+ostream& 
+Models::operator<<(ostream& ost, const Models::LeaderVars l)
+{
+	switch(l)
+	{
+		case Models::LeaderVars::FollowerStart:
+			ost<<"Models::LeaderVars::FollowerStart";
+			break;
+		case Models::LeaderVars::NetImport:
+			ost<<"Models::LeaderVars::NetImport";
+			break;
+		case Models::LeaderVars::NetExport:
+			ost<<"Models::LeaderVars::NetExport";
+			break;
+		case Models::LeaderVars::CountryImport:
+			ost<<"Models::LeaderVars::CountryImport";
+			break;
+		case Models::LeaderVars::Tax:
+			ost<<"Models::LeaderVars::Tax";
+			break;
+		case Models::LeaderVars::Caps:
+			ost<<"Models::LeaderVars::Caps";
+			break;
+		case Models::LeaderVars::AddnVar:
+			ost<<"Models::LeaderVars::AddnVar";
+			break;
+		case Models::LeaderVars::ConvHullDummy:
+			ost<<"Models::LeaderVars::ConvHullDummy";
+			break;
+		case Models::LeaderVars::End:
+			ost<<"Models::LeaderVars::End";
+			break;
+		default:
+			cerr<<"Incorrect argument to ostream& operator<<(ostream& ost, const LeaderVars l)";
+	};
+	return ost;
+}
+
+
+
 bool 
-Models::EPEC::ParamValid(const LeadAllPar& Params) const
+Models::EPEC::ParamValid(const LeadAllPar& Params ///< Object whose validity is to be tested
+		) const
+/**
+ * @brief Checks the Validity of Models::LeadAllPar object
+ * @details Checks the following:
+ * 	-	Size of FollowerParam.costs_lin, FollowerParam.costs_quad, FollowerParam.capacities, FollowerParam.emission_costs are all equal to @p Params.n_followers
+ * 	-	@p DemandParam.alpha and @p DemandParam.beta are greater than zero
+ * 	-	@p name is not empty
+ * 	-	@p name does not match with the name of any other existing countries in the EPEC object.
+ */
 {
 	if(Params.n_followers == 0) throw "Error in EPEC::ParamValid(). 0 Followers?";
 	if (Params.FollowerParam.costs_lin.size()			!= Params.n_followers ||
@@ -79,7 +129,15 @@ Models::EPEC::ParamValid(const LeadAllPar& Params) const
 }
 
 void 
-Models::EPEC::make_LL_QP(const LeadAllPar& Params, const unsigned int follower, Game::QP_Param* Foll, const Models::LeadLocs& Loc) const noexcept
+Models::EPEC::make_LL_QP(const LeadAllPar& Params, 	///< The Parameters object
+		const unsigned int follower, 				///< Which follower's QP has to be made?
+		Game::QP_Param* Foll, 						///< Non-owning pointer to the Follower QP_Param object
+		const Models::LeadLocs& Loc					///< LeadLocs object for accessing different leader locations.
+		) const noexcept
+/**
+ * @brief Makes Lower Level Quadratic Programs
+ * @details Sets the constraints and objective for the lower level problem (i.e., the follower)
+ */
 {
 		const unsigned int LeadVars = Loc.at(Models::LeaderVars::End) - Params.n_followers;
 		arma::sp_mat Q(1,1), C(1, LeadVars + Params.n_followers - 1);
@@ -196,7 +254,7 @@ Models::EPEC::addCountry(
 	 * 
 	 * Similarly the leader cannot also impose tax on any player greater than what is dictated by the input variable `max_tax_perc`.
 	 *
-	 * @return Pointer to LCP object dynamically created using `new`.  * *
+	 * @return Pointer to LCP object dynamically created using `new`. 
 	 */
 {
 	bool noError=false;
@@ -250,20 +308,20 @@ Models::EPEC::addCountry(
 			Players.push_back(Foll); 
 		}
 	}
-	catch(const char* e) { cout<<e<<endl;throw; }
-	catch(string e) { cout<<"String in Models::EPEC::addCountry : "<<e<<endl;throw; }
-	catch(GRBException &e) {cout<<"GRBException in Models::EPEC::addCountry : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
-	catch(exception &e) { cout<<"Exception in Models::EPEC::addCountry : "<<e.what()<<endl;throw; }
+	catch(const char* e) { cerr<<e<<endl;throw; }
+	catch(string e) { cerr<<"String in Models::EPEC::addCountry : "<<e<<endl;throw; }
+	catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::addCountry : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+	catch(exception &e) { cerr<<"Exception in Models::EPEC::addCountry : "<<e.what()<<endl;throw; }
 
 	// Make Leader Constraints
 	try
 	{
 		this->make_LL_LeadCons(LeadCons, LeadRHS, Params, Loc, import_lim_cons, export_lim_cons);
 	}
-	catch(const char* e) { cout<<e<<endl;throw; }
-	catch(string e) { cout<<"String: "<<e<<endl;throw; }
-	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
-	catch(exception &e) { cout<<"Exception in Models::EPEC::addCountry : "<<e.what()<<endl;throw; }
+	catch(const char* e) { cerr<<e<<endl;throw; }
+	catch(string e) { cerr<<"String: "<<e<<endl;throw; }
+	catch(GRBException &e) {cerr<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+	catch(exception &e) { cerr<<"Exception in Models::EPEC::addCountry : "<<e.what()<<endl;throw; }
 
 	// Lower level Market clearing constraints - empty
 	arma::sp_mat MC(0, LeadVars+Params.n_followers);
@@ -289,45 +347,42 @@ Models::EPEC::addTranspCosts(const arma::sp_mat& costs)
 		else this->TranspCosts = arma::sp_mat(costs);
 		this->TranspCosts.diag().zeros(); 		// Doesn't make sense for it to have a nonzero diagonal!
 	}
-	catch(const char* e) { cout<<e<<endl;throw; }
-	catch(string e) { cout<<"String in Models::EPEC::addTranspCosts : "<<e<<endl;throw; }
-	catch(GRBException &e) {cout<<"GRBException in Models::EPEC::addTranspCosts : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
-	catch(exception &e) { cout<<"Exception in Models::EPEC::addTranspCosts : "<<e.what()<<endl;throw; }
+	catch(const char* e) { cerr<<e<<endl;throw; }
+	catch(string e) { cerr<<"String in Models::EPEC::addTranspCosts : "<<e<<endl;throw; }
+	catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::addTranspCosts : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+	catch(exception &e) { cerr<<"Exception in Models::EPEC::addTranspCosts : "<<e.what()<<endl;throw; }
 
 	return *this;
 }
 
-Game::LCP* 
-Models::EPEC::playCountry(vector<Game::LCP*> countries) 
-{
-	auto Pi = &this->AllLeadPars;
-	vector<unsigned int> LeadVars(this->nCountries, 0);
-	for(unsigned int i=0;i<this->nCountries;i++)
-		LeadVars.at(i) = 2 + 2*Pi->at(i).n_followers + Pi->at(i).n_followers;		// two for quantity imported and exported, n for imposed cap and last n for tax and finally n_follower number of follower variables
-	return nullptr;
-} 
-
 const 
-Models::EPEC& Models::EPEC::finalize()
+Models::EPEC& 
+Models::EPEC::
+finalize() // Incomplete
 {
-	// To add appropriate number of additional columns to each player's Nash Game.
-	/* 
-	 * Note that if there are n countries, there might at most be n*(n-1) variables.
-	 * Below for loop adds space for each country's quantity imported from variable
-	 */
 	try
 	{
+		/* 
+		 * Below for loop adds space for each country's quantity imported from variable
+		 */
 		this->nImportMarkets = vector<unsigned int> (this->nCountries);
 		for(unsigned int i=0; i<this->nCountries; i++)
 			this->add_Leaders_tradebalance_constraints(i);
+
+		/*
+		 * Now we keep track of where each country's variables start
+		 */
+		this->computeLeaderLocations(true);
 		
-		for(unsigned int i=0; i<this->nCountries; i++)
-			;
+		this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
+		this->add_Dummy_All_Lead();
+		for(unsigned int i=0; i<this->nCountries; i++) // To add the corresponding Market Clearing constraint
+			this->make_MC_leader(i); // This function is bogus and incomplete now.
 	}
-	catch(const char* e) { cout<<e<<endl;throw; }
-	catch(string e) { cout<<"String in Models::EPEC::finalize : "<<e<<endl;throw; }
-	catch(GRBException &e) {cout<<"GRBException in Models::EPEC::finalize : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
-	catch(exception &e) { cout<<"Exception in Models::EPEC::finalize : "<<e.what()<<endl;throw; }
+	catch(const char* e) { cerr<<e<<endl;throw; }
+	catch(string e) { cerr<<"String in Models::EPEC::finalize : "<<e<<endl;throw; }
+	catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::finalize : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+	catch(exception &e) { cerr<<"Exception in Models::EPEC::finalize : "<<e.what()<<endl;throw; }
 	return *this;
 }
 
@@ -354,7 +409,88 @@ void
 Models::EPEC::make_MC_leader(unsigned int i)
 {
 	if (i>=this->nCountries) throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. Bad argument");
-	auto MC_QP = std::make_shared<Game::QP_Param>(this->env);
-	arma::sp_mat C;
-	MC_QP->set({0},std::move(C), {}, {}, {0}, {});
+	try
+	{
+		arma::sp_mat Q(1,1);
+		arma::sp_mat A, B, C; // To define well
+		arma::vec c, b; 	// To define well
+		this->MC_QP.at(i) = make_shared<Game::QP_Param>(this->env);
+		// Note Q = {0}, the MC problem has no constraints. So A=B=b={}. 
+		// this->MC_QP.at(i).get()->set({0},std::move(C), {}, {}, {0}, {});
+	}
+	catch(const char* e) { cerr<<e<<endl;throw; }
+	catch(string e) { cerr<<"String in Models::EPEC::make_MC_leader : "<<e<<endl;throw; }
+	catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::make_MC_leader : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+	catch(exception &e) { cerr<<"Exception in Models::EPEC::make_MC_leader : "<<e.what()<<endl;throw; }
 }
+
+bool 
+Models::EPEC::dataCheck( 
+			bool chkAllLeadPars,
+			bool chkcountriesLL,
+			bool chkMC_QP,
+			bool chkLeadConses,
+			bool chkLeadRHSes,
+			bool chknImportMarkets,
+			bool chkLocations,
+			bool chkLeaderLocations
+		) const
+{
+	if (!chkAllLeadPars && AllLeadPars.size() 			!= this->nCountries) return false;
+	if (!chkcountriesLL && countriesLL.size() 			!= this->nCountries) return false;
+	if (!chkMC_QP && MC_QP.size() 						!= this->nCountries) return false;
+	if (!chkLeadConses && LeadConses.size() 			!= this->nCountries) return false;
+	if (!chkLeadRHSes && LeadRHSes.size() 				!= this->nCountries) return false;
+	if (!chknImportMarkets && nImportMarkets.size() 	!= this->nCountries) return false;
+	if (!chkLocations && Locations.size() 				!= this->nCountries) return false;
+	if (!chkLeaderLocations && LeaderLocations.size() 	!= this->nCountries) return false; 
+	return true;
+}
+
+
+void 
+Models::EPEC::add_Dummy_All_Lead()
+{
+	if(!this->dataCheck())
+		throw string("Error in Models::EPEC::add_Dummy_All_Lead: dataCheck() failed!");
+}
+
+void
+Models::EPEC::computeLeaderLocations(bool addSpaceForMC)
+{
+	this->LeaderLocations = vector<unsigned int> (this->nCountries);
+	this->LeaderLocations.at(0) = 0;
+	for(unsigned int i=1; i<this->nCountries; i++)
+		this->LeaderLocations.at(i) = this->LeaderLocations.at(i-1) + this->Locations.at(i-1).at(Models::LeaderVars::End) 
+			+ (addSpaceForMC?1:0);
+}
+
+
+unsigned int 
+Models::EPEC::getPosition(unsigned int countryCount, Models::LeaderVars var) const
+{
+	if(countryCount > this->nCountries) throw string("Error in Models::EPEC::getPosition: Bad Country Count");
+	return this->LeaderLocations.at(countryCount) + this->Locations.at(countryCount).at(var);
+}
+
+
+unsigned int 
+Models::EPEC::getPosition(string countryName, Models::LeaderVars var) const
+{ 
+	return this->getPosition(name2nos.at(countryName), var);
+}
+
+
+
+/*
+Game::LCP* 
+Models::EPEC::playCountry(vector<Game::LCP*> countries) 
+{
+	auto Pi = &this->AllLeadPars;
+	vector<unsigned int> LeadVars(this->nCountries, 0);
+	for(unsigned int i=0;i<this->nCountries;i++)
+		LeadVars.at(i) = 2 + 2*Pi->at(i).n_followers + Pi->at(i).n_followers;		// two for quantity imported and exported, n for imposed cap and last n for tax and finally n_follower number of follower variables
+	return nullptr;
+} 
+
+*/

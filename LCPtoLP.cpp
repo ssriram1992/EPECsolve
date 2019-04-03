@@ -152,9 +152,7 @@ Game::LCP::makeRelaxed()
 {
 	try
 	{
-		cout<<this->madeRlxdModel<<"Here 1\n";
 		if(this->madeRlxdModel) return ;
-		cout<<"Here 1\n";
 		GRBVar x[nC], z[nR];
 		for(unsigned int i=0;i <nC;i++) x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "x_"+to_string(i));
 		for(unsigned int i=0;i <nR;i++) z[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "z_"+to_string(i));
@@ -166,7 +164,6 @@ Game::LCP::makeRelaxed()
 			expr += q(i);
 			RlxdModel.addConstr(expr, GRB_EQUAL, z[i]);
 		} 
-		cout<<"Here 1\n";
 		// If @f$Ax \leq b@f$ constraints are there, they should be included too!
 		if(this->_A.n_nonzero != 0 || this->_b.n_rows!=0)
 		{ 
@@ -179,7 +176,6 @@ Game::LCP::makeRelaxed()
 				RlxdModel.addConstr(expr, GRB_LESS_EQUAL, _b(i));
 			}
 		}
-		cout<<"Here 1\n";
 		RlxdModel.update();
 		this->madeRlxdModel = true;
 	}
@@ -832,7 +828,6 @@ Game::LCP::LCPasQP(bool solve)
  * */
 {
 	this->makeRelaxed();
-	cout<<"Here 0\n";
 	unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
 	GRBQuadExpr obj = 0;
 	GRBVar x[this->nR];

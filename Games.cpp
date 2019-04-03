@@ -90,7 +90,7 @@ Game::MP_Param::size()
 
 
 Game::MP_Param& 
-Game::MP_Param::set(arma::sp_mat &Q, arma::sp_mat &C, arma::sp_mat &A, arma::sp_mat &B, arma::vec &c, arma::vec &b)
+Game::MP_Param::set(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::sp_mat &A, const arma::sp_mat &B, const arma::vec &c, const arma::vec &b)
 /// Setting the data, while keeping the input objects intact
 {
 	this->Q = (Q); this->C = (C); this->A = (A);
@@ -248,7 +248,7 @@ Game::QP_Param::KKT(arma::sp_mat& M, arma::sp_mat& N, arma::vec& q) const
 
 
 Game::QP_Param& 
-Game::QP_Param::set(arma::sp_mat &Q, arma::sp_mat &C, arma::sp_mat &A, arma::sp_mat &B, arma::vec &c, arma::vec &b)
+Game::QP_Param::set(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::sp_mat &A, const arma::sp_mat &B, const arma::vec &c, const arma::vec &b)
 /// Setting the data, while keeping the input objects intact
 {
 	this->made_yQy = false;
