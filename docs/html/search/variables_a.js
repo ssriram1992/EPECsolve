@@ -6,13 +6,14 @@ var searchData=
   ['name2nos',['name2nos',['../classModels_1_1EPEC.html#ab653845500f19aad0ee7c352e80f8af6',1,'Models::EPEC']]],
   ['names',['names',['../structModels_1_1FollPar.html#a24bde6b28a0fab1b339c016fb97685da',1,'Models::FollPar']]],
   ['nc',['nC',['../classGame_1_1LCP.html#abeaadbce4a891d3575dddae796592c72',1,'Game::LCP']]],
-  ['ncons',['Ncons',['../classGame_1_1QP__Param.html#a0ca0d12f48d0834e1f429c4c62a0cd15',1,'Game::QP_Param']]],
+  ['ncons',['Ncons',['../classGame_1_1MP__Param.html#a786341129b4f7a0501ab1784cac70c9e',1,'Game::MP_Param']]],
   ['ncountr',['nCountr',['../classModels_1_1EPEC.html#a0462c4b21023103ca4bd744346dae048',1,'Models::EPEC']]],
   ['ncountries',['nCountries',['../classModels_1_1EPEC.html#ab393e65ef5be6c9e3c5129f8866dbc49',1,'Models::EPEC']]],
   ['nimportmarkets',['nImportMarkets',['../classModels_1_1EPEC.html#a9ab0c5070d9674c16e9b80e469eac6af',1,'Models::EPEC']]],
   ['nleader',['nLeader',['../classGame_1_1LCP.html#acc5cd4f8090d141b0ced7ec47293f755',1,'Game::LCP']]],
   ['nplayers',['Nplayers',['../classGame_1_1NashGame.html#a733771a2b0554100a9c50b78ee2f13e4',1,'Game::NashGame']]],
   ['nr',['nR',['../classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d',1,'Game::LCP']]],
-  ['nx',['Nx',['../classGame_1_1QP__Param.html#a16c78fa2a2308bfa70d5075d0610d825',1,'Game::QP_Param']]],
-  ['ny',['Ny',['../classGame_1_1QP__Param.html#a6d17148b5e8111118a5316d98bdaf4e9',1,'Game::QP_Param']]]
+  ['nvarinepec',['nVarinEPEC',['../classModels_1_1EPEC.html#a0e46d5aee2a7bf675775d3354520036f',1,'Models::EPEC']]],
+  ['nx',['Nx',['../classGame_1_1MP__Param.html#aac9e6425fcc953b69c7aae411f011e58',1,'Game::MP_Param']]],
+  ['ny',['Ny',['../classGame_1_1MP__Param.html#ab889087a490f40f114002c92fea62b2d',1,'Game::MP_Param']]]
 ];

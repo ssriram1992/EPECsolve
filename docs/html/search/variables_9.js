@@ -6,5 +6,6 @@ var searchData=
   ['marketclearing',['MarketClearing',['../classGame_1_1NashGame.html#a77402999e8c65c0e8b406dd20e95f534',1,'Game::NashGame']]],
   ['max_5ftax_5fperc',['max_tax_perc',['../structModels_1_1LeadPar.html#a88b1584e5f7f37307a569ea5b84e5d06',1,'Models::LeadPar']]],
   ['mc_5fdual_5fposition',['MC_dual_position',['../classGame_1_1NashGame.html#a5bf91b8e4cb719def5c4ef8b92d3b157',1,'Game::NashGame']]],
+  ['mc_5fqp',['MC_QP',['../classModels_1_1EPEC.html#a11b212ad1bc65ad020fb8601e302c931',1,'Models::EPEC']]],
   ['mcrhs',['MCRHS',['../classGame_1_1NashGame.html#a61332b6f39e1dff806c15e5b4f831634',1,'Game::NashGame']]]
 ];

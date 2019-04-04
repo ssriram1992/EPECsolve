@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['varlocdetails',['VarLocDetails',['../classModels_1_1VarLocDetails.html',1,'Models']]]
+  ['qp_5fparam',['QP_Param',['../classGame_1_1QP__Param.html',1,'Game']]]
 ];
