@@ -33,6 +33,7 @@ var menudata={children:[
 {text:"Data Structures",url:"annotated.html",children:[
 {text:"Data Structures",url:"annotated.html"},
 {text:"Data Structure Index",url:"classes.html"},
+{text:"Class Hierarchy",url:"hierarchy.html"},
 {text:"Data Fields",url:"functions.html",children:[
 {text:"All",url:"functions.html",children:[
 {text:"_",url:"functions.html#index__5F"},
@@ -54,6 +55,7 @@ var menudata={children:[
 {text:"r",url:"functions.html#index_r"},
 {text:"s",url:"functions.html#index_s"},
 {text:"t",url:"functions.html#index_t"},
+{text:"u",url:"functions.html#index_u"},
 {text:"~",url:"functions.html#index__7E"}]},
 {text:"Functions",url:"functions_func.html",children:[
 {text:"a",url:"functions_func.html#index_a"},
@@ -72,6 +74,7 @@ var menudata={children:[
 {text:"q",url:"functions_func.html#index_q"},
 {text:"r",url:"functions_func.html#index_r"},
 {text:"s",url:"functions_func.html#index_s"},
+{text:"u",url:"functions_func.html#index_u"},
 {text:"~",url:"functions_func.html#index__7E"}]},
 {text:"Variables",url:"functions_vars.html",children:[
 {text:"_",url:"functions_vars.html#index__5F"},

@@ -23,10 +23,10 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 	{
 		epec.addCountry(LA, 0).addCountry(LA2, 0).addTranspCosts(TrCo).finalize();
 	} 
-	catch(const char* e) { cout<<e<<endl;throw; }
-	catch(string e) { cout<<"String: "<<e<<endl;throw; }
-	catch(exception &e) { cout<<"Exception: "<<e.what()<<endl;throw; }
-	catch(GRBException &e) {cout<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+	catch(const char* e) { cerr<<e<<endl;throw; }
+	catch(string e) { cerr<<"String: "<<e<<endl;throw; }
+	catch(exception &e) { cerr<<"Exception: "<<e.what()<<endl;throw; }
+	catch(GRBException &e) {cerr<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
 	return 0;
 }
 
@@ -44,10 +44,12 @@ int main()
 	Models::LeadAllPar LA(3, "A", FP);
 	Models::LeadAllPar LA2(3, "B", FP, {60,1});
 	// cout<<LA<<LA2;
-	cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
+	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
 	arma::mat TrCo(2,2); 
 	TrCo << 0 << 1<< arma::endr << 2 <<0;
 	LCPtest(LA, LA2, arma::sp_mat(TrCo));
+
+
 	return 0;
 }
 

@@ -252,7 +252,7 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p>Class to handle and solve linear complementarity problems. </p>
 <p>A class to handle linear complementarity problems (<a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>) especially as MIPs with bigM constraints Also provides the convex hull of the feasible space, restricted feasible space etc. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00234">234</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00262">262</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8f354ec1846b682d4e8d526c4408e702"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8f354ec1846b682d4e8d526c4408e702">&#9670;&nbsp;</a></span>LCP() <span class="overload">[1/4]</span></h2>
@@ -539,7 +539,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00813">813</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00809">809</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -582,7 +582,7 @@ Private Attributes</h2></td></tr>
 <p><b>GrandParent:</b> Either the same value as the grand child, or has 0 in that location</p>
 <p><b>Grandchild:</b> Same val as grand parent in every location, except any val allowed, if grandparent is 0 </p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00485">485</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00481">481</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -630,7 +630,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00552">552</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00548">548</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -652,7 +652,7 @@ Private Attributes</h2></td></tr>
 <p>Calls the complete branch and prune for <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> object. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="classGame_1_1LCP.html#a7195e4ed0094fb413a18db3f743c8eda" title="LCP feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equ...">LCP::AllPolyhedra</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00607">607</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00603">603</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -694,7 +694,7 @@ Private Attributes</h2></td></tr>
 <p>Solves a gurobi model at some point in the branch and prune tree. From there, uses a heuristic to find the complementarity equation where the branching is to be done and information on whether the exploration is go inside the "equation" side of the branch or the "variable" side of the branch. Currently, the largest non-zero value is the value which would be forced to be zero (with the hope infeasibility would be identified fast). </p><dl class="section note"><dt>Note</dt><dd>This can be vastly improved with better branching rules. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>signed int</code> that details where branching has to be done. A positive value implies, branching will be on equation, a negative value implies branching will be on variable. As an exception, 0 implies branching on first eqn and <code> - <a class="el" href="classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d">LCP::nR</a></code> implies branching on first equation. A return value of <code><a class="el" href="classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d">LCP::nR</a></code> implies that the node is infeasible and that there is no point in branching. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00621">621</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00617">617</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -735,7 +735,7 @@ Private Attributes</h2></td></tr>
 <p>Branching choice, if we are at a processed node. </p>
 <p>When at processed node, we know that the node definitely has a feasible descendent. This just finds the first unbranched complementarity equation and branches there. </p><dl class="section return"><dt>Returns</dt><dd>Branch location if not at leaf and <a class="el" href="classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d">LCP::nR</a> if at leaf. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00675">675</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00671">671</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -782,7 +782,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00316">316</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00344">344</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -850,7 +850,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00797">797</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00793">793</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -885,7 +885,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00327">327</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00323">323</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -940,7 +940,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00501">501</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00497">497</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1009,7 +1009,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00764">764</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00760">760</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1078,7 +1078,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00698">698</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00694">694</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1107,7 +1107,7 @@ Private Attributes</h2></td></tr>
 
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a6dbcd747d3b7a82fcd9079916da001df" title="Compl stores data in &lt;Eqn, Var&gt; form.">LCP::Compl</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00273">273</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00301">301</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1136,7 +1136,7 @@ Private Attributes</h2></td></tr>
 
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a5842889dd444dceda535c0e464775d80">LCP::LeadEnd</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00272">272</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00300">300</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1165,7 +1165,7 @@ Private Attributes</h2></td></tr>
 
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a3626cacccb0d8ab0e1a88f8f1a3659f9">LCP::LeadStart</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00271">271</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00299">299</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1195,7 +1195,7 @@ Private Attributes</h2></td></tr>
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4" title="M in  that defines the LCP.">LCP::M</a>. </p>
 <p>Return data and address </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00267">267</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00295">295</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1224,7 +1224,7 @@ Private Attributes</h2></td></tr>
 
 <p>Pointer access to <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4" title="M in  that defines the LCP.">LCP::M</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00268">268</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00296">296</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1253,7 +1253,7 @@ Private Attributes</h2></td></tr>
 
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356" title="q in  that defines the LCP">LCP::q</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00269">269</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00297">297</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1282,7 +1282,7 @@ Private Attributes</h2></td></tr>
 
 <p>Pointer access to <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356" title="q in  that defines the LCP">LCP::q</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00270">270</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00298">298</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1312,7 +1312,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00291">291</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00319">319</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1362,7 +1362,7 @@ template&lt;class T &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00225">225</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00221">221</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1414,7 +1414,7 @@ Note that the model returned by this function has to be explicitly deleted using
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00193">193</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00189">189</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1434,7 +1434,7 @@ Note that the model returned by this function has to be explicitly deleted using
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00866">866</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00861">861</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1488,7 +1488,7 @@ Note that the model returned by this function has to be explicitly deleted using
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00254">254</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00250">250</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1543,7 +1543,7 @@ Note that the model returned by this function has to be explicitly deleted using
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00277">277</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00273">273</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1567,7 +1567,7 @@ Note that the model returned by this function has to be explicitly deleted using
 <p>Removes all complementarity constraints from the QP's constraints. Instead, the sum of products of complementarity pairs is minimized. If the optimal value turns out to be 0, then it is actually a solution of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>. Else the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> is infeasible. <br  />
 </p><dl class="section warning"><dt>Warning</dt><dd>Solves the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> feasibility problem. Not the MPEC optimization problem. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00828">828</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00824">824</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1639,7 +1639,7 @@ Note that the model returned by this function has to be explicitly deleted using
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00873">873</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00868">868</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1688,7 +1688,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </div><div class="memdoc">
 <p>Note that if the matrix Q is a zero matrix, then this returns a Gurobi MILP model as opposed to MIQP model. This enables Gurobi to use its much advanced MIP solver</p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00895">895</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00890">890</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1710,7 +1710,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>Print a summary of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00348">348</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00344">344</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1758,7 +1758,7 @@ Note that the model returned by this function has to be explicitly deleted using
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00525">525</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00521">521</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1789,7 +1789,7 @@ Note that the model returned by this function has to be explicitly deleted using
 <p>Given a Gurobi model, extracts variable values and equation values, encodes it in 0/+1/-1 format and returns it. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Note that the vector returned by this function might have to be explicitly deleted using the delete operator. For specific uses in <a class="el" href="classGame_1_1LCP.html#aafa5c1781e87b7eaaf510a513cf6c05a" title="Calls the complete branch and prune for LCP object.">LCP::BranchAndPrune</a>, this delete is handled by the class destructor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00542">542</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00538">538</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1814,7 +1814,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00243">243</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00271">271</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1840,7 +1840,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>Apart from <img class="formulaInl" alt="$0 \le x \perp Mx+q\ge 0$" src="form_3.png"/>, one needs <img class="formulaInl" alt="$ Ax\le b$" src="form_4.png"/> too! </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00243">243</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00271">271</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1864,7 +1864,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00249">249</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00277">277</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1890,7 +1890,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p><a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00248">248</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00276">276</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1914,7 +1914,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00249">249</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00277">277</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1932,7 +1932,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>bigM used to rewrite the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> as MIP </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00253">253</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00281">281</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1958,7 +1958,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>Compl stores data in &lt;Eqn, Var&gt; form. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00241">241</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00269">269</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1984,7 +1984,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>Gurobi env. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00238">238</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00266">266</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2002,7 +2002,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>The threshold, below which a number would be considered to be zero. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00254">254</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00282">282</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2026,7 +2026,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00242">242</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00270">270</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2050,7 +2050,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00242">242</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00270">270</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2076,7 +2076,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>M in <img class="formulaInl" alt="$Mx+q$" src="form_2.png"/> that defines the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00239">239</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00267">267</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2102,7 +2102,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>Keep track if <a class="el" href="classGame_1_1LCP.html#a187fe2df5192bc2354944d807a361333" title="A gurobi model with all complementarity constraints removed.">LCP::RlxdModel</a> is made. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00245">245</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00273">273</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2126,7 +2126,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00246">246</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00274">274</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2150,7 +2150,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00242">242</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00270">270</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2174,7 +2174,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00246">246</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00274">274</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2200,7 +2200,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>q in <img class="formulaInl" alt="$Mx+q$" src="form_2.png"/> that defines the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00240">240</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00268">268</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2224,7 +2224,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00249">249</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00277">277</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2248,7 +2248,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00249">249</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00277">277</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2272,7 +2272,7 @@ Note that the model returned by this function has to be explicitly deleted using
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00248">248</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00276">276</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2298,7 +2298,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>A gurobi model with all complementarity constraints removed. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00250">250</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00278">278</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>

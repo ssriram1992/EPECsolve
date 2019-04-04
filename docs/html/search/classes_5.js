@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['qp_5fparam',['QP_Param',['../classGame_1_1QP__Param.html',1,'Game']]]
+  ['nashgame',['NashGame',['../classGame_1_1NashGame.html',1,'Game']]]
 ];
