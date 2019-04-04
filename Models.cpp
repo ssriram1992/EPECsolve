@@ -257,6 +257,9 @@ Models::EPEC::addCountry(
 	 * @return Pointer to LCP object dynamically created using `new`. 
 	 */
 {
+
+	if(this->finalized) throw string("Error in Models::EPEC::addCountry: EPEC object finalized. Call EPEC::unlock() to unlock this object first and then edit.");
+
 	bool noError=false;
 	try { noError = this->ParamValid(Params); }
 	catch(const char* e) { cerr<<"Error in Models::EPEC::addCountry: "<<e<<endl; }
@@ -341,6 +344,7 @@ Models::EPEC::addCountry(
 Models::EPEC& 
 Models::EPEC::addTranspCosts(const arma::sp_mat& costs)
 {
+	if(this->finalized) throw string("Error in Models::EPEC::addTranspCosts: EPEC object finalized. Call EPEC::unlock() to unlock this object first and then edit.");
 	try
 	{
 		if(this->nCountries!=costs.n_rows || this->nCountries!=costs.n_cols) throw "Error in EPEC::addTranspCosts. Invalid size of Q";
@@ -358,8 +362,9 @@ Models::EPEC::addTranspCosts(const arma::sp_mat& costs)
 const 
 Models::EPEC& 
 Models::EPEC::
-finalize() // Incomplete
+finalize() 
 {
+	if(this->finalized) cerr<<"Warning in Models::EPEC::finalize: Model already finalized\n";
 	try
 	{
 		/* 
@@ -375,14 +380,17 @@ finalize() // Incomplete
 		this->computeLeaderLocations(true);
 		
 		this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
-		this->add_Dummy_All_Lead();
 		for(unsigned int i=0; i<this->nCountries; i++) // To add the corresponding Market Clearing constraint
-			this->make_MC_leader(i); // This function is bogus and incomplete now.
+		{
+			this->add_Dummy_Lead(i);
+			this->make_MC_leader(i); 
+		}
 	}
 	catch(const char* e) { cerr<<e<<endl;throw; }
 	catch(string e) { cerr<<"String in Models::EPEC::finalize : "<<e<<endl;throw; }
 	catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::finalize : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
 	catch(exception &e) { cerr<<"Exception in Models::EPEC::finalize : "<<e.what()<<endl;throw; }
+	this->finalized = true;
 	return *this;
 }
 
@@ -391,32 +399,62 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 { 
 	if (i>=this->nCountries) throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. Bad argument");
 	int nImp = 0;
+	LeadLocs &Loc = this->Locations.at(i);
 	// Counts the number of countries from which the current country imports
 	for(auto val=TranspCosts.begin_col(i); val!=TranspCosts.end_col(i); ++val) nImp++;
 	// substitutes that answer to nImportMarkets at the current position
 	this->nImportMarkets.at(i) = (nImp);
 	// Adding the constraint that the sum of imports from all countries equals total imports
-	arma::vec a(nImp + this->countriesLL.at(i)->getNprimals(), arma::fill::zeros);
-	const auto n_followers = this->AllLeadPars.at(i).n_followers;
-	a.at(n_followers) = -1; 
+	arma::vec a(nImp + Loc.at(Models::LeaderVars::End), arma::fill::zeros);
+	a.at(Loc.at(Models::LeaderVars::NetImport)) = -1;
 	a.tail(nImp) = 1;
 	this->countriesLL.at(i)->addDummy(nImp).addLeadCons(a, 0).addLeadCons(-a,0);
-	Locations.at(i)[Models::LeaderVars::CountryImport] = Locations.at(i).at(Models::LeaderVars::End);
-	Locations.at(i).at(Models::LeaderVars::End) += nImp;
+	// Updating the variable locations
+	Loc[Models::LeaderVars::CountryImport] = Loc.at(Models::LeaderVars::End);
+	Loc.at(Models::LeaderVars::End) += nImp;
 }
 
 void 
-Models::EPEC::make_MC_leader(unsigned int i)
+Models::EPEC::make_MC_leader(const unsigned int i)
 {
-	if (i>=this->nCountries) throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. Bad argument");
+	if (i>=this->nCountries) cout<<i<<" "<<this->nCountries<<endl;//throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. Bad argument");
 	try
 	{
-		arma::sp_mat Q(1,1);
-		arma::sp_mat A, B, C; // To define well
-		arma::vec c, b; 	// To define well
+		const arma::sp_mat &TrCo = this->TranspCosts;
+		const unsigned int nEPECvars = this->nVarinEPEC;
+		const unsigned int nThisMCvars = 1;
+		arma::sp_mat C(nThisMCvars, nEPECvars-nThisMCvars);
+
+
+		C.at(0, this->getPosition(i, Models::LeaderVars::NetExport)) = 1;
+
+		for(auto val=TrCo.begin_row(i); val!=TrCo.end_row(i); ++val)
+		{
+			const unsigned int j = val.col(); // This is the country from which is importing from "i"
+			unsigned int count{0};
+
+			for(auto val2=TrCo.begin_col(j); val2!=TrCo.end_col(j); ++val2) 
+			// What position in the list of j's impoting from countries  does i fall in?
+			{ 
+				if(val2.row() == i) break;
+				else count++;
+			} 
+
+			C.at(0, this->getPosition(j, 
+						Models::LeaderVars::CountryImport)+ count
+							- (j>=i?nThisMCvars:0)) = 1;
+		} 
+
 		this->MC_QP.at(i) = make_shared<Game::QP_Param>(this->env);
-		// Note Q = {0}, the MC problem has no constraints. So A=B=b={}. 
-		// this->MC_QP.at(i).get()->set({0},std::move(C), {}, {}, {0}, {});
+		// Note Q = {{0}}, c={0}, the MC problem has no constraints. So A=B={{}}, b={}. 
+		this->MC_QP.at(i).get()->set(
+				arma::sp_mat{1,1},						// Q
+				std::move(C), 							// C
+				arma::sp_mat{0,nEPECvars-nThisMCvars}, 	// A
+				arma::sp_mat{0,nThisMCvars}, 			// B
+				arma::vec{0}, 							// c
+				arma::vec{}								// b
+				);
 	}
 	catch(const char* e) { cerr<<e<<endl;throw; }
 	catch(string e) { cerr<<"String in Models::EPEC::make_MC_leader : "<<e<<endl;throw; }
@@ -426,14 +464,14 @@ Models::EPEC::make_MC_leader(unsigned int i)
 
 bool 
 Models::EPEC::dataCheck( 
-			bool chkAllLeadPars,
-			bool chkcountriesLL,
-			bool chkMC_QP,
-			bool chkLeadConses,
-			bool chkLeadRHSes,
-			bool chknImportMarkets,
-			bool chkLocations,
-			bool chkLeaderLocations
+			const bool chkAllLeadPars,
+			const bool chkcountriesLL,
+			const bool chkMC_QP,
+			const bool chkLeadConses,
+			const bool chkLeadRHSes,
+			const bool chknImportMarkets,
+			const bool chkLocations,
+			const bool chkLeaderLocations
 		) const
 {
 	if (!chkAllLeadPars && AllLeadPars.size() 			!= this->nCountries) return false;
@@ -444,43 +482,66 @@ Models::EPEC::dataCheck(
 	if (!chknImportMarkets && nImportMarkets.size() 	!= this->nCountries) return false;
 	if (!chkLocations && Locations.size() 				!= this->nCountries) return false;
 	if (!chkLeaderLocations && LeaderLocations.size() 	!= this->nCountries) return false; 
+	if (!chkLeaderLocations && this->nVarinEPEC 		== 0)				 return false;
 	return true;
 }
 
-
 void 
-Models::EPEC::add_Dummy_All_Lead()
+Models::EPEC::add_Dummy_Lead(const unsigned int i)
 {
-	if(!this->dataCheck())
-		throw string("Error in Models::EPEC::add_Dummy_All_Lead: dataCheck() failed!");
+	if(!this->dataCheck()) throw string("Error in Models::EPEC::add_Dummy_All_Lead: dataCheck() failed!");
+
+	const unsigned int nEPECvars = this->nVarinEPEC;
+	const unsigned int nThisCountryvars = this->Locations.at(i).at(Models::LeaderVars::End);
+
+	try
+	{
+		this->countriesLL.at(i).get()->addDummy(nEPECvars - nThisCountryvars);
+	}
+	catch(const char* e) { cerr<<e<<endl;throw; }
+	catch(string e) { cerr<<"String in Models::EPEC::add_Dummy_All_Lead : "<<e<<endl;throw; }
+	catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::add_Dummy_All_Lead : "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+	catch(exception &e) { cerr<<"Exception in Models::EPEC::add_Dummy_All_Lead : "<<e.what()<<endl;throw; }
 }
 
 void
-Models::EPEC::computeLeaderLocations(bool addSpaceForMC)
+Models::EPEC::computeLeaderLocations(const bool addSpaceForMC)
 {
 	this->LeaderLocations = vector<unsigned int> (this->nCountries);
 	this->LeaderLocations.at(0) = 0;
 	for(unsigned int i=1; i<this->nCountries; i++)
-		this->LeaderLocations.at(i) = this->LeaderLocations.at(i-1) + this->Locations.at(i-1).at(Models::LeaderVars::End) 
-			+ (addSpaceForMC?1:0);
+		this->LeaderLocations.at(i) = this->getPosition(i-1, Models::LeaderVars::End) + (addSpaceForMC?1:0);
+	this->nVarinEPEC = this->getPosition(this->nCountries-1, Models::LeaderVars::End) + (addSpaceForMC?1:0);
 }
 
-
 unsigned int 
-Models::EPEC::getPosition(unsigned int countryCount, Models::LeaderVars var) const
+Models::EPEC::getPosition(const unsigned int countryCount, const Models::LeaderVars var) const
 {
 	if(countryCount > this->nCountries) throw string("Error in Models::EPEC::getPosition: Bad Country Count");
 	return this->LeaderLocations.at(countryCount) + this->Locations.at(countryCount).at(var);
 }
 
-
 unsigned int 
-Models::EPEC::getPosition(string countryName, Models::LeaderVars var) const
+Models::EPEC::getPosition(const string countryName, const Models::LeaderVars var) const
 { 
 	return this->getPosition(name2nos.at(countryName), var);
 }
 
+Game::NashGame* 
+Models::EPEC::get_LowerLevelNash(const unsigned int i) const
+{
+	return this->countriesLL.at(i).get();
+}
 
+Models::EPEC&
+Models::EPEC::unlock()
+/**
+ * A finalized model cannot be edited unless it is unlocked first!
+ */
+{
+	this->finalized=false; 
+	return *this;
+}
 
 /*
 Game::LCP* 

@@ -101,6 +101,7 @@ class MP_Param
 
 ///@brief Class to handle parameterized quadratic programs(QP)
 class QP_Param:public MP_Param
+// Shape of C is Ny\times Nx
 /**
  * Represents a Parameterized QP as \f[
  * \min_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y
@@ -436,20 +437,21 @@ class EPEC
 		vector<LeadAllPar> AllLeadPars = {};  ///< The parameters of each leader in the EPEC game
 		vector<shared_ptr<Game::NashGame>> countriesLL = {}; ///< Stores each country's lower level Nash game
 		vector<shared_ptr<Game::QP_Param>> MC_QP = {}; 	///< The QP corresponding to the market clearing condition of each player
-		vector<arma::sp_mat> LeadConses = {}; ///< Stores each country's leader constraint LHS
-		vector<arma::vec> LeadRHSes = {}; ///< Stores each country's leader constraint RHS
-		arma::sp_mat TranspCosts = {};		///< Transportation costs between pairs of countries
+		vector<arma::sp_mat> LeadConses = {}; 		///< Stores each country's leader constraint LHS
+		vector<arma::vec> LeadRHSes = {}; 			///< Stores each country's leader constraint RHS
+		arma::sp_mat TranspCosts = {};				///< Transportation costs between pairs of countries
 		vector<unsigned int> nImportMarkets = {}; 	///< Number of countries from which the i-th country imports
-		vector<LeadLocs> Locations = {};					///< Location of variables for each country
+		vector<LeadLocs> Locations = {};			///< Location of variables for each country
 		vector<unsigned int> LeaderLocations = {}; 	///< Location of each leader
+		unsigned int nVarinEPEC{0};
 	private:
 		GRBEnv *env;		///< A gurobi environment to create and process the resulting LCP object.
 		map<string, unsigned int> name2nos = {};
 		bool finalized = false;
 		unsigned int nCountr = 0;
-		bool dataCheck(bool chkAllLeadPars=true, bool chkcountriesLL=true, bool chkMC_QP=true, 
-				bool chkLeadConses=true, bool chkLeadRHSes=true, bool chknImportMarkets=true, 
-				bool chkLocations=true, bool chkLeaderLocations=true) const;
+		bool dataCheck(const bool chkAllLeadPars=true, const bool chkcountriesLL=true, const bool chkMC_QP=true, 
+				const bool chkLeadConses=true, const bool chkLeadRHSes=true, const bool chknImportMarkets=true, 
+				const bool chkLocations=true, const bool chkLeaderLocations=true) const;
 	public: // Attributes
 		const unsigned int& nCountries{nCountr}; ///< Constant attribute for number of leaders in the EPEC
 	public:
@@ -472,9 +474,9 @@ class EPEC
 				const unsigned int price_lim_cons=1
 				) const noexcept;
 		void add_Leaders_tradebalance_constraints(const unsigned int i);
-		void make_MC_leader(unsigned int i);
-		void computeLeaderLocations(bool addSpaceForMC = false);
-		void add_Dummy_All_Lead();
+		void make_MC_leader(const unsigned int i);
+		void computeLeaderLocations(const bool addSpaceForMC = false);
+		void add_Dummy_Lead(const unsigned int i);
 	public:
 		///@brief %Models a Standard Nash-Cournot game within a country
 		EPEC& addCountry(
@@ -485,11 +487,12 @@ class EPEC
 				);
 		EPEC& addTranspCosts(const arma::sp_mat& costs);
 		const EPEC& finalize();
-		unsigned int getPosition(unsigned int countryCount, LeaderVars var = LeaderVars::FollowerStart) const;
-		unsigned int getPosition(string countryCount, LeaderVars var = LeaderVars::FollowerStart) const;
+		unsigned int getPosition(const unsigned int countryCount, const LeaderVars var = LeaderVars::FollowerStart) const;
+		unsigned int getPosition(const string countryCount, const LeaderVars var = LeaderVars::FollowerStart) const;
+		EPEC& unlock();
 	public:
 		// Data access methods
-		Game::NashGame* get_LowerLevelNash(unsigned int i); 
+		Game::NashGame* get_LowerLevelNash(const unsigned int i) const;
 		Game::LCP* playCountry(vector<Game::LCP*> countries);
 };
 
