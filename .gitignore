@@ -10,6 +10,7 @@ LCPTree.cpp
 *.o
 sand
 sand.cpp
+Session.vim
 *.swp
 tags
 *.txt

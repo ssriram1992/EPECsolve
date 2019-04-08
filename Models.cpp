@@ -330,9 +330,9 @@ Models::EPEC::addCountry(
 	arma::sp_mat MC(0, LeadVars+Params.n_followers);
 	arma::vec MCRHS(0, arma::fill::zeros);
 
-	auto N = make_shared<Game::NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
-	this->name2nos[Params.name] = this->countriesLL.size();
-	this->countriesLL.push_back(N);
+	auto N = std::make_shared<Game::NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
+	this->name2nos[Params.name] = this->countries_LL.size();
+	this->countries_LL.push_back(N);
 	this->LeadConses.push_back(N->RewriteLeadCons());
 	this->AllLeadPars.push_back(Params);
 	nCountr++;
@@ -382,8 +382,10 @@ finalize()
 		this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
 		for(unsigned int i=0; i<this->nCountries; i++) // To add the corresponding Market Clearing constraint
 		{
+			Game::QP_objective QP_obj;
 			this->add_Dummy_Lead(i);
 			this->make_MC_leader(i); 
+			this->make_obj_leader(i, QP_obj);
 		}
 	}
 	catch(const char* e) { cerr<<e<<endl;throw; }
@@ -408,7 +410,7 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 	arma::vec a(nImp + Loc.at(Models::LeaderVars::End), arma::fill::zeros);
 	a.at(Loc.at(Models::LeaderVars::NetImport)) = -1;
 	a.tail(nImp) = 1;
-	this->countriesLL.at(i)->addDummy(nImp).addLeadCons(a, 0).addLeadCons(-a,0);
+	this->countries_LL.at(i)->addDummy(nImp).addLeadCons(a, 0).addLeadCons(-a,0);
 	// Updating the variable locations
 	Loc[Models::LeaderVars::CountryImport] = Loc.at(Models::LeaderVars::End);
 	Loc.at(Models::LeaderVars::End) += nImp;
@@ -445,7 +447,7 @@ Models::EPEC::make_MC_leader(const unsigned int i)
 							- (j>=i?nThisMCvars:0)) = 1;
 		} 
 
-		this->MC_QP.at(i) = make_shared<Game::QP_Param>(this->env);
+		this->MC_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
 		// Note Q = {{0}}, c={0}, the MC problem has no constraints. So A=B={{}}, b={}. 
 		this->MC_QP.at(i).get()->set(
 				arma::sp_mat{1,1},						// Q
@@ -465,7 +467,7 @@ Models::EPEC::make_MC_leader(const unsigned int i)
 bool 
 Models::EPEC::dataCheck( 
 			const bool chkAllLeadPars,
-			const bool chkcountriesLL,
+			const bool chkcountries_LL,
 			const bool chkMC_QP,
 			const bool chkLeadConses,
 			const bool chkLeadRHSes,
@@ -475,7 +477,7 @@ Models::EPEC::dataCheck(
 		) const
 {
 	if (!chkAllLeadPars && AllLeadPars.size() 			!= this->nCountries) return false;
-	if (!chkcountriesLL && countriesLL.size() 			!= this->nCountries) return false;
+	if (!chkcountries_LL && countries_LL.size() 			!= this->nCountries) return false;
 	if (!chkMC_QP && MC_QP.size() 						!= this->nCountries) return false;
 	if (!chkLeadConses && LeadConses.size() 			!= this->nCountries) return false;
 	if (!chkLeadRHSes && LeadRHSes.size() 				!= this->nCountries) return false;
@@ -496,7 +498,7 @@ Models::EPEC::add_Dummy_Lead(const unsigned int i)
 
 	try
 	{
-		this->countriesLL.at(i).get()->addDummy(nEPECvars - nThisCountryvars);
+		this->countries_LL.at(i).get()->addDummy(nEPECvars - nThisCountryvars);
 	}
 	catch(const char* e) { cerr<<e<<endl;throw; }
 	catch(string e) { cerr<<"String in Models::EPEC::add_Dummy_All_Lead : "<<e<<endl;throw; }
@@ -530,17 +532,53 @@ Models::EPEC::getPosition(const string countryName, const Models::LeaderVars var
 Game::NashGame* 
 Models::EPEC::get_LowerLevelNash(const unsigned int i) const
 {
-	return this->countriesLL.at(i).get();
+	return this->countries_LL.at(i).get();
 }
 
 Models::EPEC&
 Models::EPEC::unlock()
 /**
- * A finalized model cannot be edited unless it is unlocked first!
+ * @brief Unlocks an EPEC model
+ * @details A finalized model cannot be edited unless it is unlocked first. 
+ * @internal EPEC::finalize() performs "finalizing" acts on an object.
+ * @warning Exclusively for debugging purposes for developers. Don't call this function, unless you know what you are doing. 
  */
 {
 	this->finalized=false; 
 	return *this;
+}
+
+
+void 
+Models::EPEC::make_obj_leader(const unsigned int i, 
+		Game::QP_objective &QP_obj
+		)
+{
+	const unsigned int nEPECvars = this->nVarinEPEC;
+	const unsigned int nThisCountryvars = this->Locations.at(i).at(Models::LeaderVars::End);
+	const LeadAllPar &Params = this->AllLeadPars.at(i);
+	const arma::sp_mat &TrCo = this->TranspCosts;
+	const LeadLocs &Loc = this->Locations.at(i);
+
+	QP_obj.Q.set_size(nEPECvars-nThisCountryvars, nEPECvars-nThisCountryvars);
+	QP_obj.c.set_size(nThisCountryvars);
+	QP_obj.C.set_size(nThisCountryvars, nEPECvars);
+	// emission term
+	for(unsigned int j = Loc.at(Models::LeaderVars::FollowerStart), count=0;
+			count < Params.n_followers;
+			j++, count++)
+		QP_obj.c.at(j) = Params.FollowerParam.emission_costs.at(count);
+	// export revenue term
+	QP_obj.C(Loc.at(Models::LeaderVars::NetExport), 
+		this->getPosition(i, Models::LeaderVars::End) - nThisCountryvars)  = -1;
+	// Import cost term.  
+	unsigned int count{0};
+	for(auto val=TrCo.begin_col(i); val!=TrCo.end_col(i); ++val, ++count)
+	{ 
+		QP_obj.c.at(Loc.at(Models::LeaderVars::CountryImport)+count) = (*val);
+		QP_obj.C.at(Loc.at(Models::LeaderVars::CountryImport)+count,
+				this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
+	}
 }
 
 /*
@@ -553,5 +591,7 @@ Models::EPEC::playCountry(vector<Game::LCP*> countries)
 		LeadVars.at(i) = 2 + 2*Pi->at(i).n_followers + Pi->at(i).n_followers;		// two for quantity imported and exported, n for imposed cap and last n for tax and finally n_follower number of follower variables
 	return nullptr;
 } 
+
+
 
 */

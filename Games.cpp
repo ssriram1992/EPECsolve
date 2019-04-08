@@ -111,6 +111,17 @@ Game::MP_Param::set(arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma::
 	return *this;
 }
 
+Game::MP_Param& 
+Game::MP_Param::set(const QP_objective &obj, const QP_constraints &cons)
+{
+	return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
+}
+
+Game::MP_Param& 
+Game::MP_Param::set(QP_objective &&obj, QP_constraints &&cons)
+{
+	return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
+}
 
 bool 
 Game::MP_Param::dataCheck(bool forcesymm ///< Check if MP_Param::Q is symmetric
@@ -269,6 +280,17 @@ Game::QP_Param::set(arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma::
 	return *this;
 }
 
+Game::QP_Param& 
+Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons)
+{
+	return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
+}
+
+Game::QP_Param& 
+Game::QP_Param::set(QP_objective &&obj, QP_constraints &&cons)
+{
+	return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
+}
 
 Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS):LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /**

@@ -820,6 +820,24 @@ Game::LCP::addPolyhedron(const vector<short int> &Fix, 	///< +1/0/-1 Representat
 	return *this;
 }
 
+void
+Game::LCP::makeQP(
+		const vector<short int> &Fix, 	///< +1/0/-1 Representation of the polyhedra which needed to be pushed 
+		vector<arma::sp_mat*> &custAi, 		///< Vector wait LHS of constraint matrix should be pushed.
+		vector<arma::vec*> &custbi,			///< Vector wait RHS of constraints should be pushed.
+		Game::QP_objective &QP_obj,
+		Game::QP_Param &QP
+		)
+{
+	Game::QP_constraints QP_cons;
+	this->addPolyhedron(Fix, custAi, custbi, true, &QP_cons.B, &QP_cons.b);
+	QP_cons.A.set_size(QP_cons.b.n_rows, QP_obj.Q.n_cols);
+	QP.set(QP_obj, QP_cons);
+}
+
+
+
+
 unique_ptr<GRBModel> 
 Game::LCP::LCPasQP(bool solve)
 /** @brief Solves the LCP as a QP using Gurobi */

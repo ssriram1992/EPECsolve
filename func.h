@@ -57,7 +57,20 @@ class LinConstr
 
 */
 
-///@brief Class to handle parameterized mathematical programs(MP)
+///@brief struct to handle the objective params of MP_Param/QP_Param
+struct QP_objective
+{
+	arma::sp_mat Q, C;
+	arma::vec c;
+};
+///@brief struct to handle the constraint params of MP_Param/QP_Param
+struct QP_constraints
+{
+	arma::sp_mat A, B;
+	arma::vec b;
+};
+
+///@brief class to handle parameterized mathematical programs(MP)
 class MP_Param
 {
 	protected: // Data representing the parameterized QP
@@ -96,6 +109,8 @@ class MP_Param
 				const arma::sp_mat &A, const arma::sp_mat &B, const arma::vec &c, const arma::vec &b); // Copy data into this
 		virtual MP_Param& set(arma::sp_mat &&Q, arma::sp_mat &&C, 
 				arma::sp_mat &&A, arma::sp_mat &&B, arma::vec &&c, arma::vec &&b); // Move data into this
+		virtual MP_Param& set(const QP_objective &obj, const QP_constraints &cons);
+		virtual MP_Param& set(QP_objective &&obj, QP_constraints &&cons);
 		virtual MP_Param& addDummy(unsigned int pars, unsigned int vars = 0);
 };
 
@@ -136,6 +151,8 @@ class QP_Param:public MP_Param
 				const arma::sp_mat &A, const arma::sp_mat &B, const arma::vec &c, const arma::vec &b) final; // Copy data into this
 		QP_Param& set(arma::sp_mat &&Q, arma::sp_mat &&C, 
 				arma::sp_mat &&A, arma::sp_mat &&B, arma::vec &&c, arma::vec &&b) final; // Move data into this
+		QP_Param& set(const QP_objective &obj, const QP_constraints &cons) final;
+		QP_Param& set(QP_objective &&obj, QP_constraints &&cons) final;
 	private:
 		int make_yQy();
 	public: // Other methods
@@ -350,13 +367,14 @@ class LCP
 		 * @todo Formally call LCP::BranchAndPrune or throw an exception if this method is not already run
 		 */
 		{return Game::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
+		void makeQP(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi, Game::QP_objective &QP_obj, Game::QP_Param &QP);
 };
 };
 
 
 /************************************************/
 /* 	 									      	*/
-/*******			FROM Models.CPP	        *****/ 
+/*******			FROM Models.CPP	     ********/ 
 /* 	 									      	*/
 /************************************************/
 namespace Models{
@@ -435,8 +453,9 @@ class EPEC
 {
 	private:
 		vector<LeadAllPar> AllLeadPars = {};  ///< The parameters of each leader in the EPEC game
-		vector<shared_ptr<Game::NashGame>> countriesLL = {}; ///< Stores each country's lower level Nash game
+		vector<shared_ptr<Game::NashGame>> countries_LL = {}; ///< Stores each country's lower level Nash game
 		vector<shared_ptr<Game::QP_Param>> MC_QP = {}; 	///< The QP corresponding to the market clearing condition of each player
+		vector<shared_ptr<Game::QP_Param>> country_QP = {}; 	///< The QP corresponding to the market clearing condition of each player
 		vector<arma::sp_mat> LeadConses = {}; 		///< Stores each country's leader constraint LHS
 		vector<arma::vec> LeadRHSes = {}; 			///< Stores each country's leader constraint RHS
 		arma::sp_mat TranspCosts = {};				///< Transportation costs between pairs of countries
@@ -477,6 +496,7 @@ class EPEC
 		void make_MC_leader(const unsigned int i);
 		void computeLeaderLocations(const bool addSpaceForMC = false);
 		void add_Dummy_Lead(const unsigned int i);
+		void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj);
 	public:
 		///@brief %Models a Standard Nash-Cournot game within a country
 		EPEC& addCountry(
