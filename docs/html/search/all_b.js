@@ -9,7 +9,7 @@ var searchData=
   ['make_5fmc_5fleader',['make_MC_leader',['../classModels_1_1EPEC.html#a295ae8dd8ca635a407940bc78ce8875a',1,'Models::EPEC']]],
   ['make_5fobj_5fleader',['make_obj_leader',['../classModels_1_1EPEC.html#a990238b27ca557b6dc577b5f8d9fe918',1,'Models::EPEC']]],
   ['make_5fyqy',['make_yQy',['../classGame_1_1QP__Param.html#ab9b540c7fcd3f408ad8570d7a770bce8',1,'Game::QP_Param']]],
-  ['makeqp',['makeQP',['../classGame_1_1LCP.html#a7719be2db07be4dbc58561edcf9586e4',1,'Game::LCP']]],
+  ['makeqp',['makeQP',['../classGame_1_1LCP.html#a4a698eec6acd7c3f3b2da785f3a638be',1,'Game::LCP']]],
   ['makerelaxed',['makeRelaxed',['../classGame_1_1LCP.html#a777726134bf9ffc8fa0c6bfe8ffdb6fc',1,'Game::LCP']]],
   ['marketclearing',['MarketClearing',['../classGame_1_1NashGame.html#a77402999e8c65c0e8b406dd20e95f534',1,'Game::NashGame']]],
   ['max_5ftax_5fperc',['max_tax_perc',['../structModels_1_1LeadPar.html#a88b1584e5f7f37307a569ea5b84e5d06',1,'Models::LeadPar']]],

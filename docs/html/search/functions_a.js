@@ -6,7 +6,7 @@ var searchData=
   ['make_5fmc_5fleader',['make_MC_leader',['../classModels_1_1EPEC.html#a295ae8dd8ca635a407940bc78ce8875a',1,'Models::EPEC']]],
   ['make_5fobj_5fleader',['make_obj_leader',['../classModels_1_1EPEC.html#a990238b27ca557b6dc577b5f8d9fe918',1,'Models::EPEC']]],
   ['make_5fyqy',['make_yQy',['../classGame_1_1QP__Param.html#ab9b540c7fcd3f408ad8570d7a770bce8',1,'Game::QP_Param']]],
-  ['makeqp',['makeQP',['../classGame_1_1LCP.html#a7719be2db07be4dbc58561edcf9586e4',1,'Game::LCP']]],
+  ['makeqp',['makeQP',['../classGame_1_1LCP.html#a4a698eec6acd7c3f3b2da785f3a638be',1,'Game::LCP']]],
   ['makerelaxed',['makeRelaxed',['../classGame_1_1LCP.html#a777726134bf9ffc8fa0c6bfe8ffdb6fc',1,'Game::LCP']]],
   ['mp_5fparam',['MP_Param',['../classGame_1_1MP__Param.html#aa4be3148e505ff9012f47c9966a1475b',1,'Game::MP_Param::MP_Param()=default'],['../classGame_1_1MP__Param.html#a39691108424cbff9a52de0908f9eba9e',1,'Game::MP_Param::MP_Param(MP_Param &amp;M)=default']]],
   ['mpecasmilp',['MPECasMILP',['../classGame_1_1LCP.html#a7e41da234589d7b25c11579566f2c1dc',1,'Game::LCP']]],
