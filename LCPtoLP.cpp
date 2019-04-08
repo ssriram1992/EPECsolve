@@ -877,6 +877,12 @@ Game::LCP::LCPasQP(bool solve)
 
 unique_ptr<GRBModel>
 Game::LCP::LCPasMIP(bool solve)
+/**
+ * @brief Helps solving an LCP as an MIP using bigM constraints
+ * @returns A unique_ptr to GRBModel that has the equivalent MIP
+ * @details The MIP problem that is returned by this function is equivalent to the LCP problem provided the value of bigM is large enough.
+ * @info This solves just the feasibility problem. Should you need  a leader's objective function, use LCP::MPECasMILP or LCP::MPECasMIQP
+ */
 {
 	return this->LCPasMIP({}, {}, solve);
 }
@@ -884,6 +890,12 @@ Game::LCP::LCPasMIP(bool solve)
 
 unique_ptr<GRBModel> 
 Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve)
+/**
+ * @brief Helps solving an LCP as an MIP using bigM constraints. 
+ * @returns A unique_ptr to GRBModel that has the equivalent MIP
+ * @details The MIP problem that is returned by this function is equivalent to the LCP problem provided the value of bigM is large enough. The function differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader objective, and returns an object with this objective. 
+ * @info The leader's objective has to be linear here. For quadratic objectives, refer LCP::MPECasMIQP
+ */
 {
 	unique_ptr<GRBModel> model = this->LCPasMIP(false);
 	arma::vec Cx(this->nC, arma::fill::zeros);
@@ -906,6 +918,12 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec
 
 unique_ptr<GRBModel> 
 Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::vec &c, const arma::vec &x_minus_i, bool solve)
+/**
+ * @brief Helps solving an LCP as an MIQP using bigM constraints. 
+ * @returns A unique_ptr to GRBModel that has the equivalent MIQP
+ * @details The MIQP problem that is returned by this function is equivalent to the LCP problem provided the value of bigM is large enough. The function differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader objective, and returns an object with this objective. 
+ * This allows quadratic leader objective. If you are aware that the leader's objective is linear, use the faster method LCP::MPECasMILP
+ */
 {
 	auto model = this->MPECasMILP(C, c, x_minus_i, false);
 	/// Note that if the matrix Q is a zero matrix, then this returns a Gurobi MILP model as opposed to MIQP model.

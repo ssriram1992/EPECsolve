@@ -282,8 +282,9 @@ Game::QP_Param::set(arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma::
 
 Game::QP_Param& 
 Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons)
+/// Setting the data with the inputs being a struct Game::QP_objective and struct Game::QP_constraints
 {
-	return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
+	return this->set(move(obj.Q), move(obj.C), move(cons.A), move(cons.B), move(obj.c), move(cons.b));
 }
 
 Game::QP_Param& 
@@ -498,6 +499,10 @@ Game::NashGame::RewriteLeadCons() const
 }
 
 Game::NashGame& Game::NashGame::addDummy(unsigned int par)
+/**
+ * @brief Add dummy variables in a NashGame object.
+ * @details Add extra variables at the end of the problem. These are just zero columns that don't feature in the problem anywhere. They are of importance only where the NashGame gets converted into an LCP and gets parametrized. Typically, they appear in the upper level objective in such a case. 
+ */
 {
 	for(auto &q: this->Players)
 		q->addDummy(par);
@@ -514,13 +519,17 @@ Game::NashGame& Game::NashGame::addDummy(unsigned int par)
 }
 
 Game::NashGame& Game::NashGame::addLeadCons(const arma::vec &a, double b)
+/**
+ * @bried Adds Leader constraint to a NashGame object.
+ * @details In case common constraint to all followers is to be added (like  a leader constraint in an MPEC), this function can be used. It adds a single constraint @f$ a^Tx \leq b@f$
+ */
 {
 	auto nC = this->LeaderConstraints.n_cols;
 	if (a.n_elem != nC) throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible");
 	auto nR = this->LeaderConstraints.n_rows;
 	this->LeaderConstraints.resize(nR+1, nC);
 	// (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
-	LeaderConstraints.row(nR) = a.t(); 
+	LeaderConstraints.row(nR) = a.t();  
 	this->LeaderConsRHS.resize(nR+1);
 	this->LeaderConsRHS(nR) = b;
 	return *this;

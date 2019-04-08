@@ -342,7 +342,12 @@ Models::EPEC::addCountry(
 }
 
 Models::EPEC& 
-Models::EPEC::addTranspCosts(const arma::sp_mat& costs)
+Models::EPEC::addTranspCosts(const arma::sp_mat& costs ///< The transportation cost matrix
+		)
+/**
+ * @brief Adds intercountry transportation costs matrix
+ * @details Adds the transportation cost matrix. Entry in row i and column j of this matrix corresponds to the unit transportation costs for sending fuel from country i to country j.
+ */
 {
 	if(this->finalized) throw string("Error in Models::EPEC::addTranspCosts: EPEC object finalized. Call EPEC::unlock() to unlock this object first and then edit.");
 	try
@@ -363,6 +368,15 @@ const
 Models::EPEC& 
 Models::EPEC::
 finalize() 
+/**
+ * @brief Finalizes the creation of a Models::EPEC object.
+ * @details Performs a bunch of job after all data for a Models::EPEC object are given, namely.
+ * 	-	Adds the tradebalance constraints for leaders. Calls Models::EPEC::add_Leaders_tradebalance_constraints
+ * 	-	Computes the location of where each Leader's variable start in the variable list. Calls Models::EPEC::computeLeaderLocations
+ * 	-	Adds the required dummy variables to each leader's problem so that a game among the leaders can be defined. Calls Models::EPEC::add_Dummy_Lead
+ * 	-	Makes the market clearing constraint in each country. Calls Models::EPEC::make_MC_leader
+ * 	-	Creates the QP objective corresponding to each leader's objective. Calls Models::EPEC::make_obj_leader
+ */
 {
 	if(this->finalized) cerr<<"Warning in Models::EPEC::finalize: Model already finalized\n";
 	try
@@ -398,6 +412,13 @@ finalize()
 
 void 
 Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
+/**
+ * @brief Adds leaders' trade balance constraints for import-exports
+ * @details Does the following job:
+ * 	-	Counts the number of import markets for the country @p i to store in Models::EPEC::nImportMarkets
+ * 	-	Adds the trade balance constraint. Total quantity imported by country @p i = Sum of Total quantity exported by each country to country i.
+ * 	-	Updates the LeadLocs in Models::EPEC::Locations.at(i)
+ */
 { 
 	if (i>=this->nCountries) throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. Bad argument");
 	int nImp = 0;
@@ -418,6 +439,10 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 
 void 
 Models::EPEC::make_MC_leader(const unsigned int i)
+/**
+ * @brief Makes the market clearing constraint for country @p i
+ * @details Writes the market clearing constraint as a Game::QP_Param and stores it in Models::EPEC::MC_QP
+ */
 {
 	if (i>=this->nCountries) cout<<i<<" "<<this->nCountries<<endl;//throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. Bad argument");
 	try
@@ -466,18 +491,21 @@ Models::EPEC::make_MC_leader(const unsigned int i)
 
 bool 
 Models::EPEC::dataCheck( 
-			const bool chkAllLeadPars,
-			const bool chkcountries_LL,
-			const bool chkMC_QP,
-			const bool chkLeadConses,
-			const bool chkLeadRHSes,
-			const bool chknImportMarkets,
-			const bool chkLocations,
-			const bool chkLeaderLocations
+			const bool chkAllLeadPars,		///< Checks if Models::EPEC::AllLeadPars has size @p n
+			const bool chkcountries_LL,		///< Checks if Models::EPEC::countries_LL has size @p n
+			const bool chkMC_QP,			///< Checks if Models::EPEC::MC_QP has size @p n
+			const bool chkLeadConses,		///< Checks if Models::EPEC::LeadConses has size @p n
+			const bool chkLeadRHSes,		///< Checks if Models::EPEC::LeadRHSes has size @p n
+			const bool chknImportMarkets,	///< Checks if Models::EPEC::nImportMarkets has size @p n
+			const bool chkLocations,		///< Checks if Models::EPEC::Locations has size @p n
+			const bool chkLeaderLocations	///< Checks if Models::EPEC::LeaderLocations has size @p n and Models::EPEC::nVarinEPEC is set
 		) const
+/**
+ * Checks the data in Models::EPEC object, based on checking flags, @p n is the number of countries in the Models::EPEC object.
+ */
 {
 	if (!chkAllLeadPars && AllLeadPars.size() 			!= this->nCountries) return false;
-	if (!chkcountries_LL && countries_LL.size() 			!= this->nCountries) return false;
+	if (!chkcountries_LL && countries_LL.size() 		!= this->nCountries) return false;
 	if (!chkMC_QP && MC_QP.size() 						!= this->nCountries) return false;
 	if (!chkLeadConses && LeadConses.size() 			!= this->nCountries) return false;
 	if (!chkLeadRHSes && LeadRHSes.size() 				!= this->nCountries) return false;
@@ -518,6 +546,9 @@ Models::EPEC::computeLeaderLocations(const bool addSpaceForMC)
 
 unsigned int 
 Models::EPEC::getPosition(const unsigned int countryCount, const Models::LeaderVars var) const
+/**
+ * @brief Gets position of a variable in a country.
+ */
 {
 	if(countryCount > this->nCountries) throw string("Error in Models::EPEC::getPosition: Bad Country Count");
 	return this->LeaderLocations.at(countryCount) + this->Locations.at(countryCount).at(var);
@@ -525,12 +556,18 @@ Models::EPEC::getPosition(const unsigned int countryCount, const Models::LeaderV
 
 unsigned int 
 Models::EPEC::getPosition(const string countryName, const Models::LeaderVars var) const
+/**
+ * @brief Gets position of a variable in a country given the country name and the variable.
+ */
 { 
 	return this->getPosition(name2nos.at(countryName), var);
 }
 
 Game::NashGame* 
 Models::EPEC::get_LowerLevelNash(const unsigned int i) const
+/**
+ * @brief Returns a non-owning pointer to the @p i -th country's lower level NashGame
+ */
 {
 	return this->countries_LL.at(i).get();
 }
@@ -550,9 +587,12 @@ Models::EPEC::unlock()
 
 
 void 
-Models::EPEC::make_obj_leader(const unsigned int i, 
-		Game::QP_objective &QP_obj
+Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the country whose objective is to be made
+		Game::QP_objective &QP_obj					///< The object where the objective parameters are to be stored.
 		)
+/**
+ * Makes the objective function o each country.
+ */
 {
 	const unsigned int nEPECvars = this->nVarinEPEC;
 	const unsigned int nThisCountryvars = this->Locations.at(i).at(Models::LeaderVars::End);

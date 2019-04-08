@@ -58,17 +58,19 @@ class LinConstr
 */
 
 ///@brief struct to handle the objective params of MP_Param/QP_Param
-struct QP_objective
+///@details Refer QP_Param class for what Q, C and c mean.
+typedef struct QP_objective
 {
 	arma::sp_mat Q, C;
 	arma::vec c;
-};
+} QP_objective;
 ///@brief struct to handle the constraint params of MP_Param/QP_Param
-struct QP_constraints
+///@details Refer QP_Param class for what A, B and b mean.
+typedef struct QP_constraints
 {
 	arma::sp_mat A, B;
 	arma::vec b;
-};
+} QP_constraints;
 
 ///@brief class to handle parameterized mathematical programs(MP)
 class MP_Param
