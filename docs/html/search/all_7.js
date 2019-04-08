@@ -16,6 +16,6 @@ var searchData=
   ['getnx',['getNx',['../classGame_1_1MP__Param.html#a46c6e5948869d9df6998bfd68e6629ce',1,'Game::MP_Param']]],
   ['getny',['getNy',['../classGame_1_1MP__Param.html#a9bfc41513aa12a3fe9dd40222e46f36c',1,'Game::MP_Param']]],
   ['getposition',['getPosition',['../classModels_1_1EPEC.html#a1d74390d88d7f5236d502eba172864ca',1,'Models::EPEC::getPosition(const unsigned int countryCount, const LeaderVars var=LeaderVars::FollowerStart) const'],['../classModels_1_1EPEC.html#a4a7fef43db0df43496c5bb88a6884de0',1,'Models::EPEC::getPosition(const string countryCount, const LeaderVars var=LeaderVars::FollowerStart) const']]],
-  ['getq',['getq',['../classGame_1_1LCP.html#a3cc8c85eca98fb717a4487dc7ed692cd',1,'Game::LCP::getq()'],['../classGame_1_1MP__Param.html#a3965799d2dfb02726f55ebe84e3493e7',1,'Game::MP_Param::getQ()']]],
+  ['getq',['getQ',['../classGame_1_1MP__Param.html#a3965799d2dfb02726f55ebe84e3493e7',1,'Game::MP_Param::getQ()'],['../classGame_1_1LCP.html#a3cc8c85eca98fb717a4487dc7ed692cd',1,'Game::LCP::getq()']]],
   ['getqstar',['getqstar',['../classGame_1_1LCP.html#a52df9c31f5d00c00803fe1a6f4b60534',1,'Game::LCP']]]
 ];
