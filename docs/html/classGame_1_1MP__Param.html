@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a>  </div>
   <div class="headertitle">
@@ -152,6 +153,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad2f9ad95b1d9f2e8e4aeddb7beb0b101"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab81939dcfbfa9ec244d28093ffccf652"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ab81939dcfbfa9ec244d28093ffccf652">addDummy</a> (unsigned int pars, unsigned int vars=0)</td></tr>
 <tr class="separator:ab81939dcfbfa9ec244d28093ffccf652"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:afd508aaabd67a8bd106366cfe2ca3c09"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#afd508aaabd67a8bd106366cfe2ca3c09">dataCheck</a> (const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;obj, const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;cons, bool checkObj=true, bool checkCons=true)</td></tr>
+<tr class="separator:afd508aaabd67a8bd106366cfe2ca3c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -277,12 +283,12 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classGame_1_1QP__Param.html#ac6e7d4a4a8ed43e23516343886a3173f">Game::QP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00051">51</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00052">52</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
 <a id="a3d1ee706080d6968674ad8c7a669989b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d1ee706080d6968674ad8c7a669989b">&#9670;&nbsp;</a></span>dataCheck()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d1ee706080d6968674ad8c7a669989b">&#9670;&nbsp;</a></span>dataCheck() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -323,7 +329,57 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00127">127</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00129">129</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+
+</div>
+</div>
+<a id="afd508aaabd67a8bd106366cfe2ca3c09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd508aaabd67a8bd106366cfe2ca3c09">&#9670;&nbsp;</a></span>dataCheck() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Game::MP_Param::dataCheck </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;&#160;</td>
+          <td class="paramname"><em>cons</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>checkObj</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>checkCons</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00158">158</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -650,7 +706,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classGame_1_1QP__Param.html#ac1555a30b8ba903db65a3fe0b6763ec4">Game::QP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00105">105</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00106">106</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -716,7 +772,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classGame_1_1QP__Param.html#a3fb0950b780c847e97f34043068ca758">Game::QP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00093">93</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00094">94</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -756,7 +812,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classGame_1_1QP__Param.html#a870e896ec83261f542ba67ebb2c8ef87">Game::QP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00115">115</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00116">116</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -796,7 +852,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classGame_1_1QP__Param.html#afa08cebc99b7f45614661d2dc3ff497a">Game::QP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00121">121</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00122">122</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1011,7 +1067,7 @@ Protected Attributes</h2></td></tr>
 </ul>
 <p>For proper working, <a class="el" href="classGame_1_1MP__Param.html#a3d1ee706080d6968674ad8c7a669989b" title="Check that the data for the MP_Param class is valid Always works after calls to MP_Param::size() Chec...">MP_Param::dataCheck()</a> has to be run after this. </p><dl class="section return"><dt>Returns</dt><dd><code>Ny</code>, Number of variables in the quadratic program, QP </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00074">74</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00075">75</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>

@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
@@ -109,9 +110,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ac1555a30b8ba903db65a3fe0b6763ec4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Faster means to set data. But the input objects might be corrupted now.  <a href="#ac1555a30b8ba903db65a3fe0b6763ec4">More...</a><br /></td></tr>
 <tr class="separator:ac1555a30b8ba903db65a3fe0b6763ec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a870e896ec83261f542ba67ebb2c8ef87"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a870e896ec83261f542ba67ebb2c8ef87">set</a> (const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;obj, const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;cons) final</td></tr>
-<tr class="memdesc:a870e896ec83261f542ba67ebb2c8ef87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setting the data with the inputs being a struct <a class="el" href="structGame_1_1QP__objective.html" title="struct to handle the objective params of MP_Param/QP_Param">Game::QP_objective</a> and struct <a class="el" href="structGame_1_1QP__constraints.html" title="struct to handle the constraint params of MP_Param/QP_Param">Game::QP_constraints</a>.  <a href="#a870e896ec83261f542ba67ebb2c8ef87">More...</a><br /></td></tr>
 <tr class="separator:a870e896ec83261f542ba67ebb2c8ef87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa08cebc99b7f45614661d2dc3ff497a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#afa08cebc99b7f45614661d2dc3ff497a">set</a> (<a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;&amp;obj, <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;&amp;cons) final</td></tr>
+<tr class="memdesc:afa08cebc99b7f45614661d2dc3ff497a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setting the data with the inputs being a struct <a class="el" href="structGame_1_1QP__objective.html" title="struct to handle the objective params of MP_Param/QP_Param">Game::QP_objective</a> and struct <a class="el" href="structGame_1_1QP__constraints.html" title="struct to handle the constraint params of MP_Param/QP_Param">Game::QP_constraints</a>.  <a href="#afa08cebc99b7f45614661d2dc3ff497a">More...</a><br /></td></tr>
 <tr class="separator:afa08cebc99b7f45614661d2dc3ff497a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9042eb407e5768c793f17e490e8a5bd"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#aa9042eb407e5768c793f17e490e8a5bd">KKT</a> (arma::sp_mat &amp;M, arma::sp_mat &amp;N, arma::vec &amp;q) const</td></tr>
 <tr class="memdesc:aa9042eb407e5768c793f17e490e8a5bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the KKT conditions for the given QP.  <a href="#aa9042eb407e5768c793f17e490e8a5bd">More...</a><br /></td></tr>
@@ -169,6 +170,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ad99f19eae314bd3ca720d75d219167c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize the <a class="el" href="classGame_1_1MP__Param.html" title="class to handle parameterized mathematical programs(MP)">MP_Param</a> object.  <a href="#ad99f19eae314bd3ca720d75d219167c3">More...</a><br /></td></tr>
 <tr class="separator:ad99f19eae314bd3ca720d75d219167c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:afd508aaabd67a8bd106366cfe2ca3c09"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#afd508aaabd67a8bd106366cfe2ca3c09">dataCheck</a> (const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;obj, const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;cons, bool checkObj=true, bool checkCons=true)</td></tr>
+<tr class="separator:afd508aaabd67a8bd106366cfe2ca3c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:ab133b5225e24bc6445f5abf4552df8b0"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ab133b5225e24bc6445f5abf4552df8b0">size</a> ()</td></tr>
@@ -223,7 +229,7 @@ Private Attributes</h2></td></tr>
 <img class="formulaDsp" alt="\begin{eqnarray} Ax + By &amp;\leq&amp; b \\ y &amp;\geq&amp; 0 \end{eqnarray}" src="form_1.png"/>
 </p>
  
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00120">120</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00121">121</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aca8de136cfd5597acf66de448dce9edd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aca8de136cfd5597acf66de448dce9edd">&#9670;&nbsp;</a></span>QP_Param() <span class="overload">[1/3]</span></h2>
@@ -251,7 +257,7 @@ Private Attributes</h2></td></tr>
 
 <p>Initialize only the size. Everything else is empty (can be updated later) </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00139">139</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00140">140</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -321,7 +327,7 @@ Private Attributes</h2></td></tr>
 
 <p>Set data at construct time. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00141">141</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00142">142</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -351,7 +357,7 @@ Private Attributes</h2></td></tr>
 
 <p>Copy constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00149">149</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00150">150</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -395,12 +401,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#ab81939dcfbfa9ec244d28093ffccf652">Game::MP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00220">220</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00243">243</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
 <a id="a3d1ee706080d6968674ad8c7a669989b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d1ee706080d6968674ad8c7a669989b">&#9670;&nbsp;</a></span>dataCheck()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d1ee706080d6968674ad8c7a669989b">&#9670;&nbsp;</a></span>dataCheck() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -441,7 +447,57 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00127">127</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00129">129</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+
+</div>
+</div>
+<a id="afd508aaabd67a8bd106366cfe2ca3c09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd508aaabd67a8bd106366cfe2ca3c09">&#9670;&nbsp;</a></span>dataCheck() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Game::MP_Param::dataCheck </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;&#160;</td>
+          <td class="paramname"><em>cons</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>checkObj</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>checkCons</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00158">158</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -732,7 +788,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Checks if the current object can play a game with another <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> object <code>P</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00163">163</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00164">164</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -771,7 +827,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 <p>Compute the KKT conditions for the given QP. </p>
 <p>Writes the KKT condition of the parameterized QP As per the convention, y is the decision variable for the QP and that is parameterized in x The KKT conditions are <img class="formulaInl" alt="$0 \leq y \perp My + Nx + q \geq 0$" src="form_6.png"/> </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00235">235</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00258">258</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -800,7 +856,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Adds the Gurobi Quadratic objective to the Gurobi model <code>QuadModel</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00156">156</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00179">179</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -866,7 +922,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#a4ba89f81adc04cf5e21478f8a7f7748f">Game::MP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00274">274</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00297">297</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -932,7 +988,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#a97d7a955cb93ff14144bdce152e906b6">Game::MP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00262">262</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00285">285</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -970,11 +1026,9 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p>Setting the data with the inputs being a struct <a class="el" href="structGame_1_1QP__objective.html" title="struct to handle the objective params of MP_Param/QP_Param">Game::QP_objective</a> and struct <a class="el" href="structGame_1_1QP__constraints.html" title="struct to handle the constraint params of MP_Param/QP_Param">Game::QP_constraints</a>. </p>
-
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#a81d1ef8919a4c554cba2c56832c0e025">Game::MP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00284">284</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00314">314</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1012,9 +1066,11 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
+<p>Setting the data with the inputs being a struct <a class="el" href="structGame_1_1QP__objective.html" title="struct to handle the objective params of MP_Param/QP_Param">Game::QP_objective</a> and struct <a class="el" href="structGame_1_1QP__constraints.html" title="struct to handle the constraint params of MP_Param/QP_Param">Game::QP_constraints</a>. </p>
+
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#ad2f9ad95b1d9f2e8e4aeddb7beb0b101">Game::MP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00291">291</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00307">307</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1229,7 +1285,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </ul>
 <p>For proper working, <a class="el" href="classGame_1_1MP__Param.html#a3d1ee706080d6968674ad8c7a669989b" title="Check that the data for the MP_Param class is valid Always works after calls to MP_Param::size() Chec...">MP_Param::dataCheck()</a> has to be run after this. </p><dl class="section return"><dt>Returns</dt><dd><code>Ny</code>, Number of variables in the quadratic program, QP </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00074">74</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00075">75</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1264,7 +1320,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00177">177</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00200">200</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1409,7 +1465,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00134">134</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00135">135</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1433,7 +1489,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00136">136</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00137">137</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1553,7 +1609,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00135">135</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00136">136</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>

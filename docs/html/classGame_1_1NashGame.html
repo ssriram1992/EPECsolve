@@ -94,6 +94,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad1d3b9de9fde00bb56f21784174145e5"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#ad1d3b9de9fde00bb56f21784174145e5">getNprimals</a> () const</td></tr>
 <tr class="memdesc:ad1d3b9de9fde00bb56f21784174145e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of primal variables.  <a href="#ad1d3b9de9fde00bb56f21784174145e5">More...</a><br /></td></tr>
 <tr class="separator:ad1d3b9de9fde00bb56f21784174145e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a951e968b074a65c41f66c619d52f787a"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a951e968b074a65c41f66c619d52f787a">getNshadow</a> () const</td></tr>
+<tr class="separator:a951e968b074a65c41f66c619d52f787a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4cd84999500813e49147c5e9f85a2ea"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#ac4cd84999500813e49147c5e9f85a2ea">getNleaderVars</a> () const</td></tr>
+<tr class="separator:ac4cd84999500813e49147c5e9f85a2ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af98129e452862998d5f9166493738c9f"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#af98129e452862998d5f9166493738c9f">getNduals</a> () const</td></tr>
+<tr class="separator:af98129e452862998d5f9166493738c9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c72cfd05756f5f63c9d92eaece3e921"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a0c72cfd05756f5f63c9d92eaece3e921">getPrimalLoc</a> (unsigned int i=0) const</td></tr>
+<tr class="separator:a0c72cfd05756f5f63c9d92eaece3e921"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d0fa6af117e1335f90ca4c0739f20b4"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a6d0fa6af117e1335f90ca4c0739f20b4">getMCdualLoc</a> () const</td></tr>
+<tr class="separator:a6d0fa6af117e1335f90ca4c0739f20b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44edfcdfc067edcbea485b9c3f1040c8"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a44edfcdfc067edcbea485b9c3f1040c8">getLeaderLoc</a> () const</td></tr>
+<tr class="separator:a44edfcdfc067edcbea485b9c3f1040c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff52d0e942ec759e8bcfeb2054602c0f"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#aff52d0e942ec759e8bcfeb2054602c0f">getDualLoc</a> (unsigned int i=0) const</td></tr>
+<tr class="separator:aff52d0e942ec759e8bcfeb2054602c0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93e98e15ce94cf0020f152009fe4dd3b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classGame_1_1NashGame.html">NashGame</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a93e98e15ce94cf0020f152009fe4dd3b">FormulateLCP</a> (arma::sp_mat &amp;M, arma::vec &amp;q, <a class="el" href="func_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> &amp;Compl, bool writeToFile=false, string M_name=&quot;M.txt&quot;, string q_name=&quot;q.txt&quot;) const</td></tr>
 <tr class="separator:a93e98e15ce94cf0020f152009fe4dd3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64070d10ab0de6d4369934c8f8d04c20"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a64070d10ab0de6d4369934c8f8d04c20">RewriteLeadCons</a> () const</td></tr>
@@ -154,7 +168,7 @@ Friends</h2></td></tr>
 <p>Helpful in rewriting the Nash-Cournot game as an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> Helpful in rewriting leader constraints after incorporating dual variables etc </p><dl class="section warning"><dt>Warning</dt><dd>This has public fields which if accessed and changed can cause undefined behavior! </dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Better implementation which will make the above warning go away! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00188">188</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00189">189</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a656e927f19a73f4b38e32a44ff1dfb29"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a656e927f19a73f4b38e32a44ff1dfb29">&#9670;&nbsp;</a></span>NashGame() <span class="overload">[1/2]</span></h2>
@@ -211,7 +225,7 @@ Friends</h2></td></tr>
 <p>In the correct ordering of variables, have the Market clearing equations ready.</p>
 <p>Now call this constructor. It will allocate appropriate space for the dual variables for each player. </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00296">296</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00319">319</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -261,7 +275,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00216">216</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00217">217</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -290,7 +304,7 @@ Friends</h2></td></tr>
 
 <p>Destructors to <code>delete</code> the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">QP_Param</a> objects that might have been used. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00224">224</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00225">225</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -314,7 +328,7 @@ Friends</h2></td></tr>
 <p>Add dummy variables in a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a> object. </p>
 <p>Add extra variables at the end of the problem. These are just zero columns that don't feature in the problem anywhere. They are of importance only where the <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a> gets converted into an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> and gets parametrized. Typically, they appear in the upper level objective in such a case. </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00501">501</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00533">533</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -346,7 +360,7 @@ Friends</h2></td></tr>
 <p>@bried Adds Leader constraint to a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a> object.</p>
 <p>In case common constraint to all followers is to be added (like a leader constraint in an MPEC), this function can be used. It adds a single constraint <img class="formulaInl" alt="$ a^Tx \leq b$" src="form_31.png"/> </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00521">521</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00553">553</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -416,7 +430,62 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00364">364</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00395">395</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aff52d0e942ec759e8bcfeb2054602c0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff52d0e942ec759e8bcfeb2054602c0f">&#9670;&nbsp;</a></span>getDualLoc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Game::NashGame::getDualLoc </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>i</em> = <code>0</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00253">253</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+
+</div>
+</div>
+<a id="a44edfcdfc067edcbea485b9c3f1040c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44edfcdfc067edcbea485b9c3f1040c8">&#9670;&nbsp;</a></span>getLeaderLoc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Game::NashGame::getLeaderLoc </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00252">252</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -443,7 +512,88 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00250">250</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00259">259</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+
+</div>
+</div>
+<a id="a6d0fa6af117e1335f90ca4c0739f20b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d0fa6af117e1335f90ca4c0739f20b4">&#9670;&nbsp;</a></span>getMCdualLoc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Game::NashGame::getMCdualLoc </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00251">251</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+
+</div>
+</div>
+<a id="af98129e452862998d5f9166493738c9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af98129e452862998d5f9166493738c9f">&#9670;&nbsp;</a></span>getNduals()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Game::NashGame::getNduals </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00248">248</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+
+</div>
+</div>
+<a id="ac4cd84999500813e49147c5e9f85a2ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4cd84999500813e49147c5e9f85a2ea">&#9670;&nbsp;</a></span>getNleaderVars()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Game::NashGame::getNleaderVars </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00247">247</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -472,7 +622,62 @@ Friends</h2></td></tr>
 
 <p>Return the number of primal variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00244">244</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00245">245</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+
+</div>
+</div>
+<a id="a951e968b074a65c41f66c619d52f787a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a951e968b074a65c41f66c619d52f787a">&#9670;&nbsp;</a></span>getNshadow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Game::NashGame::getNshadow </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00246">246</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+
+</div>
+</div>
+<a id="a0c72cfd05756f5f63c9d92eaece3e921"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c72cfd05756f5f63c9d92eaece3e921">&#9670;&nbsp;</a></span>getPrimalLoc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Game::NashGame::getPrimalLoc </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>i</em> = <code>0</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00250">250</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -494,7 +699,7 @@ Friends</h2></td></tr>
 <p>Rewrites leader constraint adjusting for dual variables. Rewrites leader constraints given earlier with added empty columns and spaces corresponding to Market clearing duals and other equation duals. </p>
 <p>This becomes important if the Lower level complementarity problem is passed to <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> with upper level constraints. </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00471">471</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00504">504</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -524,7 +729,7 @@ Friends</h2></td></tr>
 <img src="FormulateLCP.png" alt=""/>
 </div>
   
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00331">331</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00354">354</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -569,7 +774,7 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00230">230</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00231">231</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -595,7 +800,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>In the vector of variables of all players, which position do the DUAL variable corrresponding to this player starts. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00204">204</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00205">205</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -620,7 +825,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Manages the position of where the leader's variables start </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00208">208</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00209">209</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -646,7 +851,7 @@ Friends</h2></td></tr>
 
 <p>Upper level leader constraints RHS. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00192">192</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00193">193</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -672,7 +877,7 @@ Friends</h2></td></tr>
 
 <p>Upper level leader constraints LHS. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00191">191</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00192">192</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -698,7 +903,7 @@ Friends</h2></td></tr>
 
 <p>Market clearing constraints. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00195">195</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00196">196</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -723,7 +928,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Manages the position of Market clearing constraints' duals </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00206">206</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00207">207</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -749,7 +954,7 @@ Friends</h2></td></tr>
 
 <p>RHS to the Market Clearing constraints. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00196">196</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00197">197</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -774,7 +979,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of leader variables. These many variables will not have a matching complementary equation. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00211">211</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00212">212</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -800,7 +1005,7 @@ Friends</h2></td></tr>
 
 <p>Number of players in the Nash <a class="el" href="namespaceGame.html">Game</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00193">193</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00194">194</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -826,7 +1031,7 @@ Friends</h2></td></tr>
 
 <p>The QP that each player solves. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00194">194</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00195">195</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -851,7 +1056,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>In the vector of variables of all players, which position does the variable corrresponding to this player starts. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00201">201</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00202">202</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>

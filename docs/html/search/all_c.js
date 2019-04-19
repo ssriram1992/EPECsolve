@@ -16,6 +16,7 @@ var searchData=
   ['nleader',['nLeader',['../classGame_1_1LCP.html#acc5cd4f8090d141b0ced7ec47293f755',1,'Game::LCP']]],
   ['nplayers',['Nplayers',['../classGame_1_1NashGame.html#a733771a2b0554100a9c50b78ee2f13e4',1,'Game::NashGame']]],
   ['nr',['nR',['../classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d',1,'Game::LCP']]],
+  ['nvarepec',['nVarEPEC',['../classModels_1_1EPEC.html#a0e215b1d6cd630fc6edbbb5f78339953',1,'Models::EPEC']]],
   ['nvarinepec',['nVarinEPEC',['../classModels_1_1EPEC.html#a0e46d5aee2a7bf675775d3354520036f',1,'Models::EPEC']]],
   ['nx',['Nx',['../classGame_1_1MP__Param.html#aac9e6425fcc953b69c7aae411f011e58',1,'Game::MP_Param']]],
   ['ny',['Ny',['../classGame_1_1MP__Param.html#ab889087a490f40f114002c92fea62b2d',1,'Game::MP_Param']]]

@@ -84,6 +84,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad2ed81668039c974d5710bac7c1bd8b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05bb954912158ca39f123ec1c6cdba9a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a05bb954912158ca39f123ec1c6cdba9a">EPEC</a> (GRBEnv *<a class="el" href="classModels_1_1EPEC.html#a2431263189570cb79bba398f201b26ff">env</a>, arma::sp_mat <a class="el" href="classModels_1_1EPEC.html#afe2b46d396e7980d8336099d8d916b19">TranspCosts</a>={})</td></tr>
 <tr class="separator:a05bb954912158ca39f123ec1c6cdba9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8bef40141d868801c8c3b0a4d28fa6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#aa8bef40141d868801c8c3b0a4d28fa6f">make_country_QP</a> (const unsigned int i)</td></tr>
+<tr class="separator:aa8bef40141d868801c8c3b0a4d28fa6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14962535c0ee6c0f2669508d850dbfe1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModels_1_1EPEC.html">EPEC</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a14962535c0ee6c0f2669508d850dbfe1">addCountry</a> (<a class="el" href="structModels_1_1LeadAllPar.html">LeadAllPar</a> Params, const unsigned int addnlLeadVars=0)</td></tr>
 <tr class="memdesc:a14962535c0ee6c0f2669508d850dbfe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Models a Standard Nash-Cournot game within a country  <a href="#a14962535c0ee6c0f2669508d850dbfe1">More...</a><br /></td></tr>
 <tr class="separator:a14962535c0ee6c0f2669508d850dbfe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -99,6 +101,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4a7fef43db0df43496c5bb88a6884de0"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a4a7fef43db0df43496c5bb88a6884de0">getPosition</a> (const string countryCount, const <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">LeaderVars</a> var=<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eaf2dcda11a77f92f3c0cd7e08f37ce122">LeaderVars::FollowerStart</a>) const</td></tr>
 <tr class="memdesc:a4a7fef43db0df43496c5bb88a6884de0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets position of a variable in a country given the country name and the variable.  <a href="#a4a7fef43db0df43496c5bb88a6884de0">More...</a><br /></td></tr>
 <tr class="separator:a4a7fef43db0df43496c5bb88a6884de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a682e7745b1c10ba45d875781afa8d799"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a682e7745b1c10ba45d875781afa8d799">Respond</a> (const unsigned int i, const arma::vec &amp;x) const</td></tr>
+<tr class="separator:a682e7745b1c10ba45d875781afa8d799"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3965e63733c65959597d90de8468d39b"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a3965e63733c65959597d90de8468d39b">Respond</a> (const string name, const arma::vec &amp;x) const</td></tr>
+<tr class="separator:a3965e63733c65959597d90de8468d39b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a356a22aff221fad903b911014783651f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModels_1_1EPEC.html">EPEC</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a356a22aff221fad903b911014783651f">unlock</a> ()</td></tr>
 <tr class="memdesc:a356a22aff221fad903b911014783651f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlocks an <a class="el" href="classModels_1_1EPEC.html">EPEC</a> model.  <a href="#a356a22aff221fad903b911014783651f">More...</a><br /></td></tr>
 <tr class="separator:a356a22aff221fad903b911014783651f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -113,11 +119,14 @@ Data Fields</h2></td></tr>
 <tr class="memitem:ab393e65ef5be6c9e3c5129f8866dbc49"><td class="memItemLeft" align="right" valign="top">const unsigned int &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#ab393e65ef5be6c9e3c5129f8866dbc49">nCountries</a> {<a class="el" href="classModels_1_1EPEC.html#a0462c4b21023103ca4bd744346dae048">nCountr</a>}</td></tr>
 <tr class="memdesc:ab393e65ef5be6c9e3c5129f8866dbc49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant attribute for number of leaders in the <a class="el" href="classModels_1_1EPEC.html">EPEC</a>.  <a href="#ab393e65ef5be6c9e3c5129f8866dbc49">More...</a><br /></td></tr>
 <tr class="separator:ab393e65ef5be6c9e3c5129f8866dbc49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e215b1d6cd630fc6edbbb5f78339953"><td class="memItemLeft" align="right" valign="top">const unsigned int &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a0e215b1d6cd630fc6edbbb5f78339953">nVarEPEC</a> {<a class="el" href="classModels_1_1EPEC.html#a0e46d5aee2a7bf675775d3354520036f">nVarinEPEC</a>}</td></tr>
+<tr class="memdesc:a0e215b1d6cd630fc6edbbb5f78339953"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant attribute for number of variables in the <a class="el" href="classModels_1_1EPEC.html">EPEC</a>.  <a href="#a0e215b1d6cd630fc6edbbb5f78339953">More...</a><br /></td></tr>
+<tr class="separator:a0e215b1d6cd630fc6edbbb5f78339953"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:ae9ac7fcf9916d570bf0e3dafec725b71"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#ae9ac7fcf9916d570bf0e3dafec725b71">dataCheck</a> (const bool chkAllLeadPars=true, const bool chkcountriesLL=true, const bool chkMC_QP=true, const bool chkLeadConses=true, const bool chkLeadRHSes=true, const bool chknImportMarkets=true, const bool chkLocations=true, const bool chkLeaderLocations=true) const</td></tr>
-<tr class="separator:ae9ac7fcf9916d570bf0e3dafec725b71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa12d1e6f5237d58d74ef56b93cea45be"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#aa12d1e6f5237d58d74ef56b93cea45be">dataCheck</a> (const bool chkAllLeadPars=true, const bool chkcountriesLL=true, const bool chkMC_QP=true, const bool chkLeadConses=true, const bool chkLeadRHSes=true, const bool chknImportMarkets=true, const bool chkLocations=true, const bool chkLeaderLocations=true, const bool chkLeadObjec=true) const</td></tr>
+<tr class="separator:aa12d1e6f5237d58d74ef56b93cea45be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a043aff53098136d5f60d53a839b0ed85"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a043aff53098136d5f60d53a839b0ed85">ParamValid</a> (const <a class="el" href="structModels_1_1LeadAllPar.html">LeadAllPar</a> &amp;Param) const</td></tr>
 <tr class="memdesc:a043aff53098136d5f60d53a839b0ed85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks that the parameter given to add a country is valid. Does not have obvious errors.  <a href="#a043aff53098136d5f60d53a839b0ed85">More...</a><br /></td></tr>
 <tr class="separator:a043aff53098136d5f60d53a839b0ed85"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,8 +161,11 @@ Private Attributes</h2></td></tr>
 <tr class="memdesc:a11b212ad1bc65ad020fb8601e302c931"><td class="mdescLeft">&#160;</td><td class="mdescRight">The QP corresponding to the market clearing condition of each player.  <a href="#a11b212ad1bc65ad020fb8601e302c931">More...</a><br /></td></tr>
 <tr class="separator:a11b212ad1bc65ad020fb8601e302c931"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf4329d9fc37b38c59b4f2f459daac2c"><td class="memItemLeft" align="right" valign="top">vector&lt; shared_ptr&lt; <a class="el" href="classGame_1_1QP__Param.html">Game::QP_Param</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#aaf4329d9fc37b38c59b4f2f459daac2c">country_QP</a> = {}</td></tr>
-<tr class="memdesc:aaf4329d9fc37b38c59b4f2f459daac2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The QP corresponding to the market clearing condition of each player.  <a href="#aaf4329d9fc37b38c59b4f2f459daac2c">More...</a><br /></td></tr>
+<tr class="memdesc:aaf4329d9fc37b38c59b4f2f459daac2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The QP corresponding to each player.  <a href="#aaf4329d9fc37b38c59b4f2f459daac2c">More...</a><br /></td></tr>
 <tr class="separator:aaf4329d9fc37b38c59b4f2f459daac2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a347560f8ddc05e3167ae4a47fc4eb5ce"><td class="memItemLeft" align="right" valign="top">vector&lt; shared_ptr&lt; <a class="el" href="structGame_1_1QP__objective.html">Game::QP_objective</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a347560f8ddc05e3167ae4a47fc4eb5ce">LeadObjec</a> = {}</td></tr>
+<tr class="memdesc:a347560f8ddc05e3167ae4a47fc4eb5ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Objective of each leader.  <a href="#a347560f8ddc05e3167ae4a47fc4eb5ce">More...</a><br /></td></tr>
+<tr class="separator:a347560f8ddc05e3167ae4a47fc4eb5ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6dbaa1a86b87efeee4e0467321cb7f0"><td class="memItemLeft" align="right" valign="top">vector&lt; arma::sp_mat &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#aa6dbaa1a86b87efeee4e0467321cb7f0">LeadConses</a> = {}</td></tr>
 <tr class="memdesc:aa6dbaa1a86b87efeee4e0467321cb7f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores each country's leader constraint LHS.  <a href="#aa6dbaa1a86b87efeee4e0467321cb7f0">More...</a><br /></td></tr>
 <tr class="separator:aa6dbaa1a86b87efeee4e0467321cb7f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -186,7 +198,7 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00454">454</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00471">471</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ad2ed81668039c974d5710bac7c1bd8b7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad2ed81668039c974d5710bac7c1bd8b7">&#9670;&nbsp;</a></span>EPEC() <span class="overload">[1/2]</span></h2>
@@ -247,7 +259,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00480">480</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00499">499</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -276,7 +288,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00520">520</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00533">533</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -311,7 +323,7 @@ Private Attributes</h2></td></tr>
 <li>Updates the LeadLocs in Models::EPEC::Locations.at(i) </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00414">414</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00415">415</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -368,7 +380,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00230">230</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00225">225</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -397,7 +409,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00345">345</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00343">343</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -425,12 +437,12 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00538">538</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00551">551</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ae9ac7fcf9916d570bf0e3dafec725b71"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9ac7fcf9916d570bf0e3dafec725b71">&#9670;&nbsp;</a></span>dataCheck()</h2>
+<a id="aa12d1e6f5237d58d74ef56b93cea45be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa12d1e6f5237d58d74ef56b93cea45be">&#9670;&nbsp;</a></span>dataCheck()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -484,7 +496,13 @@ Private Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>chkLeaderLocations</em> = <code>true</code>&#160;</td>
+          <td class="paramname"><em>chkLeaderLocations</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>chkLeadObjec</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -508,12 +526,13 @@ Private Attributes</h2></td></tr>
     <tr><td class="paramname">chkLeadRHSes</td><td>Checks if <a class="el" href="classModels_1_1EPEC.html#aa723444fd50ed0cfec22c3d709e48aa3" title="Stores each country&#39;s leader constraint RHS.">Models::EPEC::LeadRHSes</a> has size <code>n</code> </td></tr>
     <tr><td class="paramname">chknImportMarkets</td><td>Checks if <a class="el" href="classModels_1_1EPEC.html#a9ab0c5070d9674c16e9b80e469eac6af" title="Number of countries from which the i-th country imports.">Models::EPEC::nImportMarkets</a> has size <code>n</code> </td></tr>
     <tr><td class="paramname">chkLocations</td><td>Checks if <a class="el" href="classModels_1_1EPEC.html#ae8d30316ca6672705a541350d4e91527" title="Location of variables for each country.">Models::EPEC::Locations</a> has size <code>n</code> </td></tr>
-    <tr><td class="paramname">chkLeaderLocations</td><td>Checks if <a class="el" href="classModels_1_1EPEC.html#adc5a35e4ebbc8d55a05dc0131e70a1d4" title="Location of each leader.">Models::EPEC::LeaderLocations</a> has size <code>n</code> and <a class="el" href="classModels_1_1EPEC.html#a0e46d5aee2a7bf675775d3354520036f">Models::EPEC::nVarinEPEC</a> is set </td></tr>
+    <tr><td class="paramname">chkLeaderLocations</td><td>Checks if <a class="el" href="classModels_1_1EPEC.html#adc5a35e4ebbc8d55a05dc0131e70a1d4" title="Location of each leader.">Models::EPEC::LeaderLocations</a> has size <code>n</code> and <a class="el" href="classModels_1_1EPEC.html#a0e215b1d6cd630fc6edbbb5f78339953" title="Constant attribute for number of variables in the EPEC.">Models::EPEC::nVarEPEC</a> is set </td></tr>
+    <tr><td class="paramname">chkLeadObjec</td><td>Checks if <a class="el" href="classModels_1_1EPEC.html#a347560f8ddc05e3167ae4a47fc4eb5ce" title="Objective of each leader.">Models::EPEC::LeadObjec</a> has size <code>n</code> </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00493">493</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00504">504</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -541,7 +560,7 @@ Private Attributes</h2></td></tr>
 <li>Creates the QP objective corresponding to each leader's objective. Calls <a class="el" href="classModels_1_1EPEC.html#a990238b27ca557b6dc577b5f8d9fe918">Models::EPEC::make_obj_leader</a> </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00370">370</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00368">368</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -563,7 +582,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns a non-owning pointer to the <code>i</code> -th country's lower level NashGame. </p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00567">567</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00580">580</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -595,7 +614,7 @@ Private Attributes</h2></td></tr>
 
 <p>Gets position of a variable in a country given the country name and the variable. </p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00558">558</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00571">571</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -627,7 +646,27 @@ Private Attributes</h2></td></tr>
 
 <p>Gets position of a variable in a country. </p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00548">548</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00561">561</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa8bef40141d868801c8c3b0a4d28fa6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8bef40141d868801c8c3b0a4d28fa6f">&#9670;&nbsp;</a></span>make_country_QP()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Models::EPEC::make_country_QP </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00663">663</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -806,7 +845,7 @@ Private Attributes</h2></td></tr>
 <p>Makes the market clearing constraint for country <code>i</code>. </p>
 <p>Writes the market clearing constraint as a <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> and stores it in <a class="el" href="classModels_1_1EPEC.html#a11b212ad1bc65ad020fb8601e302c931" title="The QP corresponding to the market clearing condition of each player.">Models::EPEC::MC_QP</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00441">441</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00452">452</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -843,7 +882,7 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Makes the objective function o each country. </p>
+<p>Makes the objective function of each country. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">i</td><td>The location of the country whose objective is to be made </td></tr>
@@ -852,7 +891,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00590">590</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00603">603</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -917,6 +956,66 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a3965e63733c65959597d90de8468d39b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3965e63733c65959597d90de8468d39b">&#9670;&nbsp;</a></span>Respond() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unique_ptr&lt; GRBModel &gt; Models::EPEC::Respond </td>
+          <td>(</td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const arma::vec &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00641">641</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a682e7745b1c10ba45d875781afa8d799"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a682e7745b1c10ba45d875781afa8d799">&#9670;&nbsp;</a></span>Respond() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unique_ptr&lt; GRBModel &gt; Models::EPEC::Respond </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>i</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const arma::vec &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00647">647</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a356a22aff221fad903b911014783651f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a356a22aff221fad903b911014783651f">&#9670;&nbsp;</a></span>unlock()</h2>
 
@@ -936,7 +1035,7 @@ Private Attributes</h2></td></tr>
 <p>A finalized model cannot be edited unless it is unlocked first. </p>
 <p><a class="el" href="classModels_1_1EPEC.html#a0b8ec7f9576b833a42e71ea9f16704f1" title="Finalizes the creation of a Models::EPEC object.">EPEC::finalize()</a> performs "finalizing" acts on an object. </p><dl class="section warning"><dt>Warning</dt><dd>Exclusively for debugging purposes for developers. Don't call this function, unless you know what you are doing. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00576">576</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00589">589</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -963,7 +1062,7 @@ Private Attributes</h2></td></tr>
 
 <p>The parameters of each leader in the <a class="el" href="classModels_1_1EPEC.html">EPEC</a> game. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00457">457</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00474">474</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -989,7 +1088,7 @@ Private Attributes</h2></td></tr>
 
 <p>Stores each country's lower level Nash game. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00458">458</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00475">475</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1013,9 +1112,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>The QP corresponding to the market clearing condition of each player. </p>
+<p>The QP corresponding to each player. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00460">460</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00477">477</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1041,7 +1140,7 @@ Private Attributes</h2></td></tr>
 
 <p>A gurobi environment to create and process the resulting LCP object. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00469">469</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00487">487</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1065,7 +1164,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00471">471</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00489">489</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1091,7 +1190,7 @@ Private Attributes</h2></td></tr>
 
 <p>Stores each country's leader constraint LHS. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00461">461</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00479">479</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1117,7 +1216,33 @@ Private Attributes</h2></td></tr>
 
 <p>Location of each leader. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00466">466</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00484">484</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+
+</div>
+</div>
+<a id="a347560f8ddc05e3167ae4a47fc4eb5ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a347560f8ddc05e3167ae4a47fc4eb5ce">&#9670;&nbsp;</a></span>LeadObjec</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;shared_ptr&lt;<a class="el" href="structGame_1_1QP__objective.html">Game::QP_objective</a>&gt; &gt; Models::EPEC::LeadObjec = {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Objective of each leader. </p>
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00478">478</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1143,7 +1268,7 @@ Private Attributes</h2></td></tr>
 
 <p>Stores each country's leader constraint RHS. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00462">462</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00480">480</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1169,7 +1294,7 @@ Private Attributes</h2></td></tr>
 
 <p>Location of variables for each country. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00465">465</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00483">483</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1195,7 +1320,7 @@ Private Attributes</h2></td></tr>
 
 <p>The QP corresponding to the market clearing condition of each player. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00459">459</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00476">476</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1219,7 +1344,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00470">470</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00488">488</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1243,7 +1368,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00472">472</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00490">490</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1261,7 +1386,7 @@ Private Attributes</h2></td></tr>
 
 <p>Constant attribute for number of leaders in the <a class="el" href="classModels_1_1EPEC.html">EPEC</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00477">477</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00495">495</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1287,7 +1412,25 @@ Private Attributes</h2></td></tr>
 
 <p>Number of countries from which the i-th country imports. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00464">464</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00482">482</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+
+</div>
+</div>
+<a id="a0e215b1d6cd630fc6edbbb5f78339953"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e215b1d6cd630fc6edbbb5f78339953">&#9670;&nbsp;</a></span>nVarEPEC</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const unsigned int&amp; Models::EPEC::nVarEPEC {<a class="el" href="classModels_1_1EPEC.html#a0e46d5aee2a7bf675775d3354520036f">nVarinEPEC</a>}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constant attribute for number of variables in the <a class="el" href="classModels_1_1EPEC.html">EPEC</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00496">496</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1311,7 +1454,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00467">467</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00485">485</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1337,7 +1480,7 @@ Private Attributes</h2></td></tr>
 
 <p>Transportation costs between pairs of countries. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00463">463</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00481">481</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>

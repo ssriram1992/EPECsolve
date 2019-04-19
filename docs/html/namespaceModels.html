@@ -110,9 +110,9 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eab352c19b5ee483451acb8039d5b92edd">LeaderVars::NetExport</a>, 
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eabaf050cedcda40eabc94d4a7bd5116cb">LeaderVars::CountryImport</a>, 
 <br />
-&#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea4b78ac8eb158840e9638a3aeb26c4a9d">LeaderVars::Tax</a>, 
-<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea55dd587cdc4a278be6a5c37f9e539de1">LeaderVars::Caps</a>, 
-<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eaf2336b6cba95fe1e93086bd87c8eb08c">LeaderVars::AddnVar</a>, 
+&#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea55dd587cdc4a278be6a5c37f9e539de1">LeaderVars::Caps</a>, 
+<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea4b78ac8eb158840e9638a3aeb26c4a9d">LeaderVars::Tax</a>, 
+<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea17d72d09ea044ac3506cece93e19f6b8">LeaderVars::DualVar</a>, 
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea2afd0bab7c35873bc8dd372c6d255448">LeaderVars::ConvHullDummy</a>, 
 <br />
 &#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea87557f11575c0ad78e4e28abedc13b6e">LeaderVars::End</a>
@@ -132,6 +132,12 @@ Functions</h2></td></tr>
 <tr class="separator:a930b278b95aa7f2ef8a4d7d144eed230"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae792fb7a6b02eebf59fd8e4de8d6bf16"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ae792fb7a6b02eebf59fd8e4de8d6bf16">operator&lt;&lt;</a> (ostream &amp;ost, const <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">LeaderVars</a> l)</td></tr>
 <tr class="separator:ae792fb7a6b02eebf59fd8e4de8d6bf16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81197aab1f9d6801996579a891f07791"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a81197aab1f9d6801996579a891f07791">increaseVal</a> (<a class="el" href="namespaceModels.html#a8e4bd29d7097f84fe08eee1d6d780c59">LeadLocs</a> &amp;L, const <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">LeaderVars</a> start, const unsigned int val, const bool startnext=true)</td></tr>
+<tr class="separator:a81197aab1f9d6801996579a891f07791"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a723b05bd3c4740451512f73d0c75ceb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a723b05bd3c4740451512f73d0c75ceb6">init</a> (<a class="el" href="namespaceModels.html#a8e4bd29d7097f84fe08eee1d6d780c59">LeadLocs</a> &amp;L)</td></tr>
+<tr class="separator:a723b05bd3c4740451512f73d0c75ceb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae235f93cb5c937e10ef640f9fe99cba0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">LeaderVars</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ae235f93cb5c937e10ef640f9fe99cba0">operator+</a> (<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">Models::LeaderVars</a> a, int b)</td></tr>
+<tr class="separator:ae235f93cb5c937e10ef640f9fe99cba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="ac928cbc777ce5f362354f5f3ae42d5d7"></a>
@@ -146,7 +152,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00384">384</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00396">396</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -162,7 +168,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00383">383</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00395">395</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -178,7 +184,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00386">386</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00398">398</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -194,7 +200,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00452">452</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00464">464</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -210,7 +216,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00385">385</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00397">397</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -239,18 +245,111 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76eabd2f8eff3cf4fc193002ef846a45c155"></a>NetImport&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76eab352c19b5ee483451acb8039d5b92edd"></a>NetExport&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76eabaf050cedcda40eabc94d4a7bd5116cb"></a>CountryImport&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76ea4b78ac8eb158840e9638a3aeb26c4a9d"></a>Tax&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76ea55dd587cdc4a278be6a5c37f9e539de1"></a>Caps&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76eaf2336b6cba95fe1e93086bd87c8eb08c"></a>AddnVar&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76ea4b78ac8eb158840e9638a3aeb26c4a9d"></a>Tax&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76ea17d72d09ea044ac3506cece93e19f6b8"></a>DualVar&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76ea2afd0bab7c35873bc8dd372c6d255448"></a>ConvHullDummy&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a64b758b38a6e4004b84630ec087bf76ea87557f11575c0ad78e4e28abedc13b6e"></a>End&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00432">432</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00444">444</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a81197aab1f9d6801996579a891f07791"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81197aab1f9d6801996579a891f07791">&#9670;&nbsp;</a></span>increaseVal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Models::increaseVal </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceModels.html#a8e4bd29d7097f84fe08eee1d6d780c59">LeadLocs</a> &amp;&#160;</td>
+          <td class="paramname"><em>L</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">LeaderVars</a>&#160;</td>
+          <td class="paramname"><em>start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>startnext</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Should be called ONLY after initializing <code>L</code> by calling <a class="el" href="namespaceModels.html#a723b05bd3c4740451512f73d0c75ceb6">Models::init</a> </p>
+
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00682">682</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a723b05bd3c4740451512f73d0c75ceb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a723b05bd3c4740451512f73d0c75ceb6">&#9670;&nbsp;</a></span>init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Models::init </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceModels.html#a8e4bd29d7097f84fe08eee1d6d780c59">LeadLocs</a> &amp;&#160;</td>
+          <td class="paramname"><em>L</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00695">695</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ae235f93cb5c937e10ef640f9fe99cba0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae235f93cb5c937e10ef640f9fe99cba0">&#9670;&nbsp;</a></span>operator+()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">Models::LeaderVars</a> Models::operator+ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">Models::LeaderVars</a>&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00701">701</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a0f6641269c168c9ff9ff6a09bb24bab5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0f6641269c168c9ff9ff6a09bb24bab5">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[1/5]</span></h2>
 

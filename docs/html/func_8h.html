@@ -162,9 +162,9 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eab352c19b5ee483451acb8039d5b92edd">Models::LeaderVars::NetExport</a>, 
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eabaf050cedcda40eabc94d4a7bd5116cb">Models::LeaderVars::CountryImport</a>, 
 <br />
-&#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea4b78ac8eb158840e9638a3aeb26c4a9d">Models::LeaderVars::Tax</a>, 
-<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea55dd587cdc4a278be6a5c37f9e539de1">Models::LeaderVars::Caps</a>, 
-<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eaf2336b6cba95fe1e93086bd87c8eb08c">Models::LeaderVars::AddnVar</a>, 
+&#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea55dd587cdc4a278be6a5c37f9e539de1">Models::LeaderVars::Caps</a>, 
+<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea4b78ac8eb158840e9638a3aeb26c4a9d">Models::LeaderVars::Tax</a>, 
+<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea17d72d09ea044ac3506cece93e19f6b8">Models::LeaderVars::DualVar</a>, 
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea2afd0bab7c35873bc8dd372c6d255448">Models::LeaderVars::ConvHullDummy</a>, 
 <br />
 &#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea87557f11575c0ad78e4e28abedc13b6e">Models::LeaderVars::End</a>
@@ -187,8 +187,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a480587ff8bece891c1e6fc76e6ee59e4"><td class="memTemplParams" colspan="2">template&lt;class T , class S &gt; </td></tr>
 <tr class="memitem:a480587ff8bece891c1e6fc76e6ee59e4"><td class="memTemplItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="func_8h.html#a480587ff8bece891c1e6fc76e6ee59e4">operator&lt;&lt;</a> (ostream &amp;ost, pair&lt; T, S &gt; p)</td></tr>
 <tr class="separator:a480587ff8bece891c1e6fc76e6ee59e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac21e6cbf8a72cb23b898eb455fde2ead"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#ac21e6cbf8a72cb23b898eb455fde2ead">Game::operator&lt;&lt;</a> (ostream &amp;os, const QP_Param &amp;Q)</td></tr>
-<tr class="separator:ac21e6cbf8a72cb23b898eb455fde2ead"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5de9da6265b1d8233c1969a24a541175"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#a5de9da6265b1d8233c1969a24a541175">Game::operator&lt;&lt;</a> (ostream &amp;os, const QP_Param &amp;Q)</td></tr>
+<tr class="separator:a5de9da6265b1d8233c1969a24a541175"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa896f1d65157fdcb9d6ebfc88c720a3d"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#aa896f1d65157fdcb9d6ebfc88c720a3d">Game::LPSolve</a> (const arma::sp_mat &amp;A, const arma::vec &amp;b, const arma::vec &amp;c, int &amp;status, bool Positivity=false)</td></tr>
 <tr class="separator:aa896f1d65157fdcb9d6ebfc88c720a3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac29ffc678f24b8184df5da2c9462d72c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#ac29ffc678f24b8184df5da2c9462d72c">Game::ConvexHull</a> (vector&lt; arma::sp_mat * &gt; *Ai, vector&lt; arma::vec * &gt; *bi, arma::sp_mat &amp;A, arma::vec &amp;b, arma::sp_mat Acom={}, arma::vec bcom={})</td></tr>
@@ -204,6 +204,12 @@ Functions</h2></td></tr>
 <tr class="separator:a930b278b95aa7f2ef8a4d7d144eed230"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae792fb7a6b02eebf59fd8e4de8d6bf16"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ae792fb7a6b02eebf59fd8e4de8d6bf16">Models::operator&lt;&lt;</a> (ostream &amp;ost, const LeaderVars l)</td></tr>
 <tr class="separator:ae792fb7a6b02eebf59fd8e4de8d6bf16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81197aab1f9d6801996579a891f07791"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a81197aab1f9d6801996579a891f07791">Models::increaseVal</a> (LeadLocs &amp;L, const LeaderVars start, const unsigned int val, const bool startnext=true)</td></tr>
+<tr class="separator:a81197aab1f9d6801996579a891f07791"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a723b05bd3c4740451512f73d0c75ceb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a723b05bd3c4740451512f73d0c75ceb6">Models::init</a> (LeadLocs &amp;L)</td></tr>
+<tr class="separator:a723b05bd3c4740451512f73d0c75ceb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae235f93cb5c937e10ef640f9fe99cba0"><td class="memItemLeft" align="right" valign="top">LeaderVars&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ae235f93cb5c937e10ef640f9fe99cba0">Models::operator+</a> (<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">Models::LeaderVars</a> a, int b)</td></tr>
+<tr class="separator:ae235f93cb5c937e10ef640f9fe99cba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a42f8c497a1968074f38bf5055c650dca"></a>
@@ -277,7 +283,7 @@ Functions</h2></td></tr>
 <p><b>Grandchild:</b> Same val as grand parent in every location, except any val allowed, if grandparent is 0 </p><dl class="section warning"><dt>Warning</dt><dd>Might be deprecated, as it pollutes global namespaces </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if Fix1 is (grand) child of Fix2 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00026">26</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00027">27</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -309,7 +315,7 @@ template&lt;class T , class S &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00022">22</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00023">23</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -339,7 +345,7 @@ template&lt;class T , class S &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00029">29</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00030">30</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -371,7 +377,7 @@ template&lt;class T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00012">12</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00013">13</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -413,7 +419,7 @@ template&lt;class T &gt; </div>
 <dl class="section warning"><dt>Warning</dt><dd>Might be deprecated, as it pollutes global namespaces </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if Fix1 and Fix2 have the same elements else <code>false</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00012">12</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00013">13</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
