@@ -15,15 +15,17 @@ ARMAOPT=$(ARMAINC) $(ARMALIB)
 
 # Gurobi stuff
 # GUR=/opt/gurobi810/linux64
-GUR=/opt/gurobi/gurobi801/linux64
+GUR=/opt/gurobi801/linux64
+# GUR=/opt/gurobi/gurobi801/linux64
 GURINC=-I $(GUR)/include 
 GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi80 -lm 
 # GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi81 -lm 
 GUROPT=$(GURINC) $(GURLIB)
 
 # Generic objects not requiring changes
-GCC=g++
-OTHEROPTS= -O2 -Wall -std=c++11
+# GCC=g++
+GCC=g++-4.8
+OTHEROPTS= -O2 -Wall -Wno-comment -std=c++11
 OPTS= $(GUROPT) $(ARMAOPT)  $(OTHEROPTS)
 
 runEPEC: compileEPEC
@@ -67,6 +69,15 @@ sand: sand.o
 	$(GCC) sand.o $(OPTS) -o sand
 	./sand
 
+
+sand2: sand2.o
+	$(GCC) sand2.o $(OTHEROPTS) -o sand2
+	./sand2
+
+sand2.o: sand2.cpp
+	$(GCC) -c sand2.cpp $(OPTS)
+
+
 sand.o: sand.cpp
 	$(GCC) -c sand.cpp $(OPTS)
 
@@ -82,3 +93,5 @@ edit:
 tag:
 	ctags *.cpp *.h
 	@echo "All tags done. Use Ctrl+] to follow a tag in vim and Ctrl+O to go back"
+
+

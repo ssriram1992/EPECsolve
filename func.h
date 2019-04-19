@@ -114,6 +114,7 @@ class MP_Param
 		virtual MP_Param& set(const QP_objective &obj, const QP_constraints &cons);
 		virtual MP_Param& set(QP_objective &&obj, QP_constraints &&cons);
 		virtual MP_Param& addDummy(unsigned int pars, unsigned int vars = 0);
+        static bool dataCheck(const QP_objective &obj, const QP_constraints &cons, bool checkObj=true, bool checkCons=true) ;
 };
 
 ///@brief Class to handle parameterized quadratic programs(QP)
@@ -234,7 +235,7 @@ class NashGame
 			os<<"Nash Game with "<<N.Nplayers<<" players"<<endl;
 			os<<"-----------------------------------------------------------------------"<<endl;
 			os<<"Number of primal variables:\t\t\t "<<N.primal_position.back()<<endl;
-			os<<"Number of dual variables:\t\t\t "<<N.dual_position.back()-N.dual_position.front()+1<<endl;
+			os<<"Number of dual variables:\t\t\t "<<N.dual_position.back()-N.dual_position.front()+0<<endl;
 			os<<"Number of shadow price dual variables:\t\t "<<N.MCRHS.n_rows<<endl;
 			os<<"Number of leader variables:\t\t\t "<<N.n_LeadVar<<endl;
 			os<<"-----------------------------------------------------------------------"<<endl;
@@ -242,6 +243,14 @@ class NashGame
 		}
 		/// Return the number of primal variables
 		inline unsigned int getNprimals() const { return this->Players.at(0)->getNy() + this->Players.at(0)->getNx(); }
+		inline unsigned int getNshadow() const {return this->MCRHS.n_rows;}
+		inline unsigned int getNleaderVars() const {return this->n_LeadVar;}
+		inline unsigned int getNduals() const {return this->dual_position.back()-this->dual_position.front()+1;}
+		// Size of variables
+		inline unsigned int getPrimalLoc(unsigned int i=0) const {return primal_position.at(i);}
+		inline unsigned int getMCdualLoc() const {return MC_dual_position;}
+		inline unsigned int getLeaderLoc() const {return Leader_position;}
+		inline unsigned int getDualLoc(unsigned int i=0) const {return dual_position.at(i);}
 
 
 	public: // Members
@@ -307,18 +316,20 @@ class LCP
 				unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={}); // Constructor with M,q,leader posn
 		LCP(GRBEnv* env, arma::sp_mat M, arma::vec q, 
 				perps Compl, arma::sp_mat A={}, arma::vec b={}); // Constructor with M, q, compl pairs
-		LCP(GRBEnv* env, NashGame N);
+		LCP(GRBEnv* env, const NashGame &N);
 	/** Destructor - to delete the objects created with new operator */
 		~LCP();
 	/** Return data and address */ 
 		inline arma::sp_mat getM() {return this->M;}  			///< Read-only access to LCP::M 
-		inline arma::sp_mat* getMstar() {return &(this->M);}	///< Pointer access to LCP::M 
+		inline arma::sp_mat* getMstar() {return &(this->M);}	///< Reference access to LCP::M 
 		inline arma::vec getq() {return this->q;}  				///< Read-only access to LCP::q 
-		inline arma::vec* getqstar() {return &(this->q);}		///< Pointer access to LCP::q 
+		inline arma::vec* getqstar() {return &(this->q);}		///< Reference access to LCP::q 
 		inline unsigned int getLStart(){return LeadStart;} 		///< Read-only access to LCP::LeadStart 
 		inline unsigned int getLEnd(){return LeadEnd;}			///< Read-only access to LCP::LeadEnd 
 		inline perps getCompl() {return this->Compl;}  			///< Read-only access to LCP::Compl 
 		void print(string end="\n");							///< Print a summary of the LCP
+		inline unsigned int getNcol() {return this->M.n_cols;};
+		inline unsigned int getNrow() {return this->M.n_rows;};
 	/* Member functions */
 	private:
 		bool errorCheck(bool throwErr=true) const;
@@ -369,7 +380,8 @@ class LCP
 		 * @todo Formally call LCP::BranchAndPrune or throw an exception if this method is not already run
 		 */
 		{return Game::ConvexHull(this->Ai, this->bi, A, b, this->_A,this->_b);};
-		void makeQP(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi, Game::QP_objective &QP_obj, Game::QP_Param &QP);
+		LCP& makeQP(const vector<short int> &Fix, vector<arma::sp_mat*> &custAi, vector<arma::vec*> &custbi, Game::QP_objective &QP_obj, Game::QP_Param &QP);
+		LCP& makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
 };
 };
 
@@ -435,9 +447,9 @@ enum class LeaderVars
 	NetImport, 
 	NetExport,
 	CountryImport,
-	Tax,
 	Caps,
-	AddnVar,
+	Tax,
+	DualVar,
 	ConvHullDummy,
 	End
 };
@@ -451,13 +463,19 @@ ostream& operator<<(ostream& ost, const LeaderVars l);
 
 using LeadLocs=map<LeaderVars,unsigned int>;
 
+void increaseVal(LeadLocs& L, const LeaderVars start, const unsigned int val, const bool startnext = true);
+void init(LeadLocs &L);
+LeaderVars operator+ (Models::LeaderVars a, int b);
+
+
 class EPEC
 {
 	private:
 		vector<LeadAllPar> AllLeadPars = {};  ///< The parameters of each leader in the EPEC game
 		vector<shared_ptr<Game::NashGame>> countries_LL = {}; ///< Stores each country's lower level Nash game
 		vector<shared_ptr<Game::QP_Param>> MC_QP = {}; 	///< The QP corresponding to the market clearing condition of each player
-		vector<shared_ptr<Game::QP_Param>> country_QP = {}; 	///< The QP corresponding to the market clearing condition of each player
+		vector<shared_ptr<Game::QP_Param>> country_QP = {}; 	///< The QP corresponding to each player
+		vector<shared_ptr<Game::QP_objective>> LeadObjec = {};	///< Objective of each leader
 		vector<arma::sp_mat> LeadConses = {}; 		///< Stores each country's leader constraint LHS
 		vector<arma::vec> LeadRHSes = {}; 			///< Stores each country's leader constraint RHS
 		arma::sp_mat TranspCosts = {};				///< Transportation costs between pairs of countries
@@ -472,9 +490,10 @@ class EPEC
 		unsigned int nCountr = 0;
 		bool dataCheck(const bool chkAllLeadPars=true, const bool chkcountriesLL=true, const bool chkMC_QP=true, 
 				const bool chkLeadConses=true, const bool chkLeadRHSes=true, const bool chknImportMarkets=true, 
-				const bool chkLocations=true, const bool chkLeaderLocations=true) const;
+				const bool chkLocations=true, const bool chkLeaderLocations=true, const bool chkLeadObjec=true) const;
 	public: // Attributes
 		const unsigned int& nCountries{nCountr}; ///< Constant attribute for number of leaders in the EPEC
+		const unsigned int& nVarEPEC{nVarinEPEC}; ///< Constant attribute for number of variables in the EPEC
 	public:
 		EPEC()=delete;
 		EPEC(GRBEnv *env, arma::sp_mat TranspCosts={}):TranspCosts{TranspCosts}, env{env}{}
@@ -500,6 +519,7 @@ class EPEC
 		void add_Dummy_Lead(const unsigned int i);
 		void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj);
 	public:
+		void make_country_QP(const unsigned int i);
 		///@brief %Models a Standard Nash-Cournot game within a country
 		EPEC& addCountry(
 				/// The Parameter structure for the leader
@@ -511,6 +531,8 @@ class EPEC
 		const EPEC& finalize();
 		unsigned int getPosition(const unsigned int countryCount, const LeaderVars var = LeaderVars::FollowerStart) const;
 		unsigned int getPosition(const string countryCount, const LeaderVars var = LeaderVars::FollowerStart) const;
+		unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
+		unique_ptr<GRBModel> Respond(const string name, const arma::vec &x) const;
 		EPEC& unlock();
 	public:
 		// Data access methods

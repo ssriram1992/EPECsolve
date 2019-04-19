@@ -22,6 +22,9 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 	try
 	{
 		epec.addCountry(LA, 0).addCountry(LA2, 0).addTranspCosts(TrCo).finalize();
+		cout<<"Here1\n";
+		epec.make_country_QP(0);
+		epec.make_country_QP(1);
 	} 
 	catch(const char* e) { cerr<<e<<endl;throw; }
 	catch(string e) { cerr<<"String: "<<e<<endl;throw; }
@@ -35,14 +38,19 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 int main()
 {
 	Models::DemPar P;
-	Models::FollPar FP;
+	Models::FollPar FP, FP2;
 	Models::LeadPar L;
-	FP.capacities = {10, 15, 10};
-	FP.costs_lin = {30, 40, 50};
-	FP.costs_quad = {60, 40, 0}; 
-	FP.emission_costs = {0, 0, 0}; 
-	Models::LeadAllPar LA(3, "A", FP);
-	Models::LeadAllPar LA2(3, "B", FP, {60,1});
+	FP.capacities = {10, 15};
+	FP.costs_lin = {30, 40};
+	FP.costs_quad = {60, 40}; 
+	FP.emission_costs = {0, 0}; 
+
+	FP2.capacities = {10, 10};
+	FP2.costs_lin = {30, 50};
+	FP2.costs_quad = {60, 40}; 
+	FP2.emission_costs = {10, 0}; 
+	Models::LeadAllPar LA(2, "A", FP);
+	Models::LeadAllPar LA2(2, "B", FP2, {60,1});
 	// cout<<LA<<LA2;
 	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
 	arma::mat TrCo(2,2); 

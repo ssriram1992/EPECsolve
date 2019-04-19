@@ -3,6 +3,7 @@
 #include"func.h"
 #include<armadillo>
 #include<array>
+#define VERBOSE true
 
 using namespace std;
 
@@ -21,7 +22,7 @@ template
 ostream& 
 operator<<(ostream& ost, pair<T,S> p)
 {
-	cout<<"<"<<p.first<<", "<<p.second<<">";
+	ost<<"<"<<p.first<<", "<<p.second<<">";
 	return ost; 
 }
 
@@ -29,12 +30,12 @@ ostream&
 operator<<(ostream& ost, perps C)
 {
 	 for (auto p:C)
-		cout<<"<"<<p.first<<", "<<p.second<<">"<<"\t";
+		ost<<"<"<<p.first<<", "<<p.second<<">"<<"\t";
 	return ost; 
 }
 
 ostream& 
-operator<< (ostream& os, const Game::QP_Param &Q)
+Game::operator<< (ostream& os, const Game::QP_Param &Q)
 {
 	os<<"Quadratic program with linear inequality constraints: "<<endl;
 	os<<Q.getNy()<<" decision variables parameterized by "<<Q.getNx()<<" variables"<<endl;
@@ -120,6 +121,7 @@ Game::MP_Param::set(const QP_objective &obj, const QP_constraints &cons)
 Game::MP_Param& 
 Game::MP_Param::set(QP_objective &&obj, QP_constraints &&cons)
 {
+    cout<<"Here\n";
 	return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
 }
 
@@ -141,16 +143,37 @@ Game::MP_Param::dataCheck(bool forcesymm ///< Check if MP_Param::Q is symmetric
  */
 {
 	if(forcesymm && !this->Q.is_symmetric()) 
-		return false; // Q should be symmetric if forcesymm is true
-	if(this->Q.n_cols != Ny) return false;
-	if(this->A.n_cols != Nx) return false; 		// Rest are matrix size compatibility checks
-	if(this->B.n_cols != Ny) return false;
-	if(this->C.n_rows != Ny) return false;
-	if(this->c.size() != Ny) return false;
-	if(this->A.n_rows != Ncons) return false;
-	if(this->B.n_rows != Ncons) return false;
+		{if(VERBOSE) cout<<"Q.is_symmetric()\n";return false; }
+	
+	if(this->Q.n_cols != Ny) {if(VERBOSE) cout<<"Q.n_cols\n"; return false; }
+	if(this->A.n_cols != Nx) {if(VERBOSE) cout<<A.n_cols<<" "<<Nx<<"A.n_cols\n"; return false; } 		// Rest are matrix size compatibility checks
+	if(this->B.n_cols != Ny) {if(VERBOSE) cout<<B.n_cols<<" "<<Ny<<" B.n_cols\n"; return false; }
+	if(this->C.n_rows != Ny) {if(VERBOSE) cout<<"C.n_rows\n"; return false; }
+	if(this->c.size() != Ny) {if(VERBOSE) cout<<"c.n_rows\n"; return false; }
+	if(this->A.n_rows != Ncons) {if(VERBOSE) cout<<"A.n_rows\n"; return false;}
+	if(this->B.n_rows != Ncons) {if(VERBOSE) cout<<"B.n_rows\n";return false;}
 	return true;
 }
+
+bool Game::MP_Param::dataCheck(const QP_objective &obj, const QP_constraints &cons, bool checkobj, bool checkcons) 
+{
+	unsigned int Ny = obj.Q.n_rows;
+	unsigned int Nx = obj.C.n_cols;
+	unsigned int Ncons = cons.b.size(); 
+	if(checkobj && !obj.Q.is_symmetric()) 
+		{if(VERBOSE) cout<<"Q.is_symmetric()\n";return false; }
+	
+	if(checkobj && obj.Q.n_cols != Ny) {if(VERBOSE) cout<<"Q.n_cols\n"; return false; }
+	if(checkobj && obj.C.n_rows != Ny) {if(VERBOSE) cout<<"C.n_rows\n"; return false; }
+	if(checkobj && obj.c.size() != Ny) {if(VERBOSE) cout<<"c.n_rows\n"; return false; }
+	if(checkcons && cons.A.n_cols != Nx) {if(VERBOSE) cout<<cons.A.n_cols<<" "<<Nx<<"A.n_cols\n"; return false; } 		// Rest are matrix size compatibility checks
+	if(checkcons && cons.B.n_cols != Ny) {if(VERBOSE) cout<<cons.B.n_cols<<" "<<Ny<<" B.n_cols\n"; return false; }
+	if(checkcons && cons.A.n_rows != Ncons) {if(VERBOSE) cout<<"A.n_rows\n"; return false;}
+	if(checkcons && cons.B.n_rows != Ncons) {if(VERBOSE) cout<<"B.n_rows\n";return false;}
+	return true;
+}
+
+
 
 int
 Game::QP_Param::make_yQy()
@@ -281,14 +304,14 @@ Game::QP_Param::set(arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma::
 }
 
 Game::QP_Param& 
-Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons)
+Game::QP_Param::set(QP_objective &&obj, QP_constraints &&cons)
 /// Setting the data with the inputs being a struct Game::QP_objective and struct Game::QP_constraints
 {
 	return this->set(move(obj.Q), move(obj.C), move(cons.A), move(cons.B), move(obj.c), move(cons.b));
 }
 
 Game::QP_Param& 
-Game::QP_Param::set(QP_objective &&obj, QP_constraints &&cons)
+Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons)
 {
 	return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
 }
@@ -322,8 +345,8 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
 	this->MarketClearing = MC;
 	this->MCRHS = MCRHS;
 	// Setting the size of class variable vectors
-	this->primal_position.resize(this->Nplayers);
-	this->dual_position.resize(this->Nplayers);
+	this->primal_position.resize(this->Nplayers+1);
+	this->dual_position.resize(this->Nplayers+1);
 
 	this->set_positions();
 }
@@ -338,15 +361,13 @@ void Game::NashGame::set_positions()
 {
 	// Defining the variable value
 	unsigned int pr_cnt{0}, dl_cnt{0}; // Temporary variables - primal count and dual count
-	vector<unsigned int> nCons(Nplayers); // Tracking the number of constraints in each player's problem
 	for(unsigned int i=0; i<Nplayers;i++)
 	{
 		primal_position.at(i)=pr_cnt;
 		pr_cnt += Players.at(i)->getNy();
-		nCons.at(i) = Players.at(i)->getNx();
 	}
 	// Pushing back the end of primal position
-	primal_position.push_back(pr_cnt);
+	primal_position.at(Nplayers)=(pr_cnt);
 	dl_cnt = pr_cnt; // From now on, the space is for dual variables.
 	this->MC_dual_position = dl_cnt;
 	this->Leader_position = dl_cnt+MCRHS.n_rows;
@@ -357,7 +378,17 @@ void Game::NashGame::set_positions()
 		dl_cnt += Players.at(i)->getb().n_rows;
 	}
 	// Pushing back the end of dual position
-	dual_position.push_back(dl_cnt);
+	dual_position.at(Nplayers)=(dl_cnt);
+	/*
+	if(VERBOSE)
+	{
+		cout<<"positions set: ";
+		for(unsigned int i=0; i<Nplayers;i++) cout<<primal_position.at(i)<<" ";
+		cout<<MC_dual_position<<" && "<<Leader_position<<" &&  ";
+		for(unsigned int i=0; i<Nplayers+1;i++) cout<<dual_position.at(i)<<" ";
+		cout<<endl;
+	}
+	*/
 }
 
 const Game::NashGame&
@@ -392,6 +423,8 @@ Game::NashGame::FormulateLCP(
 	q.set_size(NvarFollow);
 	M.zeros(); q.zeros(); // Make sure that the matrices don't have garbage value filled in !  
 	// Get the KKT conditions for each player
+	//
+	
 	
 	for(unsigned int i=0; i<Nplayers;i++)
 	{
@@ -420,7 +453,7 @@ Game::NashGame::FormulateLCP(
 		M.submat(
 					this->primal_position.at(i),  this->dual_position.at(i),
 					this->primal_position.at(i+1)-1, this->dual_position.at(i+1)-1
-				) = Mi[i].submat(0, Nprim, Nprim-1, Nprim+Ndual-1);
+				)  = Mi[i].submat(0, Nprim, Nprim-1, Nprim+Ndual-1);
 		// RHS
 		q.subvec(this->primal_position.at(i), this->primal_position.at(i+1)-1) = qi[i].subvec(0, Nprim-1);
 		for(unsigned int j=this->primal_position.at(i);j<this->primal_position.at(i+1);j++)
@@ -495,7 +528,6 @@ Game::NashGame::RewriteLeadCons() const
 	catch(const char* e) { cerr<<"Error in NashGame::RewriteLeadCons: "<<e<<endl; throw;}
 	catch(string e) { cerr<<"String: Error in NashGame::RewriteLeadCons: "<<e<<endl; throw;}
 	catch(exception &e) { cerr<<"Exception: Error in NashGame::RewriteLeadCons: "<<e.what()<<endl; throw;}
-	return A_in;
 }
 
 Game::NashGame& Game::NashGame::addDummy(unsigned int par)
@@ -525,7 +557,8 @@ Game::NashGame& Game::NashGame::addLeadCons(const arma::vec &a, double b)
  */
 {
 	auto nC = this->LeaderConstraints.n_cols;
-	if (a.n_elem != nC) throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible");
+	cout<<"here1"<<endl;
+	if (a.n_elem != nC) throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible --- ") + to_string(a.n_elem) + string(" != ") +to_string(nC);
 	auto nR = this->LeaderConstraints.n_rows;
 	this->LeaderConstraints.resize(nR+1, nC);
 	// (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo

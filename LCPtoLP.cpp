@@ -4,6 +4,7 @@
 #include"func.h"
 #include<gurobi_c++.h>
 #include<armadillo>
+// #define VERBOSE true
 
 using namespace std;
 
@@ -76,7 +77,7 @@ Game::LCP::LCP(GRBEnv* env, ///< Gurobi environment required
 /// @brief Constructor with M, q, compl pairs
 {
 	defConst(env);
-	this->Compl = Compl;
+	this->Compl = perps(Compl);
 	sort(Compl.begin(), Compl.end(), 
 		[](pair<unsigned int, unsigned int>a, pair<unsigned int, unsigned int> b) 
 			{return a.first < b.first;}
@@ -115,7 +116,7 @@ Game::LCP::LCP(GRBEnv* env,				///< Gurobi environment required
 	}
 }
 
-Game::LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
+Game::LCP::LCP(GRBEnv *env, const NashGame &N):RlxdModel(*env)
 /**
  *	@brief Constructer given a NashGame
  *	@details Given a NashGame, computes the KKT of the lower levels, and makes the appropriate LCP object.
@@ -126,8 +127,36 @@ Game::LCP::LCP(GRBEnv *env, NashGame N):RlxdModel(*env)
 {
 	arma::sp_mat M; arma::vec q; perps Compl;
 	N.FormulateLCP(M, q, Compl);
-	arma::sp_mat A; arma::vec b;
 	LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getLeadRHS());
+
+
+	// This is a constructor code! Remember to delete
+	/// @todo Delete the below section of code
+	{
+		this->M = M;
+		this->q = q;
+		this->_A = N.RewriteLeadCons();
+		this->_b = N.getLeadRHS();
+		defConst(env);
+		this->Compl = perps(Compl);
+		sort(Compl.begin(), Compl.end(), 
+			[](pair<unsigned int, unsigned int>a, pair<unsigned int, unsigned int> b) 
+				{return a.first < b.first;}
+			);
+		for(auto p:Compl)
+			if(p.first!=p.second) 
+			{
+				this->LeadStart = p.first;		 this->LeadEnd = p.second - 1;
+				this->nLeader = this->LeadEnd-this->LeadStart + 1;  
+				this->nLeader = this->nLeader>0? this->nLeader:0;
+				break;
+			}
+	}
+	// Delete no more!
+
+
+
+
 }
 
 Game::LCP::~LCP()
@@ -373,17 +402,19 @@ int Game::ConvexHull(
 	// Count the number of variables in the convex hull.
 	unsigned int nFinCons{0}, nFinVar{0};
 	// Error check
-	if (nPoly == 0) 					throw "Empty vector of polyhedra given!";	// There should be at least 1 polyhedron to consider
-	if (nPoly != bi->size()) 			throw "Inconsistent number of LHS and RHS for polyhedra"; 
+	if (nPoly == 0) 					throw string("Empty vector of polyhedra given!");	// There should be at least 1 polyhedron to consider
+	if (nPoly != bi->size()) 			throw string("Inconsistent number of LHS and RHS for polyhedra"); 
 	for(unsigned int i=0; i!=nPoly; i++)
 	{
-		if (Ai->at(i)->n_cols != nC) 		throw "Inconsistent number of variables in the polyhedra " + to_string(i) + "; " + to_string(Ai->at(i)->n_cols)+"!="+to_string(nC);
-		if (Ai->at(i)->n_rows != bi->at(i)->n_rows) throw "Inconsistent number of rows in LHS and RHS of polyhedra " + to_string(i)+";" + to_string(Ai->at(i)->n_rows) + "!=" + to_string(bi->at(i)->n_rows);
+		if (Ai->at(i)->n_cols != nC) 		
+			throw string("Inconsistent number of variables in the polyhedra ") + to_string(i) + "; " + to_string(Ai->at(i)->n_cols)+"!="+to_string(nC);
+		if (Ai->at(i)->n_rows != bi->at(i)->n_rows) 
+			throw string("Inconsistent number of rows in LHS and RHS of polyhedra ") + to_string(i)+";" + to_string(Ai->at(i)->n_rows) + "!=" + to_string(bi->at(i)->n_rows);
 		nFinCons += Ai->at(i)->n_rows;
 	} 	
 	unsigned int FirstCons = nFinCons;
-	if(Acom.n_rows >0 &&Acom.n_cols != nC) throw "Inconsistent number of variables in the common polyhedron";
-	if(Acom.n_rows >0 &&Acom.n_rows != bcom.n_rows) throw "Inconsistent number of rows in LHS and RHS in the common polyhedron";
+	if(Acom.n_rows >0 &&Acom.n_cols != nC) throw string("Inconsistent number of variables in the common polyhedron");
+	if(Acom.n_rows >0 &&Acom.n_rows != bcom.n_rows) throw string("Inconsistent number of rows in LHS and RHS in the common polyhedron");
 
 	// 2nd constraint in Eqn 4.31 of Conforti - twice so we have 2 ineq instead of 1 eq constr
 	nFinCons += nC*2;
@@ -393,16 +424,18 @@ int Game::ConvexHull(
 	nFinCons += Acom.n_rows;
 
 	nFinVar = nPoly*nC + nPoly + nC; // All x^i variables + delta variables+ original x variables 
-	A.resize(nFinCons, nFinVar); b.resize(nFinCons);
-	A.zeros(); b.zeros();
+	A.zeros(nFinCons, nFinVar); b.zeros(nFinCons);
+	
 	// Counting rows completed
 	unsigned int complRow{0};
 	if (VERBOSE){cout<<"In Convex Hull computation!"<<endl;}
+	/****************** SLOW LOOP BEWARE *******************/
 	for(unsigned int i = 0; i<nPoly; i++)
 	{
-		unsigned int nConsInPoly = complRow+Ai->at(i)->n_rows ;
+		if(1) cout<<"Game::ConvexHull: Handling Polyhedron "<<i+1<<" out of "<<nPoly<<endl;
+		const unsigned int nConsInPoly = complRow+Ai->at(i)->n_rows ;
 		// First constraint in (4.31)
-		A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i);
+		A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i); // Slowest line. Will arma improve this?
 		// First constraint RHS
 		A.submat(complRow, nPoly*nC+i, complRow+nConsInPoly-1, nPoly*nC+i) = -*bi->at(i);
 		// Second constraint in (4.31)
@@ -415,6 +448,7 @@ int Game::ConvexHull(
 		A.at(FirstCons + nC*2, nPoly*nC + i) = 1;
 		A.at(FirstCons + nC*2 + 1, nPoly*nC + i) = -1;
 	}
+	/****************** SLOW LOOP BEWARE *******************/
 	// Second Constraint RHS
 	for(unsigned int j=0; j<nC;j++)
 		A.at(FirstCons+2*j, nPoly*nC + nPoly +j) = -1;
@@ -710,7 +744,7 @@ Game::LCP::FixToPoly(const vector<short int> *Fix,  	///< A vector of +1 and -1 
    	arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
 	for(unsigned int i=0;i<this->nR;i++)
 	{
-		if(Fix->at(i) == 0) throw "Error in FixToPoly";
+		if(Fix->at(i) == 0) throw string("Error in Game::LCP::FixToPoly. 0s not allowed in argument vector");
 		if(Fix->at(i)==1) // Equation to be fixed top zero
 		{
 			for(auto j=this->M.begin_row(i); j!=this->M.end_row(i); ++j)
@@ -749,10 +783,10 @@ Game::LCP::FixToPoly(const vector<short int> *Fix,  	///< A vector of +1 and -1 
 	}
 	if(add) 
 	{ 
-		custom?this->Ai->push_back(Aii):custAi->push_back(Aii); 
-		custom?this->bi->push_back(bii):custbi->push_back(bii); 
+		custom?(custAi->push_back(Aii)):(this->Ai->push_back(Aii)); 
+		custom?custbi->push_back(bii):this->bi->push_back(bii); 
+		if(VERBOSE) cout<<custom<<" Pushed a new polyhedron! No: "<<custAi->size()<<endl;
 	}
-	if(VERBOSE) cout<<"Pushed a new polyhedron! No: "<<Ai->size()<<endl;
 	return *this;
 }
 
@@ -775,9 +809,20 @@ Game::LCP::FixToPolies(const vector<short int> *Fix, 	///< A vector of +1, 0 and
 {
 	bool flag = false;
 	vector<short int> MyFix(*Fix);
+	if(VERBOSE)
+	{
+		for(const auto v:MyFix) cout<<v<<" ";
+		cout<<endl;
+	}
 	unsigned int i;
 	for(i=0; i<this->nR;i++)
-		if(Fix->at(i)==0) { flag = true; break; }
+	{
+		if(Fix->at(i)==0) 
+		{ 
+			flag = true; 
+			break; 
+		} 
+	}
 	if(flag)
 	{
 		MyFix[i] = 1;
@@ -807,8 +852,8 @@ Game::LCP::EnumerateAll(const bool solveLP ///< Should the poyhedra added be che
 
 Game::LCP& 
 Game::LCP::addPolyhedron(const vector<short int> &Fix, 	///< +1/0/-1 Representation of the polyhedra which needed to be pushed 
-		vector<arma::sp_mat*> &custAi, 		///< Vector wait LHS of constraint matrix should be pushed.
-		vector<arma::vec*> &custbi,			///< Vector wait RHS of constraints should be pushed.
+		vector<arma::sp_mat*> &custAi, 		///< Vector with LHS of constraint matrix should be pushed.
+		vector<arma::vec*> &custbi,			///< Vector with RHS of constraints should be pushed.
 		const bool convHull, 				///< If @p true convex hull of @e all polyhedra in custAi, custbi will be computed
 		arma::sp_mat *A, 					///< Location where convex hull LHS has to be stored
 		arma::vec  *b						///< Location where convex hull RHS has to be stored
@@ -820,22 +865,44 @@ Game::LCP::addPolyhedron(const vector<short int> &Fix, 	///< +1/0/-1 Representat
 	return *this;
 }
 
-void
+Game::LCP&
 Game::LCP::makeQP(
 		const vector<short int> &Fix, 	///< +1/0/-1 Representation of the polyhedra which needed to be pushed 
-		vector<arma::sp_mat*> &custAi, 		///< Vector wait LHS of constraint matrix should be pushed.
-		vector<arma::vec*> &custbi,			///< Vector wait RHS of constraints should be pushed.
+		vector<arma::sp_mat*> &custAi, 	///< Vector with LHS of constraint matrix should be pushed.
+		vector<arma::vec*> &custbi,		///< Vector with RHS of constraints should be pushed.
+		Game::QP_objective &QP_obj,		///< The objective function of the QP to be returned. @warning Size of this parameter might change!
+		Game::QP_Param &QP
+		)
+{
+	// Original sizes
+	const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
+	Game::QP_constraints QP_cons;
+	this->addPolyhedron(Fix, custAi, custbi, true, &QP_cons.B, &QP_cons.b);
+	// Updated size after convex hull has been computed.
+	const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
+	const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};
+	// Resizing entities.
+	QP_cons.A.zeros(Ncons, Nx_old);
+	QP_obj.c.resize(Ny);
+	QP_obj.C.resize(Ny, Nx_old);
+	QP_obj.Q.resize(Ny, Ny);
+	// Setting the QP_Param object
+	QP.set(QP_obj, QP_cons);
+    return *this;
+}
+
+
+Game::LCP&
+Game::LCP::makeQP(
 		Game::QP_objective &QP_obj,
 		Game::QP_Param &QP
 		)
 {
-	Game::QP_constraints QP_cons;
-	this->addPolyhedron(Fix, custAi, custbi, true, &QP_cons.B, &QP_cons.b);
-	QP_cons.A.set_size(QP_cons.b.n_rows, QP_obj.Q.n_cols);
-	QP.set(QP_obj, QP_cons);
+	vector<arma::sp_mat*> custAi{};
+	vector<arma::vec*> custbi{};	
+	vector<short int> Fix = vector<short int>(this->getCompl().size(), 0); // Complete enumeration
+	return this->makeQP(Fix, custAi, custbi, QP_obj, QP);
 }
-
-
 
 
 unique_ptr<GRBModel> 
