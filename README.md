@@ -8,8 +8,8 @@ Code to compute mixed-equilibrium in linear EPECs.
 	* BLAS
 	* ARPACK
 	* LAPACK
-- [Gurobi](https://www.gurobi.com/registration/download-reg) (Version 8.1 or later)
-- [gcc/g++](https://gcc.gnu.org/) (Tested on version 7.3. Must support C++11) `sudo apt install gcc ` will install gcc/g++ on an Ubuntu machine.
+- [Gurobi](https://www.gurobi.com/registration/download-reg) (Version 8.0 or later)
+- [gcc/g++](https://gcc.gnu.org/) (Tested on version 4.8. Must support C++11 and be compatible with your version of Gurobi) `sudo apt install gcc ` will install gcc/g++ on an Ubuntu machine.
 - [GNU make](https://www.gnu.org/software/make/) `sudo apt install make` will install GNU make on an Ubuntu machine.
 - [DOxygen](http://www.doxygen.nl) Only if you need documentation. `sudo apt install doxygen ` will install DOxygen on an Ubuntu machine.
 

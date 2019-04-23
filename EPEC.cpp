@@ -38,7 +38,7 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 int main()
 {
 	Models::DemPar P;
-	Models::FollPar FP, FP2;
+	Models::FollPar FP, FP2, FP3;
 	Models::LeadPar L;
 	FP.capacities = {10, 15};
 	FP.costs_lin = {30, 40};
@@ -49,13 +49,22 @@ int main()
 	FP2.costs_lin = {30, 50};
 	FP2.costs_quad = {60, 40}; 
 	FP2.emission_costs = {10, 0}; 
+
+	FP3.capacities = {10, 15, 5};
+	FP3.costs_lin = {30, 40, 5};
+	FP3.costs_quad = {60, 40, 10}; 
+	FP3.emission_costs = {0, 0, 10}; 
+
+
+
 	Models::LeadAllPar LA(2, "A", FP);
 	Models::LeadAllPar LA2(2, "B", FP2, {60,1});
+	Models::LeadAllPar LA3(3, "C", FP3, {90,1});
 	// cout<<LA<<LA2;
 	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
 	arma::mat TrCo(2,2); 
 	TrCo << 0 << 1<< arma::endr << 2 <<0;
-	LCPtest(LA, LA2, arma::sp_mat(TrCo));
+	LCPtest(LA, LA3, arma::sp_mat(TrCo));
 
 
 	return 0;
