@@ -615,7 +615,7 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
 
 	QP_obj.Q.zeros(nEPECvars-nThisCountryvars, nEPECvars-nThisCountryvars);
 	QP_obj.c.set_size(nThisCountryvars);
-	QP_obj.C.set_size(nThisCountryvars, nEPECvars);
+	QP_obj.C.set_size(nThisCountryvars, nEPECvars - nThisCountryvars);
 	// emission term
 	for(unsigned int j = Loc.at(Models::LeaderVars::FollowerStart), count=0;
 			count < Params.n_followers;
