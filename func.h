@@ -279,6 +279,7 @@ namespace Game{
 
 arma::vec LPSolve(const arma::sp_mat &A, const arma::vec &b, const arma::vec &c, int &status, bool Positivity=false);
 int ConvexHull( vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, arma::sp_mat &A, arma::vec &b, arma::sp_mat Acom={}, arma::vec bcom={});
+void compConvSize(arma::sp_mat &A, const arma::uword nFinCons, const arma::uword nFinVar, const vector<arma::sp_mat*> *Ai, 	vector<arma::vec*> *bi 	);
 /**
  * @brief Class to handle and solve linear complementarity problems
  */
@@ -486,7 +487,7 @@ class EPEC
 	private:
 		GRBEnv *env;		///< A gurobi environment to create and process the resulting LCP object.
 		map<string, unsigned int> name2nos = {};
-		bool finalized = false;
+		bool finalized{false};
 		unsigned int nCountr = 0;
 		bool dataCheck(const bool chkAllLeadPars=true, const bool chkcountriesLL=true, const bool chkMC_QP=true, 
 				const bool chkLeadConses=true, const bool chkLeadRHSes=true, const bool chknImportMarkets=true, 
@@ -520,6 +521,7 @@ class EPEC
 		void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj);
 	public:
 		void make_country_QP(const unsigned int i);
+		void make_country_QP();
 		///@brief %Models a Standard Nash-Cournot game within a country
 		EPEC& addCountry(
 				/// The Parameter structure for the leader
@@ -534,6 +536,7 @@ class EPEC
 		unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
 		unique_ptr<GRBModel> Respond(const string name, const arma::vec &x) const;
 		EPEC& unlock();
+		unique_ptr<GRBModel> findNashEq(bool write=false, string  filename="x_NE.txt") const;
 	public:
 		// Data access methods
 		Game::NashGame* get_LowerLevelNash(const unsigned int i) const;

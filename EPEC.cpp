@@ -25,6 +25,7 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 		cout<<"Here1\n";
 		epec.make_country_QP(0);
 		epec.make_country_QP(1);
+		epec.findNashEq(true);
 	} 
 	catch(const char* e) { cerr<<e<<endl;throw; }
 	catch(string e) { cerr<<"String: "<<e<<endl;throw; }

@@ -613,7 +613,6 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
 	const arma::sp_mat &TrCo = this->TranspCosts;
 	const LeadLocs &Loc = this->Locations.at(i);
 
-	QP_obj.Q.zeros(5,5);
 	QP_obj.Q.zeros(nEPECvars-nThisCountryvars, nEPECvars-nThisCountryvars);
 	QP_obj.c.set_size(nThisCountryvars);
 	QP_obj.C.set_size(nThisCountryvars, nEPECvars);
@@ -658,17 +657,38 @@ Models::EPEC::Respond(const unsigned int i, const arma::vec &x) const
 	return this->country_QP.at(i).get()->solveFixed(x); 
 }
 
+void
+Models::EPEC::make_country_QP()
+/**
+ * @brief Makes the Game::QP_Param for all the countries
+ * @details
+ * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for each valid @i 
+ * @note Overloaded as EPEC::make_country_QP(unsigned int)
+ */
+{
+	static bool already_ran{false};
+	if(!already_ran)
+		for (unsigned int i =0; i<this->nCountries;++i)
+			this->make_country_QP(i);
+}
 
 void
 Models::EPEC::make_country_QP(const unsigned int i)
+/**
+ * @brief Makes the Game::QP_Param corresponding to the @p i-th country.
+ * @details
+ *  - First gets the Game::LCP object from @p countries_LL and makes a QP with this LCP as the lower level
+ *  - This is achieved by calling LCP::makeQP and using the objective value object in @p LeadObjec
+ *  - Finally the locations are updated owing to the complete convex hull calculated during the call to LCP::makeQP
+ * @note Overloaded as EPEC::make_country_QP()
+ */
 {
 	if(!this->finalized) throw string("Error in Models::EPEC::make_country_QP: Model not finalized"); 
 	if(i>=this->nCountries) throw string("Error in Models::EPEC::make_country_QP: Invalid country number"); 
-
 	if(!this->country_QP.at(i).get())
 	{
 		Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
-		cout<<"In EPEC::make_country_QP: "<<Player_i_LCP.getCompl().size()<<endl; 
+		if(VERBOSE) cout<<"In EPEC::make_country_QP: "<<Player_i_LCP.getCompl().size()<<endl; 
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
 		Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get()); 
 		LeadLocs &Loc = this->Locations.at(i);
@@ -701,4 +721,35 @@ Models::init(LeadLocs &L)
 Models::LeaderVars Models::operator+ (Models::LeaderVars a, int b)
 {
 	return static_cast<LeaderVars>(static_cast<int> (a)+b);
+}
+
+unique_ptr<GRBModel> 
+Models::EPEC::findNashEq(bool write, string  filename) const
+{
+	auto Nvar = this->country_QP.front().get()->getNx() + this->country_QP.front().get()->getNy();
+	arma::sp_mat MC(0, Nvar);
+	arma::vec MCRHS; MCRHS.set_size(0);
+	auto nashgame = Game::NashGame(this->country_QP, MC, MCRHS, 0);
+	cout<<"Here 1"<<endl;
+	for (const auto &v:this->country_QP)
+		cout<<v->getNx()<<" "<<v->getNy()<<endl;
+	for (const auto &v:this->MC_QP)
+		cout<<v->getNx()<<" "<<v->getNy()<<endl;
+	auto lcp = Game::LCP(this->env, nashgame); 
+	cout<<"Here 2"<<endl;
+
+	auto model = lcp.LCPasMIP(false);
+
+	if(write) 
+	{
+		model.get()->set(GRB_IntParam_OutputFlag, 1);
+		model.get()->optimize();
+		arma::vec xstar; 
+		xstar.set_size(Nvar);
+		for(unsigned int i=0 ; i<Nvar; i++)
+			xstar(i) = model.get()->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X);
+		xstar.save(filename, arma::file_type::arma_ascii, VERBOSE);
+	}
+
+	return model;
 }

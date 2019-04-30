@@ -8,55 +8,6 @@
 
 using namespace std;
 
-void compConvSize(arma::sp_mat &A, 
-		const arma::uword nFinCons,
-		const arma::uword nFinVar, 
-		const vector<arma::sp_mat*> *Ai, 	///< Inequality constraints LHS that define polyhedra whose convex hull is to be found 
-		vector<arma::vec*> *bi 	///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
-		)
-{ 
-	unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
-	unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
-	arma::uword N{0}; // Total number of nonzero elements in the final matrix
-	for(arma::uword i=0; i<nPoly;i++)
-	{
-		N += Ai->at(i)->n_nonzero;
-		N += bi->at(i)->n_rows;
-	}
-	// Now computed N which is the total number of nonzeros.
-	
-	arma::umat locations; 	// location of nonzeros
-	arma::vec val;			// nonzero values
-	locations.set_size(2, N);
-	val.set_size(N);
-	
-	arma::uword count{0}, rowCount{0}, colCount{0};
-	for(arma::uword i=0; i<nPoly;i++)
-	{
-		for(auto it=Ai->at(i)->begin(); it!=Ai->at(i)->end(); ++it) // First constraint
-		{ 
-			locations(0, count) = rowCount + it.row();
-			locations(1, count) = colCount + it.col();
-			val(count) = *it;
-			++count;
-		}
-		for(arma::uword j=0; j< bi->at(i)->n_rows; ++j) // RHS of first constraint
-		{
-			locations(0, count) = rowCount + j;
-			locations(1, count) = nC*nPoly+i;
-			val(count) = -bi->at(i)->at(j);
-			++count;
-		}
-		colCount += nC;
-		rowCount += Ai->at(i)->n_rows;
-		if(1) cout<<"In compConvSize: "<<i<<" out of "<<nPoly<<endl;
-	}
-	
-
-	A = arma::sp_mat(locations, val,  nFinCons, nFinVar);
-
-}
-
 bool 
 operator == (vector<int> Fix1, vector<int> Fix2)
 /**
@@ -474,7 +425,7 @@ int Game::ConvexHull(
 	nFinVar = nPoly*nC + nPoly + nC; // All x^i variables + delta variables+ original x variables 
 	A.zeros(nFinCons, nFinVar); b.zeros(nFinCons);
 	// Implements the first constraint more efficiently using better constructors for sparse matrix
-	compConvSize(A, nFinCons, nFinVar, Ai, bi);
+	Game::compConvSize(A, nFinCons, nFinVar, Ai, bi);
 	
 	// Counting rows completed
 	unsigned int complRow{0};
@@ -482,7 +433,7 @@ int Game::ConvexHull(
 	/****************** SLOW LOOP BEWARE *******************/
 	for(unsigned int i = 0; i<nPoly; i++)
 	{
-		if(1) cout<<"Game::ConvexHull: Handling Polyhedron "<<i+1<<" out of "<<nPoly<<endl;
+		if(VERBOSE) cout<<"Game::ConvexHull: Handling Polyhedron "<<i+1<<" out of "<<nPoly<<endl;
 		const unsigned int nConsInPoly = Ai->at(i)->n_rows ;
 		// First constraint in (4.31)
 		// A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i); // Slowest line. Will arma improve this?
@@ -514,6 +465,60 @@ int Game::ConvexHull(
 	}
 	cout<<"A"<<A.n_rows<<" "<<A.n_cols<<endl;
 	return 0;
+}
+
+
+void Game::compConvSize(arma::sp_mat &A, 	///< Output parameter
+		const arma::uword nFinCons,			///< Number of rows in final matrix A
+		const arma::uword nFinVar, 			///< Number of columns in the final matrix A
+		const vector<arma::sp_mat*> *Ai, 	///< Inequality constraints LHS that define polyhedra whose convex hull is to be found 
+		vector<arma::vec*> *bi 	///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
+		)
+/**
+ * @brief INTERNAL FUNCTION NOT FOR GENERAL USE.
+ * @warning INTERNAL FUNCTION NOT FOR GENERAL USE.
+ * @internal To generate the matrix "A" in Game::ConvexHull using batch insertion constructors. This is faster than the original line in the code:
+ * A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i);
+ * Motivation behind this: Response from armadillo:-https://gitlab.com/conradsnicta/armadillo-code/issues/111
+ */
+{ 
+	unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
+	unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
+	arma::uword N{0}; // Total number of nonzero elements in the final matrix
+	for(arma::uword i=0; i<nPoly;i++)
+	{
+		N += Ai->at(i)->n_nonzero;
+		N += bi->at(i)->n_rows;
+	}
+	
+	// Now computed N which is the total number of nonzeros.  
+	arma::umat locations; 	// location of nonzeros
+	arma::vec val;			// nonzero values
+	locations.set_size(2, N);
+	val.set_size(N);
+	
+	arma::uword count{0}, rowCount{0}, colCount{0};
+	for(arma::uword i=0; i<nPoly;i++)
+	{
+		for(auto it=Ai->at(i)->begin(); it!=Ai->at(i)->end(); ++it) // First constraint
+		{ 
+			locations(0, count) = rowCount + it.row();
+			locations(1, count) = colCount + it.col();
+			val(count) = *it;
+			++count;
+		}
+		for(arma::uword j=0; j< bi->at(i)->n_rows; ++j) // RHS of first constraint
+		{
+			locations(0, count) = rowCount + j;
+			locations(1, count) = nC*nPoly+i;
+			val(count) = -bi->at(i)->at(j);
+			++count;
+		}
+		colCount += nC;
+		rowCount += Ai->at(i)->n_rows;
+		if(VERBOSE) cout<<"In compConvSize: "<<i+1<<" out of "<<nPoly<<endl;
+	} 
+	A = arma::sp_mat(locations, val,  nFinCons, nFinVar); 
 }
 
 arma::vec 
@@ -927,6 +932,7 @@ Game::LCP::makeQP(
 {
 	// Original sizes
 	const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
+	cout<<QP_obj.C.n_cols<<" "<<QP_obj.C.n_rows<<endl;
 	Game::QP_constraints QP_cons;
 	this->addPolyhedron(Fix, custAi, custbi, true, &QP_cons.B, &QP_cons.b);
 	// Updated size after convex hull has been computed.

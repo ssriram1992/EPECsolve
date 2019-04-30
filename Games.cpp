@@ -121,7 +121,6 @@ Game::MP_Param::set(const QP_objective &obj, const QP_constraints &cons)
 Game::MP_Param& 
 Game::MP_Param::set(QP_objective &&obj, QP_constraints &&cons)
 {
-    cout<<"Here\n";
 	return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
 }
 
@@ -557,7 +556,6 @@ Game::NashGame& Game::NashGame::addLeadCons(const arma::vec &a, double b)
  */
 {
 	auto nC = this->LeaderConstraints.n_cols;
-	cout<<"here1"<<endl;
 	if (a.n_elem != nC) throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible --- ") + to_string(a.n_elem) + string(" != ") +to_string(nC);
 	auto nR = this->LeaderConstraints.n_rows;
 	this->LeaderConstraints.resize(nR+1, nC);
