@@ -424,7 +424,7 @@ struct LeadPar
 	double export_limit = -1;	///< Maximum net export in the country. If no limit, set the value as -1; 
 	double max_tax_perc = 0.3;	///< Government decided increase in the shift in costs_lin of any player cannot exceed this value 
 	double price_limit = -1;	///< Government does not want the price to exceed this limit
-	LeadPar(double max_tax_perc=0.3, double imp_lim=-1, double exp_lim=-1):import_limit{imp_lim}, export_limit{exp_lim}, max_tax_perc{max_tax_perc}{}
+	LeadPar(double max_tax_perc=0.3, double imp_lim=-1, double exp_lim=-1, double price_limit=-1):import_limit{imp_lim}, export_limit{exp_lim}, max_tax_perc{max_tax_perc}, price_limit{price_limit}{}
 };
 
 /// @brief Stores the parameters of a country model
@@ -435,7 +435,8 @@ struct LeadAllPar
 	Models::FollPar FollowerParam = {};	///< A struct to hold Follower Parameters 
 	Models::DemPar DemandParam = {};	///< A struct to hold Demand Parameters 
 	Models::LeadPar LeaderParam = {};	///< A struct to hold Leader Parameters
-	LeadAllPar(unsigned int n_foll, string name, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={}):n_followers{n_foll}, name{name}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}
+	LeadAllPar(unsigned int n_foll, string name, Models::FollPar FP={}, Models::DemPar DP={}, Models::LeadPar LP={})
+		:n_followers{n_foll}, name{name}, FollowerParam{FP}, DemandParam{DP}, LeaderParam{LP}
 	{
 		// Nothing here
 	}
@@ -516,6 +517,7 @@ class EPEC
 				) const noexcept;
 		void add_Leaders_tradebalance_constraints(const unsigned int i);
 		void make_MC_leader(const unsigned int i);
+		void make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const;
 		void computeLeaderLocations(const bool addSpaceForMC = false);
 		void add_Dummy_Lead(const unsigned int i);
 		void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj);

@@ -3,7 +3,6 @@
 #include"func.h"
 #include<armadillo>
 #include<array>
-#define VERBOSE true
 
 using namespace std;
 
@@ -514,8 +513,10 @@ Game::NashGame::RewriteLeadCons() const
 	// NvarFollow = NvarLead - this->n_LeadVar;
 	
 	unsigned int n_Row, n_Col;
-	n_Row = A_in.n_rows; n_Col = A_in.n_cols;
+	n_Row = A_in.n_rows; 
+	n_Col = A_in.n_cols;
 	A_out.zeros(n_Row, NvarLead);
+	if(!A_in.n_rows) return A_out;
 
 	try
 	{

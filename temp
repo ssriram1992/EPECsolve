@@ -1,2 +1,0 @@
-g++-4.8 -c Games.cpp -I /opt/gurobi801/linux64/include  -L /opt/gurobi801/linux64/lib -lgurobi_c++ -lgurobi80 -lm  -I /opt/armadillo-code/include -lblas -llapack  -O2 -Wall -Wno-comment-std=c++11
-Makefile:55: recipe for target 'Games.o' failed

@@ -283,7 +283,7 @@ Models::EPEC::addCountry(
 	if(Params.LeaderParam.export_limit >= 0) export_lim_cons = 1;
 	if(Params.LeaderParam.price_limit  >  0) price_lim_cons  = 1; 
 
-	cout<<" In addCountry: "<<Loc[Models::LeaderVars::End]<<endl;
+	// cout<<" In addCountry: "<<Loc[Models::LeaderVars::End]<<endl;
 	arma::sp_mat LeadCons(import_lim_cons+	// Import limit constraint
 			export_lim_cons+				// Export limit constraint
 			price_lim_cons+					// Price limit constraint
@@ -333,7 +333,7 @@ Models::EPEC::addCountry(
 	Models::increaseVal(Loc, Models::LeaderVars::DualVar, N->getNduals());
 	Locations.push_back(Loc);
 	this->LeadConses.push_back(N->RewriteLeadCons());
-	cout<<LeadCons<<N->RewriteLeadCons()<<LeadConses.back();
+	// cout<<LeadCons<<N->RewriteLeadCons()<<LeadConses.back();
 	this->AllLeadPars.push_back(Params);
 	nCountr++;
 	return *this;
@@ -437,15 +437,53 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 	arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
 	a.at(Loc.at(Models::LeaderVars::NetImport)) = -1;
 	a.subvec(Loc.at(LeaderVars::CountryImport), Loc.at(LeaderVars::CountryImport + 1)).ones();
-	cout<<endl<<" ______ "<<endl;
-	for(auto v:Loc) cout<<v.first<<"\t\t\t"<<v.second<<endl;
-	a.print();
-	cout<<endl<<" ______ "<<endl;
+	if(VERBOSE)
+	{
+		cout<<endl<<" ______ "<<endl;
+		for(auto v:Loc) cout<<v.first<<"\t\t\t"<<v.second<<endl;
+		a.print();
+		cout<<endl<<" ______ "<<endl;
+	}
 
 	LL_Nash.addDummy(nImp).addLeadCons(a, 0).addLeadCons(-a,0);
 	// Updating the variable locations
-	Loc[Models::LeaderVars::CountryImport] = Loc.at(Models::LeaderVars::End);
-	Loc.at(Models::LeaderVars::End) += nImp;
+ /*	Loc[Models::LeaderVars::CountryImport] = Loc.at(Models::LeaderVars::End);
+	Loc.at(Models::LeaderVars::End) += nImp;*/
+}
+
+void 
+Models::EPEC::make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const
+/** @brief Returns leader's Market clearing constraints in matrix form
+ * @details
+ */
+{
+	if(!this->finalized)
+		throw string("Error in Models::EPEC::make_MC_cons: This function can be run only AFTER calling finalize()");
+	// Transportation matrix
+	const arma::sp_mat &TrCo = this->TranspCosts;
+	// Output matrices
+	MCRHS.zeros(this->nCountries);
+	MCLHS.zeros(this->nCountries, this->nVarEPEC);
+	// The MC constraint for each leader country
+	for(unsigned int i=0; i<this->nCountries;++i)
+	{
+		MCLHS(i, this->getPosition(i, LeaderVars::NetExport)) = -1;
+		for(auto val=TrCo.begin_row(i); val!=TrCo.end_row(i); ++val)
+		{ 
+			const unsigned int j = val.col(); // This is the country which is importing from "i"
+			unsigned int count{0};
+
+			for(auto val2=TrCo.begin_col(j); val2!=TrCo.end_col(j); ++val2) 
+			// What position in the list of j's impoting from countries  does i fall in?
+			{ 
+				if(val2.row() == i) break;
+				else count++;
+			} 
+			MCLHS(i, 
+				this->getPosition(i, Models::LeaderVars::CountryImport)+count
+				 ) = 1;
+		}
+	}
 }
 
 void 
@@ -468,7 +506,7 @@ Models::EPEC::make_MC_leader(const unsigned int i)
 
 		for(auto val=TrCo.begin_row(i); val!=TrCo.end_row(i); ++val)
 		{
-			const unsigned int j = val.col(); // This is the country from which is importing from "i"
+			const unsigned int j = val.col(); // This is the country which the country "i" is importing from
 			unsigned int count{0};
 
 			for(auto val2=TrCo.begin_col(j); val2!=TrCo.end_col(j); ++val2) 
@@ -670,6 +708,22 @@ Models::EPEC::make_country_QP()
 	if(!already_ran)
 		for (unsigned int i =0; i<this->nCountries;++i)
 			this->make_country_QP(i);
+	for (unsigned int i =0; i<this->nCountries;++i)
+	{
+		LeadLocs &Loc = this->Locations.at(i);
+		// Adjusting "stuff" because we now have new convHull variables
+		unsigned int convHullVarCount = this->LeadObjec.at(i)->Q.n_rows - Loc[Models::LeaderVars::End];
+		// Location details
+		Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy, convHullVarCount); 
+		// All other players' QP
+		for(unsigned int j=0; j< this->nCountries; j++)
+		{
+			if(i!=j)
+				this->country_QP.at(j)->addDummy(convHullVarCount, 0);
+			this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
+		}
+	}
+	this->computeLeaderLocations(true);
 }
 
 void
@@ -691,9 +745,6 @@ Models::EPEC::make_country_QP(const unsigned int i)
 		if(VERBOSE) cout<<"In EPEC::make_country_QP: "<<Player_i_LCP.getCompl().size()<<endl; 
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
 		Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get()); 
-		LeadLocs &Loc = this->Locations.at(i);
-		unsigned int convHullVarCount = this->LeadObjec.at(i)->Q.n_rows - Loc[Models::LeaderVars::End];
-		Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy, convHullVarCount); 
 	}
 }
 
@@ -727,28 +778,37 @@ unique_ptr<GRBModel>
 Models::EPEC::findNashEq(bool write, string  filename) const
 {
 	auto Nvar = this->country_QP.front().get()->getNx() + this->country_QP.front().get()->getNy();
-	arma::sp_mat MC(0, Nvar);
+	arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
 	arma::vec MCRHS; MCRHS.set_size(0);
-	auto nashgame = Game::NashGame(this->country_QP, MC, MCRHS, 0);
-	cout<<"Here 1"<<endl;
-	for (const auto &v:this->country_QP)
-		cout<<v->getNx()<<" "<<v->getNy()<<endl;
-	for (const auto &v:this->MC_QP)
-		cout<<v->getNx()<<" "<<v->getNy()<<endl;
+	arma::vec dumb; dumb.set_size(0);
+	this->make_MC_cons(MC, MCRHS);
+	auto nashgame = Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb);
+	cout<<nashgame<<endl;
 	auto lcp = Game::LCP(this->env, nashgame); 
-	cout<<"Here 2"<<endl;
 
 	auto model = lcp.LCPasMIP(false);
 
+	Nvar = nashgame.getNprimals()+nashgame.getNduals()+nashgame.getNshadow()+nashgame.getNleaderVars();
 	if(write) 
 	{
 		model.get()->set(GRB_IntParam_OutputFlag, 1);
 		model.get()->optimize();
 		arma::vec xstar; 
+		arma::vec zstar; 
 		xstar.set_size(Nvar);
+		zstar.set_size(Nvar);
+		unsigned int temp;
+		try{
 		for(unsigned int i=0 ; i<Nvar; i++)
+		{
 			xstar(i) = model.get()->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X);
-		xstar.save(filename, arma::file_type::arma_ascii, VERBOSE);
+			zstar(i) = model.get()->getVarByName("z_"+to_string(i)).get(GRB_DoubleAttr_X);
+			temp=i;
+		}
+		}
+		catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::findNashEq : "<<e.getErrorCode()<<": "<<e.getMessage()<<" "<<temp<<endl;;}
+		xstar.save("x_"+filename, arma::file_type::arma_ascii, VERBOSE);
+		zstar.save("z_"+filename, arma::file_type::arma_ascii, VERBOSE);
 	}
 
 	return model;

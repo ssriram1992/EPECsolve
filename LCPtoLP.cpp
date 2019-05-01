@@ -152,10 +152,6 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N):RlxdModel(*env)
 			}
 	}
 	// Delete no more!
-
-
-
-
 }
 
 Game::LCP::~LCP()
@@ -320,7 +316,7 @@ Game::LCP::LCPasMIP(
 		for(unsigned int i=0;i <nC;i++) x[i] = model->getVarByName("x_"+to_string(i));
 		for(unsigned int i=0;i <nR;i++) z[i] = model->getVarByName("z_"+to_string(i));
 		// Define binary variables for bigM
-		for(unsigned int i=0;i <nR;i++) u[i] = model->addVar(0, 1, 1, GRB_BINARY, "u_"+to_string(i));
+		for(unsigned int i=0;i <nR;i++) u[i] = model->addVar(0, 1, 0, GRB_BINARY, "u_"+to_string(i));
 		// Include ALL Complementarity constraints using bigM
 		for(auto p:Compl)
 		{
