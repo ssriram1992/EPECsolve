@@ -234,10 +234,10 @@ class NashGame
 			os<<"-----------------------------------------------------------------------"<<endl;
 			os<<"Nash Game with "<<N.Nplayers<<" players"<<endl;
 			os<<"-----------------------------------------------------------------------"<<endl;
-			os<<"Number of primal variables:\t\t\t "<<N.primal_position.back()<<endl;
-			os<<"Number of dual variables:\t\t\t "<<N.dual_position.back()-N.dual_position.front()+0<<endl;
-			os<<"Number of shadow price dual variables:\t\t "<<N.MCRHS.n_rows<<endl;
-			os<<"Number of leader variables:\t\t\t "<<N.n_LeadVar<<endl;
+			os<<"Number of primal variables:\t\t\t "<<N.getNprimals()<<endl;
+			os<<"Number of dual variables:\t\t\t "<<N.getNduals()<<endl;
+			os<<"Number of shadow price dual variables:\t\t "<<N.getNshadow()<<endl;
+			os<<"Number of leader variables:\t\t\t "<<N.getNleaderVars()<<endl;
 			os<<"-----------------------------------------------------------------------"<<endl;
 			return os;
 		}
@@ -245,7 +245,7 @@ class NashGame
 		inline unsigned int getNprimals() const { return this->Players.at(0)->getNy() + this->Players.at(0)->getNx(); }
 		inline unsigned int getNshadow() const {return this->MCRHS.n_rows;}
 		inline unsigned int getNleaderVars() const {return this->n_LeadVar;}
-		inline unsigned int getNduals() const {return this->dual_position.back()-this->dual_position.front()+1;}
+		inline unsigned int getNduals() const {return this->dual_position.back()-this->dual_position.front()+0;}
 		// Size of variables
 		inline unsigned int getPrimalLoc(unsigned int i=0) const {return primal_position.at(i);}
 		inline unsigned int getMCdualLoc() const {return MC_dual_position;}
@@ -257,6 +257,9 @@ class NashGame
 		const NashGame& FormulateLCP(arma::sp_mat &M, arma::vec &q,	perps &Compl, bool writeToFile = false,	string M_name = "M.txt", string q_name = "q.txt") const; 
 		arma::sp_mat RewriteLeadCons() const;
 		inline arma::vec getLeadRHS() const {return this->LeaderConsRHS;}
+		inline arma::vec getMCLeadRHS() const {return arma::join_cols(
+				arma::join_cols(this->LeaderConsRHS, this->MCRHS), 
+				-this->MCRHS);}
 		NashGame& addDummy(unsigned int par=0);
 		NashGame& addLeadCons(const arma::vec &a, double b);
 };

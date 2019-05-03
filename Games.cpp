@@ -507,23 +507,32 @@ Game::NashGame::RewriteLeadCons() const
  */
 {
 	arma::sp_mat A_in = this->LeaderConstraints;
-	arma::sp_mat A_out;
+	arma::sp_mat A_out_expl, A_out_MC, A_out;
 	unsigned int  NvarLead{0};
 	NvarLead = this->dual_position.back(); // Number of Leader variables (all variables)
 	// NvarFollow = NvarLead - this->n_LeadVar;
 	
 	unsigned int n_Row, n_Col;
-	n_Row = A_in.n_rows; 
+	n_Row = A_in.n_rows;
 	n_Col = A_in.n_cols;
-	A_out.zeros(n_Row, NvarLead);
-	if(!A_in.n_rows) return A_out;
+	A_out_expl.zeros(n_Row, NvarLead);
+	A_out_MC.zeros(2*this->MarketClearing.n_rows, NvarLead);
 
 	try
 	{
-		// Primal variables i.e., everything before MCduals are the same!
-		A_out.cols(0, this->MC_dual_position-1)  = A_in.cols(0, this->MC_dual_position-1);
-		A_out.cols(this->Leader_position, this->dual_position.at(0)-1) = A_in.cols(this->MC_dual_position, n_Col-1);
-		return A_out;
+		if(A_in.n_rows)
+		{
+			// Primal variables i.e., everything before MCduals are the same!
+			A_out_expl.cols(0, this->MC_dual_position-1)  = A_in.cols(0, this->MC_dual_position-1);
+			A_out_expl.cols(this->Leader_position, this->dual_position.at(0)-1) = A_in.cols(this->MC_dual_position, n_Col-1);
+		}
+		if(this->MCRHS.n_rows)
+		{
+			// MC constraints can be written as if they are leader constraints
+			A_out_MC.submat(0, 0, this->MCRHS.n_rows-1, this->dual_position.at(0)-1) = this->MarketClearing;
+			A_out_MC.submat(this->MCRHS.n_rows, 0, 2*this->MCRHS.n_rows-1, this->dual_position.at(0)-1) = -this->MarketClearing;
+		}
+		return arma::join_cols(A_out_expl, A_out_MC);
 	}
 	catch(const char* e) { cerr<<"Error in NashGame::RewriteLeadCons: "<<e<<endl; throw;}
 	catch(string e) { cerr<<"String: Error in NashGame::RewriteLeadCons: "<<e<<endl; throw;}

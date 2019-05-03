@@ -126,7 +126,7 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N):RlxdModel(*env)
 {
 	arma::sp_mat M; arma::vec q; perps Compl;
 	N.FormulateLCP(M, q, Compl);
-	LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getLeadRHS());
+	LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getMCLeadRHS());
 
 
 	// This is a constructor code! Remember to delete
@@ -135,7 +135,7 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N):RlxdModel(*env)
 		this->M = M;
 		this->q = q;
 		this->_A = N.RewriteLeadCons();
-		this->_b = N.getLeadRHS();
+		this->_b = N.getMCLeadRHS();
 		defConst(env);
 		this->Compl = perps(Compl);
 		sort(Compl.begin(), Compl.end(), 
@@ -178,6 +178,7 @@ Game::LCP::makeRelaxed()
 	{
 		if(this->madeRlxdModel) return ;
 		GRBVar x[nC], z[nR];
+		cout<<"In LCP::makeRelaxed(): "<<nR<<" "<<nC<<endl;
 		for(unsigned int i=0;i <nC;i++) x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "x_"+to_string(i));
 		for(unsigned int i=0;i <nR;i++) z[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "z_"+to_string(i));
 		for(unsigned int i=0;i <nR;i++)
@@ -191,7 +192,11 @@ Game::LCP::makeRelaxed()
 		// If @f$Ax \leq b@f$ constraints are there, they should be included too!
 		if(this->_A.n_nonzero != 0 || this->_b.n_rows!=0)
 		{ 
-			if(_A.n_cols != nC || _A.n_rows != _b.n_rows) throw "A and b are incompatible! Thrown from makeRelaxed()";
+			if(_A.n_cols != nC || _A.n_rows != _b.n_rows) 
+			{
+				cout<<"("<<_A.n_rows<<","<<_A.n_cols<<")\t"<<_b.n_rows<<" "<<nC<<endl;
+				throw string("A and b are incompatible! Thrown from makeRelaxed()"); 
+			}
 			for(unsigned int i=0;i<_A.n_rows;i++)
 			{
 				GRBLinExpr expr = 0;

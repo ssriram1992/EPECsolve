@@ -467,7 +467,7 @@ Models::EPEC::make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const
 	// The MC constraint for each leader country
 	for(unsigned int i=0; i<this->nCountries;++i)
 	{
-		MCLHS(i, this->getPosition(i, LeaderVars::NetExport)) = -1;
+		MCLHS(i, this->getPosition(i, LeaderVars::NetExport)) = 1;
 		for(auto val=TrCo.begin_row(i); val!=TrCo.end_row(i); ++val)
 		{ 
 			const unsigned int j = val.col(); // This is the country which is importing from "i"
@@ -480,8 +480,8 @@ Models::EPEC::make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const
 				else count++;
 			} 
 			MCLHS(i, 
-				this->getPosition(i, Models::LeaderVars::CountryImport)+count
-				 ) = 1;
+				this->getPosition(j, Models::LeaderVars::CountryImport)+count
+				 ) = -1;
 		}
 	}
 }
@@ -591,8 +591,9 @@ Models::EPEC::computeLeaderLocations(const bool addSpaceForMC)
 	this->LeaderLocations = vector<unsigned int> (this->nCountries);
 	this->LeaderLocations.at(0) = 0;
 	for(unsigned int i=1; i<this->nCountries; i++)
-		this->LeaderLocations.at(i) = this->getPosition(i-1, Models::LeaderVars::End) + (addSpaceForMC?1:0);
-	this->nVarinEPEC = this->getPosition(this->nCountries-1, Models::LeaderVars::End) + (addSpaceForMC?1:0);
+		this->LeaderLocations.at(i) = this->getPosition(i-1, Models::LeaderVars::End) + (addSpaceForMC?0:0);
+
+	this->nVarinEPEC = this->getPosition(this->nCountries-1, Models::LeaderVars::End) + (addSpaceForMC?this->nCountries:0);
 }
 
 unsigned int 
@@ -782,6 +783,7 @@ Models::EPEC::findNashEq(bool write, string  filename) const
 	arma::vec MCRHS; MCRHS.set_size(0);
 	arma::vec dumb; dumb.set_size(0);
 	this->make_MC_cons(MC, MCRHS);
+	MC.print();
 	auto nashgame = Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb);
 	cout<<nashgame<<endl;
 	auto lcp = Game::LCP(this->env, nashgame); 
@@ -802,7 +804,7 @@ Models::EPEC::findNashEq(bool write, string  filename) const
 		for(unsigned int i=0 ; i<Nvar; i++)
 		{
 			xstar(i) = model.get()->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X);
-			zstar(i) = model.get()->getVarByName("z_"+to_string(i)).get(GRB_DoubleAttr_X);
+			zstar(i) = model.get()->getVarByName("z_"+to_string(i)).get(GRB_DoubleAttr_X) ;
 			temp=i;
 		}
 		}

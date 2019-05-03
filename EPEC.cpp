@@ -50,7 +50,7 @@ int main()
 {
 	Models::DemPar P;
 	Models::FollPar FP, FP2, FP3, FP1;
-	Models::LeadPar L (0.3,-1,-1,10);
+	Models::LeadPar L (0.0,-1,-1,-1);
 	FP.capacities = {10, 15};
 	FP.costs_lin = {30, 40};
 	FP.costs_quad = {60, 40}; 
