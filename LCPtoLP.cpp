@@ -1,7 +1,7 @@
 #include<iostream>
 #include<memory>
 #include<string>
-#include"func.h"
+#include"lcptolp.h"
 #include<gurobi_c++.h>
 #include<armadillo>
 // #define VERBOSE true
@@ -187,7 +187,7 @@ Game::LCP::makeRelaxed()
 			for(auto v=M.begin_row(i); v!=M.end_row(i); ++v)
 				expr += (*v) * x[v.col()];
 			expr += q(i);
-			RlxdModel.addConstr(expr, GRB_EQUAL, z[i]);
+			RlxdModel.addConstr(expr, GRB_EQUAL, z[i], "z_"+to_string(i)+"_def");
 		} 
 		// If @f$Ax \leq b@f$ constraints are there, they should be included too!
 		if(this->_A.n_nonzero != 0 || this->_b.n_rows!=0)
@@ -202,7 +202,7 @@ Game::LCP::makeRelaxed()
 				GRBLinExpr expr = 0;
 				for(auto a=_A.begin_row(i); a!=_A.end_row(i); ++a)
 					expr += (*a) * x[a.col()];
-				RlxdModel.addConstr(expr, GRB_LESS_EQUAL, _b(i));
+				RlxdModel.addConstr(expr, GRB_LESS_EQUAL, _b(i),"commonCons_"+to_string(i));
 			}
 		}
 		RlxdModel.update();
@@ -328,11 +328,11 @@ Game::LCP::LCPasMIP(
 			// z[i] <= Mu constraint
 			GRBLinExpr expr = 0;
 			expr += bigM*u[p.first];
-			model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first]);
+			model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first], "z"+to_string(p.first)+"_L_Mu"+to_string(p.first));
 			// x[i] <= M(1-u) constraint
 			expr = bigM;
 			expr -= bigM*u[p.first];
-			model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second]);
+			model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second], "x"+to_string(p.first)+"_L_MuDash"+to_string(p.first));
 		}
 		// If any equation or variable is to be fixed to zero, that happens here!
 		for(auto i:FixVar) model->addConstr(x[i], GRB_EQUAL, 0.0);
@@ -429,31 +429,32 @@ int Game::ConvexHull(
 	Game::compConvSize(A, nFinCons, nFinVar, Ai, bi);
 	
 	// Counting rows completed
-	unsigned int complRow{0};
 	if (VERBOSE){cout<<"In Convex Hull computation!"<<endl;}
 	/****************** SLOW LOOP BEWARE *******************/
 	for(unsigned int i = 0; i<nPoly; i++)
 	{
 		if(VERBOSE) cout<<"Game::ConvexHull: Handling Polyhedron "<<i+1<<" out of "<<nPoly<<endl;
-		const unsigned int nConsInPoly = Ai->at(i)->n_rows ;
 		// First constraint in (4.31)
 		// A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i); // Slowest line. Will arma improve this?
 		// First constraint RHS
-		A.submat(complRow, nPoly*nC+i, complRow+nConsInPoly-1, nPoly*nC+i) = -*bi->at(i);
+		// A.submat(complRow, nPoly*nC+i, complRow+nConsInPoly-1, nPoly*nC+i) = -*bi->at(i);
 		// Second constraint in (4.31)
 		for(unsigned int j=0; j<nC;j++)
 		{
-			A.at(FirstCons+2*j,(i*nC)+j) = 1;
-			A.at(FirstCons+2*j+1,(i*nC)+j) = -1;
+			A.at(FirstCons+2*i,nC+(i*nC)+j) = 1;
+			A.at(FirstCons+2*i+1,nC+(i*nC)+j) = -1;
 		}
 		// Third constraint in (4.31)
-		A.at(FirstCons + nC*2, nPoly*nC + i) = 1;
-		A.at(FirstCons + nC*2 + 1, nPoly*nC + i) = -1;
+		A.at(FirstCons + nC*2, nC + nPoly*nC + i) = 1;
+		A.at(FirstCons + nC*2 + 1, nC + nPoly*nC + i) = -1;
 	}
 	/****************** SLOW LOOP BEWARE *******************/
 	// Second Constraint RHS
 	for(unsigned int j=0; j<nC;j++)
-		A.at(FirstCons+2*j, nPoly*nC + nPoly +j) = -1;
+	{
+		A.at(FirstCons+2*j, j) = -1;
+		A.at(FirstCons+2*j, j) = 1;
+	}
 	// Third Constraint RHS
 	b.at(FirstCons + nC*2) = 1;
 	b.at(FirstCons + nC*2+1) = -1;
@@ -498,7 +499,7 @@ void Game::compConvSize(arma::sp_mat &A, 	///< Output parameter
 	locations.set_size(2, N);
 	val.set_size(N);
 	
-	arma::uword count{0}, rowCount{0}, colCount{0};
+	arma::uword count{0}, rowCount{0}, colCount{nC};
 	for(arma::uword i=0; i<nPoly;i++)
 	{
 		for(auto it=Ai->at(i)->begin(); it!=Ai->at(i)->end(); ++it) // First constraint
@@ -511,7 +512,7 @@ void Game::compConvSize(arma::sp_mat &A, 	///< Output parameter
 		for(arma::uword j=0; j< bi->at(i)->n_rows; ++j) // RHS of first constraint
 		{
 			locations(0, count) = rowCount + j;
-			locations(1, count) = nC*nPoly+i;
+			locations(1, count) = nC+nC*nPoly+i;
 			val(count) = -bi->at(i)->at(j);
 			++count;
 		}

@@ -1,4 +1,4 @@
-#include "func.h"
+#include "models.h"
 #include<map>
 #include<memory>
 #include<vector>
@@ -268,11 +268,11 @@ Models::EPEC::addCountry(
 	Models::init(Loc);
 
 	// Allocate so much space for each of these types of variables
-	increaseVal(Loc, LeaderVars::FollowerStart, Params.n_followers);
-	increaseVal(Loc, LeaderVars::NetImport, 1);
-	increaseVal(Loc, LeaderVars::NetExport, 1);
-	increaseVal(Loc, LeaderVars::Caps, Params.n_followers);
-	increaseVal(Loc, LeaderVars::Tax, Params.n_followers);
+	Models::increaseVal(Loc, LeaderVars::FollowerStart, Params.n_followers);
+	Models::increaseVal(Loc, LeaderVars::NetImport, 1);
+	Models::increaseVal(Loc, LeaderVars::NetExport, 1);
+	Models::increaseVal(Loc, LeaderVars::Caps, Params.n_followers);
+	Models::increaseVal(Loc, LeaderVars::Tax, Params.n_followers);
 
 	
 	// Loc[Models::LeaderVars::AddnVar] = 1;
@@ -811,6 +811,7 @@ Models::EPEC::findNashEq(bool write, string  filename) const
 		catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::findNashEq : "<<e.getErrorCode()<<": "<<e.getMessage()<<" "<<temp<<endl;;}
 		xstar.save("x_"+filename, arma::file_type::arma_ascii, VERBOSE);
 		zstar.save("z_"+filename, arma::file_type::arma_ascii, VERBOSE);
+		model->write("My_model.lp");
 	}
 
 	return model;

@@ -1,6 +1,6 @@
 #include<iostream>
 #include<memory>
-#include"func.h"
+#include "games.h"
 #include<armadillo>
 #include<array>
 

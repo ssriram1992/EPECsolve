@@ -14,3 +14,5 @@ Session.vim
 *.swp
 tags
 *.txt
+*.lp
+GamsEPEC.gms

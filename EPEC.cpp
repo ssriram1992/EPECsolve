@@ -1,7 +1,7 @@
 #include<iostream>
 #include<memory>
 #include<exception>
-#include"func.h"
+#include"models.h"
 #include<ctime>
 #include<cstdlib>
 #include<gurobi_c++.h>
@@ -50,7 +50,10 @@ int main()
 {
 	Models::DemPar P;
 	Models::FollPar FP, FP2, FP3, FP1;
-	Models::LeadPar L (0.0,-1,-1,-1);
+
+	Models::LeadPar L (0.0,-1,-1,60);
+
+	
 	FP.capacities = {10, 15};
 	FP.costs_lin = {30, 40};
 	FP.costs_quad = {60, 40}; 
@@ -59,12 +62,12 @@ int main()
 	FP1.capacities = {1000};
 	FP1.costs_lin = {1};
 	FP1.costs_quad = {0};
-	FP1.emission_costs = {0};
+	FP1.emission_costs = {-5};
 
 
 	FP2.capacities = {10, 10};
 	FP2.costs_lin = {30, 50};
-	FP2.costs_quad = {60, 40}; 
+	FP2.costs_quad = {20, 40}; 
 	FP2.emission_costs = {10, 0}; 
 
 	FP3.capacities = {10, 15, 5};
@@ -81,8 +84,8 @@ int main()
 	Models::LeadAllPar LA3(3, "C", FP3, {90,1});
 
 	// Two followers Leader with price cap
-	Models::LeadAllPar LA_pc1(1, "LA_pc1", FP1, {40,2}, L );
-	Models::LeadAllPar LA_pc2(1, "LA_pc2", FP1, {60,3}, L );
+	Models::LeadAllPar LA_pc1(1, "LA_pc1", FP1, {40,0.10}, L );
+	Models::LeadAllPar LA_pc2(1, "LA_pc2", FP1, {60,0.25}, L );
 
 	// cout<<LA<<LA2;
 	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
