@@ -100,6 +100,11 @@ class EPEC
 		vector<unsigned int> nImportMarkets = {}; 	///< Number of countries from which the i-th country imports
 		vector<LeadLocs> Locations = {};			///< Location of variables for each country
 		vector<unsigned int> LeaderLocations = {}; 	///< Location of each leader
+
+		unique_ptr<Game::NashGame> nashgame;
+		unique_ptr<Game::LCP> lcp;
+		unique_ptr<GRBModel> lcpmodel;
+
 		unsigned int nVarinEPEC{0};
 	private:
 		GRBEnv *env;		///< A gurobi environment to create and process the resulting LCP object.
@@ -154,15 +159,40 @@ class EPEC
 		unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
 		unique_ptr<GRBModel> Respond(const string name, const arma::vec &x) const;
 		EPEC& unlock();
-		unique_ptr<GRBModel> findNashEq(bool write=false, string  filename="x_NE.txt") const;
+		void findNashEq(bool write=false, string  filename="x_NE.txt") ;
 	public:
 		// Data access methods
 		Game::NashGame* get_LowerLevelNash(const unsigned int i) const;
 		Game::LCP* playCountry(vector<Game::LCP*> countries);
+	public:
+		// Writing model files
+		void write(const string filename, const unsigned int i, bool append=true) const;
+		void write(const string filename, bool append=true) const ;
+		void gur_WriteCountry_conv(const unsigned int i, string filename) const;
+		void gur_WriteEpecMip(const unsigned int i, string filename) const;
+
+		void WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append=true) const;
+		void WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const;
+	private:
+		arma::vec sol_x, sol_z;
+	public:
+		const arma::vec &x{sol_x};
+		const arma::vec &z{sol_z};
 };
 
 
 
 
 };
+
+// Gurobi functions
+string to_string(const GRBVar &var);
+string to_string(const GRBConstr &cons, const GRBModel &model);
+
+// ostream functions
+namespace Models{
+enum class prn{ label, val };
+ostream& operator<<(ostream &ost, Models::prn l);
+};
+
 #endif

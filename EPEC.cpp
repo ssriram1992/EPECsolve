@@ -7,6 +7,7 @@
 #include<gurobi_c++.h>
 #include<armadillo>
 #include<iostream>
+#include<iomanip>
 
 using namespace std;
 
@@ -31,7 +32,7 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 			for(int j=0; j<9;j++)
 			{
 				auto v = static_cast<Models::LeaderVars>(j);
-				cout<<v<<"\t\t\t"<<epec.getPosition(i, v)<<endl;
+				cout<<Models::prn::label<<std::setfill('.')<<v<<Models::prn::val<<std::setfill('.')<<epec.getPosition(i, v)<<endl;
 			}
 			cout<<endl;
 		}
@@ -51,18 +52,19 @@ int main()
 	Models::DemPar P;
 	Models::FollPar FP, FP2, FP3, FP1;
 
-	Models::LeadPar L (0.0,-1,-1,60);
+	Models::LeadPar L (1.0,-1,-1,60);
+
+	FP1.capacities = {10};
+	FP1.costs_lin = {1};
+	FP1.costs_quad = {0.1};
+	FP1.emission_costs = {5};
 
 	
 	FP.capacities = {10, 15};
-	FP.costs_lin = {30, 40};
-	FP.costs_quad = {60, 40}; 
+	FP.costs_lin = {0, 4};
+	FP.costs_quad = {0, 40}; 
 	FP.emission_costs = {0, 0}; 
-
-	FP1.capacities = {1000};
-	FP1.costs_lin = {1};
-	FP1.costs_quad = {0};
-	FP1.emission_costs = {-5};
+/*
 
 
 	FP2.capacities = {10, 10};
@@ -82,6 +84,7 @@ int main()
 	Models::LeadAllPar LA1b(1, "A2", FP1);
 	Models::LeadAllPar LA2(2, "B", FP2, {60,1});
 	Models::LeadAllPar LA3(3, "C", FP3, {90,1});
+	*/
 
 	// Two followers Leader with price cap
 	Models::LeadAllPar LA_pc1(1, "LA_pc1", FP1, {40,0.10}, L );
@@ -91,7 +94,6 @@ int main()
 	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
 	arma::mat TrCo(2,2); 
 	TrCo << 0 << 1<< arma::endr << 2 <<0;
-	cout<<LA1<<LA2<<endl;
 	LCPtest(LA_pc1, LA_pc2, arma::sp_mat(TrCo));
 
 

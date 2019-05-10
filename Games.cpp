@@ -25,8 +25,14 @@ operator<<(ostream& ost, pair<T,S> p)
 	return ost; 
 }
 
+void Game::print(const perps &C)
+{
+	 for (auto p:C)
+		cout<<"<"<<p.first<<", "<<p.second<<">"<<"\t";
+}
+
 ostream& 
-operator<<(ostream& ost, perps C)
+operator<<(ostream& ost, const perps &C)
 {
 	 for (auto p:C)
 		ost<<"<"<<p.first<<", "<<p.second<<">"<<"\t";

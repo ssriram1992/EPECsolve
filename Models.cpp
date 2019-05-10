@@ -1,4 +1,6 @@
-#include "models.h"
+// #include "models.h"
+#include"epecsolve.h"
+#include<iomanip>
 #include<map>
 #include<memory>
 #include<vector>
@@ -6,17 +8,35 @@
 #include<iostream>
 #include<gurobi_c++.h>
 
+
+ostream& 
+Models::operator<<(ostream &ost, const Models::prn l)
+{
+	switch(l)
+	{
+		case Models::prn::label:
+			ost<<std::left<<std::setw(50);
+			break;
+		case Models::prn::val:
+			ost<<std::right<<std::setprecision(2)<<std::setw(16)<<std::fixed;
+			break;
+		default:
+			break;
+	}
+	return ost;
+}
+
 ostream& 
 Models::operator<<(ostream& ost, const Models::FollPar P)
 {
 	ost<<"Follower Parameters: "<<endl;
 	ost<<"********************"<<endl;
-	ost<<"Linear Costs: \t\t\t\t";
-	for(auto a:P.costs_lin) ost<<a<<"\t";
-	ost<<endl<<"Quadratic costs: \t\t\t";
-	for(auto a:P.costs_quad) ost<<a<<"\t";
-	ost<<endl<<"Production capacities: \t\t\t";
-	for(auto a:P.capacities) ost<<(a<0?string("Inf"):to_string(a))<<"\t";
+	ost<<Models::prn::label<<"Linear Costs"<<":\t";
+	for(auto a:P.costs_lin) ost<<Models::prn::val<<a;
+	ost<<endl<<Models::prn::label<<"Quadratic costs"<<":\t";
+	for(auto a:P.costs_quad) ost<<Models::prn::val<<a;
+	ost<<endl<<Models::prn::label<<"Production capacities"<<":\t";
+	for(auto a:P.capacities) ost<<Models::prn::val<<(a<0?std::numeric_limits<double>::infinity():a);
 	ost<<endl;
 	return ost;
 }
@@ -35,11 +55,14 @@ Models::operator<<(ostream& ost, const Models::LeadPar P)
 {
 	ost<<"Leader Parameters: "<<endl;
 	ost<<"******************"<<endl;
-	ost<<"Export Limit: \t\t\t"<<(P.export_limit<0?string("Inf"):to_string(P.export_limit));
+	ost<<std::fixed;
+	ost<<Models::prn::label<<"Export Limit"<<":"<<Models::prn::val<<(P.export_limit<0?std::numeric_limits<double>::infinity():P.export_limit);
 	ost<<endl;
-	ost<<"Import Limit: \t\t\t"<<(P.import_limit<0?string("Inf"):to_string(P.import_limit));
+	ost<<Models::prn::label<<"Import Limit"<<":"<<Models::prn::val<<(P.import_limit<0?std::numeric_limits<double>::infinity():P.import_limit);
 	ost<<endl;
-	ost<<"Maximum tax percentage: \t"<<P.max_tax_perc;
+	ost<<Models::prn::label<<"Maximum tax percentage"<<":"<<Models::prn::val<<P.max_tax_perc;
+	ost<<endl;
+	ost<<Models::prn::label<<"Price limit"<<":"<<Models::prn::val<<(P.price_limit<0?std::numeric_limits<double>::infinity():P.price_limit);
 	ost<<endl;
 	return ost;
 }
@@ -51,7 +74,7 @@ Models::operator<<(ostream& ost, const Models::LeadAllPar P)
 	ost<<"***************************"<<"\n";
 	ost<<"Leader Complete Description"<<"\n";
 	ost<<"***************************"<<"\n"<<"\n";
-	ost<<"Number of followers: \t\t\t"<<P.n_followers<<"\n "<<"\n";
+	ost<<Models::prn::label<<"Number of followers"<<":"<<Models::prn::val<<P.n_followers<<"\n "<<"\n";
 	ost<<endl<<P.LeaderParam<<endl<<P.FollowerParam<<endl<<P.DemandParam<<"\n";
 	ost<<"***************************"<<"\n"<<"\n";
 	return ost;
@@ -158,9 +181,10 @@ Models::EPEC::make_LL_QP(const LeadAllPar& Params, 	///< The Parameters object
 		Ctemp(0, (Params.n_followers-1)+2+Params.n_followers+follower  ) = 1; // q_{-i}, then import, export, then tilde q_i, then i-th tax
 
 		C = Ctemp;
-		A(1, (Params.n_followers-1)+2 + follower) = -1;
-		B(0,0)=1; B(1,0) = 1;
+		// A(1, (Params.n_followers-1)+2 + follower) = 1;
+		B(0,0)=1; B(1,0) = -1;
 		b(0) = Params.FollowerParam.capacities.at(follower); 
+		b(1) = -1.21; // Params.FollowerParam.capacities.at(follower)*0.25; 
 
 		Foll->set(std::move(Q), std::move(C), std::move(A), std::move(B), std::move(c), std::move(b));
 }
@@ -775,8 +799,8 @@ Models::LeaderVars Models::operator+ (Models::LeaderVars a, int b)
 	return static_cast<LeaderVars>(static_cast<int> (a)+b);
 }
 
-unique_ptr<GRBModel> 
-Models::EPEC::findNashEq(bool write, string  filename) const
+void
+Models::EPEC::findNashEq(bool write, string  filename) 
 {
 	auto Nvar = this->country_QP.front().get()->getNx() + this->country_QP.front().get()->getNy();
 	arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
@@ -784,35 +808,191 @@ Models::EPEC::findNashEq(bool write, string  filename) const
 	arma::vec dumb; dumb.set_size(0);
 	this->make_MC_cons(MC, MCRHS);
 	MC.print();
-	auto nashgame = Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb);
-	cout<<nashgame<<endl;
-	auto lcp = Game::LCP(this->env, nashgame); 
+	this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb));
+	cout<<*nashgame<<endl;
+	lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame)); 
 
-	auto model = lcp.LCPasMIP(false);
+	this->lcpmodel = lcp->LCPasMIP(false);
 
-	Nvar = nashgame.getNprimals()+nashgame.getNduals()+nashgame.getNshadow()+nashgame.getNleaderVars();
+	Nvar = nashgame->getNprimals()+nashgame->getNduals()+nashgame->getNshadow()+nashgame->getNleaderVars();
 	if(write) 
 	{
-		model.get()->set(GRB_IntParam_OutputFlag, 1);
-		model.get()->optimize();
-		arma::vec xstar; 
-		arma::vec zstar; 
-		xstar.set_size(Nvar);
-		zstar.set_size(Nvar);
+		lcpmodel.get()->set(GRB_IntParam_OutputFlag, 1);
+		lcpmodel.get()->optimize();
+		this->sol_x.set_size(Nvar);
+		this->sol_z.set_size(Nvar);
 		unsigned int temp;
 		try{
 		for(unsigned int i=0 ; i<Nvar; i++)
 		{
-			xstar(i) = model.get()->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X);
-			zstar(i) = model.get()->getVarByName("z_"+to_string(i)).get(GRB_DoubleAttr_X) ;
+			this->sol_x(i) = lcpmodel.get()->getVarByName("x_"+to_string(i)).get(GRB_DoubleAttr_X);
+			this->sol_z(i) = lcpmodel.get()->getVarByName("z_"+to_string(i)).get(GRB_DoubleAttr_X) ;
 			temp=i;
 		}
 		}
 		catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::findNashEq : "<<e.getErrorCode()<<": "<<e.getMessage()<<" "<<temp<<endl;;}
-		xstar.save("x_"+filename, arma::file_type::arma_ascii, VERBOSE);
-		zstar.save("z_"+filename, arma::file_type::arma_ascii, VERBOSE);
-		model->write("My_model.lp");
+		this->sol_x.save("x_"+filename, arma::file_type::arma_ascii, VERBOSE);
+		this->sol_z.save("z_"+filename, arma::file_type::arma_ascii, VERBOSE);
+		lcpmodel->write("My_model.lp");
+		try{
+		this->WriteCountry(0, "temp.txt",this->sol_x, false);
+		this->WriteCountry(1, "temp.txt",this->sol_x);
+		this->write("temp.txt", true);
+		}
+		catch(GRBException &e){}
+		Game::print(lcp->getCompl());
 	}
+}
 
-	return model;
+
+void Models::EPEC::gur_WriteCountry_conv(const unsigned int i, string filename) const
+{
+
+	if(!lcp) throw;
+}
+
+void Models::EPEC::gur_WriteEpecMip(const unsigned int i, string filename) const
+{
+
+	if(!lcp) throw;
+}
+
+string to_string(const GRBConstr &cons, const GRBModel &model)
+{
+	const GRBVar* vars = model.getVars();
+	const int nVars = model.get(GRB_IntAttr_NumVars);
+	ostringstream oss;
+	oss<<cons.get(GRB_StringAttr_ConstrName)<<":\t\t";
+	constexpr double eps=1e-5;
+	// LHS
+	for(int i=0; i<nVars; ++i)
+	{
+		double coeff = model.getCoeff(cons, vars[i]);
+		if(abs(coeff) > eps)
+		{
+			char sign = (coeff>eps)?'+':' ';	
+			oss<<sign<<coeff<<to_string(vars[i])<<"\t";
+		}
+	}
+	// Inequality/Equality and RHS
+	oss<<cons.get(GRB_CharAttr_Sense)<<"\t"<<cons.get(GRB_DoubleAttr_RHS);
+	return oss.str();
+}
+
+string to_string(const GRBVar &var)
+{
+	string name = var.get(GRB_StringAttr_VarName);
+	return name.empty()?"unNamedvar":name;
+}
+
+
+void 
+Models::EPEC::write(const string filename, const unsigned int i, bool append) const
+{ 
+	ofstream file;
+	file.open(filename,append?ios::app:ios::out); 
+	const LeadAllPar &Params = this->AllLeadPars.at(i);
+	file<<"**************************************************\n";
+	file<<"COUNTRY: "<<Params.name<<'\n';
+	file<<"- - - - - - - - - - - - - - - - - - - - - - - - - \n";
+	file<<Params;
+	file<<"**************************************************\n\n\n\n\n";
+	file.close();
+}
+
+
+
+void 
+Models::EPEC::write(const string filename, bool append) const
+{ 
+	if(append)
+	{
+		ofstream file;
+		file.open(filename, ios::app);
+		file<<"\n\n\n\n\n";
+		file<<"##################################################\n";
+		file<<"############### COUNTRY PARAMETERS ###############\n";
+		file<<"##################################################\n";
+	}
+	for(unsigned int i=0; i<this->nCountries; ++i)
+		this->write(filename, i, (append||i));
+}
+
+
+void 
+Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const
+{ 
+	if(!lcp) return;
+	const LeadLocs& Loc = this->Locations.at(i);
+
+	ofstream file;
+	file.open(filename,append?ios::app:ios::out); 
+	// FILE OPERATIONS START
+	const LeadAllPar &Params = this->AllLeadPars.at(i);
+	file<<"**************************************************\n";
+	file<<"COUNTRY: "<<Params.name<<'\n';
+	file<<"**************************************************\n\n";
+	// Country Variables
+	unsigned int foll_prod;
+	foll_prod = Loc.at(Models::LeaderVars::FollowerStart);
+	// Domestic production
+	double prod{0};
+	for(unsigned int j=0;j<Params.n_followers;++j) prod+= x.at(foll_prod+j);
+	// Trade
+	double Export{x.at(Loc.at(Models::LeaderVars::NetExport))};
+	double import{0};
+	for(unsigned int j=Loc.at(Models::LeaderVars::CountryImport); j<Loc.at(Models::LeaderVars::CountryImport+1); ++j)
+		import += x.at(j);
+	// Writing national level details
+	file<<Models::prn::label<<"Domestic production"<<":"<<Models::prn::val<<prod<<"\n";
+	if(Export>=import) 
+		file<<Models::prn::label<<"Net exports"<<":"<<Models::prn::val<<Export-import<<"\n";
+	else
+		file<<Models::prn::label<<"Net imports"<<":"<<Models::prn::val<<import-Export<<"\n";
+	file<<Models::prn::label<<" -Total Export"<<":"<<Models::prn::val<<Export<<"\n";
+	file<<Models::prn::label<<" -Total Import"<<":"<<Models::prn::val<<import<<endl;
+	file<<Models::prn::label<<"Domestic consumed quantity"<<":"<<Models::prn::val<<import-Export+prod<<"\n";
+	file<<Models::prn::label<<"Domestic price"<<":"<<Models::prn::val<<Params.DemandParam.alpha - Params.DemandParam.beta*(import-Export+prod)<<"\n";
+
+	file.close();
+
+	// Follower productions
+	file<<"- - - - - - - - - - - - - - - - - - - - - - - - - \n";
+	file<<"FOLLOWER DETAILS:\n";
+	for(unsigned int j=0;j<Params.n_followers;++j)
+		this->WriteFollower(i, j, filename, x);
+
+	file<<"\n\n\n";
+	// FILE OPERATIONS END
+}
+
+void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const
+{
+	ofstream file;
+	file.open(filename,ios::app);
+
+	// Country Variables
+	const LeadLocs& Loc = this->Locations.at(i);
+	const LeadAllPar &Params = this->AllLeadPars.at(i);
+	unsigned int foll_prod, foll_tax,  foll_lim;
+	foll_prod = Loc.at(Models::LeaderVars::FollowerStart);
+	foll_tax = Loc.at(Models::LeaderVars::Tax);
+	foll_lim = Loc.at(Models::LeaderVars::Caps);
+
+	file<<"\nFollower "<<j<<"\n\n";//<<" named "<<Params.FollowerParam.names.at(j)<<"\n";
+	const double q = x.at(foll_prod+j);
+	const double tax = x.at(foll_tax+j);
+	const double lim = x.at(foll_lim+j);
+	const double lin = Params.FollowerParam.costs_lin.at(j);
+	const double quad = Params.FollowerParam.costs_quad.at(j);
+
+	file<<Models::prn::label<<"Quantity produced"<<":"<<Models::prn::val<<q<<endl;
+	file<<Models::prn::label<<"Capacity of production"<<":"<<Models::prn::val<<Params.FollowerParam.capacities.at(j)<<"\n";
+	file<<Models::prn::label<<"Limit on production"<<":"<<Models::prn::val<<lim<<"\n";
+	file<<Models::prn::label<<"Tax imposed"<<":"<<Models::prn::val<<tax<<"\n";
+	file<<Models::prn::label<<"  -Production cost function"<<":"<<"\t C(q) = ("<<lin<<" + tax)*q + 0.5*"<<quad<<"*q^2\n"<<Models::prn::label<<" "<<"="<<Models::prn::val<<(lin+tax)*q + 0.5*quad*q*q<<"\n";
+	file<<Models::prn::label<<"  -Marginal cost of production"<<":"<<Models::prn::val<<quad*q+lin+tax<<"\n";
+	file<<Models::prn::label<<"Emission cost"<<":"<<Models::prn::val<<Params.FollowerParam.emission_costs.at(j)<<endl;
+
+	file.close();
 }

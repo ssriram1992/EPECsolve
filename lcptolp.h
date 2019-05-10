@@ -1,5 +1,6 @@
 #ifndef LCPTOLP_H
 #define LCPTOLP_H
+
 #include"epecsolve.h"
 #include<iostream>
 #include<memory>
@@ -7,6 +8,7 @@
 #include<armadillo>
 
 //using namespace Game;
+
 
 namespace Game{
 
@@ -119,3 +121,4 @@ class LCP
 };
 };
 #endif
+

@@ -200,7 +200,7 @@ class NashGame
 			return os;
 		}
 		/// Return the number of primal variables
-		inline unsigned int getNprimals() const { return this->Players.at(0)->getNy() + this->Players.at(0)->getNx(); }
+		inline unsigned int getNprimals() const { return this->primal_position.back(); }
 		inline unsigned int getNshadow() const {return this->MCRHS.n_rows;}
 		inline unsigned int getNleaderVars() const {return this->n_LeadVar;}
 		inline unsigned int getNduals() const {return this->dual_position.back()-this->dual_position.front()+0;}
@@ -226,6 +226,8 @@ class NashGame
 // ostream& operator<< (ostream& os, const QP_Param &Q);
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
 ostream& operator<< (ostream& os, const QP_Param &Q);
+ostream& operator<<(ostream& ost, const perps &C);
+void print(const perps &C);
 };
 
 #endif
