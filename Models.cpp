@@ -181,10 +181,10 @@ Models::EPEC::make_LL_QP(const LeadAllPar& Params, 	///< The Parameters object
 		Ctemp(0, (Params.n_followers-1)+2+Params.n_followers+follower  ) = 1; // q_{-i}, then import, export, then tilde q_i, then i-th tax
 
 		C = Ctemp;
-		// A(1, (Params.n_followers-1)+2 + follower) = 1;
+		// A(1, (Params.n_followers-1)+2 + follower) = -1;
 		B(0,0)=1; B(1,0) = -1;
 		b(0) = Params.FollowerParam.capacities.at(follower); 
-		b(1) = -1.21; // Params.FollowerParam.capacities.at(follower)*0.25; 
+		b(1) = - Params.FollowerParam.capacities.at(follower)*0.05; 
 
 		Foll->set(std::move(Q), std::move(C), std::move(A), std::move(B), std::move(c), std::move(b));
 }
@@ -243,6 +243,9 @@ Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
 		LeadCons.at(Params.n_followers+1+import_lim_cons+export_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = Params.DemandParam.beta;
 		LeadRHS.at(Params.n_followers+1+import_lim_cons+export_lim_cons) = Params.LeaderParam.price_limit - Params.DemandParam.alpha;
 	}
+	LeadCons.impl_print_dense("LeadCons");
+	cout<<price_lim_cons;
+	LeadRHS.print("LeadRHS");
 }
 
 Models::EPEC& 
@@ -306,6 +309,7 @@ Models::EPEC::addCountry(
 	if(Params.LeaderParam.import_limit >= 0) import_lim_cons = 1;
 	if(Params.LeaderParam.export_limit >= 0) export_lim_cons = 1;
 	if(Params.LeaderParam.price_limit  >  0) price_lim_cons  = 1; 
+	cout<<"Price limit: "<<price_lim_cons<<endl;
 
 	// cout<<" In addCountry: "<<Loc[Models::LeaderVars::End]<<endl;
 	arma::sp_mat LeadCons(import_lim_cons+	// Import limit constraint
@@ -340,7 +344,7 @@ Models::EPEC::addCountry(
 	// Make Leader Constraints
 	try
 	{
-		this->make_LL_LeadCons(LeadCons, LeadRHS, Params, Loc, import_lim_cons, export_lim_cons);
+		this->make_LL_LeadCons(LeadCons, LeadRHS, Params, Loc, import_lim_cons, export_lim_cons, price_lim_cons);
 	}
 	catch(const char* e) { cerr<<e<<endl;throw; }
 	catch(string e) { cerr<<"String: "<<e<<endl;throw; }
@@ -453,23 +457,26 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 	// substitutes that answer to nImportMarkets at the current position
 	this->nImportMarkets.at(i) = (nImp);
 	
-	Models::increaseVal(Loc, LeaderVars::CountryImport, nImp);
-
-	Game::NashGame & LL_Nash = *this->countries_LL.at(i).get();
-
-	// Adding the constraint that the sum of imports from all countries equals total imports
-	arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
-	a.at(Loc.at(Models::LeaderVars::NetImport)) = -1;
-	a.subvec(Loc.at(LeaderVars::CountryImport), Loc.at(LeaderVars::CountryImport + 1)).ones();
-	if(VERBOSE)
+	if(nImp > 0)
 	{
-		cout<<endl<<" ______ "<<endl;
-		for(auto v:Loc) cout<<v.first<<"\t\t\t"<<v.second<<endl;
-		a.print();
-		cout<<endl<<" ______ "<<endl;
-	}
+		Models::increaseVal(Loc, LeaderVars::CountryImport, nImp);
 
-	LL_Nash.addDummy(nImp).addLeadCons(a, 0).addLeadCons(-a,0);
+		Game::NashGame & LL_Nash = *this->countries_LL.at(i).get();
+
+		// Adding the constraint that the sum of imports from all countries equals total imports
+		arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
+		a.at(Loc.at(Models::LeaderVars::NetImport)) = -1;
+		a.subvec(Loc.at(LeaderVars::CountryImport), Loc.at(LeaderVars::CountryImport + 1)-1).ones();
+		if(VERBOSE)
+		{
+			cout<<endl<<" ______ "<<endl;
+			for(auto v:Loc) cout<<v.first<<"\t\t\t"<<v.second<<endl;
+			a.print();
+			cout<<endl<<" ______ "<<endl;
+		}
+
+		LL_Nash.addDummy(nImp).addLeadCons(a, 0).addLeadCons(-a,0);
+	}
 	// Updating the variable locations
  /*	Loc[Models::LeaderVars::CountryImport] = Loc.at(Models::LeaderVars::End);
 	Loc.at(Models::LeaderVars::End) += nImp;*/
@@ -811,8 +818,11 @@ Models::EPEC::findNashEq(bool write, string  filename)
 	this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb));
 	cout<<*nashgame<<endl;
 	lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame)); 
+	lcp->bigM = 1e7;
 
-	this->lcpmodel = lcp->LCPasMIP(false);
+	;
+
+	this->lcpmodel = lcp->LCPasQP(false);
 
 	Nvar = nashgame->getNprimals()+nashgame->getNduals()+nashgame->getNshadow()+nashgame->getNleaderVars();
 	if(write) 
@@ -995,4 +1005,27 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
 	file<<Models::prn::label<<"Emission cost"<<":"<<Models::prn::val<<Params.FollowerParam.emission_costs.at(j)<<endl;
 
 	file.close();
+}
+
+void Models::EPEC::testQP(const unsigned int i)
+{
+	QP_Param *QP = this->country_QP.at(i).get();
+	arma::vec x;
+	x.zeros(QP->getNx());
+	std::unique_ptr<GRBModel> model = QP->solveFixed(x);
+	model->write("My_model"+to_string(i)+".lp");
+	arma::vec sol;
+	sol.set_size(QP->getNy());
+	for(unsigned int j = 0; j<QP->getNy(); ++j)
+		sol.at(j) = model->getVarByName("y_"+to_string(j)).get(GRB_DoubleAttr_X);
+	sol.save("sol_"+to_string(i)+".txt", arma::arma_ascii);
+}
+
+void Models::EPEC::testCountry(const unsigned int i)
+{
+	 auto country = this->get_LowerLevelNash(i);
+	 LCP CountryLCP = LCP(this->env,*country);
+	 cout<<"*** COUNTRY TEST***\n";
+	 auto model = CountryLCP.LCPasMIP(true);
+	 model->write("My_"+to_string(i)+"_model.lp");
 }

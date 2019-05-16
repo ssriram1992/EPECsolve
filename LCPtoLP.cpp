@@ -376,12 +376,12 @@ Game::LCP::print(string end)
 }
 
 int Game::ConvexHull( 
-		vector<arma::sp_mat*> *Ai, 	///< Inequality constraints LHS that define polyhedra whose convex hull is to be found 
-		vector<arma::vec*> *bi, 	///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
+		const vector<arma::sp_mat*> *Ai, 	///< Inequality constraints LHS that define polyhedra whose convex hull is to be found 
+		const vector<arma::vec*> *bi, 	///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
 		arma::sp_mat &A, 			///< Pointer to store the output of the convex hull LHS 
 		arma::vec &b, 				///< Pointer to store the output of the convex hull RHS 
-		arma::sp_mat Acom,			///< any common constraints to all the polyhedra - lhs.  
-	   	arma::vec bcom 				///< Any common constraints to ALL the polyhedra - RHS.
+		const arma::sp_mat Acom,			///< any common constraints to all the polyhedra - lhs.  
+	   	const arma::vec bcom 				///< Any common constraints to ALL the polyhedra - RHS.
 		)
 /** @brief Computing convex hull of finite unioon of polyhedra
  * @details Computes the convex hull of a finite union of polyhedra where 
@@ -421,10 +421,11 @@ int Game::ConvexHull(
 	// 3rd constr in Eqn 4.31. Again as two ineq constr.
 	nFinCons += 2;
 	// Common constraints
-	nFinCons += Acom.n_rows;
+	// nFinCons += Acom.n_rows;
 
 	nFinVar = nPoly*nC + nPoly + nC; // All x^i variables + delta variables+ original x variables 
 	A.zeros(nFinCons, nFinVar); b.zeros(nFinCons);
+	// A.zeros(nFinCons, nFinVar); b.zeros(nFinCons);
 	// Implements the first constraint more efficiently using better constructors for sparse matrix
 	Game::compConvSize(A, nFinCons, nFinVar, Ai, bi);
 	
@@ -461,9 +462,15 @@ int Game::ConvexHull(
 	// Common Constraints
 	if(Acom.n_rows>0)
 	{
-		b.subvec(FirstCons+2*nC+2, nFinCons-1) = bcom;
-		A.submat(FirstCons+2*nC+2, nPoly*nC+nPoly,
-					nFinCons-1, nFinVar-1) = Acom;
+		arma::sp_mat A_comm_temp;
+		A_comm_temp = arma::join_rows(Acom, arma::zeros<arma::sp_mat>(Acom.n_rows, nFinVar-nC));
+		A = arma::join_cols(A, A_comm_temp); b = arma::join_cols(b, bcom);
+		// A = arma::join_cols(A_comm_temp, A); b = arma::join_cols(bcom, b);
+
+ /*		b.subvec(FirstCons+2*nC+2, nFinCons-1) = bcom;
+		A.submat(FirstCons+2*nC+2, 0, //  nPoly*nC+nPoly,
+					nFinCons-1, nC-1 // nFinVar-1
+					) = Acom;*/
 	}
 	cout<<"A"<<A.n_rows<<" "<<A.n_cols<<endl;
 	return 0;
@@ -471,10 +478,10 @@ int Game::ConvexHull(
 
 
 void Game::compConvSize(arma::sp_mat &A, 	///< Output parameter
-		const arma::uword nFinCons,			///< Number of rows in final matrix A
-		const arma::uword nFinVar, 			///< Number of columns in the final matrix A
+		const unsigned int nFinCons,			///< Number of rows in final matrix A
+		const unsigned int nFinVar, 			///< Number of columns in the final matrix A
 		const vector<arma::sp_mat*> *Ai, 	///< Inequality constraints LHS that define polyhedra whose convex hull is to be found 
-		vector<arma::vec*> *bi 	///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
+		const vector<arma::vec*> *bi 	///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
 		)
 /**
  * @brief INTERNAL FUNCTION NOT FOR GENERAL USE.
@@ -486,8 +493,8 @@ void Game::compConvSize(arma::sp_mat &A, 	///< Output parameter
 { 
 	unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
 	unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
-	arma::uword N{0}; // Total number of nonzero elements in the final matrix
-	for(arma::uword i=0; i<nPoly;i++)
+	unsigned int N{0}; // Total number of nonzero elements in the final matrix
+	for(unsigned int i=0; i<nPoly;i++)
 	{
 		N += Ai->at(i)->n_nonzero;
 		N += bi->at(i)->n_rows;
@@ -499,8 +506,8 @@ void Game::compConvSize(arma::sp_mat &A, 	///< Output parameter
 	locations.set_size(2, N);
 	val.set_size(N);
 	
-	arma::uword count{0}, rowCount{0}, colCount{nC};
-	for(arma::uword i=0; i<nPoly;i++)
+	unsigned int count{0}, rowCount{0}, colCount{nC};
+	for(unsigned int i=0; i<nPoly;i++)
 	{
 		for(auto it=Ai->at(i)->begin(); it!=Ai->at(i)->end(); ++it) // First constraint
 		{ 
@@ -509,7 +516,7 @@ void Game::compConvSize(arma::sp_mat &A, 	///< Output parameter
 			val(count) = *it;
 			++count;
 		}
-		for(arma::uword j=0; j< bi->at(i)->n_rows; ++j) // RHS of first constraint
+		for(unsigned int j=0; j< bi->at(i)->n_rows; ++j) // RHS of first constraint
 		{
 			locations(0, count) = rowCount + j;
 			locations(1, count) = nC+nC*nPoly+i;
@@ -919,7 +926,12 @@ Game::LCP::addPolyhedron(const vector<short int> &Fix, 	///< +1/0/-1 Representat
 {
 	this->FixToPolies(&Fix, false, true, &custAi, &custbi);
 	if(convHull)
-		Game::ConvexHull(&custAi, &custbi, *A, *b, this->_A, this->_b);
+	{
+		arma::sp_mat A_common;
+		A_common = arma::join_cols(this->_A, -this->M);
+		arma::vec b_common = arma::join_cols(this->_b, this->q);
+		Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
+	}
 	return *this;
 }
 

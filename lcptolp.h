@@ -13,8 +13,8 @@
 namespace Game{
 
 arma::vec LPSolve(const arma::sp_mat &A, const arma::vec &b, const arma::vec &c, int &status, bool Positivity=false);
-int ConvexHull( vector<arma::sp_mat*> *Ai, vector<arma::vec*> *bi, arma::sp_mat &A, arma::vec &b, arma::sp_mat Acom={}, arma::vec bcom={});
-void compConvSize(arma::sp_mat &A, const arma::uword nFinCons, const arma::uword nFinVar, const vector<arma::sp_mat*> *Ai, 	vector<arma::vec*> *bi 	);
+int ConvexHull(const vector<arma::sp_mat*> *Ai, const vector<arma::vec*> *bi, arma::sp_mat &A, arma::vec &b, const arma::sp_mat Acom={}, const arma::vec bcom={});
+void compConvSize(arma::sp_mat &A, const unsigned int nFinCons, const unsigned int nFinVar, const vector<arma::sp_mat*> *Ai, 	const vector<arma::vec*> *bi 	);
 /**
  * @brief Class to handle and solve linear complementarity problems
  */

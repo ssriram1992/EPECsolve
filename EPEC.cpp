@@ -24,7 +24,11 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 	{
 		epec.addCountry(LA, 0).addCountry(LA2, 0).addTranspCosts(TrCo).finalize();
 		epec.make_country_QP();
-		epec.findNashEq(true);
+		try{epec.testQP(0);}catch(...){}
+		try{epec.testQP(1);}catch(...){}
+		epec.testCountry(1);
+		epec.testCountry(0);
+		// epec.findNashEq(true);
 		cout<<"--------------------------------------------------Printing Locations--------------------------------------------------\n";
 		for(unsigned int i = 0; i<epec.nCountries; i++)
 		{
@@ -52,25 +56,25 @@ int main()
 	Models::DemPar P;
 	Models::FollPar FP, FP2, FP3, FP1;
 
-	Models::LeadPar L (1.0,-1,-1,60);
+	Models::LeadPar L (0.3,1,1,-1);
 
-	FP1.capacities = {10};
-	FP1.costs_lin = {1};
+	FP1.capacities = {1000};
+	FP1.costs_lin = {10};
 	FP1.costs_quad = {0.1};
-	FP1.emission_costs = {5};
+	FP1.emission_costs = {0};
 
 	
 	FP.capacities = {10, 15};
 	FP.costs_lin = {0, 4};
 	FP.costs_quad = {0, 40}; 
 	FP.emission_costs = {0, 0}; 
-/*
 
 
 	FP2.capacities = {10, 10};
 	FP2.costs_lin = {30, 50};
 	FP2.costs_quad = {20, 40}; 
 	FP2.emission_costs = {10, 0}; 
+/*
 
 	FP3.capacities = {10, 15, 5};
 	FP3.costs_lin = {30, 40, 5};
@@ -88,12 +92,12 @@ int main()
 
 	// Two followers Leader with price cap
 	Models::LeadAllPar LA_pc1(1, "LA_pc1", FP1, {40,0.10}, L );
-	Models::LeadAllPar LA_pc2(1, "LA_pc2", FP1, {60,0.25}, L );
+	Models::LeadAllPar LA_pc2(2, "LA_pc2", FP2, {60,0.25}, L );
 
 	// cout<<LA<<LA2;
 	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
 	arma::mat TrCo(2,2); 
-	TrCo << 0 << 1<< arma::endr << 2 <<0;
+	TrCo << 0 << 0<< arma::endr << 0 <<0;
 	LCPtest(LA_pc1, LA_pc2, arma::sp_mat(TrCo));
 
 

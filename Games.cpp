@@ -196,6 +196,7 @@ Game::QP_Param::make_yQy()
 		yQy += 0.5*y[i]*value*y[j];
 	}
 	QuadModel.setObjective(yQy);
+	QuadModel.update();
 	this->made_yQy = true;
 	return 0;
 }
@@ -235,6 +236,7 @@ Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
 				LHS += (*j)*y[j.col()];
 			model->addConstr(LHS, GRB_LESS_EQUAL, b[i]-Ax[i]);
 		}
+		model->update();
 		model->optimize();
 	}
 	catch(const char* e) { cerr<<" Error in Game::QP_Param::solveFixed: "<<e<<endl; throw;}

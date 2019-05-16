@@ -59,14 +59,12 @@ sand: sand.o
 	$(GCC) sand.o $(OPTS) -o sand
 	./sand
 
-
 sand2: sand2.o
 	$(GCC) sand2.o $(OTHEROPTS) -o sand2
 	./sand2
 
 sand2.o: sand2.cpp
 	$(GCC) -c sand2.cpp $(OPTS)
-
 
 sand.o: sand.cpp
 	$(GCC) -c sand.cpp $(OPTS)
@@ -78,7 +76,7 @@ docDetailed:
 	doxygen refDetConf
 
 edit: 
-	vim -p func.h Games.cpp LCPtoLP.cpp  Models.cpp EPEC.cpp
+	vim -p epecsolve.h Games.cpp LCPtoLP.cpp  Models.cpp EPEC.cpp
 
 tag:
 	ctags *.cpp *.h

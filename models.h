@@ -142,6 +142,9 @@ class EPEC
 		void computeLeaderLocations(const bool addSpaceForMC = false);
 		void add_Dummy_Lead(const unsigned int i);
 		void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj);
+	public://Unit tests
+		void testQP(const unsigned int i);
+		void testCountry(const unsigned int i);
 	public:
 		void make_country_QP(const unsigned int i);
 		void make_country_QP();
