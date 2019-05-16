@@ -569,7 +569,7 @@ Game::NashGame& Game::NashGame::addDummy(unsigned int par)
 
 Game::NashGame& Game::NashGame::addLeadCons(const arma::vec &a, double b)
 /**
- * @bried Adds Leader constraint to a NashGame object.
+ * @brief Adds Leader constraint to a NashGame object.
  * @details In case common constraint to all followers is to be added (like  a leader constraint in an MPEC), this function can be used. It adds a single constraint @f$ a^Tx \leq b@f$
  */
 {

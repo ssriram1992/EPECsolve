@@ -58,20 +58,6 @@ clean:
 	rm -rf $(OUTPUT)
 	rm -rf $(OBJ)/*.o
 
-sand: sand.o
-	$(GCC) sand.o $(OPTS) -o sand
-	./sand
-
-sand2: sand2.o
-	$(GCC) sand2.o $(OTHEROPTS) -o sand2
-	./sand2
-
-sand2.o: sand2.cpp
-	$(GCC) -c sand2.cpp $(OPTS)
-
-sand.o: sand.cpp
-	$(GCC) -c sand.cpp $(OPTS)
-
 docSimple:
 	doxygen docs/refConf
 
@@ -79,7 +65,7 @@ docDetailed:
 	doxygen docs/refDetConf
 
 edit: 
-	vim -p epecsolve.h Games.cpp LCPtoLP.cpp  Models.cpp EPEC.cpp
+	vim -p src/epecsolve.h src/Games.cpp src/LCPtoLP.cpp  src/Models.cpp src/EPEC.cpp
 
 tag:
 	ctags *.cpp *.h

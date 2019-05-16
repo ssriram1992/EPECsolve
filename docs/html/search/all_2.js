@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['capacities',['capacities',['../structModels_1_1FollPar.html#afb8e83227eaf5daabece506d10c0dc6b',1,'Models::FollPar']]],
-  ['convexhull',['ConvexHull',['../classGame_1_1LCP.html#a98042d88db2e32a4c1c55bfb3b1b6756',1,'Game::LCP']]],
-  ['costs_5flin',['costs_lin',['../structModels_1_1FollPar.html#aaa36c0543e54c59699f0da4164e65b5b',1,'Models::FollPar']]],
-  ['costs_5fquad',['costs_quad',['../structModels_1_1FollPar.html#a55746125a9d34c969a27fe0c577a8fb2',1,'Models::FollPar']]]
+  ['b',['B',['../structGame_1_1QP__constraints.html#af68e8261052211f54a68637e36618cb9',1,'Game::QP_constraints::B()'],['../classGame_1_1MP__Param.html#a3d517547d70f75e43060785fe66ad091',1,'Game::MP_Param::B()'],['../structGame_1_1QP__constraints.html#a1c2ebf6e0d27fb351d8fb37f5fcb6be8',1,'Game::QP_constraints::b()'],['../classGame_1_1MP__Param.html#a97fc7b4d0d1ef97e4115f0114bbfdfcc',1,'Game::MP_Param::b()']]],
+  ['beta',['beta',['../structModels_1_1DemPar.html#a3b366b018a89e5affe7a1cc46edcaff4',1,'Models::DemPar']]],
+  ['bi',['bi',['../classGame_1_1LCP.html#a93a14422c0b00687870134c134c7e727',1,'Game::LCP']]],
+  ['bigm',['bigM',['../classGame_1_1LCP.html#ab6a2f478a8f4678316edfbf7a3eb19fe',1,'Game::LCP']]],
+  ['branch',['branch',['../classGame_1_1LCP.html#a769b78b24ff5deee29c65a50c886c895',1,'Game::LCP']]],
+  ['branchandprune',['BranchAndPrune',['../classGame_1_1LCP.html#aafa5c1781e87b7eaaf510a513cf6c05a',1,'Game::LCP']]],
+  ['branchloc',['branchLoc',['../classGame_1_1LCP.html#afaeb576a63b57c50b76f4ddd70f135c1',1,'Game::LCP']]],
+  ['branchprocloc',['branchProcLoc',['../classGame_1_1LCP.html#a3e8830e9ef2cf2ed5d4bc18b7c56d13c',1,'Game::LCP']]]
 ];

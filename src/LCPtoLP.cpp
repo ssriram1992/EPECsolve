@@ -800,7 +800,7 @@ Game::LCP::FixToPoly(const vector<short int> *Fix,  	///< A vector of +1 and -1 
  *	@details The computed polyhedron is always pushed into a vector of @p arma::sp_mat and @p arma::vec 
  *	If @p custom is false, this is the internal attribute of LCP, which are LCP::Ai and LCP::bi.
  *	Otherwise, the vectors can be provided as arguments.
- *	@p true value to @checkFeas ensures that the polyhedron is pushed @e only if it is feasible.
+ *	@p true value to @p checkFeas ensures that the polyhedron is pushed @e only if it is feasible.
  *	@warning Does not entertain 0 in the elements of *Fix. Only +1/-1 are allowed to not encounter undefined behavior. As a result, 
  *	not meant for high level code. Instead use LCP::FixToPolies.
  */
@@ -866,7 +866,7 @@ Game::LCP::FixToPolies(const vector<short int> *Fix, 	///< A vector of +1, 0 and
  *	@details The computed polyhedroa are always pushed into a vector of @p arma::sp_mat and @p arma::vec 
  *	If @p custom is false, this is the internal attribute of LCP, which are LCP::Ai and LCP::bi.
  *	Otherwise, the vectors can be provided as arguments.
- *	@p true value to @checkFeas ensures that @e each polyhedron that is pushed is feasible.
+ *	@p true value to @p checkFeas ensures that @e each polyhedron that is pushed is feasible.
  *	not meant for high level code. Instead use LCP::FixToPolies.
  *	@note A value of 0 in @p *Fix implies that polyhedra corresponding to fixing the corresponding variable as well as the equation
  *	become candidates to pushed into the vector. Hence this is preferred over LCP::FixToPoly for high-level usage.
@@ -941,7 +941,7 @@ Game::LCP::makeQP(
 		vector<arma::sp_mat*> &custAi, 	///< Vector with LHS of constraint matrix should be pushed.
 		vector<arma::vec*> &custbi,		///< Vector with RHS of constraints should be pushed.
 		Game::QP_objective &QP_obj,		///< The objective function of the QP to be returned. @warning Size of this parameter might change!
-		Game::QP_Param &QP
+		Game::QP_Param &QP				///< The output parameter where the final Game::QP_Param object is stored
 		)
 {
 	// Original sizes
@@ -1019,7 +1019,7 @@ Game::LCP::LCPasMIP(bool solve)
  * @brief Helps solving an LCP as an MIP using bigM constraints
  * @returns A unique_ptr to GRBModel that has the equivalent MIP
  * @details The MIP problem that is returned by this function is equivalent to the LCP problem provided the value of bigM is large enough.
- * @info This solves just the feasibility problem. Should you need  a leader's objective function, use LCP::MPECasMILP or LCP::MPECasMIQP
+ * @note This solves just the feasibility problem. Should you need  a leader's objective function, use LCP::MPECasMILP or LCP::MPECasMIQP
  */
 {
 	return this->LCPasMIP({}, {}, solve);
@@ -1032,7 +1032,7 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec
  * @brief Helps solving an LCP as an MIP using bigM constraints. 
  * @returns A unique_ptr to GRBModel that has the equivalent MIP
  * @details The MIP problem that is returned by this function is equivalent to the LCP problem provided the value of bigM is large enough. The function differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader objective, and returns an object with this objective. 
- * @info The leader's objective has to be linear here. For quadratic objectives, refer LCP::MPECasMIQP
+ * @note The leader's objective has to be linear here. For quadratic objectives, refer LCP::MPECasMIQP
  */
 {
 	unique_ptr<GRBModel> model = this->LCPasMIP(false);

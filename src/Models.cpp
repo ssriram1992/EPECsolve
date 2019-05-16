@@ -190,7 +190,8 @@ Models::EPEC::make_LL_QP(const LeadAllPar& Params, 	///< The Parameters object
 }
 
 void 
-Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
+Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, ///< The LHS matrix of leader constraints (for output)
+			arma::vec &LeadRHS,						///< RHS vector for leader constraints (for output)
 			const LeadAllPar& Params, ///< All country specific parameters
 			const Models::LeadLocs& Loc, ///< Location of variables
 			const unsigned int import_lim_cons, ///< Does a constraint on import limit exist or no limit?
@@ -732,7 +733,7 @@ Models::EPEC::make_country_QP()
 /**
  * @brief Makes the Game::QP_Param for all the countries
  * @details
- * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for each valid @i 
+ * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for each valid @p i 
  * @note Overloaded as EPEC::make_country_QP(unsigned int)
  */
 {

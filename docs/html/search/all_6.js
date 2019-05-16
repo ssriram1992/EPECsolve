@@ -1,18 +1,12 @@
 var searchData=
 [
-  ['get_5flowerlevelnash',['get_LowerLevelNash',['../classModels_1_1EPEC.html#aea86a7ca6a2f4d0bcedd2d7a02a4db89',1,'Models::EPEC']]],
-  ['geta',['getA',['../classGame_1_1MP__Param.html#ac838b1f2b2e2a4014ee284c3c0f0ecdf',1,'Game::MP_Param']]],
-  ['getb',['getB',['../classGame_1_1MP__Param.html#ac6340fb0573c6ddc25177fcd07588131',1,'Game::MP_Param::getB() const final'],['../classGame_1_1MP__Param.html#a6330db286f991fc0d5a9eb402e4274cf',1,'Game::MP_Param::getb() const final']]],
-  ['getc',['getC',['../classGame_1_1MP__Param.html#a291cbbacbfa31c5c102f2a8fc0fcb16f',1,'Game::MP_Param::getC() const final'],['../classGame_1_1MP__Param.html#a7cb939e706a99e695bcb96c43d673f08',1,'Game::MP_Param::getc() const final']]],
-  ['getcompl',['getCompl',['../classGame_1_1LCP.html#a56d3a73e7eea32833e3fc4f08c910e7f',1,'Game::LCP']]],
-  ['getlend',['getLEnd',['../classGame_1_1LCP.html#a7f2af6c2fa07ccde5173e88662f307d0',1,'Game::LCP']]],
-  ['getlstart',['getLStart',['../classGame_1_1LCP.html#aa5d75f96f139575afa5964cfb594d321',1,'Game::LCP']]],
-  ['getm',['getM',['../classGame_1_1LCP.html#a3ced9ff9dd3e3075326335ebeecc4229',1,'Game::LCP']]],
-  ['getmstar',['getMstar',['../classGame_1_1LCP.html#ae84003685742b9de4c91b21e91055970',1,'Game::LCP']]],
-  ['getnprimals',['getNprimals',['../classGame_1_1NashGame.html#ad1d3b9de9fde00bb56f21784174145e5',1,'Game::NashGame']]],
-  ['getnx',['getNx',['../classGame_1_1MP__Param.html#a46c6e5948869d9df6998bfd68e6629ce',1,'Game::MP_Param']]],
-  ['getny',['getNy',['../classGame_1_1MP__Param.html#a9bfc41513aa12a3fe9dd40222e46f36c',1,'Game::MP_Param']]],
-  ['getposition',['getPosition',['../classModels_1_1EPEC.html#a1d74390d88d7f5236d502eba172864ca',1,'Models::EPEC::getPosition(const unsigned int countryCount, const LeaderVars var=LeaderVars::FollowerStart) const'],['../classModels_1_1EPEC.html#a4a7fef43db0df43496c5bb88a6884de0',1,'Models::EPEC::getPosition(const string countryCount, const LeaderVars var=LeaderVars::FollowerStart) const']]],
-  ['getq',['getq',['../classGame_1_1LCP.html#a3cc8c85eca98fb717a4487dc7ed692cd',1,'Game::LCP::getq()'],['../classGame_1_1MP__Param.html#a3965799d2dfb02726f55ebe84e3493e7',1,'Game::MP_Param::getQ()']]],
-  ['getqstar',['getqstar',['../classGame_1_1LCP.html#a52df9c31f5d00c00803fe1a6f4b60534',1,'Game::LCP']]]
+  ['finalize',['finalize',['../classGame_1_1MP__Param.html#ad99f19eae314bd3ca720d75d219167c3',1,'Game::MP_Param::finalize()'],['../classModels_1_1EPEC.html#a0b8ec7f9576b833a42e71ea9f16704f1',1,'Models::EPEC::finalize()']]],
+  ['finalized',['finalized',['../classModels_1_1EPEC.html#ad930d4d05a1b40ce3ff55428a9fdfcec',1,'Models::EPEC']]],
+  ['findnasheq',['findNashEq',['../classModels_1_1EPEC.html#a7f353427de9584574a0269843b3127bb',1,'Models::EPEC']]],
+  ['fixtopolies',['FixToPolies',['../classGame_1_1LCP.html#a17e49f2dd9614e5af173ee8f7562f44a',1,'Game::LCP']]],
+  ['fixtopoly',['FixToPoly',['../classGame_1_1LCP.html#abcfa181de002a382d8bd8d5509669938',1,'Game::LCP']]],
+  ['followerparam',['FollowerParam',['../structModels_1_1LeadAllPar.html#adf8e44c2a1e3018f3393a2af5ae16ca3',1,'Models::LeadAllPar']]],
+  ['followerstart',['FollowerStart',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eaf2dcda11a77f92f3c0cd7e08f37ce122',1,'Models']]],
+  ['follpar',['FollPar',['../structModels_1_1FollPar.html',1,'Models::FollPar'],['../namespaceModels.html#a75c15ea53b50caf905986359bbc23cab',1,'Models::FollPar()']]],
+  ['formulatelcp',['FormulateLCP',['../classGame_1_1NashGame.html#a93e98e15ce94cf0020f152009fe4dd3b',1,'Game::NashGame']]]
 ];

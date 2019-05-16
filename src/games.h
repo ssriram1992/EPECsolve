@@ -186,7 +186,7 @@ class NashGame
 		void set_positions();
 
 	public: 
-		friend ostream& operator<< (ostream& os, const NashGame &N)		///< To print the Nash Game!
+		friend ostream& operator<< (ostream& os, const NashGame &N)		
 		{
 			os<<endl;
 			os<<"-----------------------------------------------------------------------"<<endl;
