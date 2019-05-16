@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceGame.html">Game</a></li><li class="navelem"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a></li>  </ul>
+<li class="navelem"><b>Game</b></li><li class="navelem"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -70,9 +70,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a>  </div>
+<a href="#pro-attribs">Protected Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">Game::QP_Param Class Reference</div>  </div>
 </div><!--header-->
@@ -80,8 +78,6 @@ $(function() {
 
 <p>Class to handle parameterized quadratic programs(QP)  
  <a href="classGame_1_1QP__Param.html#details">More...</a></p>
-
-<p><code>#include &lt;<a class="el" href="func_8h_source.html">func.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for Game::QP_Param:</div>
 <div class="dyncontent">
@@ -94,22 +90,23 @@ Inheritance diagram for Game::QP_Param:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aca8de136cfd5597acf66de448dce9edd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#aca8de136cfd5597acf66de448dce9edd">QP_Param</a> (GRBEnv *<a class="el" href="classGame_1_1QP__Param.html#a3564ee7adf9f55c822e40b978d7aea24">env</a>=nullptr)</td></tr>
+<tr class="memitem:aca8de136cfd5597acf66de448dce9edd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#aca8de136cfd5597acf66de448dce9edd">QP_Param</a> (GRBEnv *env=nullptr)</td></tr>
 <tr class="memdesc:aca8de136cfd5597acf66de448dce9edd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize only the size. Everything else is empty (can be updated later)  <a href="#aca8de136cfd5597acf66de448dce9edd">More...</a><br /></td></tr>
 <tr class="separator:aca8de136cfd5597acf66de448dce9edd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61008ed53ae0d7bf482724c6495931fe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a61008ed53ae0d7bf482724c6495931fe">QP_Param</a> (arma::sp_mat <a class="el" href="classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d">Q</a>, arma::sp_mat <a class="el" href="classGame_1_1MP__Param.html#ab17ec9cd0030436cd5c443cfcfe08ad1">C</a>, arma::sp_mat <a class="el" href="classGame_1_1MP__Param.html#aa0b31310fd4f138fe3e3771d2b077c3e">A</a>, arma::sp_mat <a class="el" href="classGame_1_1MP__Param.html#a3d517547d70f75e43060785fe66ad091">B</a>, arma::vec <a class="el" href="classGame_1_1MP__Param.html#ac0e65580b83e8e6441d6e964b515dff8">c</a>, arma::vec <a class="el" href="classGame_1_1MP__Param.html#a97fc7b4d0d1ef97e4115f0114bbfdfcc">b</a>, GRBEnv *<a class="el" href="classGame_1_1QP__Param.html#a3564ee7adf9f55c822e40b978d7aea24">env</a>=nullptr)</td></tr>
+<tr class="memitem:a61008ed53ae0d7bf482724c6495931fe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a61008ed53ae0d7bf482724c6495931fe">QP_Param</a> (arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b, GRBEnv *env=nullptr)</td></tr>
 <tr class="memdesc:a61008ed53ae0d7bf482724c6495931fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set data at construct time.  <a href="#a61008ed53ae0d7bf482724c6495931fe">More...</a><br /></td></tr>
 <tr class="separator:a61008ed53ae0d7bf482724c6495931fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad31d4aaf0a6b81b389e2a597f7779ce1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#ad31d4aaf0a6b81b389e2a597f7779ce1">QP_Param</a> (<a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;Qu)</td></tr>
 <tr class="memdesc:ad31d4aaf0a6b81b389e2a597f7779ce1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="#ad31d4aaf0a6b81b389e2a597f7779ce1">More...</a><br /></td></tr>
 <tr class="separator:ad31d4aaf0a6b81b389e2a597f7779ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fb0950b780c847e97f34043068ca758"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a3fb0950b780c847e97f34043068ca758">set</a> (const arma::sp_mat &amp;<a class="el" href="classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d">Q</a>, const arma::sp_mat &amp;<a class="el" href="classGame_1_1MP__Param.html#ab17ec9cd0030436cd5c443cfcfe08ad1">C</a>, const arma::sp_mat &amp;<a class="el" href="classGame_1_1MP__Param.html#aa0b31310fd4f138fe3e3771d2b077c3e">A</a>, const arma::sp_mat &amp;<a class="el" href="classGame_1_1MP__Param.html#a3d517547d70f75e43060785fe66ad091">B</a>, const arma::vec &amp;<a class="el" href="classGame_1_1MP__Param.html#ac0e65580b83e8e6441d6e964b515dff8">c</a>, const arma::vec &amp;<a class="el" href="classGame_1_1MP__Param.html#a97fc7b4d0d1ef97e4115f0114bbfdfcc">b</a>) final</td></tr>
+<tr class="memitem:a3fb0950b780c847e97f34043068ca758"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a3fb0950b780c847e97f34043068ca758">set</a> (const arma::sp_mat &amp;Q, const arma::sp_mat &amp;C, const arma::sp_mat &amp;A, const arma::sp_mat &amp;B, const arma::vec &amp;c, const arma::vec &amp;b) final</td></tr>
 <tr class="memdesc:a3fb0950b780c847e97f34043068ca758"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setting the data, while keeping the input objects intact.  <a href="#a3fb0950b780c847e97f34043068ca758">More...</a><br /></td></tr>
 <tr class="separator:a3fb0950b780c847e97f34043068ca758"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1555a30b8ba903db65a3fe0b6763ec4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#ac1555a30b8ba903db65a3fe0b6763ec4">set</a> (arma::sp_mat &amp;&amp;<a class="el" href="classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d">Q</a>, arma::sp_mat &amp;&amp;<a class="el" href="classGame_1_1MP__Param.html#ab17ec9cd0030436cd5c443cfcfe08ad1">C</a>, arma::sp_mat &amp;&amp;<a class="el" href="classGame_1_1MP__Param.html#aa0b31310fd4f138fe3e3771d2b077c3e">A</a>, arma::sp_mat &amp;&amp;<a class="el" href="classGame_1_1MP__Param.html#a3d517547d70f75e43060785fe66ad091">B</a>, arma::vec &amp;&amp;<a class="el" href="classGame_1_1MP__Param.html#ac0e65580b83e8e6441d6e964b515dff8">c</a>, arma::vec &amp;&amp;<a class="el" href="classGame_1_1MP__Param.html#a97fc7b4d0d1ef97e4115f0114bbfdfcc">b</a>) final</td></tr>
+<tr class="memitem:ac1555a30b8ba903db65a3fe0b6763ec4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#ac1555a30b8ba903db65a3fe0b6763ec4">set</a> (arma::sp_mat &amp;&amp;Q, arma::sp_mat &amp;&amp;C, arma::sp_mat &amp;&amp;A, arma::sp_mat &amp;&amp;B, arma::vec &amp;&amp;c, arma::vec &amp;&amp;b) final</td></tr>
 <tr class="memdesc:ac1555a30b8ba903db65a3fe0b6763ec4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Faster means to set data. But the input objects might be corrupted now.  <a href="#ac1555a30b8ba903db65a3fe0b6763ec4">More...</a><br /></td></tr>
 <tr class="separator:ac1555a30b8ba903db65a3fe0b6763ec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a870e896ec83261f542ba67ebb2c8ef87"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a870e896ec83261f542ba67ebb2c8ef87">set</a> (const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;obj, const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;cons) final</td></tr>
+<tr class="memitem:a870e896ec83261f542ba67ebb2c8ef87"><td class="memItemLeft" align="right" valign="top"><a id="a870e896ec83261f542ba67ebb2c8ef87"></a>
+<a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>set</b> (const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;obj, const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;cons) final</td></tr>
 <tr class="separator:a870e896ec83261f542ba67ebb2c8ef87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa08cebc99b7f45614661d2dc3ff497a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#afa08cebc99b7f45614661d2dc3ff497a">set</a> (<a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;&amp;obj, <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;&amp;cons) final</td></tr>
 <tr class="memdesc:afa08cebc99b7f45614661d2dc3ff497a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setting the data with the inputs being a struct <a class="el" href="structGame_1_1QP__objective.html" title="struct to handle the objective params of MP_Param/QP_Param">Game::QP_objective</a> and struct <a class="el" href="structGame_1_1QP__constraints.html" title="struct to handle the constraint params of MP_Param/QP_Param">Game::QP_constraints</a>.  <a href="#afa08cebc99b7f45614661d2dc3ff497a">More...</a><br /></td></tr>
@@ -117,7 +114,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa9042eb407e5768c793f17e490e8a5bd"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#aa9042eb407e5768c793f17e490e8a5bd">KKT</a> (arma::sp_mat &amp;M, arma::sp_mat &amp;N, arma::vec &amp;q) const</td></tr>
 <tr class="memdesc:aa9042eb407e5768c793f17e490e8a5bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the KKT conditions for the given QP.  <a href="#aa9042eb407e5768c793f17e490e8a5bd">More...</a><br /></td></tr>
 <tr class="separator:aa9042eb407e5768c793f17e490e8a5bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94c1b94ff3a3423dfcec43f2d66e3507"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a94c1b94ff3a3423dfcec43f2d66e3507">solveFixed</a> (arma::vec x)</td></tr>
+<tr class="memitem:a94c1b94ff3a3423dfcec43f2d66e3507"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a94c1b94ff3a3423dfcec43f2d66e3507">solveFixed</a> (arma::vec x)</td></tr>
 <tr class="separator:a94c1b94ff3a3423dfcec43f2d66e3507"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c6ec217fa1d9e4ce9f8b2416c8fa2dc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a8c6ec217fa1d9e4ce9f8b2416c8fa2dc">is_Playable</a> (const <a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;P) const</td></tr>
 <tr class="memdesc:a8c6ec217fa1d9e4ce9f8b2416c8fa2dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the current object can play a game with another <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> object <code>P</code>.  <a href="#a8c6ec217fa1d9e4ce9f8b2416c8fa2dc">More...</a><br /></td></tr>
@@ -148,22 +145,22 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9bfc41513aa12a3fe9dd40222e46f36c"><td class="memItemLeft" align="right" valign="top">virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a9bfc41513aa12a3fe9dd40222e46f36c">getNy</a> () const final</td></tr>
 <tr class="memdesc:a9bfc41513aa12a3fe9dd40222e46f36c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to the private variable Ny.  <a href="#a9bfc41513aa12a3fe9dd40222e46f36c">More...</a><br /></td></tr>
 <tr class="separator:a9bfc41513aa12a3fe9dd40222e46f36c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bd3eaacfb9e96f137d44883c3fe7a30"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a5bd3eaacfb9e96f137d44883c3fe7a30">setQ</a> (const arma::sp_mat &amp;<a class="el" href="classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d">Q</a>) final</td></tr>
+<tr class="memitem:a5bd3eaacfb9e96f137d44883c3fe7a30"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a5bd3eaacfb9e96f137d44883c3fe7a30">setQ</a> (const arma::sp_mat &amp;Q) final</td></tr>
 <tr class="memdesc:a5bd3eaacfb9e96f137d44883c3fe7a30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the private variable Q.  <a href="#a5bd3eaacfb9e96f137d44883c3fe7a30">More...</a><br /></td></tr>
 <tr class="separator:a5bd3eaacfb9e96f137d44883c3fe7a30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f459257ccbfd0ec32fae9986adc49ee"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a4f459257ccbfd0ec32fae9986adc49ee">setC</a> (const arma::sp_mat &amp;<a class="el" href="classGame_1_1MP__Param.html#ab17ec9cd0030436cd5c443cfcfe08ad1">C</a>) final</td></tr>
+<tr class="memitem:a4f459257ccbfd0ec32fae9986adc49ee"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a4f459257ccbfd0ec32fae9986adc49ee">setC</a> (const arma::sp_mat &amp;C) final</td></tr>
 <tr class="memdesc:a4f459257ccbfd0ec32fae9986adc49ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the private variable C.  <a href="#a4f459257ccbfd0ec32fae9986adc49ee">More...</a><br /></td></tr>
 <tr class="separator:a4f459257ccbfd0ec32fae9986adc49ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a8ed1e4c4879b2c22b979f1803af7a0"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a8a8ed1e4c4879b2c22b979f1803af7a0">setA</a> (const arma::sp_mat &amp;<a class="el" href="classGame_1_1MP__Param.html#aa0b31310fd4f138fe3e3771d2b077c3e">A</a>) final</td></tr>
+<tr class="memitem:a8a8ed1e4c4879b2c22b979f1803af7a0"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a8a8ed1e4c4879b2c22b979f1803af7a0">setA</a> (const arma::sp_mat &amp;A) final</td></tr>
 <tr class="memdesc:a8a8ed1e4c4879b2c22b979f1803af7a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the private variable A.  <a href="#a8a8ed1e4c4879b2c22b979f1803af7a0">More...</a><br /></td></tr>
 <tr class="separator:a8a8ed1e4c4879b2c22b979f1803af7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4090310464360c3e80016828ac4bde86"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a4090310464360c3e80016828ac4bde86">setB</a> (const arma::sp_mat &amp;<a class="el" href="classGame_1_1MP__Param.html#a3d517547d70f75e43060785fe66ad091">B</a>) final</td></tr>
+<tr class="memitem:a4090310464360c3e80016828ac4bde86"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a4090310464360c3e80016828ac4bde86">setB</a> (const arma::sp_mat &amp;B) final</td></tr>
 <tr class="memdesc:a4090310464360c3e80016828ac4bde86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the private variable B.  <a href="#a4090310464360c3e80016828ac4bde86">More...</a><br /></td></tr>
 <tr class="separator:a4090310464360c3e80016828ac4bde86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8aa67a1e0b76919aeedaf2416744bfa"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ab8aa67a1e0b76919aeedaf2416744bfa">setc</a> (const arma::vec &amp;<a class="el" href="classGame_1_1MP__Param.html#ac0e65580b83e8e6441d6e964b515dff8">c</a>) final</td></tr>
+<tr class="memitem:ab8aa67a1e0b76919aeedaf2416744bfa"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ab8aa67a1e0b76919aeedaf2416744bfa">setc</a> (const arma::vec &amp;c) final</td></tr>
 <tr class="memdesc:ab8aa67a1e0b76919aeedaf2416744bfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the private variable c.  <a href="#ab8aa67a1e0b76919aeedaf2416744bfa">More...</a><br /></td></tr>
 <tr class="separator:ab8aa67a1e0b76919aeedaf2416744bfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a724891835889f198c4776dbe5b2df469"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a724891835889f198c4776dbe5b2df469">setb</a> (const arma::vec &amp;<a class="el" href="classGame_1_1MP__Param.html#a97fc7b4d0d1ef97e4115f0114bbfdfcc">b</a>) final</td></tr>
+<tr class="memitem:a724891835889f198c4776dbe5b2df469"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a724891835889f198c4776dbe5b2df469">setb</a> (const arma::vec &amp;b) final</td></tr>
 <tr class="memdesc:a724891835889f198c4776dbe5b2df469"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the private variable b.  <a href="#a724891835889f198c4776dbe5b2df469">More...</a><br /></td></tr>
 <tr class="separator:a724891835889f198c4776dbe5b2df469"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad99f19eae314bd3ca720d75d219167c3"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ad99f19eae314bd3ca720d75d219167c3">finalize</a> ()</td></tr>
@@ -172,7 +169,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:afd508aaabd67a8bd106366cfe2ca3c09"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#afd508aaabd67a8bd106366cfe2ca3c09">dataCheck</a> (const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;obj, const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;cons, bool checkObj=true, bool checkCons=true)</td></tr>
+<tr class="memitem:afd508aaabd67a8bd106366cfe2ca3c09"><td class="memItemLeft" align="right" valign="top"><a id="afd508aaabd67a8bd106366cfe2ca3c09"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>dataCheck</b> (const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;obj, const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;cons, bool checkObj=true, bool checkCons=true)</td></tr>
 <tr class="separator:afd508aaabd67a8bd106366cfe2ca3c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
@@ -186,39 +184,33 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:ad1ec9489e7f1959f468e459c881cd63d"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d">Q</a></td></tr>
+<tr class="memitem:ad1ec9489e7f1959f468e459c881cd63d"><td class="memItemLeft" align="right" valign="top"><a id="ad1ec9489e7f1959f468e459c881cd63d"></a>
+arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><b>Q</b></td></tr>
 <tr class="separator:ad1ec9489e7f1959f468e459c881cd63d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0b31310fd4f138fe3e3771d2b077c3e"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#aa0b31310fd4f138fe3e3771d2b077c3e">A</a></td></tr>
+<tr class="memitem:aa0b31310fd4f138fe3e3771d2b077c3e"><td class="memItemLeft" align="right" valign="top"><a id="aa0b31310fd4f138fe3e3771d2b077c3e"></a>
+arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><b>A</b></td></tr>
 <tr class="separator:aa0b31310fd4f138fe3e3771d2b077c3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d517547d70f75e43060785fe66ad091"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a3d517547d70f75e43060785fe66ad091">B</a></td></tr>
+<tr class="memitem:a3d517547d70f75e43060785fe66ad091"><td class="memItemLeft" align="right" valign="top"><a id="a3d517547d70f75e43060785fe66ad091"></a>
+arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><b>B</b></td></tr>
 <tr class="separator:a3d517547d70f75e43060785fe66ad091"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab17ec9cd0030436cd5c443cfcfe08ad1"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ab17ec9cd0030436cd5c443cfcfe08ad1">C</a></td></tr>
+<tr class="memitem:ab17ec9cd0030436cd5c443cfcfe08ad1"><td class="memItemLeft" align="right" valign="top"><a id="ab17ec9cd0030436cd5c443cfcfe08ad1"></a>
+arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><b>C</b></td></tr>
 <tr class="separator:ab17ec9cd0030436cd5c443cfcfe08ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0e65580b83e8e6441d6e964b515dff8"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ac0e65580b83e8e6441d6e964b515dff8">c</a></td></tr>
+<tr class="memitem:ac0e65580b83e8e6441d6e964b515dff8"><td class="memItemLeft" align="right" valign="top"><a id="ac0e65580b83e8e6441d6e964b515dff8"></a>
+arma::vec&#160;</td><td class="memItemRight" valign="bottom"><b>c</b></td></tr>
 <tr class="separator:ac0e65580b83e8e6441d6e964b515dff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97fc7b4d0d1ef97e4115f0114bbfdfcc"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a97fc7b4d0d1ef97e4115f0114bbfdfcc">b</a></td></tr>
+<tr class="memitem:a97fc7b4d0d1ef97e4115f0114bbfdfcc"><td class="memItemLeft" align="right" valign="top"><a id="a97fc7b4d0d1ef97e4115f0114bbfdfcc"></a>
+arma::vec&#160;</td><td class="memItemRight" valign="bottom"><b>b</b></td></tr>
 <tr class="separator:a97fc7b4d0d1ef97e4115f0114bbfdfcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac9e6425fcc953b69c7aae411f011e58"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#aac9e6425fcc953b69c7aae411f011e58">Nx</a></td></tr>
+<tr class="memitem:aac9e6425fcc953b69c7aae411f011e58"><td class="memItemLeft" align="right" valign="top"><a id="aac9e6425fcc953b69c7aae411f011e58"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>Nx</b></td></tr>
 <tr class="separator:aac9e6425fcc953b69c7aae411f011e58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab889087a490f40f114002c92fea62b2d"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ab889087a490f40f114002c92fea62b2d">Ny</a></td></tr>
+<tr class="memitem:ab889087a490f40f114002c92fea62b2d"><td class="memItemLeft" align="right" valign="top"><a id="ab889087a490f40f114002c92fea62b2d"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>Ny</b></td></tr>
 <tr class="separator:ab889087a490f40f114002c92fea62b2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a786341129b4f7a0501ab1784cac70c9e"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a786341129b4f7a0501ab1784cac70c9e">Ncons</a></td></tr>
+<tr class="memitem:a786341129b4f7a0501ab1784cac70c9e"><td class="memItemLeft" align="right" valign="top"><a id="a786341129b4f7a0501ab1784cac70c9e"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>Ncons</b></td></tr>
 <tr class="separator:a786341129b4f7a0501ab1784cac70c9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:ab9b540c7fcd3f408ad8570d7a770bce8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#ab9b540c7fcd3f408ad8570d7a770bce8">make_yQy</a> ()</td></tr>
-<tr class="memdesc:ab9b540c7fcd3f408ad8570d7a770bce8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the Gurobi Quadratic objective to the Gurobi model <code>QuadModel</code>.  <a href="#ab9b540c7fcd3f408ad8570d7a770bce8">More...</a><br /></td></tr>
-<tr class="separator:ab9b540c7fcd3f408ad8570d7a770bce8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a3564ee7adf9f55c822e40b978d7aea24"><td class="memItemLeft" align="right" valign="top">GRBEnv *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a3564ee7adf9f55c822e40b978d7aea24">env</a></td></tr>
-<tr class="separator:a3564ee7adf9f55c822e40b978d7aea24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad06f1cf8e5c84e2c6f5de0aaf95d6bb1"><td class="memItemLeft" align="right" valign="top">GRBModel&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#ad06f1cf8e5c84e2c6f5de0aaf95d6bb1">QuadModel</a></td></tr>
-<tr class="separator:ad06f1cf8e5c84e2c6f5de0aaf95d6bb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c3ee884cc255fbc879b085109158cc3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a8c3ee884cc255fbc879b085109158cc3">made_yQy</a></td></tr>
-<tr class="separator:a8c3ee884cc255fbc879b085109158cc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to handle parameterized quadratic programs(QP) </p>
@@ -228,17 +220,12 @@ Private Attributes</h2></td></tr>
 <p> Subject to </p><p class="formulaDsp">
 <img class="formulaDsp" alt="\begin{eqnarray} Ax + By &amp;\leq&amp; b \\ y &amp;\geq&amp; 0 \end{eqnarray}" src="form_1.png"/>
 </p>
- 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00121">121</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+ </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aca8de136cfd5597acf66de448dce9edd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aca8de136cfd5597acf66de448dce9edd">&#9670;&nbsp;</a></span>QP_Param() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Game::QP_Param::QP_Param </td>
@@ -248,16 +235,9 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Initialize only the size. Everything else is empty (can be updated later) </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00140">140</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -266,9 +246,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Game::QP_Param::QP_Param </td>
@@ -318,16 +295,9 @@ Private Attributes</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Set data at construct time. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00142">142</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -336,9 +306,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Game::QP_Param::QP_Param </td>
@@ -348,16 +315,9 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Copy constructor. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00150">150</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -401,12 +361,10 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#ab81939dcfbfa9ec244d28093ffccf652">Game::MP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00243">243</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
 </div>
 </div>
 <a id="a3d1ee706080d6968674ad8c7a669989b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d1ee706080d6968674ad8c7a669989b">&#9670;&nbsp;</a></span>dataCheck() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d1ee706080d6968674ad8c7a669989b">&#9670;&nbsp;</a></span>dataCheck()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -442,62 +400,10 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 <dl class="section return"><dt>Returns</dt><dd>true if all above checks are cleared. false otherwise. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">forcesymm</td><td>Check if <a class="el" href="classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d">MP_Param::Q</a> is symmetric </td></tr>
+    <tr><td class="paramname">forcesymm</td><td>Check if MP_Param::Q is symmetric </td></tr>
   </table>
   </dd>
 </dl>
-
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00129">129</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
-</div>
-</div>
-<a id="afd508aaabd67a8bd106366cfe2ca3c09"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afd508aaabd67a8bd106366cfe2ca3c09">&#9670;&nbsp;</a></span>dataCheck() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Game::MP_Param::dataCheck </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;&#160;</td>
-          <td class="paramname"><em>obj</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;&#160;</td>
-          <td class="paramname"><em>cons</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>checkObj</em> = <code>true</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>checkCons</em> = <code>true</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00158">158</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -519,14 +425,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Finalize the <a class="el" href="classGame_1_1MP__Param.html" title="class to handle parameterized mathematical programs(MP)">MP_Param</a> object. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00107">107</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -548,14 +452,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Read-only access to the private variable A. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00092">92</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -577,14 +479,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Read-only access to the private variable B. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00093">93</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -606,14 +506,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Read-only access to the private variable b. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00095">95</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -635,14 +533,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Read-only access to the private variable C. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00091">91</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -664,14 +560,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Read-only access to the private variable c. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00094">94</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -693,14 +587,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Read-only access to the private variable Nx. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00096">96</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -722,14 +614,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Read-only access to the private variable Ny. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00097">97</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -751,14 +641,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Read-only access to the private variable Q. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00090">90</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -767,9 +655,6 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool Game::QP_Param::is_Playable </td>
@@ -779,16 +664,9 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Checks if the current object can play a game with another <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> object <code>P</code>. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00164">164</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -827,41 +705,10 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 <p>Compute the KKT conditions for the given QP. </p>
 <p>Writes the KKT condition of the parameterized QP As per the convention, y is the decision variable for the QP and that is parameterized in x The KKT conditions are <img class="formulaInl" alt="$0 \leq y \perp My + Nx + q \geq 0$" src="form_6.png"/> </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00258">258</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ab9b540c7fcd3f408ad8570d7a770bce8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab9b540c7fcd3f408ad8570d7a770bce8">&#9670;&nbsp;</a></span>make_yQy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int Game::QP_Param::make_yQy </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Adds the Gurobi Quadratic objective to the Gurobi model <code>QuadModel</code>. </p>
-
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00179">179</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
 </div>
 </div>
 <a id="ac1555a30b8ba903db65a3fe0b6763ec4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1555a30b8ba903db65a3fe0b6763ec4">&#9670;&nbsp;</a></span>set() <span class="overload">[1/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1555a30b8ba903db65a3fe0b6763ec4">&#9670;&nbsp;</a></span>set() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -922,12 +769,10 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#a4ba89f81adc04cf5e21478f8a7f7748f">Game::MP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00297">297</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
 </div>
 </div>
 <a id="a3fb0950b780c847e97f34043068ca758"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fb0950b780c847e97f34043068ca758">&#9670;&nbsp;</a></span>set() <span class="overload">[2/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fb0950b780c847e97f34043068ca758">&#9670;&nbsp;</a></span>set() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -988,52 +833,10 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#a97d7a955cb93ff14144bdce152e906b6">Game::MP_Param</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00285">285</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a870e896ec83261f542ba67ebb2c8ef87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a870e896ec83261f542ba67ebb2c8ef87">&#9670;&nbsp;</a></span>set() <span class="overload">[3/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classGame_1_1QP__Param.html">Game::QP_Param</a> &amp; Game::QP_Param::set </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structGame_1_1QP__objective.html">QP_objective</a> &amp;&#160;</td>
-          <td class="paramname"><em>obj</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structGame_1_1QP__constraints.html">QP_constraints</a> &amp;&#160;</td>
-          <td class="paramname"><em>cons</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#a81d1ef8919a4c554cba2c56832c0e025">Game::MP_Param</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00314">314</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
 </div>
 </div>
 <a id="afa08cebc99b7f45614661d2dc3ff497a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa08cebc99b7f45614661d2dc3ff497a">&#9670;&nbsp;</a></span>set() <span class="overload">[4/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afa08cebc99b7f45614661d2dc3ff497a">&#9670;&nbsp;</a></span>set() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1068,9 +871,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Setting the data with the inputs being a struct <a class="el" href="structGame_1_1QP__objective.html" title="struct to handle the objective params of MP_Param/QP_Param">Game::QP_objective</a> and struct <a class="el" href="structGame_1_1QP__constraints.html" title="struct to handle the constraint params of MP_Param/QP_Param">Game::QP_constraints</a>. </p>
 
-<p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#ad2f9ad95b1d9f2e8e4aeddb7beb0b101">Game::MP_Param</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00307">307</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html">Game::MP_Param</a>.</p>
 
 </div>
 </div>
@@ -1093,14 +894,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Set the private variable A. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00102">102</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1123,14 +922,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Set the private variable B. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00103">103</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1153,14 +950,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Set the private variable b. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00105">105</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1183,14 +978,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Set the private variable C. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00101">101</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1213,14 +1006,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Set the private variable c. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00104">104</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1243,14 +1034,12 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Set the private variable Q. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00100">100</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1279,13 +1068,11 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Calculates <code>Nx</code>, <code>Ny</code> and <code>Ncons</code> Computes parameters in <a class="el" href="classGame_1_1MP__Param.html" title="class to handle parameterized mathematical programs(MP)">MP_Param</a>: </p>
 <ul>
-<li>Computes <code>Ny</code> as number of rows in <a class="el" href="classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d">MP_Param::Q</a></li>
-<li>Computes <code>Nx</code> as number of columns in <a class="el" href="classGame_1_1MP__Param.html#ab17ec9cd0030436cd5c443cfcfe08ad1">MP_Param::C</a></li>
-<li>Computes <code>Ncons</code> as number of rows in <a class="el" href="classGame_1_1MP__Param.html#a97fc7b4d0d1ef97e4115f0114bbfdfcc">MP_Param::b</a>, i.e., the RHS of the constraints</li>
+<li>Computes <code>Ny</code> as number of rows in MP_Param::Q</li>
+<li>Computes <code>Nx</code> as number of columns in MP_Param::C</li>
+<li>Computes <code>Ncons</code> as number of rows in MP_Param::b, i.e., the RHS of the constraints</li>
 </ul>
 <p>For proper working, <a class="el" href="classGame_1_1MP__Param.html#a3d1ee706080d6968674ad8c7a669989b" title="Check that the data for the MP_Param class is valid Always works after calls to MP_Param::size() Chec...">MP_Param::dataCheck()</a> has to be run after this. </p><dl class="section return"><dt>Returns</dt><dd><code>Ny</code>, Number of variables in the quadratic program, QP </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00075">75</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1320,303 +1107,8 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00200">200</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
 </div>
 </div>
-<h2 class="groupheader">Field Documentation</h2>
-<a id="aa0b31310fd4f138fe3e3771d2b077c3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0b31310fd4f138fe3e3771d2b077c3e">&#9670;&nbsp;</a></span>A</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::sp_mat Game::MP_Param::A</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00079">79</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a3d517547d70f75e43060785fe66ad091"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d517547d70f75e43060785fe66ad091">&#9670;&nbsp;</a></span>B</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::sp_mat Game::MP_Param::B</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00079">79</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a97fc7b4d0d1ef97e4115f0114bbfdfcc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97fc7b4d0d1ef97e4115f0114bbfdfcc">&#9670;&nbsp;</a></span>b</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::vec Game::MP_Param::b</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00080">80</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="ab17ec9cd0030436cd5c443cfcfe08ad1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab17ec9cd0030436cd5c443cfcfe08ad1">&#9670;&nbsp;</a></span>C</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::sp_mat Game::MP_Param::C</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00079">79</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="ac0e65580b83e8e6441d6e964b515dff8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac0e65580b83e8e6441d6e964b515dff8">&#9670;&nbsp;</a></span>c</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::vec Game::MP_Param::c</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00080">80</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a3564ee7adf9f55c822e40b978d7aea24"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3564ee7adf9f55c822e40b978d7aea24">&#9670;&nbsp;</a></span>env</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">GRBEnv* Game::QP_Param::env</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00135">135</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a8c3ee884cc255fbc879b085109158cc3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c3ee884cc255fbc879b085109158cc3">&#9670;&nbsp;</a></span>made_yQy</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Game::QP_Param::made_yQy</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00137">137</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a786341129b4f7a0501ab1784cac70c9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a786341129b4f7a0501ab1784cac70c9e">&#9670;&nbsp;</a></span>Ncons</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::MP_Param::Ncons</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00082">82</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="aac9e6425fcc953b69c7aae411f011e58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac9e6425fcc953b69c7aae411f011e58">&#9670;&nbsp;</a></span>Nx</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::MP_Param::Nx</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00082">82</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="ab889087a490f40f114002c92fea62b2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab889087a490f40f114002c92fea62b2d">&#9670;&nbsp;</a></span>Ny</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::MP_Param::Ny</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00082">82</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="ad1ec9489e7f1959f468e459c881cd63d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1ec9489e7f1959f468e459c881cd63d">&#9670;&nbsp;</a></span>Q</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::sp_mat Game::MP_Param::Q</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00079">79</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="ad06f1cf8e5c84e2c6f5de0aaf95d6bb1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad06f1cf8e5c84e2c6f5de0aaf95d6bb1">&#9670;&nbsp;</a></span>QuadModel</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">GRBModel Game::QP_Param::QuadModel</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00136">136</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="func_8h_source.html">func.h</a></li>
-<li><a class="el" href="Games_8cpp_source.html">Games.cpp</a></li>
-</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

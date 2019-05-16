@@ -15,4 +15,5 @@ Session.vim
 tags
 *.txt
 *.lp
-GamsEPEC.gms
+*.log
+src/Gams*

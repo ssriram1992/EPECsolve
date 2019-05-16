@@ -62,15 +62,13 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceGame.html">Game</a></li><li class="navelem"><a class="el" href="classGame_1_1LCP.html">LCP</a></li>  </ul>
+<li class="navelem"><b>Game</b></li><li class="navelem"><a class="el" href="classGame_1_1LCP.html">LCP</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Data Fields</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a>  </div>
+<a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
 <div class="title">Game::LCP Class Reference</div>  </div>
 </div><!--header-->
@@ -78,51 +76,51 @@ $(function() {
 
 <p>Class to handle and solve linear complementarity problems.  
  <a href="classGame_1_1LCP.html#details">More...</a></p>
-
-<p><code>#include &lt;<a class="el" href="func_8h_source.html">func.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a8f354ec1846b682d4e8d526c4408e702"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a8f354ec1846b682d4e8d526c4408e702">LCP</a> ()=delete</td></tr>
 <tr class="memdesc:a8f354ec1846b682d4e8d526c4408e702"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class has no default constructors.  <a href="#a8f354ec1846b682d4e8d526c4408e702">More...</a><br /></td></tr>
 <tr class="separator:a8f354ec1846b682d4e8d526c4408e702"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e210b1a1e440f17ee2bb05e91b846a0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a0e210b1a1e440f17ee2bb05e91b846a0">LCP</a> (GRBEnv *<a class="el" href="classGame_1_1LCP.html#a18d477d37ce57a334c7707a9a6b89e07">env</a>, arma::sp_mat <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4">M</a>, arma::vec <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356">q</a>, unsigned int <a class="el" href="classGame_1_1LCP.html#a3626cacccb0d8ab0e1a88f8f1a3659f9">LeadStart</a>, unsigned <a class="el" href="classGame_1_1LCP.html#a5842889dd444dceda535c0e464775d80">LeadEnd</a>, arma::sp_mat A={}, arma::vec b={})</td></tr>
+<tr class="memitem:a0e210b1a1e440f17ee2bb05e91b846a0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a0e210b1a1e440f17ee2bb05e91b846a0">LCP</a> (GRBEnv *env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={})</td></tr>
 <tr class="separator:a0e210b1a1e440f17ee2bb05e91b846a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26af85e6c2bca5744cf2148da9539f31"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a26af85e6c2bca5744cf2148da9539f31">LCP</a> (GRBEnv *<a class="el" href="classGame_1_1LCP.html#a18d477d37ce57a334c7707a9a6b89e07">env</a>, arma::sp_mat <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4">M</a>, arma::vec <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356">q</a>, <a class="el" href="func_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> <a class="el" href="classGame_1_1LCP.html#a6dbcd747d3b7a82fcd9079916da001df">Compl</a>, arma::sp_mat A={}, arma::vec b={})</td></tr>
+<tr class="memitem:a26af85e6c2bca5744cf2148da9539f31"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a26af85e6c2bca5744cf2148da9539f31">LCP</a> (GRBEnv *env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A={}, arma::vec b={})</td></tr>
 <tr class="separator:a26af85e6c2bca5744cf2148da9539f31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aced553b2e3edc31b20e4668c6146f583"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#aced553b2e3edc31b20e4668c6146f583">LCP</a> (GRBEnv *<a class="el" href="classGame_1_1LCP.html#a18d477d37ce57a334c7707a9a6b89e07">env</a>, const <a class="el" href="classGame_1_1NashGame.html">NashGame</a> &amp;N)</td></tr>
-<tr class="memdesc:aced553b2e3edc31b20e4668c6146f583"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructer given a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a>.  <a href="#aced553b2e3edc31b20e4668c6146f583">More...</a><br /></td></tr>
-<tr class="separator:aced553b2e3edc31b20e4668c6146f583"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad05015288e6d7ae561cea30233128840"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ad05015288e6d7ae561cea30233128840">LCP</a> (GRBEnv *env, const <a class="el" href="classGame_1_1NashGame.html">Game::NashGame</a> &amp;N)</td></tr>
+<tr class="memdesc:ad05015288e6d7ae561cea30233128840"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructer given a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a>.  <a href="#ad05015288e6d7ae561cea30233128840">More...</a><br /></td></tr>
+<tr class="separator:ad05015288e6d7ae561cea30233128840"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afff596de30da4147b00612b500a99d68"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#afff596de30da4147b00612b500a99d68">~LCP</a> ()</td></tr>
 <tr class="memdesc:afff596de30da4147b00612b500a99d68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>.  <a href="#afff596de30da4147b00612b500a99d68">More...</a><br /></td></tr>
 <tr class="separator:afff596de30da4147b00612b500a99d68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ced9ff9dd3e3075326335ebeecc4229"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3ced9ff9dd3e3075326335ebeecc4229">getM</a> ()</td></tr>
-<tr class="memdesc:a3ced9ff9dd3e3075326335ebeecc4229"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4" title="M in  that defines the LCP.">LCP::M</a>.  <a href="#a3ced9ff9dd3e3075326335ebeecc4229">More...</a><br /></td></tr>
+<tr class="memdesc:a3ced9ff9dd3e3075326335ebeecc4229"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to LCP::M.  <a href="#a3ced9ff9dd3e3075326335ebeecc4229">More...</a><br /></td></tr>
 <tr class="separator:a3ced9ff9dd3e3075326335ebeecc4229"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae84003685742b9de4c91b21e91055970"><td class="memItemLeft" align="right" valign="top">arma::sp_mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ae84003685742b9de4c91b21e91055970">getMstar</a> ()</td></tr>
-<tr class="memdesc:ae84003685742b9de4c91b21e91055970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference access to <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4" title="M in  that defines the LCP.">LCP::M</a>.  <a href="#ae84003685742b9de4c91b21e91055970">More...</a><br /></td></tr>
+<tr class="memdesc:ae84003685742b9de4c91b21e91055970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference access to LCP::M.  <a href="#ae84003685742b9de4c91b21e91055970">More...</a><br /></td></tr>
 <tr class="separator:ae84003685742b9de4c91b21e91055970"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cc8c85eca98fb717a4487dc7ed692cd"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3cc8c85eca98fb717a4487dc7ed692cd">getq</a> ()</td></tr>
-<tr class="memdesc:a3cc8c85eca98fb717a4487dc7ed692cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356" title="q in  that defines the LCP">LCP::q</a>.  <a href="#a3cc8c85eca98fb717a4487dc7ed692cd">More...</a><br /></td></tr>
+<tr class="memdesc:a3cc8c85eca98fb717a4487dc7ed692cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to LCP::q.  <a href="#a3cc8c85eca98fb717a4487dc7ed692cd">More...</a><br /></td></tr>
 <tr class="separator:a3cc8c85eca98fb717a4487dc7ed692cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52df9c31f5d00c00803fe1a6f4b60534"><td class="memItemLeft" align="right" valign="top">arma::vec *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a52df9c31f5d00c00803fe1a6f4b60534">getqstar</a> ()</td></tr>
-<tr class="memdesc:a52df9c31f5d00c00803fe1a6f4b60534"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference access to <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356" title="q in  that defines the LCP">LCP::q</a>.  <a href="#a52df9c31f5d00c00803fe1a6f4b60534">More...</a><br /></td></tr>
+<tr class="memdesc:a52df9c31f5d00c00803fe1a6f4b60534"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference access to LCP::q.  <a href="#a52df9c31f5d00c00803fe1a6f4b60534">More...</a><br /></td></tr>
 <tr class="separator:a52df9c31f5d00c00803fe1a6f4b60534"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5d75f96f139575afa5964cfb594d321"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#aa5d75f96f139575afa5964cfb594d321">getLStart</a> ()</td></tr>
-<tr class="memdesc:aa5d75f96f139575afa5964cfb594d321"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to <a class="el" href="classGame_1_1LCP.html#a3626cacccb0d8ab0e1a88f8f1a3659f9">LCP::LeadStart</a>.  <a href="#aa5d75f96f139575afa5964cfb594d321">More...</a><br /></td></tr>
+<tr class="memdesc:aa5d75f96f139575afa5964cfb594d321"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to LCP::LeadStart.  <a href="#aa5d75f96f139575afa5964cfb594d321">More...</a><br /></td></tr>
 <tr class="separator:aa5d75f96f139575afa5964cfb594d321"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f2af6c2fa07ccde5173e88662f307d0"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a7f2af6c2fa07ccde5173e88662f307d0">getLEnd</a> ()</td></tr>
-<tr class="memdesc:a7f2af6c2fa07ccde5173e88662f307d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to <a class="el" href="classGame_1_1LCP.html#a5842889dd444dceda535c0e464775d80">LCP::LeadEnd</a>.  <a href="#a7f2af6c2fa07ccde5173e88662f307d0">More...</a><br /></td></tr>
+<tr class="memdesc:a7f2af6c2fa07ccde5173e88662f307d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to LCP::LeadEnd.  <a href="#a7f2af6c2fa07ccde5173e88662f307d0">More...</a><br /></td></tr>
 <tr class="separator:a7f2af6c2fa07ccde5173e88662f307d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56d3a73e7eea32833e3fc4f08c910e7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="func_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a56d3a73e7eea32833e3fc4f08c910e7f">getCompl</a> ()</td></tr>
-<tr class="memdesc:a56d3a73e7eea32833e3fc4f08c910e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to <a class="el" href="classGame_1_1LCP.html#a6dbcd747d3b7a82fcd9079916da001df" title="Compl stores data in &lt;Eqn, Var&gt; form.">LCP::Compl</a>.  <a href="#a56d3a73e7eea32833e3fc4f08c910e7f">More...</a><br /></td></tr>
+<tr class="memitem:a56d3a73e7eea32833e3fc4f08c910e7f"><td class="memItemLeft" align="right" valign="top">perps&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a56d3a73e7eea32833e3fc4f08c910e7f">getCompl</a> ()</td></tr>
+<tr class="memdesc:a56d3a73e7eea32833e3fc4f08c910e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to LCP::Compl.  <a href="#a56d3a73e7eea32833e3fc4f08c910e7f">More...</a><br /></td></tr>
 <tr class="separator:a56d3a73e7eea32833e3fc4f08c910e7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a275f3ff7cd3694f40030666ade4ccee4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a275f3ff7cd3694f40030666ade4ccee4">print</a> (string end=&quot;\n&quot;)</td></tr>
 <tr class="memdesc:a275f3ff7cd3694f40030666ade4ccee4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a summary of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>.  <a href="#a275f3ff7cd3694f40030666ade4ccee4">More...</a><br /></td></tr>
 <tr class="separator:a275f3ff7cd3694f40030666ade4ccee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d6b66bf9d1255fe5fb782ae23cb7438"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a6d6b66bf9d1255fe5fb782ae23cb7438">getNcol</a> ()</td></tr>
+<tr class="memitem:a6d6b66bf9d1255fe5fb782ae23cb7438"><td class="memItemLeft" align="right" valign="top"><a id="a6d6b66bf9d1255fe5fb782ae23cb7438"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>getNcol</b> ()</td></tr>
 <tr class="separator:a6d6b66bf9d1255fe5fb782ae23cb7438"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b03b6148c1b2d196fc5b840738bb6c0"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a0b03b6148c1b2d196fc5b840738bb6c0">getNrow</a> ()</td></tr>
+<tr class="memitem:a0b03b6148c1b2d196fc5b840738bb6c0"><td class="memItemLeft" align="right" valign="top"><a id="a0b03b6148c1b2d196fc5b840738bb6c0"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>getNrow</b> ()</td></tr>
 <tr class="separator:a0b03b6148c1b2d196fc5b840738bb6c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25b0cf47517b0adc600ba5e71f8b98e5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a25b0cf47517b0adc600ba5e71f8b98e5">extractSols</a> (GRBModel *model, arma::vec &amp;z, arma::vec &amp;x, bool extractZ=false) const</td></tr>
 <tr class="memdesc:a25b0cf47517b0adc600ba5e71f8b98e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts variable and equation values from a solved Gurobi model for <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>.  <a href="#a25b0cf47517b0adc600ba5e71f8b98e5">More...</a><br /></td></tr>
@@ -148,7 +146,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a98042d88db2e32a4c1c55bfb3b1b6756"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc8c8100b88e028500647be036550bfb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#adc8c8100b88e028500647be036550bfb">makeQP</a> (const vector&lt; short int &gt; &amp;Fix, vector&lt; arma::sp_mat * &gt; &amp;custAi, vector&lt; arma::vec * &gt; &amp;custbi, <a class="el" href="structGame_1_1QP__objective.html">Game::QP_objective</a> &amp;QP_obj, <a class="el" href="classGame_1_1QP__Param.html">Game::QP_Param</a> &amp;QP)</td></tr>
 <tr class="separator:adc8c8100b88e028500647be036550bfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af75f1aff19db27fd43b33f53cc3ce9e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#af75f1aff19db27fd43b33f53cc3ce9e2">makeQP</a> (<a class="el" href="structGame_1_1QP__objective.html">Game::QP_objective</a> &amp;QP_obj, <a class="el" href="classGame_1_1QP__Param.html">Game::QP_Param</a> &amp;QP)</td></tr>
+<tr class="memitem:af75f1aff19db27fd43b33f53cc3ce9e2"><td class="memItemLeft" align="right" valign="top"><a id="af75f1aff19db27fd43b33f53cc3ce9e2"></a>
+<a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>makeQP</b> (<a class="el" href="structGame_1_1QP__objective.html">Game::QP_objective</a> &amp;QP_obj, <a class="el" href="classGame_1_1QP__Param.html">Game::QP_Param</a> &amp;QP)</td></tr>
 <tr class="separator:af75f1aff19db27fd43b33f53cc3ce9e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
@@ -159,111 +158,10 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a3b2aa3049c4c22f43feafe369cbf0a8d"><td class="memItemLeft" align="right" valign="top">long double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3b2aa3049c4c22f43feafe369cbf0a8d">eps</a> {1e-5}</td></tr>
 <tr class="memdesc:a3b2aa3049c4c22f43feafe369cbf0a8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The threshold, below which a number would be considered to be zero.  <a href="#a3b2aa3049c4c22f43feafe369cbf0a8d">More...</a><br /></td></tr>
 <tr class="separator:a3b2aa3049c4c22f43feafe369cbf0a8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:a2d2876ada5a9d435754561cbbc5b6352"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a2d2876ada5a9d435754561cbbc5b6352">errorCheck</a> (bool throwErr=true) const</td></tr>
-<tr class="separator:a2d2876ada5a9d435754561cbbc5b6352"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99d7d4a906d78149e7ff1701f6d7d4aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a99d7d4a906d78149e7ff1701f6d7d4aa">defConst</a> (GRBEnv *<a class="el" href="classGame_1_1LCP.html#a18d477d37ce57a334c7707a9a6b89e07">env</a>)</td></tr>
-<tr class="memdesc:a99d7d4a906d78149e7ff1701f6d7d4aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign default values to <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> attributes.  <a href="#a99d7d4a906d78149e7ff1701f6d7d4aa">More...</a><br /></td></tr>
-<tr class="separator:a99d7d4a906d78149e7ff1701f6d7d4aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a777726134bf9ffc8fa0c6bfe8ffdb6fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a777726134bf9ffc8fa0c6bfe8ffdb6fc">makeRelaxed</a> ()</td></tr>
-<tr class="memdesc:a777726134bf9ffc8fa0c6bfe8ffdb6fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes a Gurobi object that relaxes complementarity constraints in an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>.  <a href="#a777726134bf9ffc8fa0c6bfe8ffdb6fc">More...</a><br /></td></tr>
-<tr class="separator:a777726134bf9ffc8fa0c6bfe8ffdb6fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a367aa662d820ef456a229fdf2dc5f9a5"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a367aa662d820ef456a229fdf2dc5f9a5">LCPasMIP</a> (vector&lt; unsigned int &gt; FixEq={}, vector&lt; unsigned int &gt; FixVar={}, bool solve=false)</td></tr>
-<tr class="separator:a367aa662d820ef456a229fdf2dc5f9a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21c2114307832dee104c3775c31f29cb"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a21c2114307832dee104c3775c31f29cb">LCPasMIP</a> (vector&lt; short int &gt; Fixes, bool solve)</td></tr>
-<tr class="separator:a21c2114307832dee104c3775c31f29cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71b55c08e04c22b0e4526a3bd90ad25a"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a71b55c08e04c22b0e4526a3bd90ad25a">LCP_Polyhed_fixed</a> (vector&lt; unsigned int &gt; FixEq={}, vector&lt; unsigned int &gt; FixVar={})</td></tr>
-<tr class="separator:a71b55c08e04c22b0e4526a3bd90ad25a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a646266159d34a17c8b6149e8aa1b34d8"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a646266159d34a17c8b6149e8aa1b34d8">LCP_Polyhed_fixed</a> (arma::Col&lt; int &gt; FixEq, arma::Col&lt; int &gt; FixVar)</td></tr>
-<tr class="separator:a646266159d34a17c8b6149e8aa1b34d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4530c61c56c08e195e93f52a15875dd8"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a4530c61c56c08e195e93f52a15875dd8"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a4530c61c56c08e195e93f52a15875dd8">isZero</a> (const T val) const</td></tr>
-<tr class="separator:a4530c61c56c08e195e93f52a15875dd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19650ed8a9ae7e071f9ccdc39c8d8606"><td class="memItemLeft" align="right" valign="top">vector&lt; short int &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a19650ed8a9ae7e071f9ccdc39c8d8606">solEncode</a> (GRBModel *model) const</td></tr>
-<tr class="memdesc:a19650ed8a9ae7e071f9ccdc39c8d8606"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a Gurobi model, extracts variable values and equation values, encodes it in 0/+1/-1 format and returns it.  <a href="#a19650ed8a9ae7e071f9ccdc39c8d8606">More...</a><br /></td></tr>
-<tr class="separator:a19650ed8a9ae7e071f9ccdc39c8d8606"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3e60f1a1b2b7fda80f26bf39528f1af"><td class="memItemLeft" align="right" valign="top">vector&lt; short int &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ab3e60f1a1b2b7fda80f26bf39528f1af">solEncode</a> (const arma::vec &amp;z, const arma::vec &amp;x) const</td></tr>
-<tr class="memdesc:ab3e60f1a1b2b7fda80f26bf39528f1af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given variable values and equation values, encodes it in 0/+1/-1 format and returns it.  <a href="#ab3e60f1a1b2b7fda80f26bf39528f1af">More...</a><br /></td></tr>
-<tr class="separator:ab3e60f1a1b2b7fda80f26bf39528f1af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a769b78b24ff5deee29c65a50c886c895"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a769b78b24ff5deee29c65a50c886c895">branch</a> (int loc, const vector&lt; short int &gt; *Fixes)</td></tr>
-<tr class="memdesc:a769b78b24ff5deee29c65a50c886c895"><td class="mdescLeft">&#160;</td><td class="mdescRight">Branches at a location defined by the caller If loc == nR, then stop branching. We either hit infeasibility or a leaf (i.e., all locations are branched) If loc &lt;0, then branch at abs(loc) location and go down the branch where variable is fixed to 0 else branch at abs(loc) location and go down the branch where eqn is fixed to 0.  <a href="#a769b78b24ff5deee29c65a50c886c895">More...</a><br /></td></tr>
-<tr class="separator:a769b78b24ff5deee29c65a50c886c895"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94c3f8501ce2a705e3ae3a800baef554"><td class="memItemLeft" align="right" valign="top">vector&lt; short int &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a94c3f8501ce2a705e3ae3a800baef554">anyBranch</a> (const vector&lt; vector&lt; short int &gt; * &gt; *vecOfFixes, vector&lt; short int &gt; *Fix) const</td></tr>
-<tr class="memdesc:a94c3f8501ce2a705e3ae3a800baef554"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the (grand)child if any (grand)child of <code>Fix</code> is in <code>vecOfFixes</code> else returns <code>nullptr</code> <br  />
-  <a href="#a94c3f8501ce2a705e3ae3a800baef554">More...</a><br /></td></tr>
-<tr class="separator:a94c3f8501ce2a705e3ae3a800baef554"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaeb576a63b57c50b76f4ddd70f135c1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#afaeb576a63b57c50b76f4ddd70f135c1">branchLoc</a> (unique_ptr&lt; GRBModel &gt; &amp;m, vector&lt; short int &gt; *Fix)</td></tr>
-<tr class="memdesc:afaeb576a63b57c50b76f4ddd70f135c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defining the branching rule.  <a href="#afaeb576a63b57c50b76f4ddd70f135c1">More...</a><br /></td></tr>
-<tr class="separator:afaeb576a63b57c50b76f4ddd70f135c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e8830e9ef2cf2ed5d4bc18b7c56d13c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3e8830e9ef2cf2ed5d4bc18b7c56d13c">branchProcLoc</a> (vector&lt; short int &gt; *Fix, vector&lt; short int &gt; *Leaf)</td></tr>
-<tr class="memdesc:a3e8830e9ef2cf2ed5d4bc18b7c56d13c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Branching choice, if we are at a processed node.  <a href="#a3e8830e9ef2cf2ed5d4bc18b7c56d13c">More...</a><br /></td></tr>
-<tr class="separator:a3e8830e9ef2cf2ed5d4bc18b7c56d13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e2eb5dde0e2449ce0bfd5f662f693af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3e2eb5dde0e2449ce0bfd5f662f693af">EnumerateAll</a> (bool solveLP=false)</td></tr>
-<tr class="memdesc:a3e2eb5dde0e2449ce0bfd5f662f693af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brute force computation of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> feasible region.  <a href="#a3e2eb5dde0e2449ce0bfd5f662f693af">More...</a><br /></td></tr>
-<tr class="separator:a3e2eb5dde0e2449ce0bfd5f662f693af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abcfa181de002a382d8bd8d5509669938"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#abcfa181de002a382d8bd8d5509669938">FixToPoly</a> (const vector&lt; short int &gt; *Fix, bool checkFeas=false, bool custom=false, vector&lt; arma::sp_mat * &gt; *custAi={}, vector&lt; arma::vec * &gt; *custbi={})</td></tr>
-<tr class="memdesc:abcfa181de002a382d8bd8d5509669938"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the equation of the feasibility polyhedron corresponding to the given <code>Fix</code>.  <a href="#abcfa181de002a382d8bd8d5509669938">More...</a><br /></td></tr>
-<tr class="separator:abcfa181de002a382d8bd8d5509669938"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17e49f2dd9614e5af173ee8f7562f44a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a17e49f2dd9614e5af173ee8f7562f44a">FixToPolies</a> (const vector&lt; short int &gt; *Fix, bool checkFeas=false, bool custom=false, vector&lt; arma::sp_mat * &gt; *custAi={}, vector&lt; arma::vec * &gt; *custbi={})</td></tr>
-<tr class="memdesc:a17e49f2dd9614e5af173ee8f7562f44a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the equation of the feasibility polyhedra corresponding to the given <code>Fix</code>.  <a href="#a17e49f2dd9614e5af173ee8f7562f44a">More...</a><br /></td></tr>
-<tr class="separator:a17e49f2dd9614e5af173ee8f7562f44a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a18d477d37ce57a334c7707a9a6b89e07"><td class="memItemLeft" align="right" valign="top">GRBEnv *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a18d477d37ce57a334c7707a9a6b89e07">env</a></td></tr>
-<tr class="memdesc:a18d477d37ce57a334c7707a9a6b89e07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gurobi env.  <a href="#a18d477d37ce57a334c7707a9a6b89e07">More...</a><br /></td></tr>
-<tr class="separator:a18d477d37ce57a334c7707a9a6b89e07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a220ce78f11a0e9550cec63d65411c5f4"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4">M</a></td></tr>
-<tr class="memdesc:a220ce78f11a0e9550cec63d65411c5f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">M in <img class="formulaInl" alt="$Mx+q$" src="form_2.png"/> that defines the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>.  <a href="#a220ce78f11a0e9550cec63d65411c5f4">More...</a><br /></td></tr>
-<tr class="separator:a220ce78f11a0e9550cec63d65411c5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afffdded2f61d6dee34f312c8a2e4b356"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356">q</a></td></tr>
-<tr class="memdesc:afffdded2f61d6dee34f312c8a2e4b356"><td class="mdescLeft">&#160;</td><td class="mdescRight">q in <img class="formulaInl" alt="$Mx+q$" src="form_2.png"/> that defines the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>  <a href="#afffdded2f61d6dee34f312c8a2e4b356">More...</a><br /></td></tr>
-<tr class="separator:afffdded2f61d6dee34f312c8a2e4b356"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6dbcd747d3b7a82fcd9079916da001df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="func_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a6dbcd747d3b7a82fcd9079916da001df">Compl</a></td></tr>
-<tr class="memdesc:a6dbcd747d3b7a82fcd9079916da001df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compl stores data in &lt;Eqn, Var&gt; form.  <a href="#a6dbcd747d3b7a82fcd9079916da001df">More...</a><br /></td></tr>
-<tr class="separator:a6dbcd747d3b7a82fcd9079916da001df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3626cacccb0d8ab0e1a88f8f1a3659f9"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3626cacccb0d8ab0e1a88f8f1a3659f9">LeadStart</a></td></tr>
-<tr class="separator:a3626cacccb0d8ab0e1a88f8f1a3659f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5842889dd444dceda535c0e464775d80"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a5842889dd444dceda535c0e464775d80">LeadEnd</a></td></tr>
-<tr class="separator:a5842889dd444dceda535c0e464775d80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc5cd4f8090d141b0ced7ec47293f755"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#acc5cd4f8090d141b0ced7ec47293f755">nLeader</a></td></tr>
-<tr class="separator:acc5cd4f8090d141b0ced7ec47293f755"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75112da9c4219c166062a928b437ae60"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a75112da9c4219c166062a928b437ae60">_A</a> ={}</td></tr>
-<tr class="separator:a75112da9c4219c166062a928b437ae60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c531992ff29a14f598a54fa67a789a6"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a0c531992ff29a14f598a54fa67a789a6">_b</a> ={}</td></tr>
-<tr class="memdesc:a0c531992ff29a14f598a54fa67a789a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apart from <img class="formulaInl" alt="$0 \le x \perp Mx+q\ge 0$" src="form_3.png"/>, one needs <img class="formulaInl" alt="$ Ax\le b$" src="form_4.png"/> too!  <a href="#a0c531992ff29a14f598a54fa67a789a6">More...</a><br /></td></tr>
-<tr class="separator:a0c531992ff29a14f598a54fa67a789a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5163934319dc0cbf6d62cfd772f7c1b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ac5163934319dc0cbf6d62cfd772f7c1b">madeRlxdModel</a> {false}</td></tr>
-<tr class="memdesc:ac5163934319dc0cbf6d62cfd772f7c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keep track if <a class="el" href="classGame_1_1LCP.html#a187fe2df5192bc2354944d807a361333" title="A gurobi model with all complementarity constraints removed.">LCP::RlxdModel</a> is made.  <a href="#ac5163934319dc0cbf6d62cfd772f7c1b">More...</a><br /></td></tr>
-<tr class="separator:ac5163934319dc0cbf6d62cfd772f7c1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa209e8dc6b817bff5750b1f98f1a6a6d"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d">nR</a></td></tr>
-<tr class="separator:aa209e8dc6b817bff5750b1f98f1a6a6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abeaadbce4a891d3575dddae796592c72"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#abeaadbce4a891d3575dddae796592c72">nC</a></td></tr>
-<tr class="separator:abeaadbce4a891d3575dddae796592c72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7195e4ed0094fb413a18db3f743c8eda"><td class="memItemLeft" align="right" valign="top">vector&lt; vector&lt; short int &gt; * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a7195e4ed0094fb413a18db3f743c8eda">AllPolyhedra</a></td></tr>
-<tr class="memdesc:a7195e4ed0094fb413a18db3f743c8eda"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra.  <a href="#a7195e4ed0094fb413a18db3f743c8eda">More...</a><br /></td></tr>
-<tr class="separator:a7195e4ed0094fb413a18db3f743c8eda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a060e4a6fa9b9621ffceeb857a9aa1f80"><td class="memItemLeft" align="right" valign="top">vector&lt; vector&lt; short int &gt; * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a060e4a6fa9b9621ffceeb857a9aa1f80">RelAllPol</a></td></tr>
-<tr class="separator:a060e4a6fa9b9621ffceeb857a9aa1f80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4314aa61aab0123f216d08cf49aff6a2"><td class="memItemLeft" align="right" valign="top">vector&lt; arma::sp_mat * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a4314aa61aab0123f216d08cf49aff6a2">Ai</a></td></tr>
-<tr class="separator:a4314aa61aab0123f216d08cf49aff6a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab707c4cb15ec7746faaf5eec8e33b03f"><td class="memItemLeft" align="right" valign="top">vector&lt; arma::sp_mat * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ab707c4cb15ec7746faaf5eec8e33b03f">Rel_Ai</a></td></tr>
-<tr class="separator:ab707c4cb15ec7746faaf5eec8e33b03f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93a14422c0b00687870134c134c7e727"><td class="memItemLeft" align="right" valign="top">vector&lt; arma::vec * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a93a14422c0b00687870134c134c7e727">bi</a></td></tr>
-<tr class="separator:a93a14422c0b00687870134c134c7e727"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5550fc44fd355db8e17360abcbf2798"><td class="memItemLeft" align="right" valign="top">vector&lt; arma::vec * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#af5550fc44fd355db8e17360abcbf2798">Rel_bi</a></td></tr>
-<tr class="separator:af5550fc44fd355db8e17360abcbf2798"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a187fe2df5192bc2354944d807a361333"><td class="memItemLeft" align="right" valign="top">GRBModel&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a187fe2df5192bc2354944d807a361333">RlxdModel</a></td></tr>
-<tr class="memdesc:a187fe2df5192bc2354944d807a361333"><td class="mdescLeft">&#160;</td><td class="mdescRight">A gurobi model with all complementarity constraints removed.  <a href="#a187fe2df5192bc2354944d807a361333">More...</a><br /></td></tr>
-<tr class="separator:a187fe2df5192bc2354944d807a361333"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to handle and solve linear complementarity problems. </p>
 <p>A class to handle linear complementarity problems (<a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>) especially as MIPs with bigM constraints Also provides the convex hull of the feasible space, restricted feasible space etc. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00290">290</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8f354ec1846b682d4e8d526c4408e702"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8f354ec1846b682d4e8d526c4408e702">&#9670;&nbsp;</a></span>LCP() <span class="overload">[1/4]</span></h2>
@@ -362,8 +260,6 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00095">95</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
 </div>
 </div>
 <a id="a26af85e6c2bca5744cf2148da9539f31"></a>
@@ -393,7 +289,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="func_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a>&#160;</td>
+          <td class="paramtype">perps&#160;</td>
           <td class="paramname"><em>Compl</em>, </td>
         </tr>
         <tr>
@@ -427,12 +323,10 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00070">70</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
 </div>
 </div>
-<a id="aced553b2e3edc31b20e4668c6146f583"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aced553b2e3edc31b20e4668c6146f583">&#9670;&nbsp;</a></span>LCP() <span class="overload">[4/4]</span></h2>
+<a id="ad05015288e6d7ae561cea30233128840"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad05015288e6d7ae561cea30233128840">&#9670;&nbsp;</a></span>LCP() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -446,7 +340,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classGame_1_1NashGame.html">NashGame</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classGame_1_1NashGame.html">Game::NashGame</a> &amp;&#160;</td>
           <td class="paramname"><em>N</em>&#160;</td>
         </tr>
         <tr>
@@ -460,9 +354,6 @@ Private Attributes</h2></td></tr>
 <p>Constructer given a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a>. </p>
 <p>Given a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a>, computes the KKT of the lower levels, and makes the appropriate <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> object.</p>
 <p>This constructor is the most suited for highlevel usage. </p><dl class="section note"><dt>Note</dt><dd>Most preferred constructor for user interface. </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>Delete the below section of code </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00119">119</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -484,8 +375,6 @@ Private Attributes</h2></td></tr>
 <p>Destructor of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>. </p>
 <p>Destructor - to delete the objects created with new operator</p>
 <p><a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> object owns the pointers to definitions of its polyhedra that it owns It has to be deleted and freed. </p>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00162">162</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -551,99 +440,6 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00854">854</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a94c3f8501ce2a705e3ae3a800baef554"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94c3f8501ce2a705e3ae3a800baef554">&#9670;&nbsp;</a></span>anyBranch()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt; short int &gt; * Game::LCP::anyBranch </td>
-          <td>(</td>
-          <td class="paramtype">const vector&lt; vector&lt; short int &gt; * &gt; *&#160;</td>
-          <td class="paramname"><em>vecOfFixes</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; short int &gt; *&#160;</td>
-          <td class="paramname"><em>Fix</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns the (grand)child if any (grand)child of <code>Fix</code> is in <code>vecOfFixes</code> else returns <code>nullptr</code> <br  />
- </p>
-<p><b>GrandParent:</b> Either the same value as the grand child, or has 0 in that location</p>
-<p><b>Grandchild:</b> Same val as grand parent in every location, except any val allowed, if grandparent is 0 </p>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00515">515</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a769b78b24ff5deee29c65a50c886c895"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a769b78b24ff5deee29c65a50c886c895">&#9670;&nbsp;</a></span>branch()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Game::LCP::branch </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>loc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const vector&lt; short int &gt; *&#160;</td>
-          <td class="paramname"><em>Fixes</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Branches at a location defined by the caller If loc == nR, then stop branching. We either hit infeasibility or a leaf (i.e., all locations are branched) If loc &lt;0, then branch at abs(loc) location and go down the branch where variable is fixed to 0 else branch at abs(loc) location and go down the branch where eqn is fixed to 0. </p>
-<dl class="section note"><dt>Note</dt><dd>This is just a handler for Branch and bound and obeys what other functions like <a class="el" href="classGame_1_1LCP.html#afaeb576a63b57c50b76f4ddd70f135c1" title="Defining the branching rule.">LCP::branchLoc</a> and <a class="el" href="classGame_1_1LCP.html#a3e8830e9ef2cf2ed5d4bc18b7c56d13c" title="Branching choice, if we are at a processed node.">LCP::branchProcLoc</a> suggest it to do. No major change expected here. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">loc</td><td>Location (complementarity pair) to be branched at. </td></tr>
-    <tr><td class="paramname">Fixes</td><td>What are fixed so far. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00582">582</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
 </div>
 </div>
 <a id="aafa5c1781e87b7eaaf510a513cf6c05a"></a>
@@ -662,92 +458,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Calls the complete branch and prune for <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> object. </p>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classGame_1_1LCP.html#a7195e4ed0094fb413a18db3f743c8eda" title="LCP feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equ...">LCP::AllPolyhedra</a> </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00637">637</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="afaeb576a63b57c50b76f4ddd70f135c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afaeb576a63b57c50b76f4ddd70f135c1">&#9670;&nbsp;</a></span>branchLoc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int Game::LCP::branchLoc </td>
-          <td>(</td>
-          <td class="paramtype">unique_ptr&lt; GRBModel &gt; &amp;&#160;</td>
-          <td class="paramname"><em>m</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; short int &gt; *&#160;</td>
-          <td class="paramname"><em>Fix</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Defining the branching rule. </p>
-<p>Solves a gurobi model at some point in the branch and prune tree. From there, uses a heuristic to find the complementarity equation where the branching is to be done and information on whether the exploration is go inside the "equation" side of the branch or the "variable" side of the branch. Currently, the largest non-zero value is the value which would be forced to be zero (with the hope infeasibility would be identified fast). </p><dl class="section note"><dt>Note</dt><dd>This can be vastly improved with better branching rules. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd><code>signed int</code> that details where branching has to be done. A positive value implies, branching will be on equation, a negative value implies branching will be on variable. As an exception, 0 implies branching on first eqn and <code> - <a class="el" href="classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d">LCP::nR</a></code> implies branching on first equation. A return value of <code><a class="el" href="classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d">LCP::nR</a></code> implies that the node is infeasible and that there is no point in branching. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00651">651</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a3e8830e9ef2cf2ed5d4bc18b7c56d13c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e8830e9ef2cf2ed5d4bc18b7c56d13c">&#9670;&nbsp;</a></span>branchProcLoc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int Game::LCP::branchProcLoc </td>
-          <td>(</td>
-          <td class="paramtype">vector&lt; short int &gt; *&#160;</td>
-          <td class="paramname"><em>Fix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; short int &gt; *&#160;</td>
-          <td class="paramname"><em>Leaf</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Branching choice, if we are at a processed node. </p>
-<p>When at processed node, we know that the node definitely has a feasible descendent. This just finds the first unbranched complementarity equation and branches there. </p><dl class="section return"><dt>Returns</dt><dd>Branch location if not at leaf and <a class="el" href="classGame_1_1LCP.html#aa209e8dc6b817bff5750b1f98f1a6a6d">LCP::nR</a> if at leaf. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00705">705</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<dl class="section return"><dt>Returns</dt><dd>LCP::AllPolyhedra </dd></dl>
 
 </div>
 </div>
@@ -756,9 +467,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int Game::LCP::ConvexHull </td>
@@ -778,14 +486,8 @@ Private Attributes</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 <p>Computes the convex hull of the feasible region of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> </p><dl class="section warning"><dt>Warning</dt><dd>To be run only after <a class="el" href="classGame_1_1LCP.html#aafa5c1781e87b7eaaf510a513cf6c05a" title="Calls the complete branch and prune for LCP object.">LCP::BranchAndPrune</a> is run. Otherwise this can give errors </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>Formally call <a class="el" href="classGame_1_1LCP.html#aafa5c1781e87b7eaaf510a513cf6c05a" title="Calls the complete branch and prune for LCP object.">LCP::BranchAndPrune</a> or throw an exception if this method is not already run </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">A</td><td>Convex hull inequality description LHS to be stored here </td></tr>
@@ -793,111 +495,6 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00374">374</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a99d7d4a906d78149e7ff1701f6d7d4aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a99d7d4a906d78149e7ff1701f6d7d4aa">&#9670;&nbsp;</a></span>defConst()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Game::LCP::defConst </td>
-          <td>(</td>
-          <td class="paramtype">GRBEnv *&#160;</td>
-          <td class="paramname"><em>env</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assign default values to <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> attributes. </p>
-<p>Internal member that can be called from multiple constructors to assign default values to some attributes of the class. </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd><a class="el" href="classGame_1_1LCP.html#a99d7d4a906d78149e7ff1701f6d7d4aa" title="Assign default values to LCP attributes.">LCP::defConst</a> can be replaced by a private constructor </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00053">53</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a3e2eb5dde0e2449ce0bfd5f662f693af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e2eb5dde0e2449ce0bfd5f662f693af">&#9670;&nbsp;</a></span>EnumerateAll()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classGame_1_1LCP.html">Game::LCP</a> &amp; Game::LCP::EnumerateAll </td>
-          <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>solveLP</em> = <code>false</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Brute force computation of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> feasible region. </p>
-<p>Computes all <img class="formulaInl" alt="$2^n$" src="form_15.png"/> polyhedra defining the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> feasible region. These are always added to <a class="el" href="classGame_1_1LCP.html#a4314aa61aab0123f216d08cf49aff6a2">LCP::Ai</a> and <a class="el" href="classGame_1_1LCP.html#a93a14422c0b00687870134c134c7e727">LCP::bi</a> </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">solveLP</td><td>Should the poyhedra added be checked for feasibility? </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00838">838</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a2d2876ada5a9d435754561cbbc5b6352"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d2876ada5a9d435754561cbbc5b6352">&#9670;&nbsp;</a></span>errorCheck()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Game::LCP::errorCheck </td>
-          <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>throwErr</em> = <code>true</code></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Checks if the <code>M</code> and <code>q</code> given to create the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> object are of compatible size, given the number of leader variables </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">throwErr</td><td>If this is true, function throws an error, else, it just returns false </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00352">352</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -944,153 +541,13 @@ Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd><code>false</code> if the model is not solved to optimality. <code>true</code> otherwise </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">model</td><td>The Gurobi Model that was solved (perhaps using <a class="el" href="classGame_1_1LCP.html#a367aa662d820ef456a229fdf2dc5f9a5">Game::LCP::LCPasMIP</a>) </td></tr>
+    <tr><td class="paramname">model</td><td>The Gurobi Model that was solved (perhaps using Game::LCP::LCPasMIP) </td></tr>
     <tr><td class="paramname">z</td><td>Output variable - where the equation values are stored </td></tr>
     <tr><td class="paramname">x</td><td>Output variable - where the variable values are stored </td></tr>
     <tr><td class="paramname">extractZ</td><td>z values are filled only if this is true </td></tr>
   </table>
   </dd>
 </dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00531">531</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a17e49f2dd9614e5af173ee8f7562f44a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17e49f2dd9614e5af173ee8f7562f44a">&#9670;&nbsp;</a></span>FixToPolies()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classGame_1_1LCP.html">Game::LCP</a> &amp; Game::LCP::FixToPolies </td>
-          <td>(</td>
-          <td class="paramtype">const vector&lt; short int &gt; *&#160;</td>
-          <td class="paramname"><em>Fix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>checkFeas</em> = <code>false</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>custom</em> = <code>false</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; arma::sp_mat * &gt; *&#160;</td>
-          <td class="paramname"><em>custAi</em> = <code>{}</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; arma::vec * &gt; *&#160;</td>
-          <td class="paramname"><em>custbi</em> = <code>{}</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Computes the equation of the feasibility polyhedra corresponding to the given <code>Fix</code>. </p>
-<p>The computed polyhedroa are always pushed into a vector of <code>arma::sp_mat</code> and <code>arma::vec</code> If <code>custom</code> is false, this is the internal attribute of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>, which are <a class="el" href="classGame_1_1LCP.html#a4314aa61aab0123f216d08cf49aff6a2">LCP::Ai</a> and <a class="el" href="classGame_1_1LCP.html#a93a14422c0b00687870134c134c7e727">LCP::bi</a>. Otherwise, the vectors can be provided as arguments. <code>true</code> value to @checkFeas ensures that <em>each</em> polyhedron that is pushed is feasible. not meant for high level code. Instead use <a class="el" href="classGame_1_1LCP.html#a17e49f2dd9614e5af173ee8f7562f44a" title="Computes the equation of the feasibility polyhedra corresponding to the given Fix.">LCP::FixToPolies</a>. </p><dl class="section note"><dt>Note</dt><dd>A value of 0 in <code>*Fix</code> implies that polyhedra corresponding to fixing the corresponding variable as well as the equation become candidates to pushed into the vector. Hence this is preferred over <a class="el" href="classGame_1_1LCP.html#abcfa181de002a382d8bd8d5509669938" title="Computes the equation of the feasibility polyhedron corresponding to the given Fix.">LCP::FixToPoly</a> for high-level usage. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Fix</td><td>A vector of +1, 0 and -1 referring to which equations and variables are taking 0 value. </td></tr>
-    <tr><td class="paramname">checkFeas</td><td>The polyhedron is added after ensuring feasibility, if this is true </td></tr>
-    <tr><td class="paramname">custom</td><td>Should the polyhedra be pushed into a custom vector of polyhedra as opposed to <a class="el" href="classGame_1_1LCP.html#a4314aa61aab0123f216d08cf49aff6a2">LCP::Ai</a> and <a class="el" href="classGame_1_1LCP.html#a93a14422c0b00687870134c134c7e727">LCP::bi</a> </td></tr>
-    <tr><td class="paramname">custAi</td><td>If custom polyhedra vector is used, pointer to vector of LHS constraint matrix </td></tr>
-    <tr><td class="paramname">custbi</td><td>If custom polyhedra vector is used, pointer to vector of RHS of constraints </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00794">794</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="abcfa181de002a382d8bd8d5509669938"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abcfa181de002a382d8bd8d5509669938">&#9670;&nbsp;</a></span>FixToPoly()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classGame_1_1LCP.html">Game::LCP</a> &amp; Game::LCP::FixToPoly </td>
-          <td>(</td>
-          <td class="paramtype">const vector&lt; short int &gt; *&#160;</td>
-          <td class="paramname"><em>Fix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>checkFeas</em> = <code>false</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>custom</em> = <code>false</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; arma::sp_mat * &gt; *&#160;</td>
-          <td class="paramname"><em>custAi</em> = <code>{}</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; arma::vec * &gt; *&#160;</td>
-          <td class="paramname"><em>custbi</em> = <code>{}</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Computes the equation of the feasibility polyhedron corresponding to the given <code>Fix</code>. </p>
-<p>The computed polyhedron is always pushed into a vector of <code>arma::sp_mat</code> and <code>arma::vec</code> If <code>custom</code> is false, this is the internal attribute of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>, which are <a class="el" href="classGame_1_1LCP.html#a4314aa61aab0123f216d08cf49aff6a2">LCP::Ai</a> and <a class="el" href="classGame_1_1LCP.html#a93a14422c0b00687870134c134c7e727">LCP::bi</a>. Otherwise, the vectors can be provided as arguments. <code>true</code> value to @checkFeas ensures that the polyhedron is pushed <em>only</em> if it is feasible. </p><dl class="section warning"><dt>Warning</dt><dd>Does not entertain 0 in the elements of *Fix. Only +1/-1 are allowed to not encounter undefined behavior. As a result, not meant for high level code. Instead use <a class="el" href="classGame_1_1LCP.html#a17e49f2dd9614e5af173ee8f7562f44a" title="Computes the equation of the feasibility polyhedra corresponding to the given Fix.">LCP::FixToPolies</a>. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Fix</td><td>A vector of +1 and -1 referring to which equations and variables are taking 0 value. </td></tr>
-    <tr><td class="paramname">checkFeas</td><td>The polyhedron is added after ensuring feasibility, if this is true </td></tr>
-    <tr><td class="paramname">custom</td><td>Should the polyhedra be pushed into a custom vector of polyhedra as opposed to <a class="el" href="classGame_1_1LCP.html#a4314aa61aab0123f216d08cf49aff6a2">LCP::Ai</a> and <a class="el" href="classGame_1_1LCP.html#a93a14422c0b00687870134c134c7e727">LCP::bi</a> </td></tr>
-    <tr><td class="paramname">custAi</td><td>If custom polyhedra vector is used, pointer to vector of LHS constraint matrix </td></tr>
-    <tr><td class="paramname">custbi</td><td>If custom polyhedra vector is used, pointer to vector of RHS of constraints </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00728">728</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1099,27 +556,17 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="func_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> Game::LCP::getCompl </td>
+          <td class="memname">perps Game::LCP::getCompl </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a6dbcd747d3b7a82fcd9079916da001df" title="Compl stores data in &lt;Eqn, Var&gt; form.">LCP::Compl</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00329">329</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p>Read-only access to LCP::Compl. </p>
 
 </div>
 </div>
@@ -1128,9 +575,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">unsigned int Game::LCP::getLEnd </td>
@@ -1139,16 +583,9 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a5842889dd444dceda535c0e464775d80">LCP::LeadEnd</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00328">328</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p>Read-only access to LCP::LeadEnd. </p>
 
 </div>
 </div>
@@ -1157,9 +594,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">unsigned int Game::LCP::getLStart </td>
@@ -1168,16 +602,9 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a3626cacccb0d8ab0e1a88f8f1a3659f9">LCP::LeadStart</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00327">327</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p>Read-only access to LCP::LeadStart. </p>
 
 </div>
 </div>
@@ -1186,9 +613,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">arma::sp_mat Game::LCP::getM </td>
@@ -1197,17 +621,10 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4" title="M in  that defines the LCP.">LCP::M</a>. </p>
+<p>Read-only access to LCP::M. </p>
 <p>Return data and address </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00323">323</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -1216,9 +633,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">arma::sp_mat* Game::LCP::getMstar </td>
@@ -1227,70 +641,9 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Reference access to <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4" title="M in  that defines the LCP.">LCP::M</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00324">324</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a6d6b66bf9d1255fe5fb782ae23cb7438"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6d6b66bf9d1255fe5fb782ae23cb7438">&#9670;&nbsp;</a></span>getNcol()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::LCP::getNcol </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00331">331</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a0b03b6148c1b2d196fc5b840738bb6c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b03b6148c1b2d196fc5b840738bb6c0">&#9670;&nbsp;</a></span>getNrow()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::LCP::getNrow </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00332">332</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p>Reference access to LCP::M. </p>
 
 </div>
 </div>
@@ -1299,9 +652,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">arma::vec Game::LCP::getq </td>
@@ -1310,16 +660,9 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read-only access to <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356" title="q in  that defines the LCP">LCP::q</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00325">325</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
+<p>Read-only access to LCP::q. </p>
 
 </div>
 </div>
@@ -1328,9 +671,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">arma::vec* Game::LCP::getqstar </td>
@@ -1339,153 +679,14 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Reference access to <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356" title="q in  that defines the LCP">LCP::q</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00326">326</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a4530c61c56c08e195e93f52a15875dd8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4530c61c56c08e195e93f52a15875dd8">&#9670;&nbsp;</a></span>isZero()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class T &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Game::LCP::isZero </td>
-          <td>(</td>
-          <td class="paramtype">const T&#160;</td>
-          <td class="paramname"><em>val</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00349">349</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a646266159d34a17c8b6149e8aa1b34d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a646266159d34a17c8b6149e8aa1b34d8">&#9670;&nbsp;</a></span>LCP_Polyhed_fixed() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unique_ptr&lt; GRBModel &gt; Game::LCP::LCP_Polyhed_fixed </td>
-          <td>(</td>
-          <td class="paramtype">arma::Col&lt; int &gt;&#160;</td>
-          <td class="paramname"><em>FixEq</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">arma::Col&lt; int &gt;&#160;</td>
-          <td class="paramname"><em>FixVar</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Returs a model created from a given model The returned model has constraints corresponding to the non-zero elements of FixEq set to equality and variables corresponding to the non-zero elements of FixVar set to equality (=0) </p><dl class="section note"><dt>Note</dt><dd>This model returned could either be a relaxation or a restriction or neither. If FixEq + FixVar is at least 1 (element-wise), then it is a restriction. </dd>
-<dd>
-<code><a class="el" href="classGame_1_1LCP.html#a71b55c08e04c22b0e4526a3bd90ad25a">LCP::LCP_Polyhed_fixed</a>({0,...,0},{0,...,0})</code> is equivalent to accessing <a class="el" href="classGame_1_1LCP.html#a187fe2df5192bc2354944d807a361333" title="A gurobi model with all complementarity constraints removed.">LCP::RlxdModel</a> </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>Note that the model returned by this function has to be explicitly deleted using the delete operator. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>unique pointer to a GRBModel </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">FixEq</td><td>If non zero, equality imposed on variable </td></tr>
-    <tr><td class="paramname">FixVar</td><td>If non zero, equality imposed on equation </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00250">250</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a71b55c08e04c22b0e4526a3bd90ad25a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71b55c08e04c22b0e4526a3bd90ad25a">&#9670;&nbsp;</a></span>LCP_Polyhed_fixed() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unique_ptr&lt; GRBModel &gt; Game::LCP::LCP_Polyhed_fixed </td>
-          <td>(</td>
-          <td class="paramtype">vector&lt; unsigned int &gt;&#160;</td>
-          <td class="paramname"><em>FixEq</em> = <code>{}</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; unsigned int &gt;&#160;</td>
-          <td class="paramname"><em>FixVar</em> = <code>{}</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>The returned model has constraints corresponding to the indices in FixEq set to equality and variables corresponding to the indices present in FixVar set to equality (=0) </p><dl class="section note"><dt>Note</dt><dd>This model returned could either be a relaxation or a restriction or neither. If every index is present in at least one of the two vectors &mdash; <code>FixEq</code> or <code>FixVar</code> &mdash; then it is a restriction. </dd>
-<dd>
-<code><a class="el" href="classGame_1_1LCP.html#a71b55c08e04c22b0e4526a3bd90ad25a">LCP::LCP_Polyhed_fixed</a>({},{})</code> is equivalent to accessing <a class="el" href="classGame_1_1LCP.html#a187fe2df5192bc2354944d807a361333" title="A gurobi model with all complementarity constraints removed.">LCP::RlxdModel</a> </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>The FixEq and FixVar variables are used under a different convention here! </dd>
-<dd>
-Note that the model returned by this function has to be explicitly deleted using the delete operator. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>unique pointer to a GRBModel </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">FixEq</td><td>If index is present, equality imposed on that variable </td></tr>
-    <tr><td class="paramname">FixVar</td><td>If index is present, equality imposed on that equation </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00218">218</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p>Reference access to LCP::q. </p>
 
 </div>
 </div>
 <a id="a0ba88cd2f8a2e58cac7794683f384acb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ba88cd2f8a2e58cac7794683f384acb">&#9670;&nbsp;</a></span>LCPasMIP() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ba88cd2f8a2e58cac7794683f384acb">&#9670;&nbsp;</a></span>LCPasMIP()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1503,117 +704,6 @@ Note that the model returned by this function has to be explicitly deleted using
 <p>Helps solving an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> as an MIP using bigM constraints. </p>
 <dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel that has the equivalent MIP</dd></dl>
 <p>The MIP problem that is returned by this function is equivalent to the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> problem provided the value of bigM is large enough. @info This solves just the feasibility problem. Should you need a leader's objective function, use <a class="el" href="classGame_1_1LCP.html#a7e41da234589d7b25c11579566f2c1dc" title="Helps solving an LCP as an MIP using bigM constraints.">LCP::MPECasMILP</a> or <a class="el" href="classGame_1_1LCP.html#a36fbc1c8fdaaa40fb583c6d98a82c418" title="Helps solving an LCP as an MIQP using bigM constraints.">LCP::MPECasMIQP</a> </p>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00946">946</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a21c2114307832dee104c3775c31f29cb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21c2114307832dee104c3775c31f29cb">&#9670;&nbsp;</a></span>LCPasMIP() <span class="overload">[2/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unique_ptr&lt; GRBModel &gt; Game::LCP::LCPasMIP </td>
-          <td>(</td>
-          <td class="paramtype">vector&lt; short int &gt;&#160;</td>
-          <td class="paramname"><em>Fixes</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>solve</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in Fixes in 0/+1/-1 notation </p><dl class="section note"><dt>Note</dt><dd>Returned model is <em>always</em> a restriction. For <code>Fixes = {0,...,0}</code>, the returned model would solve the exact <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> (up to bigM caused restriction). </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">string</td><td>if <code> Fixes.size()!= </code> number of equations (for complementarity). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section warning"><dt>Warning</dt><dd>Note that the model returned by this function has to be explicitly deleted using the delete operator. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>unique pointer to a GRBModel </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Fixes</td><td>For each Variable, +1 fixes the equation to equality and -1 fixes the variable to equality. A value of 0 fixes neither. </td></tr>
-    <tr><td class="paramname">solve</td><td>Whether the model is to be solved before returned </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00279">279</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a367aa662d820ef456a229fdf2dc5f9a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a367aa662d820ef456a229fdf2dc5f9a5">&#9670;&nbsp;</a></span>LCPasMIP() <span class="overload">[3/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unique_ptr&lt; GRBModel &gt; Game::LCP::LCPasMIP </td>
-          <td>(</td>
-          <td class="paramtype">vector&lt; unsigned int &gt;&#160;</td>
-          <td class="paramname"><em>FixEq</em> = <code>{}</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vector&lt; unsigned int &gt;&#160;</td>
-          <td class="paramname"><em>FixVar</em> = <code>{}</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>solve</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Uses the big M method to solve the complementarity problem. The variables and eqns to be set to equality can be given in FixVar and FixEq. </p><dl class="section note"><dt>Note</dt><dd>Returned model is <em>always</em> a restriction. For <code>FixEq = FixVar = {}</code>, the returned model would solve the exact <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> (up to bigM caused restriction). </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>Note that the model returned by this function has to be explicitly deleted using the delete operator. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>unique pointer to a GRBModel </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">FixEq</td><td>If any equation is to be fixed to equality </td></tr>
-    <tr><td class="paramname">FixVar</td><td>If any variable is to be fixed to equality </td></tr>
-    <tr><td class="paramname">solve</td><td>Whether the model should be solved in the function before returned. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00302">302</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1637,12 +727,10 @@ Note that the model returned by this function has to be explicitly deleted using
 <p>Removes all complementarity constraints from the QP's constraints. Instead, the sum of products of complementarity pairs is minimized. If the optimal value turns out to be 0, then it is actually a solution of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>. Else the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> is infeasible. <br  />
 </p><dl class="section warning"><dt>Warning</dt><dd>Solves the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> feasibility problem. Not the MPEC optimization problem. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00909">909</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
 </div>
 </div>
 <a id="adc8c8100b88e028500647be036550bfb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc8c8100b88e028500647be036550bfb">&#9670;&nbsp;</a></span>makeQP() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#adc8c8100b88e028500647be036550bfb">&#9670;&nbsp;</a></span>makeQP()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1695,68 +783,6 @@ Note that the model returned by this function has to be explicitly deleted using
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>Size of this parameter might change! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00869">869</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="af75f1aff19db27fd43b33f53cc3ce9e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af75f1aff19db27fd43b33f53cc3ce9e2">&#9670;&nbsp;</a></span>makeQP() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classGame_1_1LCP.html">Game::LCP</a> &amp; Game::LCP::makeQP </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structGame_1_1QP__objective.html">Game::QP_objective</a> &amp;&#160;</td>
-          <td class="paramname"><em>QP_obj</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classGame_1_1QP__Param.html">Game::QP_Param</a> &amp;&#160;</td>
-          <td class="paramname"><em>QP</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00896">896</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a777726134bf9ffc8fa0c6bfe8ffdb6fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a777726134bf9ffc8fa0c6bfe8ffdb6fc">&#9670;&nbsp;</a></span>makeRelaxed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Game::LCP::makeRelaxed </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Makes a Gurobi object that relaxes complementarity constraints in an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>. </p>
-<p>A Gurobi object is stored in the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> object, that has all complementarity constraints removed. A copy of this object is used by other member functions </p>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00177">177</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
 </div>
 </div>
 <a id="a7e41da234589d7b25c11579566f2c1dc"></a>
@@ -1799,9 +825,7 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>Helps solving an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> as an MIP using bigM constraints. </p>
 <dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel that has the equivalent MIP</dd></dl>
-<p>The MIP problem that is returned by this function is equivalent to the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> problem provided the value of bigM is large enough. The function differs from <a class="el" href="classGame_1_1LCP.html#a367aa662d820ef456a229fdf2dc5f9a5">LCP::LCPasMIP</a> by the fact that, this explicitly takes a leader objective, and returns an object with this objective. @info The leader's objective has to be linear here. For quadratic objectives, refer <a class="el" href="classGame_1_1LCP.html#a36fbc1c8fdaaa40fb583c6d98a82c418" title="Helps solving an LCP as an MIQP using bigM constraints.">LCP::MPECasMIQP</a> </p>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00959">959</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p>The MIP problem that is returned by this function is equivalent to the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> problem provided the value of bigM is large enough. The function differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader objective, and returns an object with this objective. @info The leader's objective has to be linear here. For quadratic objectives, refer <a class="el" href="classGame_1_1LCP.html#a36fbc1c8fdaaa40fb583c6d98a82c418" title="Helps solving an LCP as an MIQP using bigM constraints.">LCP::MPECasMIQP</a> </p>
 
 </div>
 </div>
@@ -1851,10 +875,8 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>Helps solving an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> as an MIQP using bigM constraints. </p>
 <dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel that has the equivalent MIQP</dd></dl>
-<p>The MIQP problem that is returned by this function is equivalent to the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> problem provided the value of bigM is large enough. The function differs from <a class="el" href="classGame_1_1LCP.html#a367aa662d820ef456a229fdf2dc5f9a5">LCP::LCPasMIP</a> by the fact that, this explicitly takes a leader objective, and returns an object with this objective. This allows quadratic leader objective. If you are aware that the leader's objective is linear, use the faster method <a class="el" href="classGame_1_1LCP.html#a7e41da234589d7b25c11579566f2c1dc" title="Helps solving an LCP as an MIP using bigM constraints.">LCP::MPECasMILP</a> </p>
+<p>The MIQP problem that is returned by this function is equivalent to the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> problem provided the value of bigM is large enough. The function differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader objective, and returns an object with this objective. This allows quadratic leader objective. If you are aware that the leader's objective is linear, use the faster method <a class="el" href="classGame_1_1LCP.html#a7e41da234589d7b25c11579566f2c1dc" title="Helps solving an LCP as an MIP using bigM constraints.">LCP::MPECasMILP</a> </p>
 <p>Note that if the matrix Q is a zero matrix, then this returns a Gurobi MILP model as opposed to MIQP model. This enables Gurobi to use its much advanced MIP solver</p>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00987">987</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1876,214 +898,9 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>Print a summary of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00373">373</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ab3e60f1a1b2b7fda80f26bf39528f1af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3e60f1a1b2b7fda80f26bf39528f1af">&#9670;&nbsp;</a></span>solEncode() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt; short int &gt; * Game::LCP::solEncode </td>
-          <td>(</td>
-          <td class="paramtype">const arma::vec &amp;&#160;</td>
-          <td class="paramname"><em>z</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const arma::vec &amp;&#160;</td>
-          <td class="paramname"><em>x</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Given variable values and equation values, encodes it in 0/+1/-1 format and returns it. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Note that the vector returned by this function might have to be explicitly deleted using the delete operator. For specific uses in <a class="el" href="classGame_1_1LCP.html#aafa5c1781e87b7eaaf510a513cf6c05a" title="Calls the complete branch and prune for LCP object.">LCP::BranchAndPrune</a>, this delete is handled by the class destructor. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">z</td><td>Equation values </td></tr>
-    <tr><td class="paramname">x</td><td>Variable values </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00555">555</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a19650ed8a9ae7e071f9ccdc39c8d8606"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19650ed8a9ae7e071f9ccdc39c8d8606">&#9670;&nbsp;</a></span>solEncode() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt; short int &gt; * Game::LCP::solEncode </td>
-          <td>(</td>
-          <td class="paramtype">GRBModel *&#160;</td>
-          <td class="paramname"><em>model</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Given a Gurobi model, extracts variable values and equation values, encodes it in 0/+1/-1 format and returns it. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Note that the vector returned by this function might have to be explicitly deleted using the delete operator. For specific uses in <a class="el" href="classGame_1_1LCP.html#aafa5c1781e87b7eaaf510a513cf6c05a" title="Calls the complete branch and prune for LCP object.">LCP::BranchAndPrune</a>, this delete is handled by the class destructor. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00572">572</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
 </div>
 </div>
 <h2 class="groupheader">Field Documentation</h2>
-<a id="a75112da9c4219c166062a928b437ae60"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75112da9c4219c166062a928b437ae60">&#9670;&nbsp;</a></span>_A</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::sp_mat Game::LCP::_A ={}</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00299">299</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a0c531992ff29a14f598a54fa67a789a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c531992ff29a14f598a54fa67a789a6">&#9670;&nbsp;</a></span>_b</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::vec Game::LCP::_b ={}</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Apart from <img class="formulaInl" alt="$0 \le x \perp Mx+q\ge 0$" src="form_3.png"/>, one needs <img class="formulaInl" alt="$ Ax\le b$" src="form_4.png"/> too! </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00299">299</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a4314aa61aab0123f216d08cf49aff6a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4314aa61aab0123f216d08cf49aff6a2">&#9670;&nbsp;</a></span>Ai</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;arma::sp_mat*&gt;* Game::LCP::Ai</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00305">305</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a7195e4ed0094fb413a18db3f743c8eda"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7195e4ed0094fb413a18db3f743c8eda">&#9670;&nbsp;</a></span>AllPolyhedra</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;vector&lt;short int&gt;*&gt;* Game::LCP::AllPolyhedra</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p><a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00304">304</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a93a14422c0b00687870134c134c7e727"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a93a14422c0b00687870134c134c7e727">&#9670;&nbsp;</a></span>bi</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;arma::vec*&gt;* Game::LCP::bi</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00305">305</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
 <a id="ab6a2f478a8f4678316edfbf7a3eb19fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab6a2f478a8f4678316edfbf7a3eb19fe">&#9670;&nbsp;</a></span>bigM</h2>
 
@@ -2097,60 +914,6 @@ Note that the model returned by this function has to be explicitly deleted using
 </div><div class="memdoc">
 
 <p>bigM used to rewrite the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> as MIP </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00309">309</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a6dbcd747d3b7a82fcd9079916da001df"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6dbcd747d3b7a82fcd9079916da001df">&#9670;&nbsp;</a></span>Compl</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="func_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> Game::LCP::Compl</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Compl stores data in &lt;Eqn, Var&gt; form. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00297">297</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a18d477d37ce57a334c7707a9a6b89e07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18d477d37ce57a334c7707a9a6b89e07">&#9670;&nbsp;</a></span>env</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">GRBEnv* Game::LCP::env</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gurobi env. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00294">294</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
 
 </div>
 </div>
@@ -2168,310 +931,8 @@ Note that the model returned by this function has to be explicitly deleted using
 
 <p>The threshold, below which a number would be considered to be zero. </p>
 
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00310">310</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
 </div>
 </div>
-<a id="a5842889dd444dceda535c0e464775d80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5842889dd444dceda535c0e464775d80">&#9670;&nbsp;</a></span>LeadEnd</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::LCP::LeadEnd</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00298">298</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a3626cacccb0d8ab0e1a88f8f1a3659f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3626cacccb0d8ab0e1a88f8f1a3659f9">&#9670;&nbsp;</a></span>LeadStart</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::LCP::LeadStart</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00298">298</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a220ce78f11a0e9550cec63d65411c5f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a220ce78f11a0e9550cec63d65411c5f4">&#9670;&nbsp;</a></span>M</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::sp_mat Game::LCP::M</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>M in <img class="formulaInl" alt="$Mx+q$" src="form_2.png"/> that defines the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00295">295</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="ac5163934319dc0cbf6d62cfd772f7c1b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac5163934319dc0cbf6d62cfd772f7c1b">&#9670;&nbsp;</a></span>madeRlxdModel</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Game::LCP::madeRlxdModel {false}</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Keep track if <a class="el" href="classGame_1_1LCP.html#a187fe2df5192bc2354944d807a361333" title="A gurobi model with all complementarity constraints removed.">LCP::RlxdModel</a> is made. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00301">301</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="abeaadbce4a891d3575dddae796592c72"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abeaadbce4a891d3575dddae796592c72">&#9670;&nbsp;</a></span>nC</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::LCP::nC</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00302">302</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="acc5cd4f8090d141b0ced7ec47293f755"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc5cd4f8090d141b0ced7ec47293f755">&#9670;&nbsp;</a></span>nLeader</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::LCP::nLeader</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00298">298</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="aa209e8dc6b817bff5750b1f98f1a6a6d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa209e8dc6b817bff5750b1f98f1a6a6d">&#9670;&nbsp;</a></span>nR</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int Game::LCP::nR</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00302">302</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="afffdded2f61d6dee34f312c8a2e4b356"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afffdded2f61d6dee34f312c8a2e4b356">&#9670;&nbsp;</a></span>q</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">arma::vec Game::LCP::q</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>q in <img class="formulaInl" alt="$Mx+q$" src="form_2.png"/> that defines the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00296">296</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="ab707c4cb15ec7746faaf5eec8e33b03f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab707c4cb15ec7746faaf5eec8e33b03f">&#9670;&nbsp;</a></span>Rel_Ai</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;arma::sp_mat*&gt; * Game::LCP::Rel_Ai</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00305">305</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="af5550fc44fd355db8e17360abcbf2798"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af5550fc44fd355db8e17360abcbf2798">&#9670;&nbsp;</a></span>Rel_bi</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;arma::vec*&gt; * Game::LCP::Rel_bi</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00305">305</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a060e4a6fa9b9621ffceeb857a9aa1f80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a060e4a6fa9b9621ffceeb857a9aa1f80">&#9670;&nbsp;</a></span>RelAllPol</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;vector&lt;short int&gt;*&gt; * Game::LCP::RelAllPol</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00304">304</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<a id="a187fe2df5192bc2354944d807a361333"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a187fe2df5192bc2354944d807a361333">&#9670;&nbsp;</a></span>RlxdModel</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">GRBModel Game::LCP::RlxdModel</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A gurobi model with all complementarity constraints removed. </p>
-
-<p class="definition">Definition at line <a class="el" href="func_8h_source.html#l00306">306</a> of file <a class="el" href="func_8h_source.html">func.h</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="func_8h_source.html">func.h</a></li>
-<li><a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a></li>
-</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

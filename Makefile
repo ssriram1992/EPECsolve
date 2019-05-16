@@ -73,10 +73,10 @@ sand.o: sand.cpp
 	$(GCC) -c sand.cpp $(OPTS)
 
 docSimple:
-	doxygen refConf
+	doxygen docs/refConf
 
 docDetailed:
-	doxygen refDetConf
+	doxygen docs/refDetConf
 
 edit: 
 	vim -p epecsolve.h Games.cpp LCPtoLP.cpp  Models.cpp EPEC.cpp

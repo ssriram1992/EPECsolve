@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['a',['A',['../structGame_1_1QP__constraints.html#a08f80596adf7184b243f98c563a14fd2',1,'Game::QP_constraints::A()'],['../classGame_1_1MP__Param.html#aa0b31310fd4f138fe3e3771d2b077c3e',1,'Game::MP_Param::A()']]],
-  ['ai',['Ai',['../classGame_1_1LCP.html#a4314aa61aab0123f216d08cf49aff6a2',1,'Game::LCP']]],
-  ['allleadpars',['AllLeadPars',['../classModels_1_1EPEC.html#acf28fdb858db436e1420d430e68e6f2e',1,'Models::EPEC']]],
-  ['allpolyhedra',['AllPolyhedra',['../classGame_1_1LCP.html#a7195e4ed0094fb413a18db3f743c8eda',1,'Game::LCP']]],
-  ['alpha',['alpha',['../structModels_1_1DemPar.html#a698f9479dec96509d9623d450e207d10',1,'Models::DemPar']]]
+  ['beta',['beta',['../structModels_1_1DemPar.html#a3b366b018a89e5affe7a1cc46edcaff4',1,'Models::DemPar']]],
+  ['bigm',['bigM',['../classGame_1_1LCP.html#ab6a2f478a8f4678316edfbf7a3eb19fe',1,'Game::LCP']]]
 ];

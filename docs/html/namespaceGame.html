@@ -105,11 +105,18 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a5de9da6265b1d8233c1969a24a541175"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#a5de9da6265b1d8233c1969a24a541175">operator&lt;&lt;</a> (ostream &amp;os, const <a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;Q)</td></tr>
 <tr class="separator:a5de9da6265b1d8233c1969a24a541175"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa33fd56716c09c955efc6f66576ec15a"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#aa33fd56716c09c955efc6f66576ec15a">operator&lt;&lt;</a> (ostream &amp;ost, const <a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> &amp;C)</td></tr>
+<tr class="separator:aa33fd56716c09c955efc6f66576ec15a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16b26dcd7a86efa5ee74ce6e1d709aea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#a16b26dcd7a86efa5ee74ce6e1d709aea">print</a> (const <a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> &amp;C)</td></tr>
+<tr class="separator:a16b26dcd7a86efa5ee74ce6e1d709aea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa896f1d65157fdcb9d6ebfc88c720a3d"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#aa896f1d65157fdcb9d6ebfc88c720a3d">LPSolve</a> (const arma::sp_mat &amp;A, const arma::vec &amp;b, const arma::vec &amp;c, int &amp;status, bool Positivity=false)</td></tr>
 <tr class="separator:aa896f1d65157fdcb9d6ebfc88c720a3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac29ffc678f24b8184df5da2c9462d72c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#ac29ffc678f24b8184df5da2c9462d72c">ConvexHull</a> (vector&lt; arma::sp_mat * &gt; *Ai, vector&lt; arma::vec * &gt; *bi, arma::sp_mat &amp;A, arma::vec &amp;b, arma::sp_mat Acom={}, arma::vec bcom={})</td></tr>
-<tr class="memdesc:ac29ffc678f24b8184df5da2c9462d72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computing convex hull of finite unioon of polyhedra.  <a href="#ac29ffc678f24b8184df5da2c9462d72c">More...</a><br /></td></tr>
-<tr class="separator:ac29ffc678f24b8184df5da2c9462d72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace813b46bdf72c6c92a3935542d278ef"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#ace813b46bdf72c6c92a3935542d278ef">ConvexHull</a> (const vector&lt; arma::sp_mat * &gt; *Ai, const vector&lt; arma::vec * &gt; *bi, arma::sp_mat &amp;A, arma::vec &amp;b, const arma::sp_mat Acom={}, const arma::vec bcom={})</td></tr>
+<tr class="memdesc:ace813b46bdf72c6c92a3935542d278ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computing convex hull of finite unioon of polyhedra.  <a href="#ace813b46bdf72c6c92a3935542d278ef">More...</a><br /></td></tr>
+<tr class="separator:ace813b46bdf72c6c92a3935542d278ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef0fab49c848e5e89a1cf5b15e6b47dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#aef0fab49c848e5e89a1cf5b15e6b47dc">compConvSize</a> (arma::sp_mat &amp;A, const unsigned int nFinCons, const unsigned int nFinVar, const vector&lt; arma::sp_mat * &gt; *Ai, const vector&lt; arma::vec * &gt; *bi)</td></tr>
+<tr class="memdesc:aef0fab49c848e5e89a1cf5b15e6b47dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">INTERNAL FUNCTION NOT FOR GENERAL USE.  <a href="#aef0fab49c848e5e89a1cf5b15e6b47dc">More...</a><br /></td></tr>
+<tr class="separator:aef0fab49c848e5e89a1cf5b15e6b47dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a534ef5781f97cdeff98979ea3c635471"></a>
@@ -147,8 +154,70 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ac29ffc678f24b8184df5da2c9462d72c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac29ffc678f24b8184df5da2c9462d72c">&#9670;&nbsp;</a></span>ConvexHull()</h2>
+<a id="aef0fab49c848e5e89a1cf5b15e6b47dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef0fab49c848e5e89a1cf5b15e6b47dc">&#9670;&nbsp;</a></span>compConvSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Game::compConvSize </td>
+          <td>(</td>
+          <td class="paramtype">arma::sp_mat &amp;&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>nFinCons</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>nFinVar</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const vector&lt; arma::sp_mat * &gt; *&#160;</td>
+          <td class="paramname"><em>Ai</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const vector&lt; arma::vec * &gt; *&#160;</td>
+          <td class="paramname"><em>bi</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>INTERNAL FUNCTION NOT FOR GENERAL USE. </p>
+<dl class="section warning"><dt>Warning</dt><dd>INTERNAL FUNCTION NOT FOR GENERAL USE. </dd></dl>
+<p>To generate the matrix "A" in <a class="el" href="namespaceGame.html#ace813b46bdf72c6c92a3935542d278ef" title="Computing convex hull of finite unioon of polyhedra.">Game::ConvexHull</a> using batch insertion constructors. This is faster than the original line in the code: A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai-&gt;at(i); Motivation behind this: Response from armadillo:-<a href="https://gitlab.com/conradsnicta/armadillo-code/issues/111">https://gitlab.com/conradsnicta/armadillo-code/issues/111</a> </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>Output parameter </td></tr>
+    <tr><td class="paramname">nFinCons</td><td>Number of rows in final matrix A </td></tr>
+    <tr><td class="paramname">nFinVar</td><td>Number of columns in the final matrix A </td></tr>
+    <tr><td class="paramname">Ai</td><td>Inequality constraints LHS that define polyhedra whose convex hull is to be found </td></tr>
+    <tr><td class="paramname">bi</td><td>Inequality constraints RHS that define polyhedra whose convex hull is to be found </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00480">480</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ace813b46bdf72c6c92a3935542d278ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace813b46bdf72c6c92a3935542d278ef">&#9670;&nbsp;</a></span>ConvexHull()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -156,13 +225,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int Game::ConvexHull </td>
           <td>(</td>
-          <td class="paramtype">vector&lt; arma::sp_mat * &gt; *&#160;</td>
+          <td class="paramtype">const vector&lt; arma::sp_mat * &gt; *&#160;</td>
           <td class="paramname"><em>Ai</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; arma::vec * &gt; *&#160;</td>
+          <td class="paramtype">const vector&lt; arma::vec * &gt; *&#160;</td>
           <td class="paramname"><em>bi</em>, </td>
         </tr>
         <tr>
@@ -180,13 +249,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">arma::sp_mat&#160;</td>
+          <td class="paramtype">const arma::sp_mat&#160;</td>
           <td class="paramname"><em>Acom</em> = <code>{}</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">arma::vec&#160;</td>
+          <td class="paramtype">const arma::vec&#160;</td>
           <td class="paramname"><em>bcom</em> = <code>{}</code>&#160;</td>
         </tr>
         <tr>
@@ -274,12 +343,12 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00469">469</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00534">534</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
 <a id="a5de9da6265b1d8233c1969a24a541175"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5de9da6265b1d8233c1969a24a541175">&#9670;&nbsp;</a></span>operator&lt;&lt;()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5de9da6265b1d8233c1969a24a541175">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -304,7 +373,57 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00038">38</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00043">43</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa33fd56716c09c955efc6f66576ec15a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa33fd56716c09c955efc6f66576ec15a">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ostream&amp; Game::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">ostream &amp;&#160;</td>
+          <td class="paramname"><em>ost</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> &amp;&#160;</td>
+          <td class="paramname"><em>C</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00035">35</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a16b26dcd7a86efa5ee74ce6e1d709aea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16b26dcd7a86efa5ee74ce6e1d709aea">&#9670;&nbsp;</a></span>print()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Game::print </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> &amp;&#160;</td>
+          <td class="paramname"><em>C</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00028">28</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>

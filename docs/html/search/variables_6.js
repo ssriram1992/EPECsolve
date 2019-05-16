@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['finalized',['finalized',['../classModels_1_1EPEC.html#ad930d4d05a1b40ce3ff55428a9fdfcec',1,'Models::EPEC']]],
-  ['followerparam',['FollowerParam',['../structModels_1_1LeadAllPar.html#adf8e44c2a1e3018f3393a2af5ae16ca3',1,'Models::LeadAllPar']]]
+  ['import_5flimit',['import_limit',['../structModels_1_1LeadPar.html#a5a386cd2610335a095d37ed48ac283c1',1,'Models::LeadPar']]]
 ];
