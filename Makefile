@@ -1,9 +1,12 @@
-# Make file for Gurobi projects
-
 # File name and output name
+EPEC_HOME=/home/sriram/Dropbox/code/EPEC/code
+SRC=$(EPEC_HOME)/src
+OBJ=$(EPEC_HOME)/obj
+BIN=$(EPEC_HOME)/bin
+
 PROJECT=EPEC
-FILEEPEC=LCPtoLP.o EPEC.o Games.o Models.o
-OUTPUT=$(PROJECT)
+FILEEPEC=$(OBJ)/LCPtoLP.o $(OBJ)/EPEC.o $(OBJ)/Games.o $(OBJ)/Models.o
+OUTPUT=$(BIN)/$(PROJECT)
 ARGS=
 
 
@@ -29,31 +32,31 @@ OTHEROPTS= -O2 -Wall -Wno-comment -std=c++11
 OPTS= $(GUROPT) $(ARMAOPT)  $(OTHEROPTS)
 
 runEPEC: compileEPEC
-	./$(OUTPUT) $(ARGS)
+	$(OUTPUT) $(ARGS)
 
 valgrind: compileEPEC
 	valgrind --leak-check=full --show-leak-kinds=all  -v ./$(OUTPUT) $(ARGS)
 
 compileEPEC: EPEC
 
-EPEC: LCPtoLP.o Games.o Models.o EPEC.o 
+EPEC: $(FILEEPEC)
 	$(GCC) $(FILEEPEC) $(OPTS) -o $(OUTPUT) 
 
-LCPtoLP.o: epecsolve.h lcptolp.h LCPtoLP.cpp
-	$(GCC) -c LCPtoLP.cpp $(OPTS) 
+$(OBJ)/LCPtoLP.o: $(SRC)/epecsolve.h $(SRC)/lcptolp.h $(SRC)/LCPtoLP.cpp
+	$(GCC) -c $(SRC)/LCPtoLP.cpp $(OPTS) -o $(OBJ)/LCPtoLP.o
 
-EPEC.o: epecsolve.h models.h EPEC.cpp
-	$(GCC) -c EPEC.cpp $(OPTS)
+$(OBJ)/EPEC.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/EPEC.cpp
+	$(GCC) -c $(SRC)/EPEC.cpp $(OPTS) -o $(OBJ)/EPEC.o
 
-Games.o: epecsolve.h games.h Games.cpp
-	$(GCC) -c Games.cpp $(OPTS)
+$(OBJ)/Games.o: $(SRC)/epecsolve.h $(SRC)/games.h $(SRC)/Games.cpp
+	$(GCC) -c $(SRC)/Games.cpp $(OPTS) -o $(OBJ)/Games.o
 
-Models.o: epecsolve.h models.h Models.cpp
-	$(GCC) -c Models.cpp $(OPTS)
+$(OBJ)/Models.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/Models.cpp
+	$(GCC) -c $(SRC)/Models.cpp $(OPTS) -o $(OBJ)/Models.o
 
 clean:
 	rm -rf $(OUTPUT)
-	rm -rf *.o
+	rm -rf $(OBJ)/*.o
 
 sand: sand.o
 	$(GCC) sand.o $(OPTS) -o sand
