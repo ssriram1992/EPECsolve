@@ -17,3 +17,4 @@ tags
 *.lp
 *.log
 src/Gams*
+.ipynb_checkpoints/

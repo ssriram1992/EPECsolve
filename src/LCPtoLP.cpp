@@ -454,7 +454,7 @@ int Game::ConvexHull(
 	for(unsigned int j=0; j<nC;j++)
 	{
 		A.at(FirstCons+2*j, j) = -1;
-		A.at(FirstCons+2*j, j) = 1;
+		A.at(FirstCons+2*j+1, j) = 1;
 	}
 	// Third Constraint RHS
 	b.at(FirstCons + nC*2) = 1;

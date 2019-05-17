@@ -68,7 +68,7 @@ edit:
 	vim -p src/epecsolve.h src/Games.cpp src/LCPtoLP.cpp  src/Models.cpp src/EPEC.cpp
 
 tag:
-	ctags *.cpp *.h
+	ctags src/*.cpp src/*.h
 	@echo "All tags done. Use Ctrl+] to follow a tag in vim and Ctrl+O to go back"
 
 

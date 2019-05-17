@@ -28,7 +28,7 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 		try{epec.testQP(1);}catch(...){}
 		epec.testCountry(1);
 		epec.testCountry(0);
-		// epec.findNashEq(true);
+		epec.findNashEq(true);
 		cout<<"--------------------------------------------------Printing Locations--------------------------------------------------\n";
 		for(unsigned int i = 0; i<epec.nCountries; i++)
 		{
@@ -54,50 +54,47 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 int main()
 {
 	Models::DemPar P;
-	Models::FollPar FP, FP2, FP3, FP1;
+	Models::FollPar FP, FP2, FP3, FP1, FP3a;
 
-	Models::LeadPar L (0.3,1,1,-1);
+	Models::LeadPar L (0.4,-1,-1,-1);
 
 	FP1.capacities = {1000};
 	FP1.costs_lin = {10};
 	FP1.costs_quad = {0.1};
 	FP1.emission_costs = {0};
 
-	
 	FP.capacities = {10, 15};
 	FP.costs_lin = {0, 4};
 	FP.costs_quad = {0, 40}; 
 	FP.emission_costs = {0, 0}; 
 
-
 	FP2.capacities = {10, 10};
 	FP2.costs_lin = {30, 50};
 	FP2.costs_quad = {20, 40}; 
 	FP2.emission_costs = {10, 0}; 
-/*
 
-	FP3.capacities = {10, 15, 5};
-	FP3.costs_lin = {30, 40, 5};
+	FP3.capacities = {10, 15, 50};
+	FP3.costs_lin = {30, 32, 5};
 	FP3.costs_quad = {60, 40, 10}; 
-	FP3.emission_costs = {0, 0, 10}; 
+	FP3.emission_costs = {0, 1, 10}; 
+	FP3.names = {"Solar producer", "Gas producer", "Coal producer"};
 
-
-
-	Models::LeadAllPar LA(2, "A", FP);
-	Models::LeadAllPar LA1(1, "A1", FP1);
-	Models::LeadAllPar LA1b(1, "A2", FP1);
-	Models::LeadAllPar LA2(2, "B", FP2, {60,1});
-	Models::LeadAllPar LA3(3, "C", FP3, {90,1});
-	*/
+	FP3a.capacities = {10, 15, 50};
+	FP3a.costs_lin = {30, 32, 5};
+	FP3a.costs_quad = {60, 40, 10}; 
+	FP3a.emission_costs = {0, 1, 10}; 
+	FP3a.names = {"Solar producer", "Gas producer", "Coal producer"};
+/*
+*/
 
 	// Two followers Leader with price cap
-	Models::LeadAllPar LA_pc1(1, "LA_pc1", FP1, {40,0.10}, L );
-	Models::LeadAllPar LA_pc2(2, "LA_pc2", FP2, {60,0.25}, L );
+	Models::LeadAllPar LA_pc1(3, "USA", FP3, {40,0.10}, {0.4, -1, -1, -1});
+	Models::LeadAllPar LA_pc2(3, "China", FP3, {60,0.25}, {0.4, -1, -1, -1});
 
 	// cout<<LA<<LA2;
 	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
 	arma::mat TrCo(2,2); 
-	TrCo << 0 << 0<< arma::endr << 0 <<0;
+	TrCo << 0 << 0.5<< arma::endr << 0.5 <<0;
 	LCPtest(LA_pc1, LA_pc2, arma::sp_mat(TrCo));
 
 

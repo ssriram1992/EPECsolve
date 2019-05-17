@@ -821,9 +821,7 @@ Models::EPEC::findNashEq(bool write, string  filename)
 	lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame)); 
 	lcp->bigM = 1e7;
 
-	;
-
-	this->lcpmodel = lcp->LCPasQP(false);
+	this->lcpmodel = lcp->LCPasMIP(false);
 
 	Nvar = nashgame->getNprimals()+nashgame->getNduals()+nashgame->getNshadow()+nashgame->getNleaderVars();
 	if(write) 
@@ -842,16 +840,16 @@ Models::EPEC::findNashEq(bool write, string  filename)
 		}
 		}
 		catch(GRBException &e) {cerr<<"GRBException in Models::EPEC::findNashEq : "<<e.getErrorCode()<<": "<<e.getMessage()<<" "<<temp<<endl;;}
-		this->sol_x.save("x_"+filename, arma::file_type::arma_ascii, VERBOSE);
-		this->sol_z.save("z_"+filename, arma::file_type::arma_ascii, VERBOSE);
-		lcpmodel->write("My_model.lp");
+		this->sol_x.save("dat/x_"+filename, arma::file_type::arma_ascii, VERBOSE);
+		this->sol_z.save("dat/z_"+filename, arma::file_type::arma_ascii, VERBOSE);
+		lcpmodel->write("dat/My_model.lp");
 		try{
-		this->WriteCountry(0, "temp.txt",this->sol_x, false);
-		this->WriteCountry(1, "temp.txt",this->sol_x);
-		this->write("temp.txt", true);
+			this->WriteCountry(0, "dat/temp.txt",this->sol_x, false);
+			this->WriteCountry(1, "dat/temp.txt",this->sol_x);
+			this->write("dat/temp.txt", true);
 		}
 		catch(GRBException &e){}
-		Game::print(lcp->getCompl());
+		if(VERBOSE) Game::print(lcp->getCompl());
 	}
 }
 
@@ -934,7 +932,7 @@ void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const
 { 
 	if(!lcp) return;
-	const LeadLocs& Loc = this->Locations.at(i);
+	// const LeadLocs& Loc = this->Locations.at(i);
 
 	ofstream file;
 	file.open(filename,append?ios::app:ios::out); 
@@ -945,14 +943,14 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
 	file<<"**************************************************\n\n";
 	// Country Variables
 	unsigned int foll_prod;
-	foll_prod = Loc.at(Models::LeaderVars::FollowerStart);
+	foll_prod = this->getPosition(i, Models::LeaderVars::FollowerStart);
 	// Domestic production
 	double prod{0};
 	for(unsigned int j=0;j<Params.n_followers;++j) prod+= x.at(foll_prod+j);
 	// Trade
-	double Export{x.at(Loc.at(Models::LeaderVars::NetExport))};
+	double Export{x.at(this->getPosition(i, Models::LeaderVars::NetExport))};
 	double import{0};
-	for(unsigned int j=Loc.at(Models::LeaderVars::CountryImport); j<Loc.at(Models::LeaderVars::CountryImport+1); ++j)
+	for(unsigned int j=this->getPosition(i, Models::LeaderVars::CountryImport); j<this->getPosition(i, Models::LeaderVars::CountryImport+1); ++j)
 		import += x.at(j);
 	// Writing national level details
 	file<<Models::prn::label<<"Domestic production"<<":"<<Models::prn::val<<prod<<"\n";
@@ -960,8 +958,8 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
 		file<<Models::prn::label<<"Net exports"<<":"<<Models::prn::val<<Export-import<<"\n";
 	else
 		file<<Models::prn::label<<"Net imports"<<":"<<Models::prn::val<<import-Export<<"\n";
-	file<<Models::prn::label<<" -Total Export"<<":"<<Models::prn::val<<Export<<"\n";
-	file<<Models::prn::label<<" -Total Import"<<":"<<Models::prn::val<<import<<endl;
+	file<<Models::prn::label<<" -> Total Export"<<":"<<Models::prn::val<<Export<<"\n";
+	file<<Models::prn::label<<" -> Total Import"<<":"<<Models::prn::val<<import<<endl;
 	file<<Models::prn::label<<"Domestic consumed quantity"<<":"<<Models::prn::val<<import-Export+prod<<"\n";
 	file<<Models::prn::label<<"Domestic price"<<":"<<Models::prn::val<<Params.DemandParam.alpha - Params.DemandParam.beta*(import-Export+prod)<<"\n";
 
@@ -983,14 +981,18 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
 	file.open(filename,ios::app);
 
 	// Country Variables
-	const LeadLocs& Loc = this->Locations.at(i);
 	const LeadAllPar &Params = this->AllLeadPars.at(i);
 	unsigned int foll_prod, foll_tax,  foll_lim;
-	foll_prod = Loc.at(Models::LeaderVars::FollowerStart);
-	foll_tax = Loc.at(Models::LeaderVars::Tax);
-	foll_lim = Loc.at(Models::LeaderVars::Caps);
+	foll_prod = this->getPosition(i, Models::LeaderVars::FollowerStart);
+	foll_tax = this->getPosition(i, Models::LeaderVars::Tax);
+	foll_lim = this->getPosition(i, Models::LeaderVars::Caps);
 
-	file<<"\nFollower "<<j<<"\n\n";//<<" named "<<Params.FollowerParam.names.at(j)<<"\n";
+	string name;
+	try{ name = Params.name + " --- "+ Params.FollowerParam.names.at(j); }
+	catch(...) { name = "Follower "+to_string(j)+ " of leader "+to_string(i); }
+
+	file<<"\n"<<name<<"\n\n";//<<" named "<<Params.FollowerParam.names.at(j)<<"\n";
+	
 	const double q = x.at(foll_prod+j);
 	const double tax = x.at(foll_tax+j);
 	const double lim = x.at(foll_lim+j);
@@ -998,9 +1000,12 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
 	const double quad = Params.FollowerParam.costs_quad.at(j);
 
 	file<<Models::prn::label<<"Quantity produced"<<":"<<Models::prn::val<<q<<endl;
+	// file<<"x(): "<<foll_prod+j<<endl;
 	file<<Models::prn::label<<"Capacity of production"<<":"<<Models::prn::val<<Params.FollowerParam.capacities.at(j)<<"\n";
 	file<<Models::prn::label<<"Limit on production"<<":"<<Models::prn::val<<lim<<"\n";
+	// file<<"x(): "<<foll_lim+j<<endl;
 	file<<Models::prn::label<<"Tax imposed"<<":"<<Models::prn::val<<tax<<"\n";
+	// file<<"x(): "<<foll_tax+j<<endl;
 	file<<Models::prn::label<<"  -Production cost function"<<":"<<"\t C(q) = ("<<lin<<" + tax)*q + 0.5*"<<quad<<"*q^2\n"<<Models::prn::label<<" "<<"="<<Models::prn::val<<(lin+tax)*q + 0.5*quad*q*q<<"\n";
 	file<<Models::prn::label<<"  -Marginal cost of production"<<":"<<Models::prn::val<<quad*q+lin+tax<<"\n";
 	file<<Models::prn::label<<"Emission cost"<<":"<<Models::prn::val<<Params.FollowerParam.emission_costs.at(j)<<endl;
@@ -1012,14 +1017,16 @@ void Models::EPEC::testQP(const unsigned int i)
 {
 	QP_Param *QP = this->country_QP.at(i).get();
 	arma::vec x;
-	x.zeros(QP->getNx());
+	cout<<*QP<<endl;
+	x.ones(QP->getNx());
+	cout<<"x is ones of size "<<x.n_rows<<endl;
 	std::unique_ptr<GRBModel> model = QP->solveFixed(x);
-	model->write("My_model"+to_string(i)+".lp");
+	model->write("dat/My_model"+to_string(i)+".lp");
 	arma::vec sol;
 	sol.set_size(QP->getNy());
 	for(unsigned int j = 0; j<QP->getNy(); ++j)
 		sol.at(j) = model->getVarByName("y_"+to_string(j)).get(GRB_DoubleAttr_X);
-	sol.save("sol_"+to_string(i)+".txt", arma::arma_ascii);
+	sol.save("dat/sol_"+to_string(i)+".txt", arma::arma_ascii);
 }
 
 void Models::EPEC::testCountry(const unsigned int i)
@@ -1028,5 +1035,5 @@ void Models::EPEC::testCountry(const unsigned int i)
 	 LCP CountryLCP = LCP(this->env,*country);
 	 cout<<"*** COUNTRY TEST***\n";
 	 auto model = CountryLCP.LCPasMIP(true);
-	 model->write("My_"+to_string(i)+"_model.lp");
+	 model->write("dat/My_"+to_string(i)+"_model.lp");
 }

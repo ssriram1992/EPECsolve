@@ -237,6 +237,7 @@ Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
 			model->addConstr(LHS, GRB_LESS_EQUAL, b[i]-Ax[i]);
 		}
 		model->update();
+		// model->write("abc.lp");
 		model->optimize();
 	}
 	catch(const char* e) { cerr<<" Error in Game::QP_Param::solveFixed: "<<e<<endl; throw;}
