@@ -244,9 +244,6 @@ Models::EPEC::make_LL_LeadCons(arma::sp_mat &LeadCons, ///< The LHS matrix of le
 		LeadCons.at(Params.n_followers+1+import_lim_cons+export_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = Params.DemandParam.beta;
 		LeadRHS.at(Params.n_followers+1+import_lim_cons+export_lim_cons) = Params.LeaderParam.price_limit - Params.DemandParam.alpha;
 	}
-	LeadCons.impl_print_dense("LeadCons");
-	cout<<price_lim_cons;
-	LeadRHS.print("LeadRHS");
 }
 
 Models::EPEC& 
@@ -310,7 +307,6 @@ Models::EPEC::addCountry(
 	if(Params.LeaderParam.import_limit >= 0) import_lim_cons = 1;
 	if(Params.LeaderParam.export_limit >= 0) export_lim_cons = 1;
 	if(Params.LeaderParam.price_limit  >  0) price_lim_cons  = 1; 
-	cout<<"Price limit: "<<price_lim_cons<<endl;
 
 	// cout<<" In addCountry: "<<Loc[Models::LeaderVars::End]<<endl;
 	arma::sp_mat LeadCons(import_lim_cons+	// Import limit constraint
@@ -472,7 +468,6 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 		{
 			cout<<endl<<" ______ "<<endl;
 			for(auto v:Loc) cout<<v.first<<"\t\t\t"<<v.second<<endl;
-			a.print();
 			cout<<endl<<" ______ "<<endl;
 		}
 
@@ -815,7 +810,7 @@ Models::EPEC::findNashEq(bool write, string  filename)
 	arma::vec MCRHS; MCRHS.set_size(0);
 	arma::vec dumb; dumb.set_size(0);
 	this->make_MC_cons(MC, MCRHS);
-	MC.print();
+	// MC.print();
 	this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb));
 	cout<<*nashgame<<endl;
 	lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame)); 
@@ -1006,7 +1001,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
 	// file<<"x(): "<<foll_lim+j<<endl;
 	file<<Models::prn::label<<"Tax imposed"<<":"<<Models::prn::val<<tax<<"\n";
 	// file<<"x(): "<<foll_tax+j<<endl;
-	file<<Models::prn::label<<"  -Production cost function"<<":"<<"\t C(q) = ("<<lin<<" + tax)*q + 0.5*"<<quad<<"*q^2\n"<<Models::prn::label<<" "<<"="<<Models::prn::val<<(lin+tax)*q + 0.5*quad*q*q<<"\n";
+	file<<Models::prn::label<<"  -Production cost function"<<":"<<"\t C(q) = ("<<lin<<" + "<<tax<<")*q + 0.5*"<<quad<<"*q^2\n"<<Models::prn::label<<" "<<"="<<Models::prn::val<<(lin+tax)*q + 0.5*quad*q*q<<"\n";
 	file<<Models::prn::label<<"  -Marginal cost of production"<<":"<<Models::prn::val<<quad*q+lin+tax<<"\n";
 	file<<Models::prn::label<<"Emission cost"<<":"<<Models::prn::val<<Params.FollowerParam.emission_costs.at(j)<<endl;
 

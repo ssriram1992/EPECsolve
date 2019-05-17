@@ -178,7 +178,7 @@ Game::LCP::makeRelaxed()
 	{
 		if(this->madeRlxdModel) return ;
 		GRBVar x[nC], z[nR];
-		cout<<"In LCP::makeRelaxed(): "<<nR<<" "<<nC<<endl;
+		if(VERBOSE) cout<<"In LCP::makeRelaxed(): "<<nR<<" "<<nC<<endl;
 		for(unsigned int i=0;i <nC;i++) x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "x_"+to_string(i));
 		for(unsigned int i=0;i <nR;i++) z[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "z_"+to_string(i));
 		for(unsigned int i=0;i <nR;i++)
@@ -472,7 +472,7 @@ int Game::ConvexHull(
 					nFinCons-1, nC-1 // nFinVar-1
 					) = Acom;*/
 	}
-	cout<<"A"<<A.n_rows<<" "<<A.n_cols<<endl;
+	if(VERBOSE) cout<<"A"<<A.n_rows<<" "<<A.n_cols<<endl;
 	return 0;
 }
 
