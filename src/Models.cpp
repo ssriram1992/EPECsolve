@@ -479,7 +479,8 @@ finalize()
         {
             Game::QP_objective QP_obj;
             this->add_Dummy_Lead(i);
-            this->make_MC_leader(i);
+            if (this->nCountries > 1)
+                this->make_MC_leader(i);
             this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
             this->make_obj_leader(i, *this->LeadObjec.at(i).get());
         }
@@ -829,10 +830,12 @@ Models::EPEC::make_country_QP()
         // Location details
         Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy, convHullVarCount);
         // All other players' QP
-        for (unsigned int j = 0; j < this->nCountries; j++) {
-            if (i != j)
-                this->country_QP.at(j)->addDummy(convHullVarCount, 0);
-            this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
+        if (this->nCountries > 1) {
+            for (unsigned int j = 0; j < this->nCountries; j++) {
+                if (i != j)
+                    this->country_QP.at(j)->addDummy(convHullVarCount, 0);
+                this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
+            }
         }
     }
     this->computeLeaderLocations(true);
@@ -887,6 +890,8 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
 
 void
 Models::EPEC::findNashEq(bool write, string filename) {
+    if (this->nCountries < 2)
+        cerr << "Error in EPEC::findNashEq: cannot compute nash equilibrium with less than 2 countries.";
     auto Nvar = this->country_QP.front().get()->getNx() + this->country_QP.front().get()->getNy();
     arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
     arma::vec MCRHS;
@@ -1001,7 +1006,8 @@ Models::EPEC::write(const string filename, bool append) const {
 
 void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const {
-    if (!lcp) return;
+    @todo remove the comment on the following line
+    //if (!lcp) return;
     // const LeadLocs& Loc = this->Locations.at(i);
 
     ofstream file;
@@ -1096,16 +1102,16 @@ void Models::EPEC::testQP(const unsigned int i) {
     arma::vec x;
     if (VERBOSE) cout << *QP << endl;
     x.ones(QP->getNx());
-    if (VERBOSE) cout << "x is ones of size " << x.n_rows << endl;
+    if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
     std::unique_ptr<GRBModel> model = QP->solveFixed(x);
     model->write("dat/CountryQP_" + to_string(i) + ".lp");
-    /*
-   arma::vec sol;
-   sol.zeros(QP->getNy());
-   for (unsigned int j = 0; j < QP->getNy(); ++j)
-       sol.at(j) = model->getVarByName("y_" + to_string(j)).get(GRB_DoubleAttr_X);
-   sol.save("dat/sol_" + to_string(i) + ".txt", arma::arma_ascii);
-    */
+    arma::vec sol;
+    sol.zeros(QP->getNy());
+    for (unsigned int j = 0; j < QP->getNy(); ++j)
+        sol.at(j) = model->getVarByName("y_" + to_string(j)).get(GRB_DoubleAttr_X);
+    sol.save("dat/QP_Sol_" + to_string(i) + ".txt", arma::arma_ascii);
+    this->WriteCountry(0, "dat/temp.txt", sol, false);
+
 }
 
 void Models::EPEC::testCountry(const unsigned int i) {
@@ -1115,4 +1121,14 @@ void Models::EPEC::testCountry(const unsigned int i) {
     cout << "*** COUNTRY TEST***\n";
     auto model = CountryLCP.LCPasMIP(true);
     model->write("dat/CountryLCP_" + to_string(i) + ".lp");
+    try {
+        GRBVar *vars = model->getVars();
+        int i = 0;
+        for (GRBVar *p = vars; i < model->get(GRB_IntAttr_NumVars); i++, p++) {
+            cout << p->get(GRB_StringAttr_VarName) << ":" << p->get(GRB_DoubleAttr_X) << endl;
+        }
+    }
+    catch (GRBException &e) {
+        cerr << "GRBException in Models::EPEC::testCountry: " << e.getErrorCode() << ": " << e.getMessage() << endl;
+    }
 }
