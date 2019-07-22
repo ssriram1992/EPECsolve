@@ -3,8 +3,66 @@
 #include "games.h"
 #include<armadillo>
 #include<array>
+#include <algorithm>
 
 using namespace std;
+
+bool Game::isZero(arma::mat M, double tol) {
+    return (arma::min(arma::min(abs(M))) <= tol);
+}
+
+bool Game::isZero(arma::sp_mat M, double tol) {
+    return (arma::min(arma::min(abs(M))) <= tol);
+}
+// bool Game::isZero(arma::vec M, double tol)
+// {
+// return(arma::min(abs(M)) <= tol);
+// }
+
+// Armadillo patch for inbuild resize
+// For arma::sp_mat
+arma::sp_mat Game::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC) {
+    arma::sp_mat MMat(nR, nC);
+    MMat.zeros();
+    if (nR >= Mat.n_rows && nC >= Mat.n_cols)
+        MMat.submat(0, 0,  (Mat.n_rows - 1>0) ? (Mat.n_rows - 1) : 0, (Mat.n_cols - 1>0) ? (Mat.n_cols - 1) : 0) = Mat;
+    else {
+        if (nR <= Mat.n_rows && nC <= Mat.n_cols)
+            MMat = Mat.submat(0, 0, nR, nC);
+        else
+            throw string(
+                    "Error in resize() - the patch for arma::resize. Either both dimension should be larger or both should be smaller!");
+    }
+    return MMat;
+}
+
+// For arma::mat
+arma::mat Game::resize_patch(const arma::mat &Mat, const unsigned int nR, const unsigned int nC) {
+    arma::mat MMat(nR, nC);
+    MMat.zeros();
+    if (nR >= Mat.n_rows && nC >= Mat.n_cols)
+        MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
+    else {
+        if (nR <= Mat.n_rows && nC <= Mat.n_cols)
+            MMat = Mat.submat(0, 0, nR, nC);
+        else
+            throw string(
+                    "Error in resize() - the patch for arma::resize. Either both dimension should be larger or both should be smaller!");
+    }
+    return MMat;
+}
+
+// For arma::vec
+arma::vec Game::resize_patch(const arma::vec &Mat, const unsigned int nR) {
+    arma::vec MMat(nR);
+    MMat.zeros();
+    if (nR > Mat.n_rows)
+        MMat.subvec(0, Mat.n_rows - 1) = Mat;
+    else
+        MMat = Mat.subvec(0, nR);
+    return MMat;
+}
+
 
 template
         <class T>
@@ -84,14 +142,37 @@ Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars, i
     this->Nx += pars;
     this->Ny += vars;
     if (vars) {
-        Q.resize(this->Ny, this->Ny);
-        B.resize(this->Ncons, this->Ny);
-        c.resize(this->Ny);
+        Q = resize_patch(Q, this->Ny, this->Ny);
+        B = resize_patch(B, this->Ncons, this->Ny);
+        c = resize_patch(c, this->Ny);
     }
-    if (pars)
-        A.resize(this->Ncons, this->Nx);
-    if (vars || pars)
-        C.resize(this->Ny, this->Nx);
+    switch (position) {
+        case -1:
+            if (pars)
+                A = resize_patch(A, this->Ncons, this->Nx);
+            if (vars || pars)
+                C = resize_patch(C, this->Ny, this->Nx);
+            break;
+        case 0:
+            if (pars)
+                A = arma::join_rows(arma::zeros<arma::sp_mat>(this->Ncons, pars), A);
+            if (vars || pars) {
+                C = resize_patch(C, this->Ny, C.n_cols);
+                C = arma::join_rows(arma::zeros<arma::sp_mat>(this->Ny, pars), C);
+            }
+            break;
+        default:
+            if (pars) {
+                auto A_temp = arma::join_rows(A.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ncons, pars));
+                A = arma::join_rows(A_temp, A.cols(position, A.n_cols - 1));
+            }
+            if (vars || pars) {
+                C = resize_patch(C, this->Ny, C.n_cols);
+                auto C_temp = arma::join_rows(C.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ny, pars));
+                C = arma::join_rows(C_temp, C.cols(position, C.n_cols - 1));
+            }
+            break;
+    };
 
     return *this;
 }
@@ -250,6 +331,16 @@ bool Game::MP_Param::dataCheck(const QP_objective &obj, const QP_constraints &co
     return true;
 }
 
+bool Game::QP_Param::operator==(const QP_Param &Q2) const {
+    if (!Game::isZero(this->Q - Q2.getQ())) return false;
+    if (!Game::isZero(this->C - Q2.getC())) return false;
+    if (!Game::isZero(this->A - Q2.getA())) return false;
+    if (!Game::isZero(this->B - Q2.getB())) return false;
+    if (!Game::isZero(this->c - Q2.getc())) return false;
+    if (!Game::isZero(this->b - Q2.getb())) return false;
+    return true;
+}
+
 
 int
 Game::QP_Param::make_yQy()
@@ -277,10 +368,10 @@ unique_ptr<GRBModel>
 Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
 )
 /**
- * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality. 
+ * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality.
  *
  * In terms of game theory, this can be viewed as <i>the best response</i> for a set of decisions by other players.
- * 
+ *
  */
 {
     this->make_yQy();
@@ -306,6 +397,7 @@ Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
             model->addConstr(LHS, GRB_LESS_EQUAL, b[i] - Ax[i]);
         }
         model->update();
+        model->set(GRB_IntParam_OutputFlag, 0);
         // model->write("abc.lp");
         model->optimize();
     }
@@ -329,40 +421,32 @@ Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
     return model;
 }
 
-Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars, int position)
+
+Game::QP_Param& Game::QP_Param::addDummy(unsigned int pars, unsigned int vars, int position)
 /**
  * @warning You might have to rerun QP_Param::KKT since you have now changed the QP.
  * @warning This implies you might have to rerun NashGame::FormulateLCP again too.
  */
 {
-    if (VERBOSE && (pars || vars))
-        cout
-                << "From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.\n";
+    if(VERBOSE && (pars||vars)) cout<<"From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.\n";
 
     // Call the superclass function
-    try { MP_Param::addDummy(pars, vars, position); }
-    catch (const char *e) {
-        cerr << " Error in Game::QP_Param::addDummy: " << e << endl;
-        throw;
-    }
-    catch (string e) {
-        cerr << "String: Error in Game::QP_Param::addDummy: " << e << endl;
-        throw;
-    }
-    catch (exception &e) {
-        cerr << "Exception: Error in Game::QP_Param::addDummy: " << e.what() << endl;
-        throw;
-    }
+    try{ MP_Param::addDummy(pars, vars, position); }
+    catch(const char* e) { cerr<<" Error in Game::QP_Param::addDummy: "<<e<<endl; throw;}
+    catch(string e) { cerr<<"String: Error in Game::QP_Param::addDummy: "<<e<<endl; throw;}
+    catch(exception &e) { cerr<<"Exception: Error in Game::QP_Param::addDummy: "<<e.what()<<endl; throw;}
 
     return *this;
 }
+
+
 
 unsigned int
 Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N, arma::vec &q) const
 /// @brief Compute the KKT conditions for the given QP
 /**
  * Writes the KKT condition of the parameterized QP
- * As per the convention, y is the decision variable for the QP and 
+ * As per the convention, y is the decision variable for the QP and
  * that is parameterized in x
  * The KKT conditions are
  * \f$0 \leq y \perp  My + Nx + q \geq 0\f$
@@ -428,7 +512,7 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
                          arma::sp_mat LeadA, arma::vec LeadRHS) : LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /**
  * @brief
- * Construct a NashGame by giving a vector of pointers to 
+ * Construct a NashGame by giving a vector of pointers to
  * QP_Param, defining each player's game
  * A set of Market clearing constraints and its RHS
  * And if there are leader variables, the number of leader vars.
@@ -438,11 +522,11 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
  * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
  *
- * In the correct ordering of variables, have the 
- * Market clearing equations ready. 
+ * In the correct ordering of variables, have the
+ * Market clearing equations ready.
  *
  * Now call this constructor.
- * It will allocate appropriate space for the dual variables 
+ * It will allocate appropriate space for the dual variables
  * for each player.
  *
  */
@@ -508,7 +592,7 @@ Game::NashGame::FormulateLCP(
         string M_name,        ///< File name to be used to write  M
         string q_name        ///< File name to be used to write  M
 ) const {
-/// @brief Formulates the LCP corresponding to the Nash game. 
+/// @brief Formulates the LCP corresponding to the Nash game.
 /// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
 /**
  * Computes the KKT conditions for each Player, calling QP_Param::KKT. Arranges them systematically to return M, q
@@ -622,7 +706,7 @@ arma::sp_mat
 Game::NashGame::RewriteLeadCons() const
 /** @brief Rewrites leader constraint adjusting for dual variables.
  * Rewrites leader constraints given earlier with added empty columns and spaces corresponding to Market clearing duals and other equation duals.
- * 
+ *
  * This becomes important if the Lower level complementarity problem is passed to LCP with upper level constraints.
  */
 {
@@ -698,7 +782,6 @@ Game::NashGame &Game::NashGame::addDummy(unsigned int par, int position)
     this->set_positions();
     return *this;
 }
-
 Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
 /**
  * @brief Adds Leader constraint to a NashGame object.
@@ -710,7 +793,7 @@ Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
         throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible --- ") + to_string(a.n_elem) +
               string(" != ") + to_string(nC);
     auto nR = this->LeaderConstraints.n_rows;
-    this->LeaderConstraints.resize(nR + 1, nC);
+    this->LeaderConstraints.resize( nR + 1, nC);
     // (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
     LeaderConstraints.row(nR) = a.t();
     this->LeaderConsRHS.resize(nR + 1);

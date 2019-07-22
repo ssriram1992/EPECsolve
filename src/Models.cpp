@@ -744,9 +744,9 @@ Models::EPEC &
 Models::EPEC::unlock()
 /**
  * @brief Unlocks an EPEC model
- * @details A finalized model cannot be edited unless it is unlocked first. 
+ * @details A finalized model cannot be edited unless it is unlocked first.
  * @internal EPEC::finalize() performs "finalizing" acts on an object.
- * @warning Exclusively for debugging purposes for developers. Don't call this function, unless you know what you are doing. 
+ * @warning Exclusively for debugging purposes for developers. Don't call this function, unless you know what you are doing.
  */
 {
     this->finalized = false;
@@ -815,7 +815,7 @@ Models::EPEC::make_country_QP()
 /**
  * @brief Makes the Game::QP_Param for all the countries
  * @details
- * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for each valid @p i 
+ * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for each valid @p i
  * @note Overloaded as EPEC::make_country_QP(unsigned int)
  */
 {
@@ -890,8 +890,6 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
 
 void
 Models::EPEC::findNashEq(bool write, string filename) {
-    if (this->nCountries < 2)
-        cerr << "Error in EPEC::findNashEq: cannot compute nash equilibrium with less than 2 countries.";
     auto Nvar = this->country_QP.front().get()->getNx() + this->country_QP.front().get()->getNy();
     arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
     arma::vec MCRHS;
@@ -1006,8 +1004,7 @@ Models::EPEC::write(const string filename, bool append) const {
 
 void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const {
-    @todo remove the comment on the following line
-    //if (!lcp) return;
+    if (!lcp) return;
     // const LeadLocs& Loc = this->Locations.at(i);
 
     ofstream file;
@@ -1102,6 +1099,7 @@ void Models::EPEC::testQP(const unsigned int i) {
     arma::vec x;
     if (VERBOSE) cout << *QP << endl;
     x.ones(QP->getNx());
+    cout << "x is "<<x<<endl;
     if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
     std::unique_ptr<GRBModel> model = QP->solveFixed(x);
     model->write("dat/CountryQP_" + to_string(i) + ".lp");

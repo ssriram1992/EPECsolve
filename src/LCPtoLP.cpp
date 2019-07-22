@@ -998,9 +998,10 @@ Game::LCP::makeQP(
     const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};
     // Resizing entities.
     QP_cons.A.zeros(Ncons, Nx_old);
+    //QP_cons.B.zeros();
     QP_obj.c.resize(Ny);
-    QP_obj.C.resize(Ny, Nx_old);
-    QP_obj.Q.resize(Ny, Ny);
+    resize_patch(QP_obj.C,Ny,Nx_old);
+    resize_patch(QP_obj.Q,Ny,Ny);
     // Setting the QP_Param object
     QP.set(QP_obj, QP_cons);
     return *this;
