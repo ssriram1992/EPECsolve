@@ -1,11 +1,12 @@
 #ifndef EPECSOLVE_H
 #define EPECSOLVE_H
 
-#define VERBOSE false
+#define VERBOSE true
 
 #include <map>
 #include <iostream>
 #include <vector>
+#include<armadillo>
 
 using namespace std;
 

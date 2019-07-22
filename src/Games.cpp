@@ -368,10 +368,10 @@ unique_ptr<GRBModel>
 Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
 )
 /**
- * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality.
+ * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality. 
  *
  * In terms of game theory, this can be viewed as <i>the best response</i> for a set of decisions by other players.
- *
+ * 
  */
 {
     this->make_yQy();
@@ -446,7 +446,7 @@ Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N, arma::vec &q) const
 /// @brief Compute the KKT conditions for the given QP
 /**
  * Writes the KKT condition of the parameterized QP
- * As per the convention, y is the decision variable for the QP and
+ * As per the convention, y is the decision variable for the QP and 
  * that is parameterized in x
  * The KKT conditions are
  * \f$0 \leq y \perp  My + Nx + q \geq 0\f$
@@ -512,7 +512,7 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
                          arma::sp_mat LeadA, arma::vec LeadRHS) : LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /**
  * @brief
- * Construct a NashGame by giving a vector of pointers to
+ * Construct a NashGame by giving a vector of pointers to 
  * QP_Param, defining each player's game
  * A set of Market clearing constraints and its RHS
  * And if there are leader variables, the number of leader vars.
@@ -522,11 +522,11 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
  * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
  *
- * In the correct ordering of variables, have the
- * Market clearing equations ready.
+ * In the correct ordering of variables, have the 
+ * Market clearing equations ready. 
  *
  * Now call this constructor.
- * It will allocate appropriate space for the dual variables
+ * It will allocate appropriate space for the dual variables 
  * for each player.
  *
  */
@@ -592,7 +592,7 @@ Game::NashGame::FormulateLCP(
         string M_name,        ///< File name to be used to write  M
         string q_name        ///< File name to be used to write  M
 ) const {
-/// @brief Formulates the LCP corresponding to the Nash game.
+/// @brief Formulates the LCP corresponding to the Nash game. 
 /// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
 /**
  * Computes the KKT conditions for each Player, calling QP_Param::KKT. Arranges them systematically to return M, q
@@ -706,7 +706,7 @@ arma::sp_mat
 Game::NashGame::RewriteLeadCons() const
 /** @brief Rewrites leader constraint adjusting for dual variables.
  * Rewrites leader constraints given earlier with added empty columns and spaces corresponding to Market clearing duals and other equation duals.
- *
+ * 
  * This becomes important if the Lower level complementarity problem is passed to LCP with upper level constraints.
  */
 {

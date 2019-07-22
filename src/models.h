@@ -1,8 +1,6 @@
 #ifndef MODELS_H
 #define MODELS_H
 
-#define VERBOSE false
-
 #include"epecsolve.h"
 #include<iostream>
 #include<memory>
