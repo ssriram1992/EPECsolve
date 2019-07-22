@@ -1105,17 +1105,27 @@ void Models::EPEC::testQP(const unsigned int i) {
     arma::vec x;
     if (VERBOSE) cout << *QP << endl;
     x.ones(QP->getNx());
-    cout << "x is " << x << endl;
     if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
     std::unique_ptr<GRBModel> model = QP->solveFixed(x);
     model->write("dat/CountryQP_" + to_string(i) + ".lp");
-    arma::vec sol;
-    sol.zeros(QP->getNy());
-    for (unsigned int j = 0; j < QP->getNy(); ++j)
-        sol.at(j) = model->getVarByName("y_" + to_string(j)).get(GRB_DoubleAttr_X);
-    sol.save("dat/QP_Sol_" + to_string(i) + ".txt", arma::arma_ascii);
-    this->WriteCountry(0, "dat/temp.txt", sol, false);
-
+    int status = model->get(GRB_IntAttr_Status);
+    if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
+        arma::vec sol;
+        sol.zeros(QP->getNy());
+        try {
+            GRBVar *vars = model->getVars();
+            int i = 0;
+            for (GRBVar *p = vars; i < model->get(GRB_IntAttr_NumVars); i++, p++) {
+                sol.at(i) = p->get(GRB_DoubleAttr_X);
+            }
+        } catch (GRBException &e) {
+            cerr << "GRBException in Models::EPEC::testQP: " << e.getErrorCode() << ": " << e.getMessage() << endl;
+        }
+        sol.save("dat/QP_Sol_" + to_string(i) + ".txt", arma::arma_ascii);
+        this->WriteCountry(i, "dat/temp_"+to_string(i)+".txt", sol, false);
+    } else{
+        cout << "Models::EPEC::testQP: QP of country "<<i<<" is infeasible or unbounded." << endl;
+    }
 }
 
 void Models::EPEC::testCountry(const unsigned int i) {

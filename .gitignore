@@ -22,5 +22,6 @@ src/Gams*
 cmake-build-debug/*
 .DS_Store
 dat/*
-dat/countrQP_0
-dat/LCP_0
+dat/
+EPECsolve
+EPECsolve
