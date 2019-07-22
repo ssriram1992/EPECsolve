@@ -20,13 +20,16 @@ bool Game::isZero(arma::sp_mat M, double tol) {
 // }
 
 // Armadillo patch for inbuild resize
+// unisgned uword in row and column indexes create some problems with empty matrix
+// which is the case with empty constraints matrices
 // For arma::sp_mat
 arma::sp_mat Game::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC) {
     arma::sp_mat MMat(nR, nC);
     MMat.zeros();
-    if (nR >= Mat.n_rows && nC >= Mat.n_cols)
-        MMat.submat(0, 0,  (Mat.n_rows - 1>0) ? (Mat.n_rows - 1) : 0, (Mat.n_cols - 1>0) ? (Mat.n_cols - 1) : 0) = Mat;
-    else {
+    if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
+        if (Mat.n_rows > 1 && Mat.n_cols > 1)
+            MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
+    } else {
         if (nR <= Mat.n_rows && nC <= Mat.n_cols)
             MMat = Mat.submat(0, 0, nR, nC);
         else
@@ -422,23 +425,33 @@ Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
 }
 
 
-Game::QP_Param& Game::QP_Param::addDummy(unsigned int pars, unsigned int vars, int position)
+Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars, int position)
 /**
  * @warning You might have to rerun QP_Param::KKT since you have now changed the QP.
  * @warning This implies you might have to rerun NashGame::FormulateLCP again too.
  */
 {
-    if(VERBOSE && (pars||vars)) cout<<"From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.\n";
+    if (VERBOSE && (pars || vars))
+        cout
+                << "From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.\n";
 
     // Call the superclass function
-    try{ MP_Param::addDummy(pars, vars, position); }
-    catch(const char* e) { cerr<<" Error in Game::QP_Param::addDummy: "<<e<<endl; throw;}
-    catch(string e) { cerr<<"String: Error in Game::QP_Param::addDummy: "<<e<<endl; throw;}
-    catch(exception &e) { cerr<<"Exception: Error in Game::QP_Param::addDummy: "<<e.what()<<endl; throw;}
+    try { MP_Param::addDummy(pars, vars, position); }
+    catch (const char *e) {
+        cerr << " Error in Game::QP_Param::addDummy: " << e << endl;
+        throw;
+    }
+    catch (string e) {
+        cerr << "String: Error in Game::QP_Param::addDummy: " << e << endl;
+        throw;
+    }
+    catch (exception &e) {
+        cerr << "Exception: Error in Game::QP_Param::addDummy: " << e.what() << endl;
+        throw;
+    }
 
     return *this;
 }
-
 
 
 unsigned int
@@ -782,6 +795,7 @@ Game::NashGame &Game::NashGame::addDummy(unsigned int par, int position)
     this->set_positions();
     return *this;
 }
+
 Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
 /**
  * @brief Adds Leader constraint to a NashGame object.
@@ -793,7 +807,7 @@ Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
         throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible --- ") + to_string(a.n_elem) +
               string(" != ") + to_string(nC);
     auto nR = this->LeaderConstraints.n_rows;
-    this->LeaderConstraints.resize( nR + 1, nC);
+    this->LeaderConstraints.resize(nR + 1, nC);
     // (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
     LeaderConstraints.row(nR) = a.t();
     this->LeaderConsRHS.resize(nR + 1);

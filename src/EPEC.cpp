@@ -52,8 +52,8 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2,
         epec.make_country_QP();
         // try{epec.testQP(0);}catch(...){}
         // try{epec.testQP(2);}catch(...){}
-        epec.testCountry(2);
         epec.testCountry(0);
+        epec.testCountry(1);
         epec.findNashEq(true);
         cout<<"--------------------------------------------------Printing Locations--------------------------------------------------\n";
         for(unsigned int i = 0; i<epec.nCountries; i++)
@@ -98,8 +98,8 @@ int main()
 
 
     // Two followers Leader with price cap
-    Models::LeadAllPar Europe(1, "Europe", FP, {80,0.5}, {0.4, -1, -1, 70});
-    Models::LeadAllPar USA(1, "USA", FP1, {75,0.10}, {0.4, -1, -1, 79});
+    Models::LeadAllPar Europe(1, "Europe", FP, {800,0.15}, {-1, -1, -1, -1});
+    Models::LeadAllPar USA(1, "USA", FP1, {705,0.10}, {-1, -1, -1, -1});
     // cout<<LA<<LA2;
     // cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
     arma::mat TrCo(2,2);
