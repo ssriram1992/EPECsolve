@@ -50,8 +50,8 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2,
                         // .addCountry(LA3,0)
                 .addTranspCosts(TrCo).finalize();
         epec.make_country_QP();
-        // try{epec.testQP(0);}catch(...){}
-        // try{epec.testQP(2);}catch(...){}
+        try{epec.testQP(0);}catch(...){}
+        try{epec.testQP(1);}catch(...){}
         epec.testCountry(0);
         epec.testCountry(1);
         epec.findNashEq(true);
@@ -98,14 +98,14 @@ int main()
 
 
     // Two followers Leader with price cap
-    Models::LeadAllPar Europe(1, "Europe", FP, {800,0.15}, {-1, -1, -1, -1});
-    Models::LeadAllPar USA(1, "USA", FP1, {705,0.10}, {-1, -1, -1, -1});
+    Models::LeadAllPar Europe(1, "Europe", FP, {80,0.15}, {10, -1, -1, -1});
+    Models::LeadAllPar USA(1, "USA", FP1, {125,0.10}, {10, -1, -1, -1});
     // cout<<LA<<LA2;
     // cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
     arma::mat TrCo(2,2);
     TrCo << 0 << 1<< arma::endr << 1 <<0;
-    LCPtest(Europe, USA, static_cast<arma::sp_mat>(TrCo));
-    //BilevelTest(USA);
+    //LCPtest(Europe, USA, static_cast<arma::sp_mat>(TrCo));
+    BilevelTest(USA);
 
 
     return 0;

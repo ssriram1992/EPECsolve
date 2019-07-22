@@ -912,27 +912,33 @@ Models::EPEC::findNashEq(bool write, string filename) {
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
         unsigned int temp;
-        try {
-            for (unsigned int i = 0; i < Nvar; i++) {
-                this->sol_x(i) = lcpmodel.get()->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
-                this->sol_z(i) = lcpmodel.get()->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
-                temp = i;
+        int status = lcpmodel->get(GRB_IntAttr_Status);
+        if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
+            try {
+
+                for (unsigned int i = 0; i < Nvar; i++) {
+                    this->sol_x(i) = lcpmodel.get()->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
+                    this->sol_z(i) = lcpmodel.get()->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
+                    temp = i;
+                }
+
             }
-        }
-        catch (GRBException &e) {
-            cerr << "GRBException in Models::EPEC::findNashEq : " << e.getErrorCode() << ": " << e.getMessage() << " "
-                 << temp << endl;;
-        }
-        this->sol_x.save("dat/x_" + filename, arma::file_type::arma_ascii, VERBOSE);
-        this->sol_z.save("dat/z_" + filename, arma::file_type::arma_ascii, VERBOSE);
-        // lcpmodel->write("dat/My_model.lp");
-        try {
-            this->WriteCountry(0, "dat/temp.txt", this->sol_x, false);
-            for (unsigned int ell = 1; ell < this->nCountries; ++ell)
-                this->WriteCountry(ell, "dat/temp.txt", this->sol_x, true);
-            this->write("dat/temp.txt", true);
-        }
-        catch (GRBException &e) {}
+            catch (GRBException &e) {
+                cerr << "GRBException in Models::EPEC::findNashEq : " << e.getErrorCode() << ": " << e.getMessage()
+                     << " "
+                     << temp << endl;;
+            }
+            this->sol_x.save("dat/x_" + filename, arma::file_type::arma_ascii, VERBOSE);
+            this->sol_z.save("dat/z_" + filename, arma::file_type::arma_ascii, VERBOSE);
+            // lcpmodel->write("dat/My_model.lp");
+            try {
+                this->WriteCountry(0, "dat/temp.txt", this->sol_x, false);
+                for (unsigned int ell = 1; ell < this->nCountries; ++ell)
+                    this->WriteCountry(ell, "dat/temp.txt", this->sol_x, true);
+                this->write("dat/temp.txt", true);
+            } catch (GRBException &e) {}
+        } else
+            cout << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
         if (VERBOSE) Game::print(lcp->getCompl());
     }
 }
@@ -1099,7 +1105,7 @@ void Models::EPEC::testQP(const unsigned int i) {
     arma::vec x;
     if (VERBOSE) cout << *QP << endl;
     x.ones(QP->getNx());
-    cout << "x is "<<x<<endl;
+    cout << "x is " << x << endl;
     if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
     std::unique_ptr<GRBModel> model = QP->solveFixed(x);
     model->write("dat/CountryQP_" + to_string(i) + ".lp");
