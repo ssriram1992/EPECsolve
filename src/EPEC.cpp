@@ -11,93 +11,102 @@
 
 using namespace std;
 
-
-int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
+int BilevelTest(Models::LeadAllPar LA)
 {
-	GRBEnv env = GRBEnv();
-	// GRBModel* model=nullptr;
-	arma::sp_mat M;		 arma::vec q;		 perps Compl;
-	// Game::LCP *MyNashGame = nullptr;
-	arma::sp_mat Aa; arma::vec b;
-	Models::EPEC epec(&env);
-	try
-	{
-		epec.addCountry(LA, 0).addCountry(LA2, 0).addTranspCosts(TrCo).finalize();
-		epec.make_country_QP();
-		try{epec.testQP(0);}catch(...){}
-		try{epec.testQP(1);}catch(...){}
-		epec.testCountry(1);
-		epec.testCountry(0);
-		epec.findNashEq(true);
-		cout<<"--------------------------------------------------Printing Locations--------------------------------------------------\n";
-		for(unsigned int i = 0; i<epec.nCountries; i++)
-		{
-			cout<<"********** Country number "<<i+1<<"\t\t"<<"**********\n";
-			for(int j=0; j<9;j++)
-			{
-				auto v = static_cast<Models::LeaderVars>(j);
-				cout<<Models::prn::label<<std::setfill('.')<<v<<Models::prn::val<<std::setfill('.')<<epec.getPosition(i, v)<<endl;
-			}
-			cout<<endl;
-		}
-		cout<<"--------------------------------------------------Printing Locations--------------------------------------------------\n";
-	} 
-	catch(const char* e) { cerr<<e<<endl;throw; }
-	catch(string e) { cerr<<"String: "<<e<<endl;throw; }
-	catch(exception &e) { cerr<<"Exception: "<<e.what()<<endl;throw; }
-	catch(GRBException &e) {cerr<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
-	return 0;
+    GRBEnv env = GRBEnv();
+    arma::sp_mat M;		 arma::vec q;		 perps Compl;
+    arma::sp_mat Aa; arma::vec b;
+    Models::EPEC epec(&env);
+    try
+    {
+        arma::sp_mat TrCo(1,1);
+        TrCo(0,0) = 0;
+        epec.addCountry(LA).addTranspCosts(TrCo).finalize();
+        epec.make_country_QP();
+        epec.testCountry(0);
+        epec.findNashEq(true);
+
+    }
+    catch(const char* e) { cerr<<e<<endl;throw; }
+    catch(string e) { cerr<<"String: "<<e<<endl;throw; }
+    catch(exception &e) { cerr<<"Exception: "<<e.what()<<endl;throw; }
+    catch(GRBException &e) {cerr<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+    return 0;
+}
+
+int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2,
+        // Models::LeadAllPar LA3,
+            arma::sp_mat TrCo)
+{
+    GRBEnv env = GRBEnv();
+    // GRBModel* model=nullptr;
+    arma::sp_mat M;		 arma::vec q;		 perps Compl;
+    // Game::LCP *MyNashGame = nullptr;
+    arma::sp_mat Aa; arma::vec b;
+    Models::EPEC epec(&env);
+    try
+    {
+        epec.addCountry(LA, 0).addCountry(LA2, 0)
+                        // .addCountry(LA3,0)
+                .addTranspCosts(TrCo).finalize();
+        epec.make_country_QP();
+        // try{epec.testQP(0);}catch(...){}
+        // try{epec.testQP(2);}catch(...){}
+        epec.testCountry(2);
+        epec.testCountry(0);
+        epec.findNashEq(true);
+        cout<<"--------------------------------------------------Printing Locations--------------------------------------------------\n";
+        for(unsigned int i = 0; i<epec.nCountries; i++)
+        {
+            cout<<"********** Country number "<<i+1<<"\t\t"<<"**********\n";
+            for(int j=0; j<9;j++)
+            {
+                auto v = static_cast<Models::LeaderVars>(j);
+                cout<<Models::prn::label<<std::setfill('.')<<v<<Models::prn::val<<std::setfill('.')<<epec.getPosition(i, v)<<endl;
+            }
+            cout<<endl;
+        }
+        cout<<"--------------------------------------------------Printing Locations--------------------------------------------------\n";
+    }
+    catch(const char* e) { cerr<<e<<endl;throw; }
+    catch(string e) { cerr<<"String: "<<e<<endl;throw; }
+    catch(exception &e) { cerr<<"Exception: "<<e.what()<<endl;throw; }
+    catch(GRBException &e) {cerr<<"GRBException: "<<e.getErrorCode()<<": "<<e.getMessage()<<endl;throw;}
+    return 0;
 }
 
 
 
 int main()
 {
-	Models::DemPar P;
-	Models::FollPar FP, FP2, FP3, FP1, FP3a;
+    Models::DemPar P;
+    Models::FollPar FP, FP2, FP3, FP1, FP3a, FP2a;
 
-	Models::LeadPar L (0.4,-1,-1,-1);
+    Models::LeadPar L (0.4,-1,-1,-1);
 
-	FP1.capacities = {1000};
-	FP1.costs_lin = {10};
-	FP1.costs_quad = {0.1};
-	FP1.emission_costs = {0};
+    FP1.capacities = {1000};
+    FP1.costs_lin = {10};
+    FP1.costs_quad = {0.1};
+    FP1.emission_costs = {6};
+    FP1.names={"US_follower"};
 
-	FP.capacities = {10, 15};
-	FP.costs_lin = {0, 4};
-	FP.costs_quad = {0, 40}; 
-	FP.emission_costs = {0, 0}; 
-
-	FP2.capacities = {10, 10};
-	FP2.costs_lin = {30, 50};
-	FP2.costs_quad = {20, 40}; 
-	FP2.emission_costs = {10, 0}; 
-
-	FP3.capacities = {10, 15, 50};
-	FP3.costs_lin = {30, 32, 5};
-	FP3.costs_quad = {60, 40, 10}; 
-	FP3.emission_costs = {0, 1, 10}; 
-	FP3.names = {"Solar producer", "Gas producer", "Coal producer"};
-
-	FP3a.capacities = {10, 15, 50};
-	FP3a.costs_lin = {30, 32, 5};
-	FP3a.costs_quad = {60, 40, 10}; 
-	FP3a.emission_costs = {0, 1, 10}; 
-	FP3a.names = {"Solar producer", "Gas producer", "Coal producer"};
-/*
-*/
-
-	// Two followers Leader with price cap
-	Models::LeadAllPar LA_pc1(3, "USA", FP3, {40,0.10}, {0.4, -1, -1, -1});
-	Models::LeadAllPar LA_pc2(3, "China", FP3, {60,0.25}, {0.4, -1, -1, -1});
-
-	// cout<<LA<<LA2;
-	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
-	arma::mat TrCo(2,2); 
-	TrCo << 0 << 0.5<< arma::endr << 0.5 <<0;
-	LCPtest(LA_pc1, LA_pc2, arma::sp_mat(TrCo));
+    FP.capacities = {1000};
+    FP.costs_lin = { 4};
+    FP.costs_quad = {0.25};
+    FP.emission_costs = { 10};
+    FP.names={"Eur_follower"};
 
 
-	return 0;
+    // Two followers Leader with price cap
+    Models::LeadAllPar Europe(1, "Europe", FP, {80,0.5}, {0.4, -1, -1, 70});
+    Models::LeadAllPar USA(1, "USA", FP1, {75,0.10}, {0.4, -1, -1, 79});
+    // cout<<LA<<LA2;
+    // cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
+    arma::mat TrCo(2,2);
+    TrCo << 0 << 1<< arma::endr << 1 <<0;
+    LCPtest(Europe, USA, static_cast<arma::sp_mat>(TrCo));
+    //BilevelTest(USA);
+
+
+    return 0;
 }
-
