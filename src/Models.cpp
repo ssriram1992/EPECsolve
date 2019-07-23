@@ -523,7 +523,6 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
     for (auto val = TranspCosts.begin_col(i); val != TranspCosts.end_col(i); ++val) nImp++;
     // substitutes that answer to nImportMarkets at the current position
     this->nImportMarkets.at(i) = (nImp);
-
     if (nImp > 0) {
         Models::increaseVal(Loc, LeaderVars::CountryImport, nImp);
 
@@ -541,6 +540,16 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 
         LL_Nash.addDummy(nImp, Loc.at(Models::LeaderVars::CountryImport));
         LL_Nash.addLeadCons(a, 0).addLeadCons(-a, 0);
+    } else {
+        Game::NashGame &LL_Nash = *this->countries_LL.at(i).get();
+
+        // Adding the constraint that the sum of imports from all countries equals total imports
+        arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
+        a.at(Loc.at(Models::LeaderVars::NetImport)) = 1;
+        if (VERBOSE)
+            cout << "Single Country: imports are set to zero." << endl;
+
+        LL_Nash.addLeadCons(a, 0);
     }
     // Updating the variable locations
     /*	Loc[Models::LeaderVars::CountryImport] = Loc.at(Models::LeaderVars::End);
@@ -1105,6 +1114,7 @@ void Models::EPEC::testQP(const unsigned int i) {
     arma::vec x;
     if (VERBOSE) cout << *QP << endl;
     x.ones(QP->getNx());
+    x.fill(555);
     if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
     std::unique_ptr<GRBModel> model = QP->solveFixed(x);
     model->write("dat/CountryQP_" + to_string(i) + ".lp");
@@ -1122,9 +1132,9 @@ void Models::EPEC::testQP(const unsigned int i) {
             cerr << "GRBException in Models::EPEC::testQP: " << e.getErrorCode() << ": " << e.getMessage() << endl;
         }
         sol.save("dat/QP_Sol_" + to_string(i) + ".txt", arma::arma_ascii);
-        this->WriteCountry(i, "dat/temp_"+to_string(i)+".txt", sol, false);
-    } else{
-        cout << "Models::EPEC::testQP: QP of country "<<i<<" is infeasible or unbounded." << endl;
+        this->WriteCountry(i, "dat/temp_" + to_string(i) + ".txt", sol, false);
+    } else {
+        cout << "Models::EPEC::testQP: QP of country " << i << " is infeasible or unbounded." << endl;
     }
 }
 
