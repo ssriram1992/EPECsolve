@@ -57,7 +57,7 @@ Models::operator<<(ostream &ost, const Models::LeadPar P) {
     ost << Models::prn::label << "Import Limit" << ":" << Models::prn::val
         << (P.import_limit < 0 ? std::numeric_limits<double>::infinity() : P.import_limit);
     ost << endl;
-    ost << Models::prn::label << "Maximum tax percentage" << ":" << Models::prn::val << P.max_tax_perc;
+    ost << Models::prn::label << "Maximum tax" << ":" << Models::prn::val << P.max_tax;
     ost << endl;
     ost << Models::prn::label << "Price limit" << ":" << Models::prn::val
         << (P.price_limit < 0 ? std::numeric_limits<double>::infinity() : P.price_limit);
@@ -220,7 +220,7 @@ void Models::EPEC::make_LL_LeadCons(
     for (unsigned int follower = 0; follower < Params.n_followers; follower++) {
         // Constraints for Tax limits
         LeadCons(follower, Loc.at(Models::LeaderVars::Tax) + follower) = 1;
-        LeadRHS(follower) = Params.LeaderParam.max_tax_perc;
+        LeadRHS(follower) = Params.LeaderParam.max_tax;
     }
     // Export - import <= Local Production
     // (28b)
@@ -286,7 +286,7 @@ Models::EPEC::addCountry(
  *
  * The leader is also constrained to not export or import anything more than the limits set by `export_limit` and `import_limit`. A negative value to these input variables imply that there is no such limit.
  *
- * Similarly the leader cannot also impose tax on any player greater than what is dictated by the input variable `max_tax_perc`.
+ * Similarly the leader cannot also impose tax on any player greater than what is dictated by the input variable `max_tax`.
  *
  * @return Pointer to LCP object dynamically created using `new`.
  */
@@ -543,12 +543,16 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
     } else {
         Game::NashGame &LL_Nash = *this->countries_LL.at(i).get();
 
-        // Adding the constraint that the sum of imports from all countries equals total imports
+        // Set imports and exporta to zero
         arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 1;
         if (VERBOSE)
             cout << "Single Country: imports are set to zero." << endl;
-
+        LL_Nash.addLeadCons(a, 0);
+        a.at(Loc.at(Models::LeaderVars::NetImport)) = 0;
+        a.at(Loc.at(Models::LeaderVars::NetExport)) = 1;
+        if (VERBOSE)
+            cout << "Single Country: exports are set to zero." << endl;
         LL_Nash.addLeadCons(a, 0);
     }
     // Updating the variable locations
@@ -1019,7 +1023,7 @@ Models::EPEC::write(const string filename, bool append) const {
 
 void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const {
-    if (!lcp) return;
+    //if (!lcp) return;
     // const LeadLocs& Loc = this->Locations.at(i);
 
     ofstream file;
@@ -1138,7 +1142,7 @@ void Models::EPEC::testQP(const unsigned int i) {
     }
 }
 
-void Models::EPEC::testCountry(const unsigned int i) {
+void Models::EPEC::testLCP(const unsigned int i) {
     auto country = this->get_LowerLevelNash(i);
     LCP CountryLCP = LCP(this->env, *country);
     CountryLCP.write("dat/LCP_" + to_string(i));

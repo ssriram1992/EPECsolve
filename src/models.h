@@ -34,10 +34,10 @@ namespace Models {
     struct LeadPar {
         double import_limit = -1;    ///< Maximum net import in the country. If no limit, set the value as -1;
         double export_limit = -1;    ///< Maximum net export in the country. If no limit, set the value as -1;
-        double max_tax_perc = 0.3;    ///< Government decided increase in the shift in costs_lin of any player cannot exceed this value
+        double max_tax = 10;    ///< Government decided increase in the shift in costs_lin of any player cannot exceed this value
         double price_limit = -1;    ///< Government does not want the price to exceed this limit
-        LeadPar(double max_tax_perc = 0.3, double imp_lim = -1, double exp_lim = -1, double price_limit = -1)
-                : import_limit{imp_lim}, export_limit{exp_lim}, max_tax_perc{max_tax_perc}, price_limit{price_limit} {}
+        LeadPar(double max_tax = 10, double imp_lim = -1, double exp_lim = -1, double price_limit = -1)
+                : import_limit{imp_lim}, export_limit{exp_lim}, max_tax{max_tax}, price_limit{price_limit} {}
     };
 
 /// @brief Stores the parameters of a country model
@@ -161,7 +161,7 @@ namespace Models {
         //Unit tests
         void testQP(const unsigned int i);
 
-        void testCountry(const unsigned int i);
+        void testLCP(const unsigned int i);
 
         void make_country_QP(const unsigned int i);
 
