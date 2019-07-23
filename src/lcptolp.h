@@ -91,7 +91,7 @@ namespace Game {
     public:
         // Fudgible data
         long double bigM{1e7}; ///< bigM used to rewrite the LCP as MIP
-        long double eps{1e-8}; ///< The threshold, below which a number would be considered to be zero.
+        long double eps{1e-5}; ///< The threshold, below which a number would be considered to be zero.
 
         /** Constructors */
         /// Class has no default constructors

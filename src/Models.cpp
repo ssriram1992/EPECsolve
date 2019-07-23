@@ -183,9 +183,9 @@ Models::EPEC::make_LL_QP(const LeadAllPar &Params,    ///< The Parameters object
              follower) = 1; // q_{-i}, then import, export, then tilde q_i, then i-th tax
 
     C = Ctemp;
-    A(1, (Params.n_followers - 1) + 2 + follower) = -1;
+    A(1, (Params.n_followers - 1) + 2 + follower) = 0;
     B(0, 0) = 1;
-    B(1, 0) = 1;
+    B(1, 0) = -1;
     b(0) = Params.FollowerParam.capacities.at(follower);
     b(1) = 0; // - Params.FollowerParam.capacities.at(follower)*0.05;
 
@@ -916,12 +916,15 @@ Models::EPEC::findNashEq(bool write, string filename) {
     lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
     lcp->bigM = 1e7;
 
+    this->nashgame->write("dat/NashGame",true,true);
     this->lcpmodel = lcp->LCPasMIP(false);
 
     Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
     if (write) {
-        lcpmodel.get()->set(GRB_IntParam_OutputFlag, 1);
-        lcpmodel.get()->optimize();
+        lcpmodel->set(GRB_IntParam_OutputFlag, 1);
+        lcpmodel->write("dat/NashLCP.lp");
+        lcpmodel->optimize();
+        lcpmodel->write("dat/NashLCP.sol");
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
         unsigned int temp;
@@ -930,8 +933,9 @@ Models::EPEC::findNashEq(bool write, string filename) {
             try {
 
                 for (unsigned int i = 0; i < Nvar; i++) {
-                    this->sol_x(i) = lcpmodel.get()->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
-                    this->sol_z(i) = lcpmodel.get()->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
+                    this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
+                    this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
+                    if (VERBOSE) cout << "x_"+to_string(i)+":"<<this->sol_x(i)<<"\t\tz_"+to_string(i)+":"<<this->sol_z(i)<<endl;
                     temp = i;
                 }
 

@@ -347,6 +347,7 @@ Game::LCP::LCPasMIP(
         for (auto i:FixVar) model->addConstr(x[i], GRB_EQUAL, 0.0);
         for (auto i:FixEq) model->addConstr(z[i], GRB_EQUAL, 0.0);
         model->update();
+        model->set(GRB_DoubleParam_IntFeasTol, this->eps);
         if (solve) model->optimize();
         return model;
     }
