@@ -13,7 +13,6 @@ sand.cpp
 Session.vim
 *.swp
 tags
-*.txt
 *.lp
 *.log
 src/Gams*
@@ -23,7 +22,5 @@ cmake-build-debug/*
 .DS_Store
 dat/*
 dat/
-EPECsolve
-EPECsolve
 EPECtest
 EPECsolve
