@@ -24,7 +24,7 @@ int BilevelTest(Models::LeadAllPar LA)
         epec.addCountry(LA).addTranspCosts(TrCo).finalize();
         epec.make_country_QP();
         //epec.testLCP(0);
-        //try{epec.testQP(0);}catch(...){cerr<<"Cannot test QP"<<endl;}
+        try{epec.testQP(0);}catch(...){cerr<<"Cannot test QP"<<endl;}
         epec.findNashEq(true);
         cout<<"--------------------------------------------------Printing Locations--------------------------------------------------\n";
         for(unsigned int i = 0; i<epec.nCountries; i++)
@@ -112,7 +112,7 @@ int main()
 
     // Two followers Leader with price cap
     Models::LeadAllPar Europe(1, "Europe", FP, {80,0.15}, {-1, -1, -1, -1});
-    Models::LeadAllPar USA(1, "USA", FP1, {300,0.05}, {150, -1, -1, -1});
+    Models::LeadAllPar USA(1, "USA", FP1, {300,0.05}, {-1, -1, -1, -1});
     // cout<<LA<<LA2;
     // cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
     arma::mat TrCo(2,2);

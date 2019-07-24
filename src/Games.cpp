@@ -166,12 +166,12 @@ Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars, i
             break;
         default:
             if (pars) {
-                auto A_temp = arma::join_rows(A.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ncons, pars));
+                arma::sp_mat A_temp = arma::join_rows(A.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ncons, pars));
                 A = arma::join_rows(A_temp, A.cols(position, A.n_cols - 1));
             }
             if (vars || pars) {
                 C = resize_patch(C, this->Ny, C.n_cols);
-                auto C_temp = arma::join_rows(C.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ny, pars));
+                arma::sp_mat C_temp = arma::join_rows(C.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ny, pars));
                 C = arma::join_rows(C_temp, C.cols(position, C.n_cols - 1));
             }
             break;

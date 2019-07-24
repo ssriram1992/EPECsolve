@@ -133,25 +133,23 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N) : RlxdModel(*env)
 
     // This is a constructor code! Remember to delete
     /// @todo Delete the below section of code
-    {
-        this->M = M;
-        this->q = q;
-        this->_A = N.RewriteLeadCons();
-        this->_b = N.getMCLeadRHS();
-        defConst(env);
-        this->Compl = perps(Compl);
-        sort(Compl.begin(), Compl.end(),
-             [](pair<unsigned int, unsigned int> a, pair<unsigned int, unsigned int> b) { return a.first < b.first; }
-        );
-        for (auto p:Compl)
-            if (p.first != p.second) {
-                this->LeadStart = p.first;
-                this->LeadEnd = p.second - 1;
-                this->nLeader = this->LeadEnd - this->LeadStart + 1;
-                this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
-                break;
-            }
-    }
+    this->M = M;
+    this->q = q;
+    this->_A = N.RewriteLeadCons();
+    this->_b = N.getMCLeadRHS();
+    defConst(env);
+    this->Compl = perps(Compl);
+    sort(Compl.begin(), Compl.end(),
+         [](pair<unsigned int, unsigned int> a, pair<unsigned int, unsigned int> b) { return a.first < b.first; }
+    );
+    for (auto p:Compl)
+        if (p.first != p.second) {
+            this->LeadStart = p.first;
+            this->LeadEnd = p.second - 1;
+            this->nLeader = this->LeadEnd - this->LeadStart + 1;
+            this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
+            break;
+        }
     // Delete no more!
 }
 
@@ -347,7 +345,10 @@ Game::LCP::LCPasMIP(
         for (auto i:FixVar) model->addConstr(x[i], GRB_EQUAL, 0.0);
         for (auto i:FixEq) model->addConstr(z[i], GRB_EQUAL, 0.0);
         model->update();
-        model->set(GRB_DoubleParam_IntFeasTol, this->eps);
+        model->set(GRB_DoubleParam_IntFeasTol, this->eps_int);
+        model->set(GRB_DoubleParam_FeasibilityTol, this->eps);
+        model->set(GRB_DoubleParam_OptimalityTol, this->eps);
+
         if (solve) model->optimize();
         return model;
     }
@@ -1001,8 +1002,8 @@ Game::LCP::makeQP(
     QP_cons.A.zeros(Ncons, Nx_old);
     //QP_cons.B.zeros();
     QP_obj.c.resize(Ny);
-    QP_obj.C.resize(Ny,Nx_old);
-    QP_obj.Q.resize(Ny,Ny);
+    QP_obj.C.resize(Ny, Nx_old);
+    QP_obj.Q.resize(Ny, Ny);
     // Setting the QP_Param object
     QP.set(QP_obj, QP_cons);
     return *this;

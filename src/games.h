@@ -49,8 +49,7 @@ namespace Game {
     public:
         // Default constructors
         MP_Param() = default;
-
-        MP_Param(MP_Param &M) = default;
+        MP_Param(const MP_Param &M) = default;
 
         // Getters and setters
         virtual inline arma::sp_mat
@@ -154,8 +153,9 @@ namespace Game {
         }
 
         /// Copy constructor
-        QP_Param(QP_Param &Qu) : MP_Param(Qu),
+        QP_Param(const QP_Param &Qu) : MP_Param(Qu),
                                  env{Qu.env}, QuadModel{Qu.QuadModel}, made_yQy{Qu.made_yQy} { this->size(); };
+
 
         // Override setters
         QP_Param &set(const arma::sp_mat &Q, const arma::sp_mat &C,
