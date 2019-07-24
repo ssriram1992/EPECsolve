@@ -1,11 +1,8 @@
 var searchData=
 [
-  ['m',['M',['../classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4',1,'Game::LCP']]],
-  ['made_5fyqy',['made_yQy',['../classGame_1_1QP__Param.html#a8c3ee884cc255fbc879b085109158cc3',1,'Game::QP_Param']]],
-  ['maderlxdmodel',['madeRlxdModel',['../classGame_1_1LCP.html#ac5163934319dc0cbf6d62cfd772f7c1b',1,'Game::LCP']]],
-  ['marketclearing',['MarketClearing',['../classGame_1_1NashGame.html#a77402999e8c65c0e8b406dd20e95f534',1,'Game::NashGame']]],
-  ['max_5ftax_5fperc',['max_tax_perc',['../structModels_1_1LeadPar.html#a88b1584e5f7f37307a569ea5b84e5d06',1,'Models::LeadPar']]],
-  ['mc_5fdual_5fposition',['MC_dual_position',['../classGame_1_1NashGame.html#a5bf91b8e4cb719def5c4ef8b92d3b157',1,'Game::NashGame']]],
-  ['mc_5fqp',['MC_QP',['../classModels_1_1EPEC.html#a11b212ad1bc65ad020fb8601e302c931',1,'Models::EPEC']]],
-  ['mcrhs',['MCRHS',['../classGame_1_1NashGame.html#a61332b6f39e1dff806c15e5b4f831634',1,'Game::NashGame']]]
+  ['n_5ffollowers',['n_followers',['../struct_models_1_1_lead_all_par.html#a50316bb42793ad51f81470ec2c75deaa',1,'Models::LeadAllPar']]],
+  ['name',['name',['../struct_models_1_1_lead_all_par.html#a0d8d822ed1688b77c5cf87531942e23e',1,'Models::LeadAllPar']]],
+  ['names',['names',['../struct_models_1_1_foll_par.html#a24bde6b28a0fab1b339c016fb97685da',1,'Models::FollPar']]],
+  ['ncountries',['nCountries',['../class_models_1_1_e_p_e_c.html#ab393e65ef5be6c9e3c5129f8866dbc49',1,'Models::EPEC']]],
+  ['nvarepec',['nVarEPEC',['../class_models_1_1_e_p_e_c.html#a0e215b1d6cd630fc6edbbb5f78339953',1,'Models::EPEC']]]
 ];

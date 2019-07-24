@@ -21,6 +21,5 @@ src/Gams*
 cmake-build-debug/*
 .DS_Store
 dat/*
-dat/
 EPECtest
 EPECsolve

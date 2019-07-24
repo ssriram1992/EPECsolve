@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['lcp',['LCP',['../classGame_1_1LCP.html',1,'Game']]],
-  ['leadallpar',['LeadAllPar',['../structModels_1_1LeadAllPar.html',1,'Models']]],
-  ['leadpar',['LeadPar',['../structModels_1_1LeadPar.html',1,'Models']]]
+  ['lcp',['LCP',['../class_game_1_1_l_c_p.html',1,'Game']]],
+  ['leadallpar',['LeadAllPar',['../struct_models_1_1_lead_all_par.html',1,'Models']]],
+  ['leadpar',['LeadPar',['../struct_models_1_1_lead_par.html',1,'Models']]]
 ];

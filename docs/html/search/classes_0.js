@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['dempar',['DemPar',['../structModels_1_1DemPar.html',1,'Models']]]
+  ['dempar',['DemPar',['../struct_models_1_1_dem_par.html',1,'Models']]]
 ];

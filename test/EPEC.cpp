@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
 
         GRBEnv env;
 
-        /** First test is to create an duopoly **/
+        /** First test is to create a duopoly **/
         /* PLAYER 1:
          * 	min: 10 q1 + 0.1 q1^2 - (100 - (q1+q2)) q1 	= 1.1 q1^2 - 90 q1 + q1q2
          * 	 s.t:

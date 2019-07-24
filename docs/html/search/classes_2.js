@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['follpar',['FollPar',['../structModels_1_1FollPar.html',1,'Models']]]
+  ['follpar',['FollPar',['../struct_models_1_1_foll_par.html',1,'Models']]]
 ];

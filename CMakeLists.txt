@@ -1,3 +1,4 @@
+#Gabriele's CMake for Mac OS 10.15-Beta Catalina
 cmake_minimum_required(VERSION 3.14)
 project(EPECsolve)
 add_compile_options(-std=c++11)
