@@ -906,7 +906,7 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
 
 void
 Models::EPEC::findNashEq(bool write, string filename) {
-    auto Nvar = this->country_QP.front().get()->getNx() + this->country_QP.front().get()->getNy();
+    int Nvar = this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
     arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
     arma::vec MCRHS;
     MCRHS.zeros(0);

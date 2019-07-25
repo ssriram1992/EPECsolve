@@ -189,13 +189,17 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
          * 	min: 5 q2 + 0.2 q2^2 - (100 - (q1+q2)) q2 	= 1.2 q2^2 - 95 q2 + q2q1
          * 	 s.t:
          * 	 	q2 >= 0
+         *
+         * EXPECTED LCP
+         * 0 \leq q1 \perp 2.2 q1 + q2 - 90 \geq 0
+         * 0 \leq q2 \perp q1 + 2.4 q2 - 95 \geq 0
          */
         arma::sp_mat Q(1, 1), A(0, 1), B(0, 1), C(1,1); arma::vec  b, c(1); b.set_size(0);
-        Q(0,0) = 1.1;
+        Q(0,0) = 2*1.1;
         C(0,0) = 1;
         c(0) = -90;
         auto q1 = std::make_shared<Game::QP_Param>(Q, C, A, B, c, b, &env);
-        Q(0,0 )=1.2; c(0) = -95;
+        Q(0,0 )=2*1.2; c(0) = -95;
         auto q2 = std::make_shared<Game::QP_Param>(Q, C, A, B, c, b, &env);
 
         // Creating the Nashgame
@@ -205,11 +209,14 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
 
         // Master check  -  LCP should be proper!
         sp_mat MM, MM_ref; vec qq, qq_ref; perps Compl;
-        try{
-            Nash.FormulateLCP(MM, qq, Compl);
-        } catch(exception &e){cerr<<e.what();}
-        MM.print_dense("MM");
-        qq.print("qq");
+        BOOST_TEST_MESSAGE("NashGame.FormulateLCP test");
+        BOOST_CHECK_NO_THROW( Nash.FormulateLCP(MM, qq, Compl));
+        BOOST_CHECK_MESSAGE(MM(0,0)==2.2, "checking q1 coefficient in M-LCP (0,0)");
+        BOOST_CHECK_MESSAGE(MM(0,1)==1, "checking q2 coefficient in M-LCP (0,1)");
+        BOOST_CHECK_MESSAGE(MM(1,0)==1, "checking q1 coefficient in M-LCP (1,0)");
+        BOOST_CHECK_MESSAGE(MM(1,1)==2.4, "checking q2 coefficient in M-LCP (1,1)");
+        BOOST_CHECK_MESSAGE(qq(0)==-90, "checking rhs coefficient in Q-LCP (0)");
+        BOOST_CHECK_MESSAGE(qq(1)==-95, "checking rhs coefficient in Q-LCP (1)");
 
 
     }
@@ -218,11 +225,25 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
 
     /* These are tests for Models.h and using EPEC class.
      * We make increasingly complicated problems and test them.
-     * Bella ciao */
+     * Bella ciao
 
     BOOST_AUTO_TEST_CASE(SingleBilevel)
     {
-        BOOST_TEST_MESSAGE("\n\n");
-        BOOST_WARN_MESSAGE(false, "Not yet implemented");
-    }
+        BOOST_TEST_MESSAGE("Testing single belevel");
+        Models::FollPar FP;
+        FP.capacities = {100};
+        FP.costs_lin = {10};
+        FP.costs_quad = {5};
+        FP.emission_costs = {6};
+        FP.names={"US_follower"};
+        Models::LeadAllPar Country(1, "Country", FP, {300,0.05}, {-1, -1, -1, -1});
+        GRBEnv env = GRBEnv();
+        arma::sp_mat M;		 arma::vec q;		 perps Compl;
+        arma::sp_mat Aa; arma::vec b;
+        Models::EPEC epec(&env);
+        arma::sp_mat TrCo(1,1);
+        TrCo(0,0) = 0;
+        epec.addCountry(Country).addTranspCosts(TrCo).finalize();
+        epec.findNashEq(true);
+    }*/
 BOOST_AUTO_TEST_SUITE_END()

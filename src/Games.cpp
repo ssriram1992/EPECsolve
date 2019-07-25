@@ -166,12 +166,14 @@ Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars, i
             break;
         default:
             if (pars) {
-                arma::sp_mat A_temp = arma::join_rows(A.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ncons, pars));
+                arma::sp_mat A_temp = arma::join_rows(A.cols(0, position - 1),
+                                                      arma::zeros<arma::sp_mat>(this->Ncons, pars));
                 A = arma::join_rows(A_temp, A.cols(position, A.n_cols - 1));
             }
             if (vars || pars) {
                 C = resize_patch(C, this->Ny, C.n_cols);
-                arma::sp_mat C_temp = arma::join_rows(C.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ny, pars));
+                arma::sp_mat C_temp = arma::join_rows(C.cols(0, position - 1),
+                                                      arma::zeros<arma::sp_mat>(this->Ny, pars));
                 C = arma::join_rows(C_temp, C.cols(position, C.n_cols - 1));
             }
             break;
@@ -584,16 +586,15 @@ void Game::NashGame::set_positions()
     }
     // Pushing back the end of dual position
     dual_position.at(Nplayers) = (dl_cnt);
-    /*
-    if(VERBOSE)
-    {
-        cout<<"positions set: ";
-        for(unsigned int i=0; i<Nplayers;i++) cout<<primal_position.at(i)<<" ";
-        cout<<MC_dual_position<<" && "<<Leader_position<<" &&  ";
-        for(unsigned int i=0; i<Nplayers+1;i++) cout<<dual_position.at(i)<<" ";
-        cout<<endl;
+
+    if (VERBOSE) {
+        cout << "Primals: ";
+        for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i) << " ";
+        cout << "---MC_Dual:" << MC_dual_position << "---Leader: " << Leader_position << "Duals: ";
+        for (unsigned int i = 0; i < Nplayers + 1; i++) cout << dual_position.at(i) << " ";
+        cout << endl;
     }
-    */
+
 }
 
 const Game::NashGame &
@@ -630,73 +631,92 @@ Game::NashGame::FormulateLCP(
 
 
     for (unsigned int i = 0; i < Nplayers; i++) {
+        cout << "-----Player " << i << endl;
         this->Players[i]->KKT(Mi[i], Ni[i], qi[i]);
         unsigned int Nprim, Ndual;
         Nprim = this->Players[i]->getNy();
         Ndual = this->Players[i]->getA().n_rows;
         // Adding the primal equations
-        if (VERBOSE) cout << "Region 0\n";
         // Region 1 in Formulate LCP.ipe
-        if (i > 0) // For the first player, no need to add anything 'before' 0-th position
+        if (i > 0) { // For the first player, no need to add anything 'before' 0-th position
+            cout << "Region 1" << endl;
+            cout << "\tM(" << this->primal_position.at(i) << "," << 0 << "," << this->primal_position.at(i + 1) - 1
+                 << "-"
+                 << this->primal_position.at(i) - 1 << ")" << endl;
+            cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << this->primal_position.at(i) - 1 << ")" << endl;
             M.submat(
                     this->primal_position.at(i), 0,
                     this->primal_position.at(i + 1) - 1, this->primal_position.at(i) - 1
             ) = Ni[i].submat(0, 0, Nprim - 1, this->primal_position.at(i) - 1);
-        if (VERBOSE) cout << "Region 1\n";
+        }
         // Region 2 in Formulate LCP.ipe
+        cout << "Region 2" << endl;
+        cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i) << "-"
+             << this->primal_position.at(i + 1) - 1 << "-" << this->primal_position.at(i + 1) - 1 << ")" << endl;
+        cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << Nprim - 1 << ")" << endl;
         M.submat(
                 this->primal_position.at(i), this->primal_position.at(i),
                 this->primal_position.at(i + 1) - 1, this->primal_position.at(i + 1) - 1
         ) = Mi[i].submat(0, 0, Nprim - 1, Nprim - 1);
-        if (VERBOSE) cout << "Region 2\n";
         // Region 3 in Formulate LCP.ipe
-        M.submat(
-                this->primal_position.at(i), this->primal_position.at(i + 1),
-                this->primal_position.at(i + 1) - 1, this->dual_position.at(0) - 1
-        ) = Ni[i].submat(0, this->primal_position.at(i), Nprim - 1, Ni[i].n_cols - 1);
-        if (VERBOSE) cout << "Region 3\n";
+        if (this->primal_position.at(i+1) != this->dual_position.at(0)) {
+            cout << "Region 3" << endl;
+            cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i + 1) << "-"
+                 << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(0) - 1 << ")" << endl;
+            cout << "\t(" << 0 << "," << this->primal_position.at(i) << "-" << Nprim - 1 << "," << Ni[i].n_cols - 1
+                 << ")"
+                 << endl;
+            M.submat(
+                    this->primal_position.at(i), this->primal_position.at(i + 1),
+                    this->primal_position.at(i + 1) - 1, this->dual_position.at(0) - 1
+            ) = Ni[i].submat(0, this->primal_position.at(i), Nprim - 1, Ni[i].n_cols - 1);
+        }
         // Region 4 in Formulate LCP.ipe
-        M.submat(
-                this->primal_position.at(i), this->dual_position.at(i),
-                this->primal_position.at(i + 1) - 1, this->dual_position.at(i + 1) - 1
-        ) = Mi[i].submat(0, Nprim, Nprim - 1, Nprim + Ndual - 1);
-        if (VERBOSE) cout << "Region 4\n";
+        if (this->dual_position.at(i) != this->dual_position.at(i + 1)) {
+            cout << "Region 4" << endl;
+            cout << "\tM(" << this->primal_position.at(i) << "," << this->dual_position.at(i) << "-"
+                 << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(i + 1) << ")" << endl;
+            cout << "\t(" << 0 << "," << Nprim - 1 << "-" << Nprim - 1 << "," << Nprim + Ndual - 1 << ")" << endl;
+            M.submat(
+                    this->primal_position.at(i),  this->dual_position.at(i),
+                    this->primal_position.at(i+1)-1, this->dual_position.at(i+1)-1
+            )  = Mi[i].submat(0, Nprim, Nprim-1, Nprim+Ndual-1);
+        }
         // RHS
         q.subvec(this->primal_position.at(i), this->primal_position.at(i + 1) - 1) = qi[i].subvec(0, Nprim - 1);
         for (unsigned int j = this->primal_position.at(i); j < this->primal_position.at(i + 1); j++)
             Compl.push_back({j, j});
         // Adding the dual equations
         // Region 5 in Formulate LCP.ipe
-        if (i > 0) // For the first player, no need to add anything 'before' 0-th position
+        if (Ndual > 0) {
+            if (i > 0) // For the first player, no need to add anything 'before' 0-th position
+                M.submat(
+                        this->dual_position.at(i) - n_LeadVar, 0,
+                        this->dual_position.at(i + 1) - n_LeadVar - 1, this->primal_position.at(i) - 1
+                ) = Ni[i].submat(Nprim, 0, Ni[i].n_rows - 1, this->primal_position.at(i) - 1);
+            // Region 6 in Formulate LCP.ipe
             M.submat(
-                    this->dual_position.at(i) - n_LeadVar, 0,
-                    this->dual_position.at(i + 1) - n_LeadVar - 1, this->primal_position.at(i) - 1
-            ) = Ni[i].submat(Nprim, 0, Ni[i].n_rows - 1, this->primal_position.at(i) - 1);
-        if (VERBOSE) cout << "Region 5\n";
-        // Region 6 in Formulate LCP.ipe
-        M.submat(
-                this->dual_position.at(i) - n_LeadVar, this->primal_position.at(i),
-                this->dual_position.at(i + 1) - n_LeadVar - 1, this->primal_position.at(i + 1) - 1
-        ) = Mi[i].submat(Nprim, 0, Nprim + Ndual - 1, Nprim - 1);
-        if (VERBOSE) cout << "Region 6\n";
-        // Region 7 in Formulate LCP.ipe
-        M.submat(
-                this->dual_position.at(i) - n_LeadVar, this->primal_position.at(i + 1),
-                this->dual_position.at(i + 1) - n_LeadVar - 1, this->dual_position.at(0) - 1
-        ) = Ni[i].submat(Nprim, this->primal_position.at(i), Ni[i].n_rows - 1, Ni[i].n_cols - 1);
-        if (VERBOSE) cout << "Region 7\n";
-        // Region 8 in Formulate LCP.ipe
-        M.submat(
-                this->dual_position.at(i) - n_LeadVar, this->dual_position.at(i),
-                this->dual_position.at(i + 1) - n_LeadVar - 1, this->dual_position.at(i + 1) - 1
-        ) = Mi[i].submat(Nprim, Nprim, Nprim + Ndual - 1, Nprim + Ndual - 1);
-        if (VERBOSE) cout << "Region 8\n";
-        // RHS
-        q.subvec(this->dual_position.at(i) - n_LeadVar, this->dual_position.at(i + 1) - n_LeadVar - 1) = qi[i].subvec(
-                Nprim, qi[i].n_rows - 1);
-        for (unsigned int j = this->dual_position.at(i) - n_LeadVar; j < this->dual_position.at(i + 1) - n_LeadVar; j++)
-            Compl.push_back({j, j + n_LeadVar});
-        if (VERBOSE) cout << "RHS \n";
+                    this->dual_position.at(i) - n_LeadVar, this->primal_position.at(i),
+                    this->dual_position.at(i + 1) - n_LeadVar - 1, this->primal_position.at(i + 1) - 1
+            ) = Mi[i].submat(Nprim, 0, Nprim + Ndual - 1, Nprim - 1);
+            // Region 7 in Formulate LCP.ipe
+            M.submat(
+                    this->dual_position.at(i) - n_LeadVar, this->primal_position.at(i + 1),
+                    this->dual_position.at(i + 1) - n_LeadVar - 1, this->dual_position.at(0) - 1
+            ) = Ni[i].submat(Nprim, this->primal_position.at(i), Ni[i].n_rows - 1, Ni[i].n_cols - 1);
+            // Region 8 in Formulate LCP.ipe
+            M.submat(
+                    this->dual_position.at(i) - n_LeadVar, this->dual_position.at(i),
+                    this->dual_position.at(i + 1) - n_LeadVar - 1, this->dual_position.at(i + 1) - 1
+            ) = Mi[i].submat(Nprim, Nprim, Nprim + Ndual - 1, Nprim + Ndual - 1);
+            // RHS
+            q.subvec(this->dual_position.at(i) - n_LeadVar,
+                     this->dual_position.at(i + 1) - n_LeadVar - 1) = qi[i].subvec(
+                    Nprim, qi[i].n_rows - 1);
+            for (unsigned int j = this->dual_position.at(i) - n_LeadVar;
+                 j < this->dual_position.at(i + 1) - n_LeadVar; j++)
+                Compl.push_back({j, j + n_LeadVar});
+        }
     }
     if (this->MCRHS.n_elem >= 1) // It is possible that it is a Cournot game and there are no MC conditions!
     {
@@ -705,7 +725,6 @@ Game::NashGame::FormulateLCP(
         q.subvec(this->MC_dual_position, this->Leader_position - 1) = -this->MCRHS;
         for (unsigned int j = this->MC_dual_position; j < this->Leader_position; j++)
             Compl.push_back({j, j});
-        if (VERBOSE) cout << "MC \n";
     }
 
     if (writeToFile) {
