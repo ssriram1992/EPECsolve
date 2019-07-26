@@ -925,6 +925,8 @@ Models::EPEC::findNashEq(bool write, string filename) {
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
 
         this->nashgame->write("dat/NashGame", true, true);
+        //Using indicator constraints
+        lcp->useIndicators= true;
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();

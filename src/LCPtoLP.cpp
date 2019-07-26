@@ -323,12 +323,15 @@ Game::LCP::LCPasMIP(
     unique_ptr<GRBModel> model{new GRBModel(this->RlxdModel)};
     // Creating the model
     try {
-        GRBVar x[nC], z[nR], u[nR];
+        GRBVar x[nC], z[nR], u[nR], v[nR];
         // Get hold of the Variables and Eqn Variables
         for (unsigned int i = 0; i < nC; i++) x[i] = model->getVarByName("x_" + to_string(i));
         for (unsigned int i = 0; i < nR; i++) z[i] = model->getVarByName("z_" + to_string(i));
         // Define binary variables for bigM
         for (unsigned int i = 0; i < nR; i++) u[i] = model->addVar(0, 1, 0, GRB_BINARY, "u_" + to_string(i));
+        if (this->useIndicators)
+            for (unsigned int i = 0; i < nR; i++)
+                v[i] = model->addVar(0, 1, 0, GRB_BINARY, "v_" + to_string(i));
         // Include ALL Complementarity constraints using bigM
         if (VERBOSE) {
             if (this->useIndicators) { cout << "Using indicator constraints for complementarities." << endl; }
@@ -337,12 +340,14 @@ Game::LCP::LCPasMIP(
         GRBLinExpr expr = 0;
         for (auto p:Compl) {
             // z[i] <= Mu constraint
+
+            // u[j]=0 --> z[i] <=0
             if (!this->useIndicators) {
                 expr = bigM * u[p.first];
                 model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first],
                                  "z" + to_string(p.first) + "_L_Mu" + to_string(p.first));
             } else
-                model->addGenConstrIndicator(u[p.first], 0, z[p.first], GRB_GREATER_EQUAL, 0,
+                model->addGenConstrIndicator(u[p.first], 0, z[p.first], GRB_LESS_EQUAL, 0,
                                              "z_ind_" + to_string(p.first) + "_L_Mu_" + to_string(p.first));
             // x[i] <= M(1-u) constraint
             if (!this->useIndicators) {
@@ -351,8 +356,11 @@ Game::LCP::LCPasMIP(
                 model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second],
                                  "x" + to_string(p.first) + "_L_MuDash" + to_string(p.first));
             } else
-                model->addGenConstrIndicator(u[p.first], 1, x[p.second], GRB_GREATER_EQUAL, 0,
+                model->addGenConstrIndicator(v[p.first], 1, x[p.second], GRB_LESS_EQUAL, 0,
                                              "x_ind_" + to_string(p.first) + "_L_MuDash_" + to_string(p.first));
+
+            if (this->useIndicators)
+                model->addConstr(u[p.first] + v[p.first], GRB_EQUAL, 1, "uv_sum_" + to_string(p.first));
         }
         // If any equation or variable is to be fixed to zero, that happens here!
         for (auto i:FixVar) model->addConstr(x[i], GRB_EQUAL, 0.0);
@@ -1016,9 +1024,12 @@ Game::LCP::makeQP(
     // Resizing entities.
     QP_cons.A.zeros(Ncons, Nx_old);
     //QP_cons.B.zeros();
-    QP_obj.c.resize(Ny);
-    QP_obj.C.resize(Ny, Nx_old);
-    QP_obj.Q.resize(Ny, Ny);
+    QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
+    //QP_obj.c.resize(Ny);
+    QP_obj.C = resize_patch(QP_obj.C, Ny, Nx_old);
+    //QP_obj.C.resize(Ny, Nx_old);
+    //QP_obj.Q.resize(Ny, Ny);
+    QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
     // Setting the QP_Param object
     QP.set(QP_obj, QP_cons);
     return *this;
