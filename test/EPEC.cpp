@@ -2,6 +2,7 @@
 #include<chrono>
 #include"../src/models.h"
 #include"../src/games.h"
+#include"../src/lcptolp.h"
 #include<ctime>
 #include<cstdlib>
 #include<gurobi_c++.h>
@@ -193,6 +194,7 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
          * EXPECTED LCP
          * 0 \leq q1 \perp 2.2 q1 + q2 - 90 \geq 0
          * 0 \leq q2 \perp q1 + 2.4 q2 - 95 \geq 0
+         * Solution: q1=28.271, q2=27.8037
          */
         arma::sp_mat Q(1, 1), A(0, 1), B(0, 1), C(1,1); arma::vec  b, c(1); b.set_size(0);
         Q(0,0) = 2*1.1;
@@ -205,12 +207,12 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         // Creating the Nashgame
         std::vector<shared_ptr<Game::QP_Param>> q {q1, q2};
         sp_mat MC(0, 2); vec MCRHS; MCRHS.set_size(0);
-        Game::NashGame Nash = Game::NashGame(q, MC, MCRHS);
+         Game::NashGame Nash = Game::NashGame(q, MC, MCRHS);
 
         // Master check  -  LCP should be proper!
         sp_mat MM, MM_ref; vec qq, qq_ref; perps Compl;
         BOOST_TEST_MESSAGE("NashGame.FormulateLCP test");
-        BOOST_CHECK_NO_THROW( Nash.FormulateLCP(MM, qq, Compl));
+        BOOST_CHECK_NO_THROW(Nash.FormulateLCP(MM, qq, Compl));
         BOOST_CHECK_MESSAGE(MM(0,0)==2.2, "checking q1 coefficient in M-LCP (0,0)");
         BOOST_CHECK_MESSAGE(MM(0,1)==1, "checking q2 coefficient in M-LCP (0,1)");
         BOOST_CHECK_MESSAGE(MM(1,0)==1, "checking q1 coefficient in M-LCP (1,0)");
@@ -218,6 +220,15 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         BOOST_CHECK_MESSAGE(qq(0)==-90, "checking rhs coefficient in Q-LCP (0)");
         BOOST_CHECK_MESSAGE(qq(1)==-95, "checking rhs coefficient in Q-LCP (1)");
 
+        BOOST_TEST_MESSAGE("LCP.LCPasMIP test");
+        Game::LCP lcp = Game::LCP(&env, Nash);
+        unique_ptr<GRBModel> lcpmodel = lcp.LCPasMIP(true);
+
+       int Nvar = Nash.getNprimals() + Nash.getNduals() + Nash.getNshadow() + Nash.getNleaderVars();
+       BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X));
+       BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X));
+       BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X),28.271,0.001);
+       BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X),27.8037,0.001);
 
     }
 
