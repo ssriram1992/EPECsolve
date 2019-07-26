@@ -639,33 +639,33 @@ Game::NashGame::FormulateLCP(
         // Adding the primal equations
         // Region 1 in Formulate LCP.ipe
         if (i > 0) { // For the first player, no need to add anything 'before' 0-th position
-            cout << "Region 1" << endl;
-            cout << "\tM(" << this->primal_position.at(i) << "," << 0 << "," << this->primal_position.at(i + 1) - 1
-                 << "-"
-                 << this->primal_position.at(i) - 1 << ")" << endl;
-            cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << this->primal_position.at(i) - 1 << ")" << endl;
+            // cout << "Region 1" << endl;
+            // cout << "\tM(" << this->primal_position.at(i) << "," << 0 << "," << this->primal_position.at(i + 1) - 1
+                 // << "-"
+                 // << this->primal_position.at(i) - 1 << ")" << endl;
+            // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << this->primal_position.at(i) - 1 << ")" << endl;
             M.submat(
                     this->primal_position.at(i), 0,
                     this->primal_position.at(i + 1) - 1, this->primal_position.at(i) - 1
             ) = Ni[i].submat(0, 0, Nprim - 1, this->primal_position.at(i) - 1);
         }
         // Region 2 in Formulate LCP.ipe
-        cout << "Region 2" << endl;
-        cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i) << "-"
-             << this->primal_position.at(i + 1) - 1 << "-" << this->primal_position.at(i + 1) - 1 << ")" << endl;
-        cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << Nprim - 1 << ")" << endl;
+        // cout << "Region 2" << endl;
+        // cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i) << "-"
+             // << this->primal_position.at(i + 1) - 1 << "-" << this->primal_position.at(i + 1) - 1 << ")" << endl;
+        // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << Nprim - 1 << ")" << endl;
         M.submat(
                 this->primal_position.at(i), this->primal_position.at(i),
                 this->primal_position.at(i + 1) - 1, this->primal_position.at(i + 1) - 1
         ) = Mi[i].submat(0, 0, Nprim - 1, Nprim - 1);
         // Region 3 in Formulate LCP.ipe
         if (this->primal_position.at(i+1) != this->dual_position.at(0)) {
-            cout << "Region 3" << endl;
-            cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i + 1) << "-"
-                 << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(0) - 1 << ")" << endl;
-            cout << "\t(" << 0 << "," << this->primal_position.at(i) << "-" << Nprim - 1 << "," << Ni[i].n_cols - 1
-                 << ")"
-                 << endl;
+            // cout << "Region 3" << endl;
+            // cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i + 1) << "-"
+                 // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(0) - 1 << ")" << endl;
+            // cout << "\t(" << 0 << "," << this->primal_position.at(i) << "-" << Nprim - 1 << "," << Ni[i].n_cols - 1
+                 // << ")"
+                 // << endl;
             M.submat(
                     this->primal_position.at(i), this->primal_position.at(i + 1),
                     this->primal_position.at(i + 1) - 1, this->dual_position.at(0) - 1
@@ -673,10 +673,10 @@ Game::NashGame::FormulateLCP(
         }
         // Region 4 in Formulate LCP.ipe
         if (this->dual_position.at(i) != this->dual_position.at(i + 1)) {
-            cout << "Region 4" << endl;
-            cout << "\tM(" << this->primal_position.at(i) << "," << this->dual_position.at(i) << "-"
-                 << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(i + 1) << ")" << endl;
-            cout << "\t(" << 0 << "," << Nprim - 1 << "-" << Nprim - 1 << "," << Nprim + Ndual - 1 << ")" << endl;
+            // cout << "Region 4" << endl;
+            // cout << "\tM(" << this->primal_position.at(i) << "," << this->dual_position.at(i) << "-"
+                 // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(i + 1) << ")" << endl;
+            // cout << "\t(" << 0 << "," << Nprim - 1 << "-" << Nprim - 1 << "," << Nprim + Ndual - 1 << ")" << endl;
             M.submat(
                     this->primal_position.at(i),  this->dual_position.at(i),
                     this->primal_position.at(i+1)-1, this->dual_position.at(i+1)-1
