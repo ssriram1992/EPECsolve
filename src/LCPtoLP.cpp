@@ -330,22 +330,36 @@ Game::LCP::LCPasMIP(
         // Define binary variables for bigM
         for (unsigned int i = 0; i < nR; i++) u[i] = model->addVar(0, 1, 0, GRB_BINARY, "u_" + to_string(i));
         // Include ALL Complementarity constraints using bigM
+        if (VERBOSE) {
+            if (this->useIndicators) { cout << "Using indicator constraints for complementarities." << endl; }
+            else { cout << "Using bigM for complementarities with M=" << this->bigM << endl; }
+        }
+        GRBLinExpr expr = 0;
         for (auto p:Compl) {
             // z[i] <= Mu constraint
-            GRBLinExpr expr = 0;
-            expr += bigM * u[p.first];
-            model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first],
-                             "z" + to_string(p.first) + "_L_Mu" + to_string(p.first));
+            if (!this->useIndicators) {
+                expr = bigM * u[p.first];
+                model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first],
+                                 "z" + to_string(p.first) + "_L_Mu" + to_string(p.first));
+            } else
+                model->addGenConstrIndicator(u[p.first], 0, z[p.first], GRB_GREATER_EQUAL, 0,
+                                             "z_ind_" + to_string(p.first) + "_L_Mu_" + to_string(p.first));
             // x[i] <= M(1-u) constraint
-            expr = bigM;
-            expr -= bigM * u[p.first];
-            model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second],
-                             "x" + to_string(p.first) + "_L_MuDash" + to_string(p.first));
+            if (!this->useIndicators) {
+                expr = bigM;
+                expr -= bigM * u[p.first];
+                model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second],
+                                 "x" + to_string(p.first) + "_L_MuDash" + to_string(p.first));
+            } else
+                model->addGenConstrIndicator(u[p.first], 1, x[p.second], GRB_GREATER_EQUAL, 0,
+                                             "x_ind_" + to_string(p.first) + "_L_MuDash_" + to_string(p.first));
         }
         // If any equation or variable is to be fixed to zero, that happens here!
         for (auto i:FixVar) model->addConstr(x[i], GRB_EQUAL, 0.0);
         for (auto i:FixEq) model->addConstr(z[i], GRB_EQUAL, 0.0);
         model->update();
+        if (VERBOSE)
+            cout << "IntegerTol=" << this->eps_int << ";FeasabilityTol=OptimalityTol=" << this->eps << endl;
         model->set(GRB_DoubleParam_IntFeasTol, this->eps_int);
         model->set(GRB_DoubleParam_FeasibilityTol, this->eps);
         model->set(GRB_DoubleParam_OptimalityTol, this->eps);
