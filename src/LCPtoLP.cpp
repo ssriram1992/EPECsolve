@@ -60,7 +60,8 @@ Game::LCP::defConst(GRBEnv *env)
     RelAllPol = new vector<vector<short int> *>{};
     Ai = new vector<arma::sp_mat *>{};
     bi = new vector<arma::vec *>{};
-    this->RlxdModel.set(GRB_IntParam_OutputFlag, 0);
+    if (VERBOSE)
+        this->RlxdModel.set(GRB_IntParam_OutputFlag, 0);
     this->env = env;
     this->nR = this->M.n_rows;
     this->nC = this->M.n_cols;
@@ -190,7 +191,7 @@ Game::LCP::makeRelaxed()
             RlxdModel.addConstr(expr, GRB_EQUAL, z[i], "z_" + to_string(i) + "_def");
         }
         // If @f$Ax \leq b@f$ constraints are there, they should be included too!
-        if (this->_A.n_nonzero != 0 || this->_b.n_rows != 0) {
+        if (this->_A.n_nonzero != 0 && this->_b.n_rows != 0) {
             if (_A.n_cols != nC || _A.n_rows != _b.n_rows) {
                 cout << "(" << _A.n_rows << "," << _A.n_cols << ")\t" << _b.n_rows << " " << nC << endl;
                 throw string("A and b are incompatible! Thrown from makeRelaxed()");

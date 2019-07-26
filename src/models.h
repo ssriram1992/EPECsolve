@@ -134,7 +134,8 @@ namespace Models {
                               const Models::LeadLocs &Loc = {},
                               const unsigned int import_lim_cons = 1,
                               const unsigned int export_lim_cons = 1,
-                              const unsigned int price_lim_cons = 1) const noexcept;
+                              const unsigned int price_lim_cons = 1,
+                              const unsigned int tax_lim_cons = 1) const noexcept;
 
         void add_Leaders_tradebalance_constraints(const unsigned int i);
 

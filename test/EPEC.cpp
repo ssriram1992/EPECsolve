@@ -234,27 +234,27 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
 
 
 
-    /* These are tests for Models.h and using EPEC class.
-     * We make increasingly complicated problems and test them.
-     * Bella ciao
 
     BOOST_AUTO_TEST_CASE(SingleBilevel)
     {
-        BOOST_TEST_MESSAGE("Testing single belevel");
+        BOOST_TEST_MESSAGE("Testing a single bilevel problem.");
         Models::FollPar FP;
         FP.capacities = {100};
         FP.costs_lin = {10};
         FP.costs_quad = {5};
         FP.emission_costs = {6};
-        FP.names={"US_follower"};
-        Models::LeadAllPar Country(1, "Country", FP, {300,0.05}, {-1, -1, -1, -1});
+        FP.names={"NiceFollower"};
+        Models::LeadAllPar Country(1, "NiceCountry", FP, {300,0.05}, {50, -1, -1, -1});
         GRBEnv env = GRBEnv();
         arma::sp_mat M;		 arma::vec q;		 perps Compl;
         arma::sp_mat Aa; arma::vec b;
         Models::EPEC epec(&env);
         arma::sp_mat TrCo(1,1);
         TrCo(0,0) = 0;
-        epec.addCountry(Country).addTranspCosts(TrCo).finalize();
-        epec.findNashEq(true);
-    }*/
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country));
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+    }
 BOOST_AUTO_TEST_SUITE_END()

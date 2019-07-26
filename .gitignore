@@ -23,3 +23,5 @@ cmake-build-debug/*
 dat/*
 EPECtest
 EPECsolve
+dat/countrQP_0
+dat/LCP_0
