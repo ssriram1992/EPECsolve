@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         FP.costs_quad = {5};
         FP.emission_costs = {6};
         FP.names={"NiceFollower"};
-        Models::LeadAllPar Country(1, "NiceCountry", FP, {300,0.05}, {50, -1, -1, -1});
+        Models::LeadAllPar Country(1, "NiceCountry", FP, {300,0.05}, {666, -1, -1, -1});
         GRBEnv env = GRBEnv();
         arma::sp_mat M;		 arma::vec q;		 perps Compl;
         arma::sp_mat Aa; arma::vec b;

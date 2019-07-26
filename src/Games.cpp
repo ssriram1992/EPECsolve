@@ -27,7 +27,7 @@ arma::sp_mat Game::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, 
     arma::sp_mat MMat(nR, nC);
     MMat.zeros();
     if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
-        if (Mat.n_rows > 1 && Mat.n_cols > 1)
+        if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
             MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
     } else {
         if (nR <= Mat.n_rows && nC <= Mat.n_cols)
@@ -43,8 +43,10 @@ arma::sp_mat Game::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, 
 arma::mat Game::resize_patch(const arma::mat &Mat, const unsigned int nR, const unsigned int nC) {
     arma::mat MMat(nR, nC);
     MMat.zeros();
-    if (nR >= Mat.n_rows && nC >= Mat.n_cols)
-        MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
+    if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
+        if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
+            MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
+    }
     else {
         if (nR <= Mat.n_rows && nC <= Mat.n_cols)
             MMat = Mat.submat(0, 0, nR, nC);
@@ -476,8 +478,11 @@ Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N, arma::vec &q) const
             arma::join_rows(this->Q, this->B.t()),
             arma::join_rows(-this->B, arma::zeros<arma::sp_mat>(this->Ncons, this->Ncons))
     );
+    //M.print_dense();
     N = arma::join_cols(this->C, -this->A);
+    //N.print_dense();
     q = arma::join_cols(this->c, this->b);
+    //q.print();
     return M.n_rows;
 }
 
