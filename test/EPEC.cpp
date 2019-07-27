@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         Game::LCP lcp = Game::LCP(&env, Nash);
         unique_ptr<GRBModel> lcpmodel = lcp.LCPasMIP(true);
 
-       int Nvar = Nash.getNprimals() + Nash.getNduals() + Nash.getNshadow() + Nash.getNleaderVars();
+       // int Nvar = Nash.getNprimals() + Nash.getNduals() + Nash.getNshadow() + Nash.getNleaderVars();
        BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X));
        BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X));
        BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X),28.271,0.001);

@@ -1,7 +1,7 @@
 #ifndef EPECSOLVE_H
 #define EPECSOLVE_H
 
-#define VERBOSE true
+#define VERBOSE false
 
 #include <map>
 #include <iostream>
