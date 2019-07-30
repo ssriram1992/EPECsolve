@@ -86,8 +86,8 @@ int main()
 	FP3a.names = {"Solar producer", "Gas producer", "Coal producer"};
 
 	// Two followers Leader with price cap
-	Models::LeadAllPar LA_pc1(1, "USA", FP3, {40,1.10}, {0.4, -1, -1, -1});
-	Models::LeadAllPar LA_pc2(1, "China", FP3a, {60,1.25}, {0.4, -1, -1, -1});
+	Models::LeadAllPar LA_pc1(1, "USA", FP1, {40,1.10}, {0.4, -1, -1, -1});
+	Models::LeadAllPar LA_pc2(1, "China", FP1, {60,1.25}, {0.4, -1, -1, -1});
 
 	// cout<<LA<<LA2;
 	// cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
