@@ -46,8 +46,7 @@ arma::mat Game::resize_patch(const arma::mat &Mat, const unsigned int nR, const 
     if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
         if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
             MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
-    }
-    else {
+    } else {
         if (nR <= Mat.n_rows && nC <= Mat.n_cols)
             MMat = Mat.submat(0, 0, nR, nC);
         else
@@ -646,8 +645,8 @@ Game::NashGame::FormulateLCP(
         if (i > 0) { // For the first player, no need to add anything 'before' 0-th position
             // cout << "Region 1" << endl;
             // cout << "\tM(" << this->primal_position.at(i) << "," << 0 << "," << this->primal_position.at(i + 1) - 1
-                 // << "-"
-                 // << this->primal_position.at(i) - 1 << ")" << endl;
+            // << "-"
+            // << this->primal_position.at(i) - 1 << ")" << endl;
             // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << this->primal_position.at(i) - 1 << ")" << endl;
             M.submat(
                     this->primal_position.at(i), 0,
@@ -657,20 +656,20 @@ Game::NashGame::FormulateLCP(
         // Region 2 in Formulate LCP.ipe
         // cout << "Region 2" << endl;
         // cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i) << "-"
-             // << this->primal_position.at(i + 1) - 1 << "-" << this->primal_position.at(i + 1) - 1 << ")" << endl;
+        // << this->primal_position.at(i + 1) - 1 << "-" << this->primal_position.at(i + 1) - 1 << ")" << endl;
         // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << Nprim - 1 << ")" << endl;
         M.submat(
                 this->primal_position.at(i), this->primal_position.at(i),
                 this->primal_position.at(i + 1) - 1, this->primal_position.at(i + 1) - 1
         ) = Mi[i].submat(0, 0, Nprim - 1, Nprim - 1);
         // Region 3 in Formulate LCP.ipe
-        if (this->primal_position.at(i+1) != this->dual_position.at(0)) {
+        if (this->primal_position.at(i + 1) != this->dual_position.at(0)) {
             // cout << "Region 3" << endl;
             // cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i + 1) << "-"
-                 // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(0) - 1 << ")" << endl;
+            // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(0) - 1 << ")" << endl;
             // cout << "\t(" << 0 << "," << this->primal_position.at(i) << "-" << Nprim - 1 << "," << Ni[i].n_cols - 1
-                 // << ")"
-                 // << endl;
+            // << ")"
+            // << endl;
             M.submat(
                     this->primal_position.at(i), this->primal_position.at(i + 1),
                     this->primal_position.at(i + 1) - 1, this->dual_position.at(0) - 1
@@ -680,12 +679,12 @@ Game::NashGame::FormulateLCP(
         if (this->dual_position.at(i) != this->dual_position.at(i + 1)) {
             // cout << "Region 4" << endl;
             // cout << "\tM(" << this->primal_position.at(i) << "," << this->dual_position.at(i) << "-"
-                 // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(i + 1) << ")" << endl;
+            // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(i + 1) << ")" << endl;
             // cout << "\t(" << 0 << "," << Nprim - 1 << "-" << Nprim - 1 << "," << Nprim + Ndual - 1 << ")" << endl;
             M.submat(
-                    this->primal_position.at(i),  this->dual_position.at(i),
-                    this->primal_position.at(i+1)-1, this->dual_position.at(i+1)-1
-            )  = Mi[i].submat(0, Nprim, Nprim-1, Nprim+Ndual-1);
+                    this->primal_position.at(i), this->dual_position.at(i),
+                    this->primal_position.at(i + 1) - 1, this->dual_position.at(i + 1) - 1
+            ) = Mi[i].submat(0, Nprim, Nprim - 1, Nprim + Ndual - 1);
         }
         // RHS
         q.subvec(this->primal_position.at(i), this->primal_position.at(i + 1) - 1) = qi[i].subvec(0, Nprim - 1);

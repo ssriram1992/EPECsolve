@@ -262,9 +262,9 @@ void Models::EPEC::make_LL_LeadCons(
     cout << "\n********** Import Limit constraint: " << import_lim_cons;
     cout << "\n********** Export Limit constraint: " << export_lim_cons;
     cout << "\n********** Tax Limit constraint: " << tax_lim_cons << "\n\t";
-    for (int i=0;i<Params.n_followers;i++) cout<<"q_"+to_string(i)<<"\t\t";
-    cout<<"q_imp\t\tq_exp\t\tp_cap\t\t";
-    for (int i=0;i<Params.n_followers;i++) cout<<"t_"+to_string(i)<<"\t\t";
+    for (int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
+    cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
+    for (int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
     LeadCons.impl_print_dense("\nLeadCons:\n");
     LeadRHS.print("\nLeadRHS");
 }
@@ -888,7 +888,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
         if (VERBOSE) cout << "In EPEC::make_country_QP: " << Player_i_LCP.getCompl().size() << endl;
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
-        if (!this->convexify) Player_i_LCP.convexify= false;
+        if (!this->convexify) Player_i_LCP.convexify = false;
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
     }
 }
@@ -933,7 +933,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
 
         this->nashgame->write("dat/NashGame", true, true);
         //Using indicator constraints
-        lcp->useIndicators= true;
+        lcp->useIndicators = true;
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();

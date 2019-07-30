@@ -14,11 +14,16 @@ using namespace Game;
 
 namespace Game {
     bool isZero(arma::mat M, double tol = 1e-6);
+
     bool isZero(arma::sp_mat M, double tol = 1e-6);
+
 // bool isZero(arma::vec M, double tol = 1e-6);
     arma::sp_mat resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC);
+
     arma::mat resize_patch(const arma::mat &Mat, const unsigned int nR, const unsigned int nC);
+
     arma::vec resize_patch(const arma::vec &Mat, const unsigned int nR);
+
 ///@brief struct to handle the objective params of MP_Param/QP_Param
 ///@details Refer QP_Param class for what Q, C and c mean.
     typedef struct QP_objective {
@@ -49,6 +54,7 @@ namespace Game {
     public:
         // Default constructors
         MP_Param() = default;
+
         MP_Param(const MP_Param &M) = default;
 
         // Getters and setters
@@ -154,7 +160,7 @@ namespace Game {
 
         /// Copy constructor
         QP_Param(const QP_Param &Qu) : MP_Param(Qu),
-                                 env{Qu.env}, QuadModel{Qu.QuadModel}, made_yQy{Qu.made_yQy} { this->size(); };
+                                       env{Qu.env}, QuadModel{Qu.QuadModel}, made_yQy{Qu.made_yQy} { this->size(); };
 
 
         // Override setters
@@ -167,7 +173,7 @@ namespace Game {
 
         QP_Param &set(QP_objective &&obj, QP_constraints &&cons) final;
 
-        bool operator ==(const QP_Param &Q2) const;
+        bool operator==(const QP_Param &Q2) const;
 
         // Other methods
         unsigned int KKT(arma::sp_mat &M, arma::sp_mat &N, arma::vec &q) const;

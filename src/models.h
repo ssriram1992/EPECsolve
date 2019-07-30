@@ -154,7 +154,8 @@ namespace Models {
     public: // Attributes
         const unsigned int &nCountries{nCountr}; ///< Constant attribute for number of leaders in the EPEC
         const unsigned int &nVarEPEC{nVarinEPEC}; ///< Constant attribute for number of variables in the EPEC
-        bool convexify = {true}; ///< Controls the flag convexify in LCPtoLP class. If true, the Balas' union of polyhedra will be computed
+        bool convexify = {
+                true}; ///< Controls the flag convexify in LCPtoLP class. If true, the Balas' union of polyhedra will be computed
 
         EPEC() = delete;
 
