@@ -490,8 +490,8 @@ int Game::ConvexHull(
         // A.submat(complRow, nPoly*nC+i, complRow+nConsInPoly-1, nPoly*nC+i) = -*bi->at(i);
         // Second constraint in (4.31)
         for (unsigned int j = 0; j < nC; j++) {
-            A.at(FirstCons + 2 * i, nC + (i * nC) + j) = 1;
-            A.at(FirstCons + 2 * i + 1, nC + (i * nC) + j) = -1;
+            A.at(FirstCons + 2 * j, nC + (i * nC) + j) = 1;
+            A.at(FirstCons + 2 * j + 1, nC + (i * nC) + j) = -1;
         }
         // Third constraint in (4.31)
         A.at(FirstCons + nC * 2, nC + nPoly * nC + i) = 1;

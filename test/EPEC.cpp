@@ -302,7 +302,7 @@ using namespace arma;
         Ai.push_back(&A2);
         bi.push_back(&b2);
 
-		/*
+		
         //------THIRD POLYHEDRON
         A3.zeros(4, 2);
         b3.zeros(4);
@@ -320,7 +320,6 @@ using namespace arma;
         b3(3) = 1.5;
         Ai.push_back(&A3);
         bi.push_back(&b3);
-		*/
 
         //Minimize the sum of negative variables. Solution should be a vertex of polyhedron A2
 
