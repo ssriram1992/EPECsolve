@@ -10,6 +10,8 @@
 #include<iostream>
 #include<random>
 
+#define VERBOSE true
+
 #define BOOST_TEST_MODULE EPECTest
 #include<boost/test/unit_test.hpp>
 
@@ -235,26 +237,75 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
 
 
 
-    BOOST_AUTO_TEST_CASE(SingleBilevel)
+    BOOST_AUTO_TEST_CASE(SingleBilevelNonConvex)
     {
-        BOOST_TEST_MESSAGE("Testing a single bilevel problem.");
+        BOOST_TEST_MESSAGE("Testing a single bilevel problem without convexification.");
         Models::FollPar FP;
         FP.capacities = {100};
         FP.costs_lin = {10};
         FP.costs_quad = {5};
         FP.emission_costs = {6};
         FP.names={"NiceFollower"};
-        Models::LeadAllPar Country(1, "NiceCountry", FP, {300,0.05}, {666, -1, -1, -1});
+        Models::LeadAllPar Country(1, "NiceCountry", FP, {300,0.05}, {290, -1, -1, -1});
         GRBEnv env = GRBEnv();
         arma::sp_mat M;		 arma::vec q;		 perps Compl;
         arma::sp_mat Aa; arma::vec b;
         Models::EPEC epec(&env);
         arma::sp_mat TrCo(1,1);
         TrCo(0,0) = 0;
+        //Switch off convexification
+        epec.convexify= false;
+
         BOOST_CHECK_NO_THROW(epec.addCountry(Country));
         BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
         BOOST_CHECK_NO_THROW(epec.finalize());
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_MESSAGE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart)+0)==0, "checking q1==0");
+        BOOST_CHECK_MESSAGE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax)+0)==290, "checking t1==290");
+    }
+
+    BOOST_AUTO_TEST_CASE(SingleBilevel)
+    {
+        BOOST_TEST_MESSAGE("Testing a single bilevel problem without convexification.");
+        Models::FollPar FP;
+        FP.capacities = {100};
+        FP.costs_lin = {10};
+        FP.costs_quad = {5};
+        FP.emission_costs = {6};
+        FP.names={"NiceFollower"};
+        Models::LeadAllPar Country(1, "NiceCountry", FP, {300,0.05}, {290, -1, -1, -1});
+        GRBEnv env = GRBEnv();
+        arma::sp_mat M;		 arma::vec q;		 perps Compl;
+        arma::sp_mat Aa; arma::vec b;
+        Models::EPEC epec(&env);
+        arma::sp_mat TrCo(1,1);
+        TrCo(0,0) = 0;
+        //Switch off convexification
+        epec.convexify= false;
+
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country));
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        double q1=epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart)+0),t1=epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax)+0);
+        BOOST_TEST_MESSAGE("Testing non-convexified results");
+        BOOST_CHECK_MESSAGE(q1==0, "(NC) checking q1==0");
+        BOOST_CHECK_MESSAGE(t1==290, "(NC) checking t1==290");
+
+        Models::EPEC epec2(&env);
+        BOOST_CHECK_NO_THROW(epec2.addCountry(Country));
+        BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
+        BOOST_CHECK_NO_THROW(epec2.finalize());
+        BOOST_CHECK_NO_THROW(epec2.make_country_QP());
+        BOOST_CHECK_NO_THROW(epec2.findNashEq(true));
+        BOOST_TEST_MESSAGE("Testing convexified results");
+        BOOST_CHECK_MESSAGE(epec2.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart)+0)==0, "(C) checking q1==0");
+        BOOST_CHECK_MESSAGE(epec2.x.at(epec.getPosition(0, Models::LeaderVars::Tax)+0)==290, "(C) checking t1==290");
+
+        BOOST_TEST_MESSAGE("Testing discrepancy between the 2");
+        BOOST_CHECK_MESSAGE(epec2.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart)+0)==q1, "comparing q1 among the two");
+        BOOST_CHECK_MESSAGE(epec2.x.at(epec.getPosition(0, Models::LeaderVars::Tax)+0)==t1, "comparing t1 among the two");
     }
 BOOST_AUTO_TEST_SUITE_END()

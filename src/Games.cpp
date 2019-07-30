@@ -101,7 +101,7 @@ operator<<(ostream &ost, const perps &C) {
 ostream &
 Game::operator<<(ostream &os, const Game::QP_Param &Q) {
     os << "Quadratic program with linear inequality constraints: " << endl;
-    os << Q.getNy() << " decision variables parameterized by " << Q.getNx() << " variables" << endl;
+    os << Q.getNy() << " decision variables parametrized by " << Q.getNx() << " variables" << endl;
     os << Q.getb().n_rows << " linear inequalities" << endl << endl;
     if (VERBOSE) {
         Q.getQ().print("Q");
@@ -636,7 +636,7 @@ Game::NashGame::FormulateLCP(
 
 
     for (unsigned int i = 0; i < Nplayers; i++) {
-        cout << "-----Player " << i << endl;
+        //cout << "-----Player " << i << endl;
         this->Players[i]->KKT(Mi[i], Ni[i], qi[i]);
         unsigned int Nprim, Ndual;
         Nprim = this->Players[i]->getNy();

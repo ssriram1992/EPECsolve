@@ -519,7 +519,7 @@ int Game::ConvexHull(
                            nFinCons-1, nC-1 // nFinVar-1
                            ) = Acom;*/
     }
-    if (VERBOSE) cout << "A" << A.n_rows << " " << A.n_cols << endl;
+    if (VERBOSE) cout << "Convex Hull A:" << A.n_rows << "x" << A.n_cols << endl;
     return 0;
 }
 
@@ -936,13 +936,13 @@ Game::LCP::FixToPolies(
         vector<arma::sp_mat *> *custAi,                  ///< If custom polyhedra vector is used, pointer to vector of LHS constraint matrix
         vector<arma::vec *> *custbi                      /// If custom polyhedra vector is used, pointer to vector of RHS of constraints
 )
-/** @brief Computes the equation of the feasibility polyhedra corresponding to the given @p Fix
- *	@details The computed polyhedroa are always pushed into a vector of @p arma::sp_mat and @p arma::vec 
+/** @brief Computes the equation of the feasibility polyhedron corresponding to the given @p Fix
+ *	@details The computed polyhedron are always pushed into a vector of @p arma::sp_mat and @p arma::vec
  *	If @p custom is false, this is the internal attribute of LCP, which are LCP::Ai and LCP::bi.
  *	Otherwise, the vectors can be provided as arguments.
  *	@p true value to @p checkFeas ensures that @e each polyhedron that is pushed is feasible.
  *	not meant for high level code. Instead use LCP::FixToPolies.
- *	@note A value of 0 in @p *Fix implies that polyhedra corresponding to fixing the corresponding variable as well as the equation
+ *	@note A value of 0 in @p *Fix implies that polyhedron corresponding to fixing the corresponding variable as well as the equation
  *	become candidates to pushed into the vector. Hence this is preferred over LCP::FixToPoly for high-level usage.
  */
 {
@@ -974,7 +974,7 @@ Game::LCP::EnumerateAll(const bool solveLP ///< Should the poyhedra added be che
 /**
  * @brief Brute force computation of LCP feasible region
  * @details Computes all @f$2^n@f$ polyhedra defining the LCP feasible region.
- * These are always added to LCP::Ai and LCP::bi
+ * Th ese are always added to LCP::Ai and LCP::bi
  */
 {
     delete Ai;
@@ -1000,14 +1000,20 @@ Game::LCP::addPolyhedron(
         arma::sp_mat A_common;
         A_common = arma::join_cols(this->_A, -this->M);
         arma::vec b_common = arma::join_cols(this->_b, this->q);
-        Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
+        if (!this->convexify) {
+            *A = A_common;
+            *b = b_common;
+            cout << "Convexification is disabled"<<endl;
+        } else {
+            Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
+        }
     }
     return *this;
 }
 
 Game::LCP &
 Game::LCP::makeQP(
-        const vector<short int> &Fix,    ///< +1/0/-1 Representation of the polyhedra which needed to be pushed
+        const vector<short int> &Fix,    ///< +1/0/-1 Representation of the polyhedron which needed to be pushed
         vector<arma::sp_mat *> &custAi,    ///< Vector with LHS of constraint matrix should be pushed.
         vector<arma::vec *> &custbi,        ///< Vector with RHS of constraints should be pushed.
         Game::QP_objective &QP_obj,        ///< The objective function of the QP to be returned. @warning Size of this parameter might change!
@@ -1015,7 +1021,9 @@ Game::LCP::makeQP(
 ) {
     // Original sizes
     const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
-    cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
+
+
+    if (VERBOSE) cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
     Game::QP_constraints QP_cons;
     this->addPolyhedron(Fix, custAi, custbi, true, &QP_cons.B, &QP_cons.b);
     // Updated size after convex hull has been computed.
@@ -1023,12 +1031,8 @@ Game::LCP::makeQP(
     const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};
     // Resizing entities.
     QP_cons.A.zeros(Ncons, Nx_old);
-    //QP_cons.B.zeros();
     QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
-    //QP_obj.c.resize(Ny);
     QP_obj.C = resize_patch(QP_obj.C, Ny, Nx_old);
-    //QP_obj.C.resize(Ny, Nx_old);
-    //QP_obj.Q.resize(Ny, Ny);
     QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
     // Setting the QP_Param object
     QP.set(QP_obj, QP_cons);

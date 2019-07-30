@@ -258,8 +258,14 @@ void Models::EPEC::make_LL_LeadCons(
         LeadRHS.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons) =
                 Params.LeaderParam.price_limit - Params.DemandParam.alpha;
     }
-    LeadCons.impl_print_dense("LeadCons:");
-    cout << "********** Price Limit constraint: " << price_lim_cons;
+    cout << "\n********** Price Limit constraint: " << price_lim_cons;
+    cout << "\n********** Import Limit constraint: " << import_lim_cons;
+    cout << "\n********** Export Limit constraint: " << export_lim_cons;
+    cout << "\n********** Tax Limit constraint: " << tax_lim_cons << "\n\t";
+    for (int i=0;i<Params.n_followers;i++) cout<<"q_"+to_string(i)<<"\t\t";
+    cout<<"q_imp\t\tq_exp\t\tp_cap\t\t";
+    for (int i=0;i<Params.n_followers;i++) cout<<"t_"+to_string(i)<<"\t\t";
+    LeadCons.impl_print_dense("\nLeadCons:\n");
     LeadRHS.print("\nLeadRHS");
 }
 
@@ -328,8 +334,8 @@ Models::EPEC::addCountry(
     short int import_lim_cons{0}, export_lim_cons{0}, price_lim_cons{0}, tax_lim_cons{0};
     if (Params.LeaderParam.import_limit >= 0) import_lim_cons = 1;
     if (Params.LeaderParam.export_limit >= 0) export_lim_cons = 1;
-    if (Params.LeaderParam.price_limit > 0) price_lim_cons = 1;
-    if (Params.LeaderParam.max_tax > 0) tax_lim_cons = 1;
+    if (Params.LeaderParam.price_limit >= 0) price_lim_cons = 1;
+    if (Params.LeaderParam.max_tax >= 0) tax_lim_cons = 1;
 
     // cout<<" In addCountry: "<<Loc[Models::LeaderVars::End]<<endl;
     arma::sp_mat LeadCons(import_lim_cons +    // Import limit constraint
@@ -403,7 +409,6 @@ Models::EPEC::addCountry(
     auto N = std::make_shared<Game::NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
     this->name2nos[Params.name] = this->countries_LL.size();
     this->countries_LL.push_back(N);
-    // N->write("./dat/"+Params.name, false, true);
     Models::increaseVal(Loc, Models::LeaderVars::DualVar, N->getNduals());
     Locations.push_back(Loc);
     this->LeadConses.push_back(N->RewriteLeadCons());
@@ -836,6 +841,7 @@ void
 Models::EPEC::make_country_QP()
 /**
  * @brief Makes the Game::QP_Param for all the countries
+ * @param convexify controls whether the balas formulation is used to compute the union of polyhedra
  * @details
  * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for each valid @p i
  * @note Overloaded as EPEC::make_country_QP(unsigned int)
@@ -882,6 +888,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
         if (VERBOSE) cout << "In EPEC::make_country_QP: " << Player_i_LCP.getCompl().size() << endl;
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
+        if (!this->convexify) Player_i_LCP.convexify= false;
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
     }
 }
