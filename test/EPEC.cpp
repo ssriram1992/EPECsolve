@@ -314,9 +314,9 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         //x2>=1
         A3(2, 1) = -1;
         b3(2) = -1;
-        //x2<=2
+        //x2<=1.5
         A3(3, 1) = 1;
-        b3(3) = 2;
+        b3(3) = 1.5;
         Ai.push_back(&A3);
         bi.push_back(&b3);
 
@@ -341,6 +341,11 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         model.set(GRB_IntParam_DualReductions, 0);
         model.write("dat/ConvexHullTest.lp");
         model.optimize();
+        model.write("dat/ConvexHullTest.sol");
+        BOOST_CHECK_MESSAGE(model.get(GRB_IntAttr_Status) == GRB_OPTIMAL, "checking optimization status");
+        BOOST_CHECK_MESSAGE(model.getObjective().getValue() == 4,"checking obj==4");
+        BOOST_CHECK_MESSAGE(model.getVarByName("x_0").get(GRB_DoubleAttr_X) == 3,"checking x0==3");
+        BOOST_CHECK_MESSAGE(model.getVarByName("x_1").get(GRB_DoubleAttr_X) == 1,"checking x1==1");
 
     }
 
