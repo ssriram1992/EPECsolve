@@ -931,40 +931,40 @@ Models::EPEC::findNashEq(bool write, string filename) {
         if (VERBOSE) cout << *nashgame << endl;
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
 
-        this->nashgame->write("dat/NashGame", true, true);
+        if (VERBOSE) this->nashgame->write("dat/NashGame", true, true);
         //Using indicator constraints
         lcp->useIndicators = true;
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        if (write) {
-            lcpmodel->optimize();
-            if (VERBOSE) {
-                lcpmodel->write("dat/NashLCP.lp");
-                lcpmodel->write("dat/NashLCP.sol");
+        lcpmodel->optimize();
+        if (VERBOSE) {
+            lcpmodel->write("dat/NashLCP.lp");
+            lcpmodel->write("dat/NashLCP.sol");
+        }
+        this->sol_x.zeros(Nvar);
+        this->sol_z.zeros(Nvar);
+        unsigned int temp;
+        int status = lcpmodel->get(GRB_IntAttr_Status);
+        if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
+            try {
+
+                for (unsigned int i = 0; i < Nvar; i++) {
+                    this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
+                    this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
+                    if (VERBOSE)
+                        cout << "x_" + to_string(i) + ":" << this->sol_x(i) << "\t\tz_" + to_string(i) + ":"
+                             << this->sol_z(i) << endl;
+                    temp = i;
+                }
+
             }
-            this->sol_x.zeros(Nvar);
-            this->sol_z.zeros(Nvar);
-            unsigned int temp;
-            int status = lcpmodel->get(GRB_IntAttr_Status);
-            if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
-                try {
-
-                    for (unsigned int i = 0; i < Nvar; i++) {
-                        this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
-                        this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
-                        if (VERBOSE)
-                            cout << "x_" + to_string(i) + ":" << this->sol_x(i) << "\t\tz_" + to_string(i) + ":"
-                                 << this->sol_z(i) << endl;
-                        temp = i;
-                    }
-
-                }
-                catch (GRBException &e) {
-                    cerr << "GRBException in Models::EPEC::findNashEq : " << e.getErrorCode() << ": " << e.getMessage()
-                         << " "
-                         << temp << endl;;
-                }
+            catch (GRBException &e) {
+                cerr << "GRBException in Models::EPEC::findNashEq : " << e.getErrorCode() << ": " << e.getMessage()
+                     << " "
+                     << temp << endl;;
+            }
+            if (write) {
                 this->sol_x.save("dat/x_" + filename, arma::file_type::arma_ascii, VERBOSE);
                 this->sol_z.save("dat/z_" + filename, arma::file_type::arma_ascii, VERBOSE);
                 try {
@@ -973,10 +973,11 @@ Models::EPEC::findNashEq(bool write, string filename) {
                         this->WriteCountry(ell, "dat/Solution.txt", this->sol_x, true);
                     this->write("dat/Solution.txt", true);
                 } catch (GRBException &e) {}
-            } else
-                cout << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
-            if (VERBOSE) Game::print(lcp->getCompl());
-        }
+            }
+        } else
+            cout << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
+        if (VERBOSE) Game::print(lcp->getCompl());
+
     } else
         cerr << "GRBException in Models::EPEC::findNashEq : no country QP has been made." << endl;
 }
@@ -1146,7 +1147,7 @@ void Models::EPEC::testQP(const unsigned int i) {
     x.fill(555);
     if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
     std::unique_ptr<GRBModel> model = QP->solveFixed(x);
-    model->write("dat/CountryQP_" + to_string(i) + ".lp");
+    if (VERBOSE) model->write("dat/CountryQP_" + to_string(i) + ".lp");
     int status = model->get(GRB_IntAttr_Status);
     if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
         arma::vec sol;
