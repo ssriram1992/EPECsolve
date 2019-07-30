@@ -81,7 +81,7 @@ tag:
 
 EPECtest: $(EPEC_HOME)/test/EPEC
 	@echo "Starting the tests..."
-	@$(EPEC_HOME)/test/EPEC -l success
+	@$(EPEC_HOME)/test/EPEC -l success $(ARGS)
 	@echo "Tests completed"
 
 $(EPEC_HOME)/test/EPEC.o: $(EPEC_HOME)/test/EPEC.cpp

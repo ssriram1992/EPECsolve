@@ -20,7 +20,7 @@
 using namespace std;
 using namespace arma;
 
-BOOST_AUTO_TEST_SUITE(EPECTests)
+// BOOST_AUTO_TEST_SUITE(EPECTests)
 
     BOOST_AUTO_TEST_CASE(QP_Param_test) {
         BOOST_TEST_MESSAGE("\n\n");
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
     }
 
 
-    BOOST_AUTO_TEST_CASE(ConvexHull) {
+    BOOST_AUTO_TEST_CASE(ConvexHulltest) {
         BOOST_TEST_MESSAGE("\n\n");
         BOOST_TEST_MESSAGE("Testing Game::ConvexHull");
 
@@ -302,6 +302,7 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         Ai.push_back(&A2);
         bi.push_back(&b2);
 
+		/*
         //------THIRD POLYHEDRON
         A3.zeros(4, 2);
         b3.zeros(4);
@@ -319,6 +320,7 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         b3(3) = 1.5;
         Ai.push_back(&A3);
         bi.push_back(&b3);
+		*/
 
         //Minimize the sum of negative variables. Solution should be a vertex of polyhedron A2
 
@@ -327,7 +329,7 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         GRBVar x[A.n_cols];
         GRBConstr a[A.n_rows];
         for (unsigned int i = 0; i < A.n_cols; i++)
-            x[i] = model.addVar(-42, +42, 0, GRB_CONTINUOUS, "x_" + to_string(i));
+            x[i] = model.addVar(-GRB_INFINITY, +GRB_INFINITY, 0, GRB_CONTINUOUS, "x_" + to_string(i));
         for (unsigned int i = 0; i < A.n_rows; i++) {
             GRBLinExpr lin{0};
             for (auto j = A.begin_row(i); j != A.end_row(i); ++j)
@@ -431,4 +433,4 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
                             "comparing t1 among the two");
     }
 
-BOOST_AUTO_TEST_SUITE_END()
+// BOOST_AUTO_TEST_SUITE_END()
