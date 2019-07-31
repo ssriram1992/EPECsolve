@@ -405,30 +405,24 @@ BOOST_AUTO_TEST_CASE(SingleCountry_test) {
     FP.emission_costs = {6, 10};
     FP.names = {"Rosso", "Bianco"};
     Models::LeadAllPar Country(2, "One", FP, {300, 0.05}, {100, -1, -1, -1});
+    Models::LeadAllPar Country2(2, "Two", FP, {350, 0.05}, {150, -1, -1, -1});
     GRBEnv env = GRBEnv();
     Models::EPEC epec(&env);
-    arma::sp_mat TrCo(1, 1);
-    TrCo(0, 0) = 0;
-
-    epec.convexify=false;
-    BOOST_CHECK_NO_THROW(epec.addCountry(Country));
-    BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-    BOOST_CHECK_NO_THROW(epec.finalize());
-    BOOST_CHECK_NO_THROW(epec.make_country_QP());
-    BOOST_CHECK_NO_THROW(epec.findNashEq());
-    double q1 = epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), t1 = epec.x.at(
-            epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+    arma::sp_mat TrCo(2, 2);
+    TrCo(0, 1) = 1;
+    TrCo(1, 0) = 1;
 
     Models::EPEC epec2(&env);
     BOOST_CHECK_NO_THROW(epec2.addCountry(Country));
+    BOOST_CHECK_NO_THROW(epec2.addCountry(Country2));
     BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
     BOOST_CHECK_NO_THROW(epec2.finalize());
     BOOST_CHECK_NO_THROW(epec2.make_country_QP());
-    BOOST_CHECK_NO_THROW(epec2.findNashEq());
+    BOOST_CHECK_NO_THROW(epec2.findNashEq(true));
     BOOST_TEST_MESSAGE("Testing discrepancy between the 2");
-    BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0) == q1,
+    BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0) == 0,
                         "comparing q1 among the two");
-    BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::Tax) + 0) == t1,
+    BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::Tax) + 0) == 0,
                         "comparing t1 among the two");
 
 

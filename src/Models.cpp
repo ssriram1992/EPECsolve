@@ -920,6 +920,11 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
 void
 Models::EPEC::findNashEq(bool write, string filename) {
     if (this->country_QP.front() != nullptr) {
+        if (this->convexify == false &&
+            (this->nCountries != 1 or (this->nCountries == 1 && this->AllLeadPars.at(0).n_followers != 1)))
+            cerr << "Warning in Models::EPEC::findNashEq : convexification is off and problem might not be convex."
+                 << endl;
+
         int Nvar = this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
         arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
         arma::vec MCRHS, dumb;
@@ -962,7 +967,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
             catch (GRBException &e) {
                 cerr << "GRBException in Models::EPEC::findNashEq : " << e.getErrorCode() << ": " << e.getMessage()
                      << " "
-                     << temp << endl;;
+                     << temp << endl;
             }
             if (write) {
                 this->sol_x.save("dat/x_" + filename, arma::file_type::arma_ascii, VERBOSE);
@@ -978,8 +983,10 @@ Models::EPEC::findNashEq(bool write, string filename) {
             cout << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
         if (VERBOSE) Game::print(lcp->getCompl());
 
-    } else
+    } else {
         cerr << "GRBException in Models::EPEC::findNashEq : no country QP has been made." << endl;
+        throw;
+    }
 }
 
 
@@ -1186,3 +1193,4 @@ void Models::EPEC::testLCP(const unsigned int i) {
         cerr << "GRBException in Models::EPEC::testCountry: " << e.getErrorCode() << ": " << e.getMessage() << endl;
     }
 }
+

@@ -1003,7 +1003,7 @@ Game::LCP::addPolyhedron(
         if (!this->convexify) {
             *A = A_common;
             *b = b_common;
-            cout << "Convexification is disabled" << endl;
+            cout << "WARNING: Convexification is disabled." << endl;
         } else {
             Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
         }
