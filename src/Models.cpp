@@ -262,9 +262,9 @@ void Models::EPEC::make_LL_LeadCons(
     cout << "\n********** Import Limit constraint: " << import_lim_cons;
     cout << "\n********** Export Limit constraint: " << export_lim_cons;
     cout << "\n********** Tax Limit constraint: " << tax_lim_cons << "\n\t";
-    for (int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
+    for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
     cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
-    for (int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
+    for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
     LeadCons.impl_print_dense("\nLeadCons:\n");
     LeadRHS.print("\nLeadRHS");
 }
@@ -920,7 +920,7 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
 void
 Models::EPEC::findNashEq(bool write, string filename) {
     if (this->country_QP.front() != nullptr) {
-        if (this->convexify == false &&
+        if (!this->convexify &&
             (this->nCountries != 1 or (this->nCountries == 1 && this->AllLeadPars.at(0).n_followers != 1)))
             cerr << "Warning in Models::EPEC::findNashEq : convexification is off and problem might not be convex."
                  << endl;
@@ -933,10 +933,10 @@ Models::EPEC::findNashEq(bool write, string filename) {
         this->make_MC_cons(MC, MCRHS);
         this->nashgame = std::unique_ptr<Game::NashGame>(
                 new Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb));
-        if (VERBOSE) cout << *nashgame << endl;
+        //if (VERBOSE) cout << *nashgame << endl;
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
 
-        if (VERBOSE) this->nashgame->write("dat/NashGame", true, true);
+        if (write) this->nashgame->write("dat/NashGame", true, true);
         //Using indicator constraints
         lcp->useIndicators = this->indicators;
         this->lcpmodel = lcp->LCPasMIP(false);
@@ -954,12 +954,12 @@ Models::EPEC::findNashEq(bool write, string filename) {
         if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
             try {
 
-                for (unsigned int i = 0; i < Nvar; i++) {
+                for (unsigned int i = 0; i < (unsigned int)Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
-                    if (VERBOSE)
-                        cout << "x_" + to_string(i) + ":" << this->sol_x(i) << "\t\tz_" + to_string(i) + ":"
-                             << this->sol_z(i) << endl;
+                    //if (VERBOSE)
+                    //    cout << "x_" + to_string(i) + ":" << this->sol_x(i) << "\t\tz_" + to_string(i) + ":"
+                    //         << this->sol_z(i) << endl;
                     temp = i;
                 }
 
@@ -981,7 +981,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
             }
         } else
             cout << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
-        if (VERBOSE) Game::print(lcp->getCompl());
+        //if (VERBOSE) Game::print(lcp->getCompl());
 
     } else {
         cerr << "GRBException in Models::EPEC::findNashEq : no country QP has been made." << endl;
@@ -1149,7 +1149,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
 void Models::EPEC::testQP(const unsigned int i) {
     QP_Param *QP = this->country_QP.at(i).get();
     arma::vec x;
-    if (VERBOSE) cout << *QP << endl;
+    //if (VERBOSE) cout << *QP << endl;
     x.ones(QP->getNx());
     x.fill(555);
     if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
@@ -1182,6 +1182,8 @@ void Models::EPEC::testLCP(const unsigned int i) {
     cout << "*** COUNTRY TEST***\n";
     auto model = CountryLCP.LCPasMIP(true);
     model->write("dat/CountryLCP_" + to_string(i) + ".lp");
+    model->write("dat/CountryLCP_" + to_string(i) + ".sol");
+    /*
     try {
         GRBVar *vars = model->getVars();
         int i = 0;
@@ -1192,5 +1194,6 @@ void Models::EPEC::testLCP(const unsigned int i) {
     catch (GRBException &e) {
         cerr << "GRBException in Models::EPEC::testCountry: " << e.getErrorCode() << ": " << e.getMessage() << endl;
     }
+     */
 }
 
