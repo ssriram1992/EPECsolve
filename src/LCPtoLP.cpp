@@ -347,7 +347,7 @@ Game::LCP::LCPasMIP(
                 model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first],
                                  "z" + to_string(p.first) + "_L_Mu" + to_string(p.first));
             } else
-                model->addGenConstrIndicator(u[p.first], 0, z[p.first], GRB_LESS_EQUAL, 0,
+                model->addGenConstrIndicator(u[p.first], 1, z[p.first], GRB_LESS_EQUAL, 0,
                                              "z_ind_" + to_string(p.first) + "_L_Mu_" + to_string(p.first));
             // x[i] <= M(1-u) constraint
             if (!this->useIndicators) {

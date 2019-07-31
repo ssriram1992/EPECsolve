@@ -156,6 +156,8 @@ namespace Models {
         const unsigned int &nVarEPEC{nVarinEPEC}; ///< Constant attribute for number of variables in the EPEC
         bool convexify = {
                 true}; ///< Controls the flag convexify in LCPtoLP class. If true, the Balas' union of polyhedra will be computed
+        bool indicators = {
+                true}; ///< Controls the flag useIndicators in LCPtoLP class. If true, indicators constraints replace bigM ones.
 
         EPEC() = delete;
 

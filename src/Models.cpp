@@ -938,7 +938,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
 
         if (VERBOSE) this->nashgame->write("dat/NashGame", true, true);
         //Using indicator constraints
-        lcp->useIndicators = true;
+        lcp->useIndicators = this->indicators;
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
