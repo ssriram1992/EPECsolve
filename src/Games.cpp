@@ -404,7 +404,6 @@ Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
         }
         model->update();
         model->set(GRB_IntParam_OutputFlag, 0);
-        model->write("dat/abc.lp");
         model->optimize();
     }
     catch (const char *e) {
