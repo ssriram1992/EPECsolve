@@ -354,23 +354,23 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
     Models::FollPar FP;
     FP.capacities = {100};
     FP.costs_lin = {10};
-    FP.costs_quad = {5};
+    FP.costs_quad = {0.5};
     FP.emission_costs = {6};
     FP.names = {"NiceFollower"};
-    Models::LeadAllPar Country(1, "NiceCountry", FP, {300, 0.05}, {290, -1, -1, -1});
+    Models::LeadAllPar Country(1, "NiceCountry", FP, {300, 0.05}, {250, -1, -1, -1});
     GRBEnv env = GRBEnv();
     Models::EPEC epec(&env);
     arma::sp_mat TrCo(1, 1);
     TrCo(0, 0) = 0;
     //Switch off convexification
     //Since there is just one follower, assuming its feasible region is convex, we can skip the computation for the union of polyhedra
-    epec.convexify = false;
+    epec.convexify = true;
 
     BOOST_CHECK_NO_THROW(epec.addCountry(Country));
     BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
     BOOST_CHECK_NO_THROW(epec.finalize());
     BOOST_CHECK_NO_THROW(epec.make_country_QP());
-    BOOST_CHECK_NO_THROW(epec.findNashEq());
+    BOOST_CHECK_NO_THROW(epec.findNashEq(true));
     double q1 = epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), t1 = epec.x.at(
             epec.getPosition(0, Models::LeaderVars::Tax) + 0);
     BOOST_TEST_MESSAGE("Testing non-convexified results");
@@ -413,6 +413,7 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
 
 BOOST_AUTO_TEST_CASE(SingleCountry_test) {
     BOOST_TEST_MESSAGE("Testing a single country.");
+	cout<<"Reached here \n";
     Models::FollPar FP;
     FP.capacities = {100, 200};
     FP.costs_lin = {10, 4};

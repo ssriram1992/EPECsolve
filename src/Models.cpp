@@ -886,11 +886,17 @@ Models::EPEC::make_country_QP(const unsigned int i)
     if (i >= this->nCountries) throw string("Error in Models::EPEC::make_country_QP: Invalid country number");
     if (!this->country_QP.at(i).get()) {
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
+		// Debug line to remove
+		auto my_model = Player_i_LCP.LCPasMIP(false);
+		my_model->write("dat/LCP.lp");
         if (VERBOSE) cout << "In EPEC::make_country_QP: " << Player_i_LCP.getCompl().size() << endl;
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         if (!this->convexify) Player_i_LCP.convexify = false;
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
     }
+	// Debug line to remove
+	arma::vec x(this->country_QP.at(i)->getNx(), arma::fill::zeros);
+	this->country_QP.at(i)->solveFixed(x);
 }
 
 
