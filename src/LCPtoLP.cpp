@@ -444,6 +444,11 @@ int Game::ConvexHull(
     // Count number of polyhedra and the space we are in!
     unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
     unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
+    for (unsigned int i = 0; i < nPoly; i++) {
+        //Push common constraints into each polyhedron
+        *Ai->at(i) = arma::join_cols(*Ai->at(i), Acom);
+        *bi->at(i) = arma::join_cols(*bi->at(i), bcom);
+    }
 
     // Count the number of variables in the convex hull.
     unsigned int nFinCons{0}, nFinVar{0};
