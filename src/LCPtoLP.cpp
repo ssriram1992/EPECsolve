@@ -894,7 +894,7 @@ Game::LCP::FixToPoly(
             for (auto i:*Fix) {
                 if (i > 0) model->getVarByName("z_" + to_string(count)).set(GRB_DoubleAttr_UB, 0);
                 if (i < 0)
-                    model->getVarByName("x_" + to_string(count > this->LeadStart ? count + nLeader : i)).set(
+                    model->getVarByName("x_" + to_string(count > this->LeadStart ? count + nLeader : count)).set(
                             GRB_DoubleAttr_UB, 0);
                 count++;
             }
@@ -995,7 +995,7 @@ Game::LCP::addPolyhedron(
         arma::sp_mat *A,                    ///< Location where convex hull LHS has to be stored
         arma::vec *b                        ///< Location where convex hull RHS has to be stored
 ) {
-    this->FixToPolies(&Fix, false, true, &custAi, &custbi);
+    this->FixToPolies(&Fix, true, true, &custAi, &custbi);
     if (convHull) {
         arma::sp_mat A_common;
         A_common = arma::join_cols(this->_A, -this->M);
