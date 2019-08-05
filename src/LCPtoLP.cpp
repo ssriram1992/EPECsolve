@@ -877,7 +877,7 @@ Game::LCP::FixToPoly(
             for (auto j = this->M.begin_row(i); j != this->M.end_row(i); ++j)
                 if (!this->isZero((*j)))
                     Aii->at(i, j.col()) = (*j); // Only mess with non-zero elements of a sparse matrix!
-            bii->at(i) = this->q(i);
+            bii->at(i) = -this->q(i);
         } else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be added
         {
             unsigned int varpos = (i > this->LeadStart) ? i + this->nLeader : i;
