@@ -841,7 +841,6 @@ void
 Models::EPEC::make_country_QP()
 /**
  * @brief Makes the Game::QP_Param for all the countries
- * @param convexify controls whether the balas formulation is used to compute the union of polyhedra
  * @details
  * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for each valid @p i
  * @note Overloaded as EPEC::make_country_QP(unsigned int)
@@ -880,6 +879,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
  *  - This is achieved by calling LCP::makeQP and using the objective value object in @p LeadObjec
  *  - Finally the locations are updated owing to the complete convex hull calculated during the call to LCP::makeQP
  * @note Overloaded as EPEC::make_country_QP()
+ * @todo where is the error?
  */
 {
     if (!this->finalized) throw string("Error in Models::EPEC::make_country_QP: Model not finalized");
@@ -888,8 +888,9 @@ Models::EPEC::make_country_QP(const unsigned int i)
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
         if (VERBOSE) cout << "In EPEC::make_country_QP: " << Player_i_LCP.getCompl().size() << endl;
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
-        if (!this->convexify) Player_i_LCP.convexify = false;
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
+        auto model = Player_i_LCP.LCPasMIP(false);
+        model->write("dat/Modellone.lp");
     }
 }
 
@@ -920,10 +921,6 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
 void
 Models::EPEC::findNashEq(bool write, string filename) {
     if (this->country_QP.front() != nullptr) {
-        if (!this->convexify &&
-            (this->nCountries != 1 or (this->nCountries == 1 && this->AllLeadPars.at(0).n_followers != 1)))
-            cerr << "Warning in Models::EPEC::findNashEq : convexification is off and problem might not be convex."
-                 << endl;
 
         int Nvar = this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
         arma::sp_mat MC(0, Nvar), dumA(0, Nvar);

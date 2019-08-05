@@ -1000,13 +1000,7 @@ Game::LCP::addPolyhedron(
         arma::sp_mat A_common;
         A_common = arma::join_cols(this->_A, -this->M);
         arma::vec b_common = arma::join_cols(this->_b, this->q);
-        if (!this->convexify) {
-            *A = A_common;
-            *b = b_common;
-            cout << "WARNING: Convexification is disabled." << endl;
-        } else {
-            Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
-        }
+        Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
     }
     return *this;
 }
