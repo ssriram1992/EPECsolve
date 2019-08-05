@@ -552,6 +552,14 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
     locations.zeros(2, N);
     val.zeros(N);
 
+    if (VERBOSE){
+        cout << "Found these polyhedra:" << endl;
+        for (unsigned int i = 0; i < nPoly; i++) {
+            Ai->at(i)->print_dense("A_"+to_string(i));
+            bi->at(i)->print("b_"+to_string(i));
+        }
+    }
+
     unsigned int count{0}, rowCount{0}, colCount{nC};
     for (unsigned int i = 0; i < nPoly; i++) {
         for (auto it = Ai->at(i)->begin(); it != Ai->at(i)->end(); ++it) // First constraint
@@ -880,7 +888,7 @@ Game::LCP::FixToPoly(
             bii->at(i) = -this->q(i);
         } else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be added
         {
-            unsigned int varpos = (i > this->LeadStart) ? i + this->nLeader : i;
+            unsigned int varpos = (i >= this->LeadStart) ? i + this->nLeader : i;
             Aii->at(i, varpos) = 1;
             bii->at(i) = 0;
         }
@@ -894,7 +902,7 @@ Game::LCP::FixToPoly(
             for (auto i:*Fix) {
                 if (i > 0) model->getVarByName("z_" + to_string(count)).set(GRB_DoubleAttr_UB, 0);
                 if (i < 0)
-                    model->getVarByName("x_" + to_string(count > this->LeadStart ? count + nLeader : count)).set(
+                    model->getVarByName("x_" + to_string(count >= this->LeadStart ? count + nLeader : count)).set(
                             GRB_DoubleAttr_UB, 0);
                 count++;
             }
