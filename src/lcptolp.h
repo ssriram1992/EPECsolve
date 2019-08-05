@@ -95,8 +95,6 @@ namespace Game {
         long double eps_int{1e-5}; ///< The threshold, below which a number would be considered to be zero.
         bool useIndicators{
                 true};///< If true, complementarities will be handled with indicator constraints. BigM formulation otherwise
-        bool convexify{
-                true}; ///< For debug purpose only. If false, the convex hull for lower level QPs won't be computed
 
         /** Constructors */
         /// Class has no default constructors
