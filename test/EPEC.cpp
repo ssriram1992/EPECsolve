@@ -356,8 +356,8 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
     FP.costs_lin = {10};
     FP.costs_quad = {0.5};
     FP.emission_costs = {6};
-    FP.names = {"NiceFollower"};
-    Models::LeadAllPar Country(1, "NiceCountry", FP, {300, 0.05}, {250, -1, -1, -1});
+    FP.names = {"Blu"};
+    Models::LeadAllPar Country(1, "One", FP, {300, 0.05}, {250, -1, -1, -1});
     GRBEnv env = GRBEnv();
     arma::sp_mat TrCo(1, 1);
     TrCo(0, 0) = 0;
@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
     BOOST_CHECK_CLOSE(q1, 66.6666, 0.01);
 
     Models::EPEC epec3(&env);
-    epec3.indicators=false;
+    epec3.indicators = false;
     BOOST_CHECK_NO_THROW(epec3.addCountry(Country));
     BOOST_CHECK_NO_THROW(epec3.addTranspCosts(TrCo));
     BOOST_CHECK_NO_THROW(epec3.finalize());
@@ -404,7 +404,6 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
 
 BOOST_AUTO_TEST_CASE(SingleCountry_test) {
     BOOST_TEST_MESSAGE("Testing a single country.");
-	cout<<"Reached here \n";
     Models::FollPar FP;
     FP.capacities = {100, 200};
     FP.costs_lin = {10, 4};
