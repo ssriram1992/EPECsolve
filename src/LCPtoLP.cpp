@@ -920,6 +920,7 @@ Game::LCP::FixToPoly(
                             GRB_DoubleAttr_UB, 0);
                 count++;
             }
+            model->set(GRB_IntParam_OutputFlag, VERBOSE);
             model->optimize();
             if (model->get(GRB_IntAttr_Status) == GRB_OPTIMAL) add = true;
             delete model;

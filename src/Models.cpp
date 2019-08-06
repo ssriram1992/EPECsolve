@@ -382,8 +382,6 @@ Models::EPEC::addCountry(
     try {
         this->make_LL_LeadCons(LeadCons, LeadRHS, Params, Loc, import_lim_cons, export_lim_cons, price_lim_cons,
                                tax_lim_cons);
-        LeadCons.print_dense("LeadCons");
-        cout << LeadRHS;
     }
     catch (const char *e) {
         cerr << e << endl;
