@@ -346,18 +346,18 @@ Game::LCP::LCPasMIP(
                 expr = bigM * u[p.first];
                 model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first],
                                  "z" + to_string(p.first) + "_L_Mu" + to_string(p.first));
-            } else
+            } else{
                 model->addGenConstrIndicator(u[p.first], 1, z[p.first], GRB_LESS_EQUAL, 0,
                                              "z_ind_" + to_string(p.first) + "_L_Mu_" + to_string(p.first));
+            }
             // x[i] <= M(1-u) constraint
             if (!this->useIndicators) {
-                expr = bigM;
-                expr -= bigM * u[p.first];
+                expr = bigM -bigM * u[p.first];
                 model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second],
                                  "x" + to_string(p.first) + "_L_MuDash" + to_string(p.first));
-            } else
+            } else{
                 model->addGenConstrIndicator(v[p.first], 1, x[p.second], GRB_LESS_EQUAL, 0,
-                                             "x_ind_" + to_string(p.first) + "_L_MuDash_" + to_string(p.first));
+                                             "x_ind_" + to_string(p.first) + "_L_MuDash_" + to_string(p.first));}
 
             if (this->useIndicators)
                 model->addConstr(u[p.first] + v[p.first], GRB_EQUAL, 1, "uv_sum_" + to_string(p.first));
@@ -574,7 +574,7 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
         }
         rowCount += Ai->at(i)->n_rows;
 
-		// For common constraints 
+		// For common constraints
         for (auto it = Acom.begin(); it != Acom.end(); ++it) // First constraint
         {
             locations(0, count) = rowCount + it.row();
@@ -589,7 +589,7 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
             val(count) = -bcom.at(j);
             ++count;
         }
-		rowCount += Acom.n_rows; 
+		rowCount += Acom.n_rows;
 
         colCount += nC;
         if (VERBOSE) cout << "In compConvSize: " << i + 1 << " out of " << nPoly << endl;
