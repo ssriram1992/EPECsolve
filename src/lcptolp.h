@@ -18,7 +18,8 @@ namespace Game {
                    const arma::sp_mat Acom = {}, const arma::vec bcom = {});
 
     void compConvSize(arma::sp_mat &A, const unsigned int nFinCons, const unsigned int nFinVar,
-                      const vector<arma::sp_mat *> *Ai, const vector<arma::vec *> *bi);
+				  const vector<arma::sp_mat *> *Ai, const vector<arma::vec *> *bi,
+                  const arma::sp_mat &Acom, const arma::vec &bcom);
 /**
  * @brief Class to handle and solve linear complementarity problems
  */

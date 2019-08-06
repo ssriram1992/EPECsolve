@@ -442,8 +442,14 @@ int Game::ConvexHull(
 */
 {
     // Count number of polyhedra and the space we are in!
-    unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
-    unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
+    const unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
+    const unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
+    const unsigned int nComm{static_cast<unsigned int>(Acom.n_rows)};
+
+    if (nComm > 0 && Acom.n_cols != nC) throw string("Inconsistent number of variables in the common polyhedron");
+    if (nComm > 0 && nComm != bcom.n_rows)
+        throw string("Inconsistent number of rows in LHS and RHS in the common polyhedron");
+
     for (unsigned int i = 0; i < nPoly; i++) {
         //Push common constraints into each polyhedron
         *Ai->at(i) = arma::join_cols(*Ai->at(i), Acom);
@@ -465,10 +471,10 @@ int Game::ConvexHull(
                   to_string(Ai->at(i)->n_rows) + "!=" + to_string(bi->at(i)->n_rows);
         nFinCons += Ai->at(i)->n_rows;
     }
-    unsigned int FirstCons = nFinCons;
-    if (Acom.n_rows > 0 && Acom.n_cols != nC) throw string("Inconsistent number of variables in the common polyhedron");
-    if (Acom.n_rows > 0 && Acom.n_rows != bcom.n_rows)
-        throw string("Inconsistent number of rows in LHS and RHS in the common polyhedron");
+	// For common constraint copy
+	nFinCons += nPoly*nComm;
+
+    const unsigned int FirstCons = nFinCons;
 
     // 2nd constraint in Eqn 4.31 of Conforti - twice so we have 2 ineq instead of 1 eq constr
     nFinCons += nC * 2;
@@ -482,7 +488,7 @@ int Game::ConvexHull(
     b.zeros(nFinCons);
     // A.zeros(nFinCons, nFinVar); b.zeros(nFinCons);
     // Implements the first constraint more efficiently using better constructors for sparse matrix
-    Game::compConvSize(A, nFinCons, nFinVar, Ai, bi);
+    Game::compConvSize(A, nFinCons, nFinVar, Ai, bi, Acom, bcom);
 
     // Counting rows completed
     if (VERBOSE) { cout << "In Convex Hull computation!" << endl; }
@@ -511,29 +517,18 @@ int Game::ConvexHull(
     // Third Constraint RHS
     b.at(FirstCons + nC * 2) = 1;
     b.at(FirstCons + nC * 2 + 1) = -1;
-    // Common Constraints
-    if (Acom.n_rows > 0) {
-        arma::sp_mat A_comm_temp;
-        A_comm_temp = arma::join_rows(Acom, arma::zeros<arma::sp_mat>(Acom.n_rows, nFinVar - nC));
-        A = arma::join_cols(A, A_comm_temp);
-        b = arma::join_cols(b, bcom);
-        // A = arma::join_cols(A_comm_temp, A); b = arma::join_cols(bcom, b);
-
-        /*		b.subvec(FirstCons+2*nC+2, nFinCons-1) = bcom;
-               A.submat(FirstCons+2*nC+2, 0, //  nPoly*nC+nPoly,
-                           nFinCons-1, nC-1 // nFinVar-1
-                           ) = Acom;*/
-    }
     if (VERBOSE) cout << "Convex Hull A:" << A.n_rows << "x" << A.n_cols << endl;
     return 0;
 }
 
 
 void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
-                        const unsigned int nFinCons,            ///< Number of rows in final matrix A
-                        const unsigned int nFinVar,            ///< Number of columns in the final matrix A
-                        const vector<arma::sp_mat *> *Ai,    ///< Inequality constraints LHS that define polyhedra whose convex hull is to be found
-                        const vector<arma::vec *> *bi    ///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
+                 const unsigned int nFinCons,            ///< Number of rows in final matrix A
+                 const unsigned int nFinVar,            ///< Number of columns in the final matrix A
+                 const vector<arma::sp_mat *> *Ai,    ///< Inequality constraints LHS that define polyhedra whose convex hull is to be found
+                 const vector<arma::vec *> *bi,    ///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
+                 const arma::sp_mat &Acom, 		///< LHS of the common constraints for all polyhedra
+				 const arma::vec &bcom 			///< RHS of the common constraints for all polyhedra
 )
 /**
  * @brief INTERNAL FUNCTION NOT FOR GENERAL USE.
@@ -543,13 +538,15 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
  * Motivation behind this: Response from armadillo:-https://gitlab.com/conradsnicta/armadillo-code/issues/111
  */
 {
-    unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
-    unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
+    const unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
+    const unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
     unsigned int N{0}; // Total number of nonzero elements in the final matrix
+	const unsigned int nCommnz {static_cast<unsigned int>(Acom.n_nonzero+bcom.n_rows)};
     for (unsigned int i = 0; i < nPoly; i++) {
         N += Ai->at(i)->n_nonzero;
         N += bi->at(i)->n_rows;
     }
+	N += nCommnz*nPoly; // The common constraints have to be copied for each polyhedron.
 
     // Now computed N which is the total number of nonzeros.
     arma::umat locations;    // location of nonzeros
@@ -581,8 +578,26 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
             val(count) = -bi->at(i)->at(j);
             ++count;
         }
-        colCount += nC;
         rowCount += Ai->at(i)->n_rows;
+
+		// For common constraints 
+        for (auto it = Acom.begin(); it != Acom.end(); ++it) // First constraint
+        {
+            locations(0, count) = rowCount + it.row();
+            locations(1, count) = colCount + it.col();
+            val(count) = *it;
+            ++count;
+        }
+        for (unsigned int j = 0; j < bcom.n_rows; ++j) // RHS of first constraint
+        {
+            locations(0, count) = rowCount + j;
+            locations(1, count) = nC + nC * nPoly + i;
+            val(count) = -bcom.at(j);
+            ++count;
+        }
+		rowCount += Acom.n_rows; 
+
+        colCount += nC;
         if (VERBOSE) cout << "In compConvSize: " << i + 1 << " out of " << nPoly << endl;
     }
     A = arma::sp_mat(locations, val, nFinCons, nFinVar);
