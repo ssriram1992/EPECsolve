@@ -258,15 +258,19 @@ void Models::EPEC::make_LL_LeadCons(
         LeadRHS.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons) =
                 Params.LeaderParam.price_limit - Params.DemandParam.alpha;
     }
-    cout << "\n********** Price Limit constraint: " << price_lim_cons;
-    cout << "\n********** Import Limit constraint: " << import_lim_cons;
-    cout << "\n********** Export Limit constraint: " << export_lim_cons;
-    cout << "\n********** Tax Limit constraint: " << tax_lim_cons << "\n\t";
+    if(VERBOSE){
+      cout << "\n********** Price Limit constraint: " << price_lim_cons;
+      cout << "\n********** Import Limit constraint: " << import_lim_cons;
+      cout << "\n********** Export Limit constraint: " << export_lim_cons;
+      cout << "\n********** Tax Limit constraint: " << tax_lim_cons << "\n\t";
+    }
     for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
     cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
     for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
-    LeadCons.impl_print_dense("\nLeadCons:\n");
-    LeadRHS.print("\nLeadRHS");
+    if(VERBOSE){
+      LeadCons.impl_print_dense("\nLeadCons:\n");
+      LeadRHS.print("\nLeadRHS");
+    }
 }
 
 
@@ -301,7 +305,6 @@ Models::EPEC::addCountry(
  * @return Pointer to LCP object dynamically created using `new`.
  */
 {
-
     if (this->finalized)
         throw string(
                 "Error in Models::EPEC::addCountry: EPEC object finalized. Call EPEC::unlock() to unlock this object first and then edit.");
@@ -1181,17 +1184,5 @@ void Models::EPEC::testLCP(const unsigned int i) {
     auto model = CountryLCP.LCPasMIP(true);
     model->write("dat/CountryLCP_" + to_string(i) + ".lp");
     model->write("dat/CountryLCP_" + to_string(i) + ".sol");
-    /*
-    try {
-        GRBVar *vars = model->getVars();
-        int i = 0;
-        for (GRBVar *p = vars; i < model->get(GRB_IntAttr_NumVars); i++, p++) {
-            cout << p->get(GRB_StringAttr_VarName) << ":" << p->get(GRB_DoubleAttr_X) << endl;
-        }
-    }
-    catch (GRBException &e) {
-        cerr << "GRBException in Models::EPEC::testCountry: " << e.getErrorCode() << ": " << e.getMessage() << endl;
-    }
-     */
 }
 

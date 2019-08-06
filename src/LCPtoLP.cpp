@@ -450,12 +450,6 @@ int Game::ConvexHull(
     if (nComm > 0 && nComm != bcom.n_rows)
         throw string("Inconsistent number of rows in LHS and RHS in the common polyhedron");
 
-    for (unsigned int i = 0; i < nPoly; i++) {
-        //Push common constraints into each polyhedron
-        *Ai->at(i) = arma::join_cols(*Ai->at(i), Acom);
-        *bi->at(i) = arma::join_cols(*bi->at(i), bcom);
-    }
-
     // Count the number of variables in the convex hull.
     unsigned int nFinCons{0}, nFinVar{0};
     // Error check
