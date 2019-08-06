@@ -1,3 +1,4 @@
+dat/
 Archive.cpp
 docs/latex
 EPEC
@@ -13,8 +14,17 @@ sand.cpp
 Session.vim
 *.swp
 tags
-*.txt
 *.lp
 *.log
 src/Gams*
 .ipynb_checkpoints/
+.idea/*
+cmake-build-debug/*
+.DS_Store
+dat/*
+EPECtest
+EPECsolve
+dat/countrQP_0
+dat/LCP_0
+EPECsolve
+EPECsolve
