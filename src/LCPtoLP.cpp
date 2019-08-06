@@ -346,18 +346,19 @@ Game::LCP::LCPasMIP(
                 expr = bigM * u[p.first];
                 model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first],
                                  "z" + to_string(p.first) + "_L_Mu" + to_string(p.first));
-            } else{
+            } else {
                 model->addGenConstrIndicator(u[p.first], 1, z[p.first], GRB_LESS_EQUAL, 0,
                                              "z_ind_" + to_string(p.first) + "_L_Mu_" + to_string(p.first));
             }
             // x[i] <= M(1-u) constraint
             if (!this->useIndicators) {
-                expr = bigM -bigM * u[p.first];
+                expr = bigM - bigM * u[p.first];
                 model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second],
                                  "x" + to_string(p.first) + "_L_MuDash" + to_string(p.first));
-            } else{
+            } else {
                 model->addGenConstrIndicator(v[p.first], 1, x[p.second], GRB_LESS_EQUAL, 0,
-                                             "x_ind_" + to_string(p.first) + "_L_MuDash_" + to_string(p.first));}
+                                             "x_ind_" + to_string(p.first) + "_L_MuDash_" + to_string(p.first));
+            }
 
             if (this->useIndicators)
                 model->addConstr(u[p.first] + v[p.first], GRB_EQUAL, 1, "uv_sum_" + to_string(p.first));
@@ -443,6 +444,10 @@ int Game::ConvexHull(
 {
     // Count number of polyhedra and the space we are in!
     const unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
+    // Error check
+    if (nPoly == 0)
+        throw string(
+                "Empty vector of polyhedra given! Problem might be infeasible.");    // There should be at least 1 polyhedron to consider
     const unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
     const unsigned int nComm{static_cast<unsigned int>(Acom.n_rows)};
 
@@ -452,9 +457,6 @@ int Game::ConvexHull(
 
     // Count the number of variables in the convex hull.
     unsigned int nFinCons{0}, nFinVar{0};
-    // Error check
-    if (nPoly == 0)
-        throw string("Empty vector of polyhedra given!");    // There should be at least 1 polyhedron to consider
     if (nPoly != bi->size()) throw string("Inconsistent number of LHS and RHS for polyhedra");
     for (unsigned int i = 0; i != nPoly; i++) {
         if (Ai->at(i)->n_cols != nC)
@@ -465,8 +467,8 @@ int Game::ConvexHull(
                   to_string(Ai->at(i)->n_rows) + "!=" + to_string(bi->at(i)->n_rows);
         nFinCons += Ai->at(i)->n_rows;
     }
-	// For common constraint copy
-	nFinCons += nPoly*nComm;
+    // For common constraint copy
+    nFinCons += nPoly * nComm;
 
     const unsigned int FirstCons = nFinCons;
 
@@ -517,12 +519,12 @@ int Game::ConvexHull(
 
 
 void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
-                 const unsigned int nFinCons,            ///< Number of rows in final matrix A
-                 const unsigned int nFinVar,            ///< Number of columns in the final matrix A
-                 const vector<arma::sp_mat *> *Ai,    ///< Inequality constraints LHS that define polyhedra whose convex hull is to be found
-                 const vector<arma::vec *> *bi,    ///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
-                 const arma::sp_mat &Acom, 		///< LHS of the common constraints for all polyhedra
-				 const arma::vec &bcom 			///< RHS of the common constraints for all polyhedra
+                        const unsigned int nFinCons,            ///< Number of rows in final matrix A
+                        const unsigned int nFinVar,            ///< Number of columns in the final matrix A
+                        const vector<arma::sp_mat *> *Ai,    ///< Inequality constraints LHS that define polyhedra whose convex hull is to be found
+                        const vector<arma::vec *> *bi,    ///< Inequality constraints RHS that define polyhedra whose convex hull is to be found
+                        const arma::sp_mat &Acom,        ///< LHS of the common constraints for all polyhedra
+                        const arma::vec &bcom            ///< RHS of the common constraints for all polyhedra
 )
 /**
  * @brief INTERNAL FUNCTION NOT FOR GENERAL USE.
@@ -535,12 +537,12 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
     const unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
     const unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
     unsigned int N{0}; // Total number of nonzero elements in the final matrix
-	const unsigned int nCommnz {static_cast<unsigned int>(Acom.n_nonzero+bcom.n_rows)};
+    const unsigned int nCommnz{static_cast<unsigned int>(Acom.n_nonzero + bcom.n_rows)};
     for (unsigned int i = 0; i < nPoly; i++) {
         N += Ai->at(i)->n_nonzero;
         N += bi->at(i)->n_rows;
     }
-	N += nCommnz*nPoly; // The common constraints have to be copied for each polyhedron.
+    N += nCommnz * nPoly; // The common constraints have to be copied for each polyhedron.
 
     // Now computed N which is the total number of nonzeros.
     arma::umat locations;    // location of nonzeros
@@ -548,11 +550,11 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
     locations.zeros(2, N);
     val.zeros(N);
 
-    if (VERBOSE){
+    if (VERBOSE) {
         cout << "Found these polyhedra:" << endl;
         for (unsigned int i = 0; i < nPoly; i++) {
-            Ai->at(i)->print_dense("A_"+to_string(i));
-            bi->at(i)->print("b_"+to_string(i));
+            Ai->at(i)->print_dense("A_" + to_string(i));
+            bi->at(i)->print("b_" + to_string(i));
         }
     }
 
@@ -574,7 +576,7 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
         }
         rowCount += Ai->at(i)->n_rows;
 
-		// For common constraints
+        // For common constraints
         for (auto it = Acom.begin(); it != Acom.end(); ++it) // First constraint
         {
             locations(0, count) = rowCount + it.row();
@@ -589,7 +591,7 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
             val(count) = -bcom.at(j);
             ++count;
         }
-		rowCount += Acom.n_rows;
+        rowCount += Acom.n_rows;
 
         colCount += nC;
         if (VERBOSE) cout << "In compConvSize: " << i + 1 << " out of " << nPoly << endl;
@@ -1014,17 +1016,18 @@ Game::LCP::addPolyhedron(
         const vector<short int> &Fix,    ///< +1/0/-1 Representation of the polyhedra which needed to be pushed
         vector<arma::sp_mat *> &custAi,        ///< Vector with LHS of constraint matrix should be pushed.
         vector<arma::vec *> &custbi,            ///< Vector with RHS of constraints should be pushed.
-        const bool convHull,                ///< If @p true convex hull of @e all polyhedra in custAi, custbi will be computed
         arma::sp_mat *A,                    ///< Location where convex hull LHS has to be stored
         arma::vec *b                        ///< Location where convex hull RHS has to be stored
 ) {
     this->FixToPolies(&Fix, true, true, &custAi, &custbi);
-    if (convHull) {
-        arma::sp_mat A_common;
-        A_common = arma::join_cols(this->_A, -this->M);
-        arma::vec b_common = arma::join_cols(this->_b, this->q);
-        Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
+    arma::sp_mat A_common;
+    A_common = arma::join_cols(this->_A, -this->M);
+    arma::vec b_common = arma::join_cols(this->_b, this->q);
+    if (custAi.size() == 0) {
+        throw string(
+                "Empty vector of polyhedra given! Problem might be infeasible.");
     }
+    Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
     return *this;
 }
 
@@ -1042,7 +1045,7 @@ Game::LCP::makeQP(
 
     if (VERBOSE) cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
     Game::QP_constraints QP_cons;
-    this->addPolyhedron(Fix, custAi, custbi, true, &QP_cons.B, &QP_cons.b);
+    this->addPolyhedron(Fix, custAi, custbi, &QP_cons.B, &QP_cons.b);
     // Updated size after convex hull has been computed.
     const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
     const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};

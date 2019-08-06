@@ -145,7 +145,7 @@ namespace Game {
 
         /* Convex hull computation */
         LCP &addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat *> &custAi, vector<arma::vec *> &custbi,
-                           const bool convHull = false, arma::sp_mat *A = {}, arma::vec *b = {});
+                            arma::sp_mat *A = {}, arma::vec *b = {});
 
         int ConvexHull(
                 arma::sp_mat &A, ///< Convex hull inequality description LHS to be stored here
