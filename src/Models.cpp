@@ -889,9 +889,6 @@ Models::EPEC::make_country_QP(const unsigned int i)
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
     }
-    // Debug line to remove
-    arma::vec x(this->country_QP.at(i)->getNx(), arma::fill::zeros);
-    this->country_QP.at(i)->solveFixed(x);
 }
 
 
