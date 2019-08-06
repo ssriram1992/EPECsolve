@@ -1,0 +1,32 @@
+\form#0:\[ \min_y \frac{1}{2}y^TQy + c^Ty + (Cx)^T y \]
+\form#1:\begin{eqnarray} Ax + By &\leq& b \\ y &\geq& 0 \end{eqnarray}
+\form#2:$Mx+q$
+\form#3:$0 \le x \perp Mx+q\ge 0$
+\form#4:$ Ax\le b$
+\form#5:$x$
+\form#6:$0 \leq y \perp My + Nx + q \geq 0$
+\form#7:$x^{i}$
+\form#8:$x^{-i}$
+\form#9:$0\leq q \perp Mx+q \geq 0 $
+\form#10:$ a^Tx \leq b$
+\form#11:$P_i$
+\form#12:\begin{eqnarray} A^ix &\leq& b^i\\ x &\geq& 0 \end{eqnarray}
+\form#13:$x\geq0$
+\form#14:$ Ax\leq b$
+\form#15:$c^Tx$
+\form#16:$2^n$
+\form#17:\begin{eqnarray} t_i^{I} &\leq& \bar{t_i^{I}}\\ q^{import} - q^{export} &\leq& \bar{q^{import}}\\ q^{export} - q^{import} &\leq& \bar{q^{export}}\\ \alpha - \beta\left(q^{import} - q^{export} + \sum_i q_i \right) &\leq& \bar{\pi}\\ q^{export} &\leq& \sum_i q_i +q^{import} \end{eqnarray}
+\form#18:$\bar{q^{import}}$
+\form#19:$\bar{q^{export}}$
+\form#20:$\bar\pi$
+\form#21:$l_i$
+\form#22:$i$
+\form#23:$q_i$
+\form#24:$x_i$
+\form#25:\[ l_ix_i + \frac{1}{2}q_ix_i^2 \]
+\form#26:\[{Total\quad Quantity} = \sum_i x_i + x_{imp} - x_{exp} \]
+\form#27:\[{Price} = a-b({Total\quad Quantity})\]
+\form#28:$q_{imp}$
+\form#29:$q_{exp}$
+\form#30:$\tilde{x_i}$
+\form#31:$t_i$
