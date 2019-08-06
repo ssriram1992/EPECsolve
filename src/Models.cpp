@@ -1126,13 +1126,13 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
     const double quad = Params.FollowerParam.costs_quad.at(j);
 
     file << Models::prn::label << "Quantity produced" << ":" << Models::prn::val << q << endl;
-    file << "x(): " << foll_prod + j << endl;
+    //file << "x(): " << foll_prod + j << endl;
     file << Models::prn::label << "Capacity of production" << ":" << Models::prn::val
          << Params.FollowerParam.capacities.at(j) << "\n";
     file << Models::prn::label << "Limit on production" << ":" << Models::prn::val << lim << "\n";
-    file << "x(): " << foll_lim + j << endl;
+    //file << "x(): " << foll_lim + j << endl;
     file << Models::prn::label << "Tax imposed" << ":" << Models::prn::val << tax << "\n";
-    file << "x(): " << foll_tax + j << endl;
+    //file << "x(): " << foll_tax + j << endl;
     file << Models::prn::label << "  -Production cost function" << ":" << "\t C(q) = (" << lin << " + " << tax
          << ")*q + 0.5*" << quad << "*q^2\n" << Models::prn::label << " " << "=" << Models::prn::val
          << (lin + tax) * q + 0.5 * quad * q * q << "\n";

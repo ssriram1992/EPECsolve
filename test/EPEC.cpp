@@ -367,7 +367,7 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
     BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
     BOOST_CHECK_NO_THROW(epec2.finalize());
     BOOST_CHECK_NO_THROW(epec2.make_country_QP());
-    BOOST_CHECK_NO_THROW(epec2.findNashEq(true));
+    BOOST_CHECK_NO_THROW(epec2.findNashEq());
     BOOST_TEST_MESSAGE("Testing results (with indicators)");
     double q1 = epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0), t1 = epec2.x.at(
             epec2.getPosition(0, Models::LeaderVars::Tax) + 0);
@@ -393,7 +393,7 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
     BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
     BOOST_CHECK_NO_THROW(epec.finalize());
     BOOST_CHECK_NO_THROW(epec.make_country_QP());
-    BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+    BOOST_CHECK_NO_THROW(epec.findNashEq());
     BOOST_TEST_MESSAGE("Testing results (second instance)");
     BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
     BOOST_CHECK_CLOSE(epec.x.at(
@@ -413,21 +413,18 @@ BOOST_AUTO_TEST_CASE(SingleCountry_test) {
     FP.names = {"Rosso", "Bianco"};
     Models::LeadAllPar Country(2, "One", FP, {300, 0.05}, {100, -1, -1, -1});
     GRBEnv env = GRBEnv();
-    Models::EPEC epec(&env);
     arma::sp_mat TrCo(1, 1);
     TrCo(0, 0) = 0;
 
-    Models::EPEC epec2(&env);
-    BOOST_CHECK_NO_THROW(epec2.addCountry(Country));
-    BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
-    BOOST_CHECK_NO_THROW(epec2.finalize());
-    BOOST_CHECK_NO_THROW(epec2.make_country_QP());
-    BOOST_CHECK_NO_THROW(epec2.findNashEq(true));
-    BOOST_TEST_MESSAGE("Testing discrepancy between the 2");
-    BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0) == 0,
-                        "comparing q1 among the two");
-    BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::Tax) + 0) == 0,
-                        "comparing t1 among the two");
+    Models::EPEC epec(&env);
+    BOOST_CHECK_NO_THROW(epec.addCountry(Country));
+    BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+    BOOST_CHECK_NO_THROW(epec.finalize());
+    BOOST_CHECK_NO_THROW(epec.make_country_QP());
+    BOOST_CHECK_NO_THROW(epec.findNashEq());
+    BOOST_TEST_MESSAGE("Testing results");
+    BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.001);
+    BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.001);
 
 
 }
