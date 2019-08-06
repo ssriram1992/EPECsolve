@@ -162,6 +162,9 @@ int main() {
     Models::LeadPar L(0.4, -1, -1, -1);
 
 
+	// Two followers Leader with price cap
+	Models::LeadAllPar LA_pc1(1, "USA", FP1, {40,1.10}, {0.4, -1, -1, -1});
+	Models::LeadAllPar LA_pc2(1, "China", FP1, {60,1.25}, {0.4, -1, -1, -1});
     FP1.capacities = {100};
     FP1.costs_lin = {10};
     FP1.costs_quad = {5};
