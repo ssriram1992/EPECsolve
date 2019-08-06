@@ -359,7 +359,6 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
     FP.names = {"NiceFollower"};
     Models::LeadAllPar Country(1, "NiceCountry", FP, {300, 0.05}, {250, -1, -1, -1});
     GRBEnv env = GRBEnv();
-    Models::EPEC epec(&env);
     arma::sp_mat TrCo(1, 1);
     TrCo(0, 0) = 0;
 
@@ -368,18 +367,13 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
     BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
     BOOST_CHECK_NO_THROW(epec2.finalize());
     BOOST_CHECK_NO_THROW(epec2.make_country_QP());
-    BOOST_CHECK_NO_THROW(epec2.findNashEq());
-    BOOST_TEST_MESSAGE("Testing convexified results");
-    BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0) == 0,
-                        "(C) checking q1==0");
-    BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::Tax) + 0) == 290,
-                        "(C) checking t1==290");
+    BOOST_CHECK_NO_THROW(epec2.findNashEq(true));
+    BOOST_TEST_MESSAGE("Testing results (with indicators)");
     double q1 = epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0), t1 = epec2.x.at(
             epec2.getPosition(0, Models::LeaderVars::Tax) + 0);
+    BOOST_CHECK_CLOSE(t1, 250, 0.001);
+    BOOST_CHECK_CLOSE(q1, 66.6666, 0.01);
 
-
-    
-    BOOST_TEST_MESSAGE("Testing indicator constraints.");
     Models::EPEC epec3(&env);
     epec3.indicators=false;
     BOOST_CHECK_NO_THROW(epec3.addCountry(Country));
@@ -387,11 +381,25 @@ BOOST_AUTO_TEST_CASE(SingleBilevel_test) {
     BOOST_CHECK_NO_THROW(epec3.finalize());
     BOOST_CHECK_NO_THROW(epec3.make_country_QP());
     BOOST_CHECK_NO_THROW(epec3.findNashEq());
-    BOOST_TEST_MESSAGE("Testing non-indicator results vs previous ones");
-    BOOST_CHECK_MESSAGE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) + 0) == q1,
-                        "(C) checking q1==0");
-    BOOST_CHECK_MESSAGE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0) == t1,
-                        "(C) checking t1==290");
+    BOOST_TEST_MESSAGE("Testing results (without indicators)");
+    BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) + 0), q1, 0.001);
+    BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), t1, 0.001);
+
+
+    Models::LeadAllPar Country2(1, "NiceCountry", FP, {300, 0.05}, {20, -1, -1, -1});
+    Models::EPEC epec(&env);
+
+    BOOST_CHECK_NO_THROW(epec.addCountry(Country2));
+    BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+    BOOST_CHECK_NO_THROW(epec.finalize());
+    BOOST_CHECK_NO_THROW(epec.make_country_QP());
+    BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+    BOOST_TEST_MESSAGE("Testing results (second instance)");
+    BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
+    BOOST_CHECK_CLOSE(epec.x.at(
+            epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
+
+
 }
 
 BOOST_AUTO_TEST_CASE(SingleCountry_test) {
