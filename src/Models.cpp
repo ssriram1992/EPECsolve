@@ -258,18 +258,16 @@ void Models::EPEC::make_LL_LeadCons(
         LeadRHS.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons) =
                 Params.LeaderParam.price_limit - Params.DemandParam.alpha;
     }
-    if(VERBOSE){
-      cout << "\n********** Price Limit constraint: " << price_lim_cons;
-      cout << "\n********** Import Limit constraint: " << import_lim_cons;
-      cout << "\n********** Export Limit constraint: " << export_lim_cons;
-      cout << "\n********** Tax Limit constraint: " << tax_lim_cons << "\n\t";
-    }
-    for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
-    cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
-    for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
-    if(VERBOSE){
-      LeadCons.impl_print_dense("\nLeadCons:\n");
-      LeadRHS.print("\nLeadRHS");
+    if (VERBOSE) {
+        cout << "\n********** Price Limit constraint: " << price_lim_cons;
+        cout << "\n********** Import Limit constraint: " << import_lim_cons;
+        cout << "\n********** Export Limit constraint: " << export_lim_cons;
+        cout << "\n********** Tax Limit constraint: " << tax_lim_cons << "\n\t";
+        for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
+        cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
+        for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
+        LeadCons.impl_print_dense("\nLeadCons:\n");
+        LeadRHS.print("\nLeadRHS");
     }
 }
 
@@ -893,9 +891,9 @@ Models::EPEC::make_country_QP(const unsigned int i)
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
     }
-	// Debug line to remove
-	arma::vec x(this->country_QP.at(i)->getNx(), arma::fill::zeros);
-	this->country_QP.at(i)->solveFixed(x);
+    // Debug line to remove
+    arma::vec x(this->country_QP.at(i)->getNx(), arma::fill::zeros);
+    this->country_QP.at(i)->solveFixed(x);
 }
 
 
@@ -955,7 +953,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
         if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
             try {
 
-                for (unsigned int i = 0; i < (unsigned int)Nvar; i++) {
+                for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
                     //if (VERBOSE)
