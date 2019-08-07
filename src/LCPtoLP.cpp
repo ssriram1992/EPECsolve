@@ -367,11 +367,13 @@ Game::LCP::LCPasMIP(
         for (auto i:FixVar) model->addConstr(x[i], GRB_EQUAL, 0.0);
         for (auto i:FixEq) model->addConstr(z[i], GRB_EQUAL, 0.0);
         model->update();
-        if (VERBOSE)
-            cout << "IntegerTol=" << this->eps_int << ";FeasabilityTol=OptimalityTol=" << this->eps << endl;
-        model->set(GRB_DoubleParam_IntFeasTol, this->eps_int);
-        model->set(GRB_DoubleParam_FeasibilityTol, this->eps);
-        model->set(GRB_DoubleParam_OptimalityTol, this->eps);
+        if (!this->useIndicators) {
+            if (VERBOSE)
+                cout << "IntegerTol=" << this->eps_int << ";FeasabilityTol=OptimalityTol=" << this->eps << endl;
+            model->set(GRB_DoubleParam_IntFeasTol, this->eps_int);
+            model->set(GRB_DoubleParam_FeasibilityTol, this->eps);
+            model->set(GRB_DoubleParam_OptimalityTol, this->eps);
+        }
 
         if (solve) model->optimize();
         return model;

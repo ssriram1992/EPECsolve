@@ -93,7 +93,7 @@ namespace Game {
         // Fudgible data
         long double bigM{1e7}; ///< bigM used to rewrite the LCP as MIP
         long double eps{1e-5}; ///< The threshold for optimality and feasability tollerances
-        long double eps_int{1e-9}; ///< The threshold, below which a number would be considered to be zero.
+        long double eps_int{1e-8}; ///< The threshold, below which a number would be considered to be zero.
         bool useIndicators{
                 true};///< If true, complementarities will be handled with indicator constraints. BigM formulation otherwise
 
