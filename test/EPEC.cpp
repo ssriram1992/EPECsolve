@@ -416,7 +416,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
-    /* This test suite perform basic unit tests for EPEC problems with one country and one follower, namely Stackelberg games.
+    /* This test suite perform unit tests for EPEC problems with one country and one follower, namely Stackelberg games.
      */
 
     BOOST_AUTO_TEST_CASE(Bilevel_test) {
@@ -602,7 +602,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
 
-    /* This test suite perform basic unit tests for EPEC problems with one country and multiple followers
+    /* This test suite perform unit tests for EPEC problems with one country and multiple followers
      */
 
     BOOST_AUTO_TEST_CASE(C1F1_test) {
@@ -738,4 +738,55 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+
+BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
+
+    /* This test suite perform basic unit tests for generalized EPEC problem with multiple countries and followers
+     */
+
+    BOOST_AUTO_TEST_CASE(C2F1_test) {
+        /** Testing two countries (C2) with a single follower (F1)
+        *  LeaderConstraints: price cap 300 and tax cap 100
+        *  The follower with the lowest marginal cost will produce more
+        **/
+        BOOST_TEST_MESSAGE("Testing 2 Countries with a follower each -  with tax cap and price cap.");
+        Models::FollPar FP;
+        FP.capacities = {550};
+        FP.costs_lin = {4};
+        FP.costs_quad = {3};
+        FP.emission_costs = {10};
+        FP.names = {"Rosso"};
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {100, -1, -1, 299.99});
+        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5}, {100, -1, -1, -1});
+        GRBEnv env = GRBEnv();
+        arma::sp_mat TrCo(2, 2);
+        TrCo.zeros(2,2);
+        TrCo(0, 1) = 1;
+        TrCo(1, 0) = TrCo(0, 1);
+
+        BOOST_TEST_MESSAGE("MaxTax:100, PriceLimit:300 with alpha=300 and beta=0.05");
+        //BOOST_TEST_MESSAGE("Expected: margCost(Rosso)>margCost(Bianco);t_0=t_1=maxTax=100");
+        Models::EPEC epec(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry (0)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country0));
+        BOOST_TEST_MESSAGE("testing Models::addCountry (1)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        double margCountryOne = FP.costs_quad[0] * epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+                           FP.costs_lin[0] + epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margCountryTwo = FP.costs_quad[0] * epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+                            FP.costs_lin[0] + epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+        cout << margCountryOne << "\t" << margCountryTwo << endl;
+
+    }
+
+
+BOOST_AUTO_TEST_SUITE_END()
 
