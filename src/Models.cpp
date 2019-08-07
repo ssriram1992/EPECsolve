@@ -865,8 +865,10 @@ Models::EPEC::make_country_QP()
         }
     }
     this->computeLeaderLocations(true);
-    for (unsigned int i = 0; i < this->nCountries; ++i)
-        this->country_QP.at(i)->QP_Param::write("dat/countrQP_" + to_string(i), false);
+    if (VERBOSE) {
+        for (unsigned int i = 0; i < this->nCountries; ++i)
+            this->country_QP.at(i)->QP_Param::write("dat/countrQP_" + to_string(i), false);
+    }
 }
 
 void
@@ -930,7 +932,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
         //if (VERBOSE) cout << *nashgame << endl;
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
 
-        if (write) this->nashgame->write("dat/NashGame", true, true);
+        if (VERBOSE) this->nashgame->write("dat/NashGame", false, true);
         //Using indicator constraints
         lcp->useIndicators = this->indicators;
         this->lcpmodel = lcp->LCPasMIP(false);
