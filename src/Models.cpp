@@ -230,32 +230,32 @@ void Models::EPEC::make_LL_LeadCons(
     // (28b)
     for (unsigned int i = 0; i < Params.n_followers; i++)
         LeadCons.at(Params.n_followers, i) = -1;
-    LeadCons.at(Params.n_followers, Loc.at(Models::LeaderVars::NetExport)) = 1;
-    LeadCons.at(Params.n_followers, Loc.at(Models::LeaderVars::NetImport)) = -1;
+    LeadCons.at(Params.n_followers * tax_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = 1;
+    LeadCons.at(Params.n_followers * tax_lim_cons, Loc.at(Models::LeaderVars::NetImport)) = -1;
     // Import limit - In more precise terms, everything that comes in minus everything that goes out should satisfy this limit
     // (28c)
     if (import_lim_cons) {
-        LeadCons(Params.n_followers + import_lim_cons, Loc.at(Models::LeaderVars::NetImport)) = 1;
-        LeadCons(Params.n_followers + import_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = -1;
-        LeadRHS(Params.n_followers + import_lim_cons) = Params.LeaderParam.import_limit;
+        LeadCons(Params.n_followers* tax_lim_cons + import_lim_cons, Loc.at(Models::LeaderVars::NetImport)) = 1;
+        LeadCons(Params.n_followers* tax_lim_cons + import_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = -1;
+        LeadRHS(Params.n_followers* tax_lim_cons + import_lim_cons) = Params.LeaderParam.import_limit;
     }
     // Export limit - In more precise terms, everything that goes out minus everything that comes in should satisfy this limit
     // (28d)
     if (export_lim_cons) {
-        LeadCons(Params.n_followers + import_lim_cons + export_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = 1;
-        LeadCons(Params.n_followers + import_lim_cons + export_lim_cons, Loc.at(Models::LeaderVars::NetImport)) = -1;
-        LeadRHS(Params.n_followers + import_lim_cons + export_lim_cons) = Params.LeaderParam.export_limit;
+        LeadCons(Params.n_followers* tax_lim_cons + import_lim_cons + export_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = 1;
+        LeadCons(Params.n_followers* tax_lim_cons + import_lim_cons + export_lim_cons, Loc.at(Models::LeaderVars::NetImport)) = -1;
+        LeadRHS(Params.n_followers* tax_lim_cons + import_lim_cons + export_lim_cons) = Params.LeaderParam.export_limit;
     }
     // (28g)
     if (price_lim_cons) {
         for (unsigned int i = 0; i < Params.n_followers; i++)
-            LeadCons.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons,
+            LeadCons.at(Params.n_followers* tax_lim_cons + price_lim_cons + import_lim_cons + export_lim_cons,
                         i) = -Params.DemandParam.beta;
-        LeadCons.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons,
+        LeadCons.at(Params.n_followers* tax_lim_cons + price_lim_cons + import_lim_cons + export_lim_cons,
                     Loc.at(Models::LeaderVars::NetImport)) = -Params.DemandParam.beta;
-        LeadCons.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons,
+        LeadCons.at(Params.n_followers* tax_lim_cons + price_lim_cons + import_lim_cons + export_lim_cons,
                     Loc.at(Models::LeaderVars::NetExport)) = Params.DemandParam.beta;
-        LeadRHS.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons) =
+        LeadRHS.at(Params.n_followers* tax_lim_cons + price_lim_cons + import_lim_cons + export_lim_cons) =
                 Params.LeaderParam.price_limit - Params.DemandParam.alpha;
     }
     if (VERBOSE) {
@@ -889,7 +889,9 @@ Models::EPEC::make_country_QP(const unsigned int i)
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
         if (VERBOSE) cout << "In EPEC::make_country_QP: " << Player_i_LCP.getCompl().size() << endl;
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
+
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
+        Player_i_LCP.LCPasMIP(false)->write("ModelConvex.lp");
     }
 }
 
@@ -935,6 +937,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
         if (VERBOSE) this->nashgame->write("dat/NashGame", false, true);
         //Using indicator constraints
         lcp->useIndicators = this->indicators;
+        lcp->bigM=1e6;
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
