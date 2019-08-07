@@ -417,60 +417,81 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
 
+        // @todo change tax limit
 
-        BOOST_TEST_MESSAGE("MaxTax:20 with alpha=300 and beta=0.05");
-        BOOST_TEST_MESSAGE("Expected: q=100;t=20");
-        Models::EPEC epec(&env);
-        BOOST_TEST_MESSAGE("testing Models::addCountry");
-        BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
-        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-        BOOST_TEST_MESSAGE("testing Models::finalize");
-        BOOST_CHECK_NO_THROW(epec.finalize());
-        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-        BOOST_CHECK_NO_THROW(epec.make_country_QP());
-        BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
-        BOOST_TEST_MESSAGE("Testing results:");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
-
-
-        BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:85 with alpha=300 and beta=0.05");
-        BOOST_TEST_MESSAGE("Expected: exception in make_country_QP (infeasability PriceLimit<295)");
-        Models::EPEC epec2(&env);
-        Models::LeadAllPar Country2(FP.capacities.size(), "One", FP, {300, 0.05}, {20, -1, -1, 85});
-        BOOST_TEST_MESSAGE("testing Models::addCountry");
-        BOOST_CHECK_NO_THROW(epec2.addCountry(Country2));
-        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-        BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
-        BOOST_TEST_MESSAGE("testing Models::finalize");
-        BOOST_CHECK_NO_THROW(epec2.finalize());
-        BOOST_TEST_MESSAGE("testing Models::make_country_QP, expecting an exception :(");
-        BOOST_CHECK_THROW(epec2.make_country_QP(), string);
+       BOOST_TEST_MESSAGE("MaxTax:20 with alpha=300 and beta=0.05");
+       BOOST_TEST_MESSAGE("Expected: q=100;t=20");
+       Models::EPEC epec(&env);
+       BOOST_TEST_MESSAGE("testing Models::addCountry");
+       BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
+       BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+       BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+       BOOST_TEST_MESSAGE("testing Models::finalize");
+       BOOST_CHECK_NO_THROW(epec.finalize());
+       BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+       BOOST_CHECK_NO_THROW(epec.make_country_QP());
+       BOOST_TEST_MESSAGE("testing Models::findNashEq");
+       BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+       BOOST_TEST_MESSAGE("Testing results:");
+       BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
+       BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
 
 
-        Models::EPEC epec3(&env);
-        Models::LeadAllPar Country3(FP.capacities.size(), "One", FP, {300, 0.05}, {20, -1, -1, 295});
+       BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:85 with alpha=300 and beta=0.05");
+       BOOST_TEST_MESSAGE("Expected: exception in make_country_QP (infeasability PriceLimit<295)");
+       Models::EPEC epec2(&env);
+       Models::LeadAllPar Country2(FP.capacities.size(), "One", FP, {300, 0.05}, {20, -1, -1, 85});
+       BOOST_TEST_MESSAGE("testing Models::addCountry");
+       BOOST_CHECK_NO_THROW(epec2.addCountry(Country2));
+       BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+       BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
+       BOOST_TEST_MESSAGE("testing Models::finalize");
+       BOOST_CHECK_NO_THROW(epec2.finalize());
+       BOOST_TEST_MESSAGE("testing Models::make_country_QP, expecting an exception :(");
+       BOOST_CHECK_THROW(epec2.make_country_QP(), string);
+
+
+       Models::EPEC epec3(&env);
+       Models::LeadAllPar Country3(FP.capacities.size(), "One", FP, {300, 0.05}, {20, -1, -1, 295});
+       BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:290 with alpha=300 and beta=0.05");
+       BOOST_TEST_MESSAGE("PriceLimit coincides with domestic demand price");
+       BOOST_TEST_MESSAGE("Expected: q=100;t=20");
+       BOOST_TEST_MESSAGE("testing Models::addCountry");
+       BOOST_CHECK_NO_THROW(epec3.addCountry(Country3));
+       BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+       BOOST_CHECK_NO_THROW(epec3.addTranspCosts(TrCo));
+       BOOST_TEST_MESSAGE("testing Models::finalize");
+       BOOST_CHECK_NO_THROW(epec3.finalize());
+       BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+       BOOST_CHECK_NO_THROW(epec3.make_country_QP());
+       BOOST_TEST_MESSAGE("testing Models::findNashEq");
+       BOOST_CHECK_NO_THROW(epec3.findNashEq(true));
+       BOOST_TEST_MESSAGE("Testing results:");
+       BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
+       BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
+
+
+        Models::EPEC epec4(&env);
+        Models::LeadAllPar Country4(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1, 299});
         BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:290 with alpha=300 and beta=0.05");
         BOOST_TEST_MESSAGE("PriceLimit coincides with domestic demand price");
-        BOOST_TEST_MESSAGE("Expected: q=100;t=20");
+        BOOST_TEST_MESSAGE("Expected: q=20;p=299");
         BOOST_TEST_MESSAGE("testing Models::addCountry");
-        BOOST_CHECK_NO_THROW(epec3.addCountry(Country3));
+        BOOST_CHECK_NO_THROW(epec4.addCountry(Country4));
         BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-        BOOST_CHECK_NO_THROW(epec3.addTranspCosts(TrCo));
+        BOOST_CHECK_NO_THROW(epec4.addTranspCosts(TrCo));
         BOOST_TEST_MESSAGE("testing Models::finalize");
-        BOOST_CHECK_NO_THROW(epec3.finalize());
+        BOOST_CHECK_NO_THROW(epec4.finalize());
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-        BOOST_CHECK_NO_THROW(epec3.make_country_QP());
+        BOOST_CHECK_NO_THROW(epec4.make_country_QP());
+        BOOST_CHECK_NO_THROW(epec4.testLCP(0));
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec3.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec4.findNashEq(true));
         BOOST_TEST_MESSAGE("Testing results:");
-        BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
-        BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
+        BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 20, 0.001);
     }
 
-    BOOST_AUTO_TEST_CASE(OneCountryMultipleFollowers_test) {
+    BOOST_AUTO_TEST_CASE(l1fn_1_test) {
         BOOST_TEST_MESSAGE("Testing 2Followers 1 Country.");
         Models::FollPar FP;
         FP.capacities = {100, 200};
