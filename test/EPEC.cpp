@@ -560,4 +560,94 @@ BOOST_AUTO_TEST_SUITE(EPECTests)
         BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
     }
 
+    BOOST_AUTO_TEST_CASE(MultipleCountriesMultipleFollowers_test) {
+        BOOST_TEST_MESSAGE("Testing 2Followers 1 Country.");
+        Models::FollPar FP;
+        FP.capacities = {100, 200};
+        FP.costs_lin = {10, 4};
+        FP.costs_quad = {5, 3};
+        FP.emission_costs = {6, 10};
+        FP.names = {"Rosso", "Bianco"};
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {100, -1, -1, 300});
+        GRBEnv env = GRBEnv();
+        arma::sp_mat TrCo(1, 1);
+        TrCo(0, 0) = 0;
+
+        BOOST_TEST_MESSAGE("MaxTax:100, PriceLimit:300 with alpha=300 and beta=0.05");
+        BOOST_TEST_MESSAGE("Expected: margCost(Rosso)>margCost(Bianco);t_0=t_1=maxTax=100");
+        Models::EPEC epec(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        double margRosso=FP.costs_quad[0]*epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) + FP.costs_lin[0] + epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margBianco=FP.costs_quad[1]*epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) + FP.costs_lin[1] + epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1);
+        BOOST_CHECK_MESSAGE(margRosso>margBianco, "Checking marginal cost of Rosso > marginal cost of Bianco");
+        BOOST_CHECK_MESSAGE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1)>epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), "Checking q_Rosso<q_Bianco");
+        BOOST_TEST_MESSAGE("checking taxation on Rosso & Bianco");
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
+
+        BOOST_TEST_MESSAGE("Replicating previous test limiting Bianco production to 50");
+        BOOST_TEST_MESSAGE("Expected: maximum production of Bianco (q1=50), Rosso producing slightly more than before");
+        FP.capacities[1]=50;
+        Models::LeadAllPar Country2(FP.capacities.size(), "One", FP, {300, 0.05}, {100, -1, -1, 300});
+        Models::EPEC epec2(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry");
+        BOOST_CHECK_NO_THROW(epec2.addCountry(Country2));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec2.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec2.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec2.findNashEq(true));
+        BOOST_TEST_MESSAGE("checking production on Bianco");
+        BOOST_CHECK_CLOSE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 50, 0.01);
+        BOOST_CHECK_MESSAGE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0)>epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), "checking production on Rosso");
+        BOOST_TEST_MESSAGE("checking taxation on Rosso & Bianco");
+        BOOST_CHECK_CLOSE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec2.x.at(epec2.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
+
+
+        BOOST_TEST_MESSAGE("Testing 5Followers 1 Country.");
+        BOOST_TEST_MESSAGE("MaxTax:100,  with alpha=400 and beta=0.05");
+        BOOST_TEST_MESSAGE("Expected: MaxTax on all followers and maximum production for polluting ones. ");
+        Models::FollPar FP5;
+        FP5.capacities = {100, 70, 50, 30, 20};
+        FP5.costs_lin = {20, 15, 13, 10, 5};
+        FP5.costs_quad = {5, 4, 3, 3, 2};
+        FP5.emission_costs = {2, 4, 9, 10, 15};
+        FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {100, -1, -1, -1});
+        Models::EPEC epec5(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry");
+        BOOST_CHECK_NO_THROW(epec5.addCountry(Country5));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec5.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec5.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec5.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec5.findNashEq(true));
+        BOOST_TEST_MESSAGE("checking taxation");
+        BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::Tax) + 2), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::Tax) + 3), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::Tax) + 4), 100, 0.01);
+        BOOST_TEST_MESSAGE("checking production of polluting followers");
+        BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::FollowerStart) + 2), 50, 0.01);
+        BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::FollowerStart) + 3), 30, 0.01);
+        BOOST_CHECK_CLOSE(epec5.x.at(epec5.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
