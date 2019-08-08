@@ -659,12 +659,12 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         **/
         BOOST_TEST_MESSAGE("Testing 2Followers (one with cap) 1 Country with tax cap and price cap.");
         Models::FollPar FP;
-        FP.capacities = {100, 50};
-        FP.costs_lin = {10, 4};
-        FP.costs_quad = {5, 3};
-        FP.emission_costs = {6, 10};
+        FP.capacities = {100, 80};
+        FP.costs_lin = {130, 140};
+        FP.costs_quad = {0.5, 0.9};
+        FP.emission_costs = {6, 1};
         FP.names = {"Rosso", "Bianco"};
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {100, -1, -1, 300});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.5}, {100, -1, -1, 240});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -684,13 +684,13 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("checking production on Bianco");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 50, 0.01);
-        BOOST_CHECK_MESSAGE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) >
-                            epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart)+1), 50, 0.01);
+        BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) >
+                            epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
                             "checking production on Rosso");
         BOOST_TEST_MESSAGE("checking taxation on Rosso & Bianco");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
     }
 
     BOOST_AUTO_TEST_CASE(C1F5_test) {
@@ -830,6 +830,68 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
 
     }
 
+    BOOST_AUTO_TEST_CASE(C2F2_test) {
+        Models::FollPar FP1, FP2;
+        FP1.capacities = {100, 150};
+        FP1.costs_lin = {130, 120};
+        FP1.costs_quad = {0.5, 0.3};
+        FP1.emission_costs = {6, 10};
+        FP1.names = {"USGas", "USCoal"};
+        Models::LeadAllPar US(FP1.capacities.size(), "US", FP1, {300, 0.5}, {100, 0, 0, 230});
+
+
+        FP2.capacities = {100, 80};
+        FP2.costs_lin = {130, 140};
+        FP2.costs_quad = {0.5, 0.9};
+        FP2.emission_costs = {6, 1};
+        FP2.names = {"EurGas", "EurSolar"};
+        Models::LeadAllPar Eur(FP2.capacities.size(), "Eur", FP2, {300, 0.5}, {100, 0, 0, 240});
+
+		/* Expected answer for this problem */
+		/************************************/
+		/* USA:
+		 * 	Total production: 			140
+		 * 		USGas production:		100
+		 * 		USCoal production:		40
+		 * 	Taxes:
+		 * 		USGas tax:				0.00
+		 * 		USCoal tax:				78.00
+		 *
+		 * 	Price:						230
+		 *
+		 * Europe:
+		 * 	Total production: 			120
+		 * 		EurGas production:		48.57
+		 * 		EurSolar production:	71.43
+		 * 	Taxes:
+		 * 		EurGas tax:				61.43
+		 * 		EurSolar tax:			0.00
+		 *
+		 * 	Price:						240
+		 *									*/
+		/************************************/
+
+        GRBEnv env = GRBEnv();
+        arma::sp_mat TrCo(2, 2);
+        TrCo.zeros(2,2);
+		// Note that setting the below number to 0, makes the test succeed with the correct values.
+        TrCo(0, 1) = 1;
+        TrCo(1, 0) = TrCo(0, 1);
+
+
+
+		Models::EPEC epec(&env);
+		epec.addCountry(US).addCountry(Eur).addTranspCosts(TrCo).finalize();
+		epec.make_country_QP();
+
+
+		epec.testLCP(0);
+		epec.testLCP(1);
+		
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec.findNashEq(true)); // This is failing.
+
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 

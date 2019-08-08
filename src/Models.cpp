@@ -975,8 +975,10 @@ Models::EPEC::findNashEq(bool write, string filename) {
                     this->write("dat/Solution.txt", true);
                 } catch (GRBException &e) {}
             }
-        } else
-            cout << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
+        } else{
+            cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
+		throw string("Models::EPEC::findNashEq: no nash equilibrium found.");
+		}
         //if (VERBOSE) Game::print(lcp->getCompl());
 
     } else {
