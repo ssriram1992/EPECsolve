@@ -374,7 +374,7 @@ Game::LCP::LCPasMIP(
             model->set(GRB_DoubleParam_FeasibilityTol, this->eps);
             model->set(GRB_DoubleParam_OptimalityTol, this->eps);
         }
-
+        //Get first Equilibrium
         model->set(GRB_IntParam_SolutionLimit, 1);
         if (solve) model->optimize();
         return model;
