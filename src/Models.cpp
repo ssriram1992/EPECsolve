@@ -162,8 +162,8 @@ Models::EPEC::make_LL_QP(const LeadAllPar &Params,    ///< The Parameters object
     arma::sp_mat Q(1, 1), C(1, LeadVars + Params.n_followers - 1);
     // Two constraints. One saying that you should be less than capacity
     // Another saying that you should be less than leader imposed cap!
-    arma::sp_mat A(2, Loc.at(Models::LeaderVars::End) - 1), B(2, 1);
-    arma::vec c(1), b(2);
+    arma::sp_mat A(1, Loc.at(Models::LeaderVars::End) - 1), B(1, 1);
+    arma::vec c(1), b(1);
     c.fill(0);
     b.fill(0);
     A.zeros();
@@ -187,9 +187,7 @@ Models::EPEC::make_LL_QP(const LeadAllPar &Params,    ///< The Parameters object
     //A(1, (Params.n_followers - 1) + 2 + follower) = 0;
     //Produce positive (zero) quantities and less than the cap
     B(0, 0) = 1;
-    B(1, 0) = -1;
     b(0) = Params.FollowerParam.capacities.at(follower);
-    b(1) = 0; // - Params.FollowerParam.capacities.at(follower)*0.05;
 
     Foll->set(std::move(Q), std::move(C), std::move(A), std::move(B), std::move(c), std::move(b));
 }
