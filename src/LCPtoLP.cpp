@@ -375,7 +375,7 @@ Game::LCP::LCPasMIP(
             model->set(GRB_DoubleParam_OptimalityTol, this->eps);
         }
 
-		model->set(GRB_IntParam_SolutionLimit,1);
+        model->set(GRB_IntParam_SolutionLimit, 1);
         if (solve) model->optimize();
         return model;
     }
@@ -1023,14 +1023,19 @@ Game::LCP::addPolyhedron(
         arma::vec *b                        ///< Location where convex hull RHS has to be stored
 ) {
     this->FixToPolies(&Fix, true, true, &custAi, &custbi);
-    arma::sp_mat A_common;
-    A_common = arma::join_cols(this->_A, -this->M);
-    arma::vec b_common = arma::join_cols(this->_b, this->q);
-    if (custAi.size() == 0) {
-        throw string(
-                "Empty vector of polyhedra given! Problem might be infeasible.");
+
+    if (custAi.empty()) {
+        cerr << "Empty vector of polyhedra given! Problem might be infeasible."<<endl;
+        // 0 <= -1 for infeasability
+        *A = arma::sp_mat(1,this->M.n_cols);
+        *b = arma::vec(1);
+        b->at(0)=-1;
+    } else {
+        arma::sp_mat A_common;
+        A_common = arma::join_cols(this->_A, -this->M);
+        arma::vec b_common = arma::join_cols(this->_b, this->q);
+        Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
     }
-    Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
     return *this;
 }
 
