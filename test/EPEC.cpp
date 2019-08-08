@@ -549,7 +549,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {20, -1, -1, 85});
 
         BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:85 with alpha=300 and beta=0.05");
-        BOOST_TEST_MESSAGE("Expected: exception in make_country_QP (infeasability PriceLimit<295)");
+        BOOST_TEST_MESSAGE("Expected: exception in findNashEq (infeasability PriceLimit<295)");
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry");
         BOOST_CHECK_NO_THROW(epec.addCountry(Country));
@@ -557,8 +557,10 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
         BOOST_TEST_MESSAGE("testing Models::finalize");
         BOOST_CHECK_NO_THROW(epec.finalize());
-        BOOST_TEST_MESSAGE("testing Models::make_country_QP, expecting an exception :(");
-        BOOST_CHECK_THROW(epec.make_country_QP(), string);
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_THROW(epec.findNashEq(), string);
     }
 
     BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
@@ -662,9 +664,9 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP.capacities = {100, 80};
         FP.costs_lin = {130, 140};
         FP.costs_quad = {0.5, 0.9};
-        FP.emission_costs = {6, 1};
+        FP.emission_costs = {6, 2};
         FP.names = {"Rosso", "Bianco"};
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.5}, {100, -1, -1, 240});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.5}, {100, -1, -1, 300});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -683,10 +685,9 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
-        BOOST_TEST_MESSAGE("checking production on Bianco");
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart)+1), 50, 0.01);
-        BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) >
-                            epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
+        BOOST_TEST_MESSAGE("checking production levels");
+        BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) >
+                            epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1),
                             "checking production on Rosso");
         BOOST_TEST_MESSAGE("checking taxation on Rosso & Bianco");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
@@ -702,14 +703,60 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         **/
         BOOST_TEST_MESSAGE("Testing 5Followers 1 Country.");
         BOOST_TEST_MESSAGE("MaxTax:100,  with alpha=400 and beta=0.05");
-        BOOST_TEST_MESSAGE("Expected: MaxTax on all followers and maximum production for polluting ones. ");
+        BOOST_TEST_MESSAGE("Expected: maximum production for polluting ones. ");
+        Models::FollPar FP5;
+        GRBEnv env = GRBEnv();
+        arma::sp_mat TrCo(1, 1);
+        TrCo(0, 0) = 0;
+        FP5.capacities = {100, 70, 50, 30, 20};
+        FP5.costs_lin = {200, 150, 130, 100, 50};
+        FP5.costs_quad = {5, 4, 3, 3, 2};
+        FP5.emission_costs = {2, 4, 9, 10, 15};
+        FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {25, -1, -1, -1});
+        Models::EPEC epec(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_TEST_MESSAGE("checking taxation");
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 2), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 3), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 4), 25, 0.01);
+        BOOST_TEST_MESSAGE("checking production of polluting followers");
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 2), 50, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 3), 30, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
+
+
+    }
+
+    BOOST_AUTO_TEST_CASE(C1F5_PriceCap_test) {
+        /** Testing a Single country (C1) with a 5 followers (F5)
+        *  LeaderConstraints:  tax cap 100
+        *  The followers with the lowest marginal cost will produce more
+         * taxation will be maximized to the cap for all followers
+         * Also, the more economical followers will produce up to their cap
+        **/
+        BOOST_TEST_MESSAGE("Testing 5 Followers 1 Country with a price cap.");
+        BOOST_TEST_MESSAGE("Expected: MaxTax on all followers and maximum production ");
+        BOOST_TEST_MESSAGE("MaxTax:100,  with alpha=400 and beta=0.05");
+        // BOOST_TEST_MESSAGE("Expected: MaxTax on all followers and maximum production for polluting ones. ");
         Models::FollPar FP5;
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
         FP5.capacities = {100, 70, 50, 30, 20};
         FP5.costs_lin = {20, 15, 13, 10, 5};
-        FP5.costs_quad = {5, 4, 3, 3, 2};
+        FP5.costs_quad = {0.5, 0.4, 0.3, 0.3, 0.2};
         FP5.emission_costs = {2, 4, 9, 10, 15};
         FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
         Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {100, -1, -1, -1});
@@ -736,15 +783,13 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
     }
 
-BOOST_AUTO_TEST_CASE(C1F5_pricecap_test) {
+    BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
         /** Testing a Single country (C1) with a 5 followers (F5)
-        *  LeaderConstraints:  tax cap 100
-        *  The followers with the lowest marginal cost will produce more
-         * taxation will be maximized to the cap for all followers
-         * Also, the more economical followers will produce up to their cap
+        *  LeaderConstraints:  tax cap 100 and price cap at 385
+        *  The price cap is infeasible (<386.5). Hence, we should get an exception in findNashEq
         **/
-        BOOST_TEST_MESSAGE("Testing 5 Followers 1 Country with a price cap.");
-        BOOST_TEST_MESSAGE("MaxTax:100,  with alpha=400 and beta=0.05");
+        BOOST_TEST_MESSAGE("Testing 5 Followers 1 Country with a price cap and tax cap.");
+        BOOST_TEST_MESSAGE("Expected: Problem is infeasible");
         // BOOST_TEST_MESSAGE("Expected: MaxTax on all followers and maximum production for polluting ones. ");
         Models::FollPar FP5;
         GRBEnv env = GRBEnv();
@@ -755,7 +800,7 @@ BOOST_AUTO_TEST_CASE(C1F5_pricecap_test) {
         FP5.costs_quad = {0.5, 0.4, 0.3, 0.3, 0.2};
         FP5.emission_costs = {2, 4, 9, 10, 15};
         FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
-        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {200, -1, -1, 385});
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {100, -1, -1, 385});
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry");
         BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -766,17 +811,7 @@ BOOST_AUTO_TEST_CASE(C1F5_pricecap_test) {
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
-        BOOST_TEST_MESSAGE("checking taxation");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 2), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 3), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 4), 100, 0.01);
-        BOOST_TEST_MESSAGE("checking production of polluting followers");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 2), 50, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 3), 30, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
+        BOOST_CHECK_THROW(epec.findNashEq(), string);
     }
     
 BOOST_AUTO_TEST_SUITE_END()
