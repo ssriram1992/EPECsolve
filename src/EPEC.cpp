@@ -99,60 +99,6 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo)
 	return 0;
 }
 
-int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2,
-        // Models::LeadAllPar LA3,
-            arma::sp_mat TrCo) {
-    GRBEnv env = GRBEnv();
-    // GRBModel* model=nullptr;
-    arma::sp_mat M;
-    arma::vec q;
-    perps Compl;
-    // Game::LCP *MyNashGame = nullptr;
-    arma::sp_mat Aa;
-    arma::vec b;
-    Models::EPEC epec(&env);
-    try {
-        epec.addCountry(LA, 0).addCountry(LA2, 0)
-                        // .addCountry(LA3,0)
-                .addTranspCosts(TrCo).finalize();
-        epec.make_country_QP();
-        try { epec.testQP(0); } catch (...) {}
-        try { epec.testQP(1); } catch (...) {}
-        epec.testLCP(0);
-        epec.testLCP(1);
-        epec.findNashEq(true);
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
-        for (unsigned int i = 0; i < epec.nCountries; i++) {
-            cout << "********** Country number " << i + 1 << "\t\t" << "**********\n";
-            for (int j = 0; j < 9; j++) {
-                auto v = static_cast<Models::LeaderVars>(j);
-                cout << Models::prn::label << std::setfill('.') << v << Models::prn::val << std::setfill('.')
-                     << epec.getPosition(i, v) << endl;
-            }
-            cout << endl;
-        }
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
-    }
-    catch (const char *e) {
-        cerr << e << endl;
-        throw;
-    }
-    catch (string e) {
-        cerr << "String: " << e << endl;
-        throw;
-    }
-    catch (exception &e) {
-        cerr << "Exception: " << e.what() << endl;
-        throw;
-    }
-    catch (GRBException &e) {
-        cerr << "GRBException: " << e.getErrorCode() << ": " << e.getMessage() << endl;
-        throw;
-    }
-    return 0;
-}
 
 
 
