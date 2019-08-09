@@ -214,13 +214,14 @@ namespace Models {
 
         void WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const;
 
-		// Gabriele, I am changing this due to compatibility with some c++ compilers. 
-		// The standard is being weird and somehow this does not work in linux, g++4.8
+        // Gabriele, I am changing this due to compatibility with some c++ compilers.
+        // The standard is being weird and somehow this does not work in linux, g++4.8
         const arma::vec &x{sol_x};
         const arma::vec &z{sol_z};
-		
-		const arma::vec getx() const {return this->sol_x;}
-		const arma::vec getz() const {return this->sol_z;}
+
+        const arma::vec getx() const { return this->sol_x; }
+
+        const arma::vec getz() const { return this->sol_z; }
     };
 
 

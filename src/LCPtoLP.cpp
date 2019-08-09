@@ -1025,11 +1025,11 @@ Game::LCP::addPolyhedron(
     this->FixToPolies(&Fix, true, true, &custAi, &custbi);
 
     if (custAi.empty()) {
-        cerr << "Empty vector of polyhedra given! Problem might be infeasible."<<endl;
+        cerr << "Empty vector of polyhedra given! Problem might be infeasible." << endl;
         // 0 <= -1 for infeasability
-        *A = arma::sp_mat(1,this->M.n_cols);
+        *A = arma::sp_mat(1, this->M.n_cols);
         *b = arma::vec(1);
-        b->at(0)=-1;
+        b->at(0) = -1;
     } else {
         arma::sp_mat A_common;
         A_common = arma::join_cols(this->_A, -this->M);
