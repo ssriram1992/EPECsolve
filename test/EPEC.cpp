@@ -911,7 +911,6 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
         TrCo.zeros(2,2);
-		// Note that setting the below number to 0, makes the test succeed with the correct values.
         TrCo(0, 1) = 1;
         TrCo(1, 0) = TrCo(0, 1);
 
@@ -941,5 +940,85 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
 
 	}
 
+    BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
+
+        /* Expected answer for this problem */
+        /************************************/
+        /* One:
+         *  Exports                     38.57
+         * 	Total production: 			178.57
+         * 		OneGas production:		100
+         * 		OneCoal production:		78.57
+         * 	Taxes:
+         * 		OneGas tax:				0.00
+         * 		OneCoal tax:			47.14
+         *
+         * 	Price:						230
+         *
+         * Two:
+         *  Imports                     38.57
+         * 	Total production: 			81.43
+         * 		TwoGas production:		10.00
+         * 		TwoSolar production:	71.43
+         * 	Taxes:
+         * 		TwoGas tax:				100.00
+         * 		TwoSolar tax:			0.00
+         *
+         * 	Price:						240
+         *									*/
+        /************************************/
+        BOOST_TEST_MESSAGE("Testing 2 Followers 2 Countries with a price caps, tax caps.");
+        BOOST_TEST_MESSAGE("Exports and export caps on both");
+        Models::FollPar FP1, FP2;
+        FP1.capacities = {100, 150};
+        FP1.costs_lin = {130, 120};
+        FP1.costs_quad = {0.5, 0.3};
+        FP1.emission_costs = {6, 10};
+        FP1.names = {"OneGas", "OneCoal"};
+        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {100, 100, 100, 230});
+
+
+        FP2.capacities = {100, 80};
+        FP2.costs_lin = {130, 140};
+        FP2.costs_quad = {0.5, 0.9};
+        FP2.emission_costs = {6, 1};
+        FP2.names = {"TwoGas", "TwoSolar"};
+        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {100, 100, 100, 240});
+
+
+        GRBEnv env = GRBEnv();
+        arma::sp_mat TrCo(2, 2);
+        TrCo.zeros(2,2);
+        TrCo(0, 1) = 1;
+        TrCo(1, 0) = TrCo(0, 1);
+
+        Models::EPEC epec(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry (One)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(One));
+        BOOST_TEST_MESSAGE("testing Models::addCountry (Two)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Two));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_TEST_MESSAGE("checking production");
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 78.57, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 10, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 71.43, 0.01);
+        BOOST_TEST_MESSAGE("checking taxation");
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 47.14, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
+        BOOST_TEST_MESSAGE("checking exports/imports");
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::NetExport)), 38.57, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::NetImport) ), 38.57, 0.01);
+
+    }
 BOOST_AUTO_TEST_SUITE_END()
 
