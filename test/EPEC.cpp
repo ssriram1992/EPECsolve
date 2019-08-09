@@ -819,7 +819,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
 
-    /* This test suite perform basic unit tests for generalized EPEC problem with multiple countries and followers
+    /* This test suite perform  unit tests for generalized EPEC problem with multiple countries and followers
      */
 
     BOOST_AUTO_TEST_CASE(C2F1_test) {
@@ -866,45 +866,47 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
     }
 
     BOOST_AUTO_TEST_CASE(C2F2_test) {
+
+        /* Expected answer for this problem */
+        /************************************/
+        /* One:
+         * 	Total production: 			140
+         * 		OneGas production:		100
+         * 		OneCoal production:		40
+         * 	Taxes:
+         * 		OneGas tax:				0.00
+         * 		OneCoal tax:				78.00
+         *
+         * 	Price:						230
+         *
+         * Two:
+         * 	Total production: 			120
+         * 		TwoGas production:		48.57
+         * 		TwoSolar production:	71.43
+         * 	Taxes:
+         * 		TwoGas tax:				61.43
+         * 		TwoSolar tax:			0.00
+         *
+         * 	Price:						240
+         *									*/
+        /************************************/
+        BOOST_TEST_MESSAGE("Testing 2 Followers 2 Countries with a price caps, tax caps.");
         Models::FollPar FP1, FP2;
         FP1.capacities = {100, 150};
         FP1.costs_lin = {130, 120};
         FP1.costs_quad = {0.5, 0.3};
         FP1.emission_costs = {6, 10};
-        FP1.names = {"USGas", "USCoal"};
-        Models::LeadAllPar US(FP1.capacities.size(), "US", FP1, {300, 0.5}, {100, 0, 0, 230});
+        FP1.names = {"OneGas", "OneCoal"};
+        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {100, 0, 0, 230});
 
 
         FP2.capacities = {100, 80};
         FP2.costs_lin = {130, 140};
         FP2.costs_quad = {0.5, 0.9};
         FP2.emission_costs = {6, 1};
-        FP2.names = {"EurGas", "EurSolar"};
-        Models::LeadAllPar Eur(FP2.capacities.size(), "Eur", FP2, {300, 0.5}, {100, 0, 0, 240});
+        FP2.names = {"TwoGas", "TwoSolar"};
+        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {100, 0, 0, 240});
 
-		/* Expected answer for this problem */
-		/************************************/
-		/* USA:
-		 * 	Total production: 			140
-		 * 		USGas production:		100
-		 * 		USCoal production:		40
-		 * 	Taxes:
-		 * 		USGas tax:				0.00
-		 * 		USCoal tax:				78.00
-		 *
-		 * 	Price:						230
-		 *
-		 * Europe:
-		 * 	Total production: 			120
-		 * 		EurGas production:		48.57
-		 * 		EurSolar production:	71.43
-		 * 	Taxes:
-		 * 		EurGas tax:				61.43
-		 * 		EurSolar tax:			0.00
-		 *
-		 * 	Price:						240
-		 *									*/
-		/************************************/
 
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
@@ -913,18 +915,29 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         TrCo(0, 1) = 1;
         TrCo(1, 0) = TrCo(0, 1);
 
-
-
 		Models::EPEC epec(&env);
-		epec.addCountry(US).addCountry(Eur).addTranspCosts(TrCo).finalize();
-		epec.make_country_QP();
-
-
-		epec.testLCP(0);
-		epec.testLCP(1);
-		
+        BOOST_TEST_MESSAGE("testing Models::addCountry (One)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(One));
+        BOOST_TEST_MESSAGE("testing Models::addCountry (Two)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Two));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true)); // This is failing.
+        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_TEST_MESSAGE("checking production");
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 40, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 48.57, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 71.43, 0.01);
+        BOOST_TEST_MESSAGE("checking taxation");
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 78, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 61.43, 0.01);
+        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
 
 	}
 
