@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec2.findNashEq(true));
         BOOST_TEST_MESSAGE("Testing results (with indicators)");
-        double q1 = epec2.x.at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0), t1 = epec2.x.at(
+        double q1 = epec2.getx().at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0), t1 = epec2.getx().at(
                 epec2.getPosition(0, Models::LeaderVars::Tax) + 0);
         BOOST_CHECK_CLOSE(t1, 250, 0.001);
         BOOST_CHECK_CLOSE(q1, 66.6666, 0.01);
@@ -407,8 +407,8 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec3.findNashEq(true));
         BOOST_TEST_MESSAGE("Testing results (with bigM)");
-        BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) + 0), q1, 0.001);
-        BOOST_CHECK_CLOSE(epec3.x.at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), t1, 0.001);
+        BOOST_CHECK_CLOSE(epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) + 0), q1, 0.001);
+        BOOST_CHECK_CLOSE(epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), t1, 0.001);
 
 
     }
@@ -452,8 +452,8 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("Testing results:");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 0, 0.001);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 290, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 0, 0.001);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 290, 0.01);
     }
 
     BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
@@ -490,8 +490,8 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("Testing results:");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
     }
 
     BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
@@ -528,7 +528,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("Testing results:");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 20, 0.001);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 20, 0.001);
     }
 
     BOOST_AUTO_TEST_CASE(Bilevel_PriceCap2_test) {
@@ -595,8 +595,8 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("Testing results:");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
 
     }
 
@@ -638,17 +638,17 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
-        double margRosso = FP.costs_quad[0] * epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-                           FP.costs_lin[0] + epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-        double margBianco = FP.costs_quad[1] * epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) +
-                            FP.costs_lin[1] + epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1);
+        double margRosso = FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+                           FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margBianco = FP.costs_quad[1] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) +
+                            FP.costs_lin[1] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1);
         BOOST_CHECK_MESSAGE(margRosso > margBianco, "Checking marginal cost of Rosso > marginal cost of Bianco");
-        BOOST_CHECK_MESSAGE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) >
-                            epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
+        BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) >
+                            epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
                             "Checking q_Rosso<q_Bianco");
         BOOST_TEST_MESSAGE("checking taxation on Rosso & Bianco");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
 
     }
 
@@ -726,15 +726,15 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("checking taxation");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 25, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 25, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 2), 25, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 3), 25, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 4), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 2), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 3), 25, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 4), 25, 0.01);
         BOOST_TEST_MESSAGE("checking production of polluting followers");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 2), 50, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 3), 30, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 2), 50, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 3), 30, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
 
 
     }
@@ -772,15 +772,15 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("checking taxation");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 2), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 3), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 4), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 2), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 3), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 4), 100, 0.01);
         BOOST_TEST_MESSAGE("checking production of polluting followers");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 2), 50, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 3), 30, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 2), 50, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 3), 30, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 4), 20, 0.01);
     }
 
     BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
@@ -813,7 +813,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_THROW(epec.findNashEq(), string);
     }
-    
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
@@ -857,10 +857,10 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
-        double margCountryOne = FP.costs_quad[0] * epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-                           FP.costs_lin[0] + epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-        double margCountryTwo = FP.costs_quad[0] * epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
-                            FP.costs_lin[0] + epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+        double margCountryOne = FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+                                FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margCountryTwo = FP.costs_quad[0] * epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+                                FP.costs_lin[0] + epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
         cout << margCountryOne << "\t" << margCountryTwo << endl;
 
     }
@@ -914,7 +914,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         TrCo(0, 1) = 1;
         TrCo(1, 0) = TrCo(0, 1);
 
-		Models::EPEC epec(&env);
+        Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry (One)");
         BOOST_CHECK_NO_THROW(epec.addCountry(One));
         BOOST_TEST_MESSAGE("testing Models::addCountry (Two)");
@@ -928,17 +928,17 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("checking production");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 40, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 48.57, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 71.43, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 40, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 48.57, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 71.43, 0.01);
         BOOST_TEST_MESSAGE("checking taxation");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 78, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 61.43, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 78, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 61.43, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
 
-	}
+    }
 
     BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
 
@@ -1006,19 +1006,20 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("checking production");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 78.57, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 10, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 71.43, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 78.57, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 10, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 71.43, 0.01);
         BOOST_TEST_MESSAGE("checking taxation");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 47.14, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 47.14, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
         BOOST_TEST_MESSAGE("checking exports/imports");
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(0, Models::LeaderVars::NetExport)), 38.57, 0.01);
-        BOOST_CHECK_CLOSE(epec.x.at(epec.getPosition(1, Models::LeaderVars::NetImport) ), 38.57, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::NetExport)), 38.57, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::NetImport) ), 38.57, 0.01);
 
     }
+
 BOOST_AUTO_TEST_SUITE_END()
 
