@@ -1,4 +1,3 @@
-dat/
 Archive.cpp
 docs/latex
 EPEC
@@ -23,9 +22,5 @@ cmake-build-debug/*
 .DS_Store
 dat/*
 EPECtest
-EPECsolve
-dat/countrQP_0
-dat/LCP_0
-EPECsolve
 EPECsolve
 cmake-*
