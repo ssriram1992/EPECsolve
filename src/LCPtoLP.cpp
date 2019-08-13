@@ -177,6 +177,9 @@ Game::LCP::makeRelaxed()
 {
     try {
         if (this->madeRlxdModel) return;
+		if(!VERBOSE) {
+			RlxdModel.set(GRB_IntParam_LogToConsole, 0);
+		}
         GRBVar x[nC], z[nR];
         if (VERBOSE) cout << "In LCP::makeRelaxed(): " << nR << " " << nC << endl;
         for (unsigned int i = 0; i < nC; i++)
@@ -1051,8 +1054,16 @@ Game::LCP::makeQP(
     const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
 
 
-    if (VERBOSE) cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
+	cout<<"Inside makeQP()\n";
+	// cout<<"A: "<<A.n_rows<<" "<<A.n_cols<<"\n";
+	cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
     Game::QP_constraints QP_cons;
+	cout<<"LCP: "<<this->M.n_rows<<" "<<this->M.n_cols<<endl;
+	QP_obj.C.print_dense("C");
+	M.print_dense("M");
+	for (const auto& comp:Compl)
+		cout<<comp.first<<","<<comp.second<<"\t";
+	cout<<endl;
     this->addPolyhedron(Fix, custAi, custbi, &QP_cons.B, &QP_cons.b);
     // Updated size after convex hull has been computed.
     const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
@@ -1060,10 +1071,18 @@ Game::LCP::makeQP(
     // Resizing entities.
     QP_cons.A.zeros(Ncons, Nx_old);
     QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
+	// Debug print
+	// cout<<"Inside makeQP()...\n";
+	// cout<<"\t Before\n\t";
+	// cout<<QP_obj.C<<endl;
     QP_obj.C = resize_patch(QP_obj.C, Ny, Nx_old);
+	// cout<<"\t After\n\t";
+	// cout<<QP_obj.C<<endl;
     QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
     // Setting the QP_Param object
     QP.set(QP_obj, QP_cons);
+	cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
+	cout<<"Outside makeQP()\n";
     return *this;
 }
 

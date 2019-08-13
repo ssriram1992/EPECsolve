@@ -743,7 +743,7 @@ Models::EPEC::getPosition(const unsigned int countryCount, const Models::LeaderV
  * @brief Gets position of a variable in a country.
  */
 {
-    if (countryCount > this->nCountr) throw string("Error in Models::EPEC::getPosition: Bad Country Count");
+    if (countryCount >= this->nCountr) throw string("Error in Models::EPEC::getPosition: Bad Country Count");
     return this->LeaderLocations.at(countryCount) + this->Locations.at(countryCount).at(var);
 }
 
@@ -789,7 +789,6 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
 {
     const unsigned int nEPECvars = this->nVarinEPEC;
     const unsigned int nThisCountryvars = this->Locations.at(i).at(Models::LeaderVars::End);
-	cout<<"In make_obj_leader: "<<i<<" "<<nEPECvars<<" "<<nThisCountryvars<<endl;
     const LeadAllPar &Params = this->AllLeadPars.at(i);
     const arma::sp_mat &TrCo = this->TranspCosts;
     const LeadLocs &Loc = this->Locations.at(i);
@@ -797,7 +796,6 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
     QP_obj.Q.zeros(nEPECvars - nThisCountryvars, nEPECvars - nThisCountryvars);
     QP_obj.c.zeros(nThisCountryvars);
     QP_obj.C.zeros(nThisCountryvars, nEPECvars - nThisCountryvars);
-	cout<<"In make_obj_leader: "<<QP_obj.C.n_rows<<" "<<QP_obj.C.n_cols<<endl;
     // emission term
     for (unsigned int j = Loc.at(Models::LeaderVars::FollowerStart), count = 0;
          count < Params.n_followers;
@@ -806,20 +804,20 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
     if (this->nCountr > 1) {
         // export revenue term
         QP_obj.C(Loc.at(Models::LeaderVars::NetExport),
-                 this->getPosition(i, Models::LeaderVars::End) - nThisCountryvars) = -1;
+                 // this->getPosition(i, Models::LeaderVars::End) - nThisCountryvars) = -1;
+                 this->getPosition(this->nCountr-1, Models::LeaderVars::End) - nThisCountryvars + i) = -1;
         // Import cost term.
         unsigned int count{0};
-		QP_obj.C.print("Before for loop");
         for (auto val = TrCo.begin_col(i); val != TrCo.end_col(i); ++val, ++count) {
             // C^{tr}_{IA}*q^{I\to A}_{imp} term
             QP_obj.c.at(Loc.at(Models::LeaderVars::CountryImport) + count) = (*val);
             // \pi^I*q^{I\to A}_{imp} term
             QP_obj.C.at(Loc.at(Models::LeaderVars::CountryImport) + count,
-					this->Locations.at(val.row()).at(Models::LeaderVars::End)) = 1;
+					this->getPosition(this->nCountr-1, Models::LeaderVars::End) -nThisCountryvars + val.row()) = 1;
+					// this->Locations.at(val.row()).at(Models::LeaderVars::End)) = 1;
                         // this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
-			cout<<"***"<<this->getPosition(val. row(), Models::LeaderVars::End)<<"***\t";
+			cout<<"C value added at "<<this->getPosition(this->nCountr-1, Models::LeaderVars::End) + val.row() << " for country "<<i<<endl;
         }
-		QP_obj.C.print("After for loop");
     }
 }
 
@@ -894,6 +892,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
     if (i >= this->nCountr) throw string("Error in Models::EPEC::make_country_QP: Invalid country number");
     if (!this->country_QP.at(i).get()) {
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
+		// Player_i_LCP.LCPasMIP(false)->write("dat/country_QP_"+to_string(i)+".lp");
         if (VERBOSE) cout << "In EPEC::make_country_QP: " << Player_i_LCP.getCompl().size() << endl;
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
@@ -945,8 +944,9 @@ Models::EPEC::findNashEq(bool write, string filename) {
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        if (VERBOSE) lcpmodel->write("dat/NashLCP.lp");
+        if (true) lcpmodel->write("dat/NashLCP.lp");
         lcpmodel->optimize();
+		cout<<*nashgame;
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
         unsigned int temp;
