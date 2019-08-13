@@ -360,6 +360,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         /** Testing the indicator constraints switch
         *  Two identical problems should have same solutions with bigM formulation and indicator constraints one
          * Numerical issues in some instances suggest that indicators are a safer choice for numerical stability issues.
+         * @warning the test might fail depending on the thresholds. please see lcptolp bigM, eps, eps_Int. For a better stability, indicators constraints are suggested.
         **/
         BOOST_TEST_MESSAGE("Indicator constraints test");
         Models::FollPar FP;
@@ -686,12 +687,11 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
         BOOST_TEST_MESSAGE("checking production levels");
-        BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) >
-                            epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1),
+        BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) >
+                            epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
                             "checking production on Rosso");
-        BOOST_TEST_MESSAGE("checking taxation on Rosso & Bianco");
+        BOOST_TEST_MESSAGE("checking taxation");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
     }
 
     BOOST_AUTO_TEST_CASE(C1F5_test) {
