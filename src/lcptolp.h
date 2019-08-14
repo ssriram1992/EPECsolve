@@ -18,8 +18,8 @@ namespace Game {
                    const arma::sp_mat Acom = {}, const arma::vec bcom = {});
 
     void compConvSize(arma::sp_mat &A, const unsigned int nFinCons, const unsigned int nFinVar,
-				  const vector<arma::sp_mat *> *Ai, const vector<arma::vec *> *bi,
-                  const arma::sp_mat &Acom, const arma::vec &bcom);
+                      const vector<arma::sp_mat *> *Ai, const vector<arma::vec *> *bi,
+                      const arma::sp_mat &Acom, const arma::vec &bcom);
 /**
  * @brief Class to handle and solve linear complementarity problems
  */
@@ -91,9 +91,9 @@ namespace Game {
 
     public:
         // Fudgible data
-        long double bigM{1e6}; ///< bigM used to rewrite the LCP as MIP
-        long double eps{1e-4}; ///< The threshold for optimality and feasability tollerances
-        long double eps_int{1e-5}; ///< The threshold, below which a number would be considered to be zero.
+        long double bigM{1e7}; ///< bigM used to rewrite the LCP as MIP
+        long double eps{1e-5}; ///< The threshold for optimality and feasability tollerances
+        long double eps_int{1e-8}; ///< The threshold, below which a number would be considered to be zero.
         bool useIndicators{
                 true};///< If true, complementarities will be handled with indicator constraints. BigM formulation otherwise
 
@@ -145,7 +145,7 @@ namespace Game {
 
         /* Convex hull computation */
         LCP &addPolyhedron(const vector<short int> &Fix, vector<arma::sp_mat *> &custAi, vector<arma::vec *> &custbi,
-                           const bool convHull = false, arma::sp_mat *A = {}, arma::vec *b = {});
+                           arma::sp_mat *A = {}, arma::vec *b = {});
 
         int ConvexHull(
                 arma::sp_mat &A, ///< Convex hull inequality description LHS to be stored here

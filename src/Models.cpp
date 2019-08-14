@@ -57,9 +57,6 @@ Models::operator<<(ostream &ost, const Models::LeadPar P) {
     ost << Models::prn::label << "Import Limit" << ":" << Models::prn::val
         << (P.import_limit < 0 ? std::numeric_limits<double>::infinity() : P.import_limit);
     ost << endl;
-    ost << Models::prn::label << "Maximum Tax" << ":" << Models::prn::val
-        << (P.max_tax < 0 ? std::numeric_limits<double>::infinity() : P.max_tax);
-    ost << endl;
     ost << Models::prn::label << "Price limit" << ":" << Models::prn::val
         << (P.price_limit < 0 ? std::numeric_limits<double>::infinity() : P.price_limit);
     ost << endl;
@@ -132,6 +129,7 @@ Models::EPEC::ParamValid(const LeadAllPar &Params ///< Object whose validity is 
     if (Params.FollowerParam.costs_lin.size() != Params.n_followers ||
         Params.FollowerParam.costs_quad.size() != Params.n_followers ||
         Params.FollowerParam.capacities.size() != Params.n_followers ||
+        Params.FollowerParam.tax_caps.size() != Params.n_followers ||
         Params.FollowerParam.emission_costs.size() != Params.n_followers
             )
         throw "Error in EPEC::ParamValid(). Size Mismatch";
@@ -162,8 +160,8 @@ Models::EPEC::make_LL_QP(const LeadAllPar &Params,    ///< The Parameters object
     arma::sp_mat Q(1, 1), C(1, LeadVars + Params.n_followers - 1);
     // Two constraints. One saying that you should be less than capacity
     // Another saying that you should be less than leader imposed cap!
-    arma::sp_mat A(2, Loc.at(Models::LeaderVars::End) - 1), B(2, 1);
-    arma::vec c(1), b(2);
+    arma::sp_mat A(1, Loc.at(Models::LeaderVars::End) - 1), B(1, 1);
+    arma::vec c(1), b(1);
     c.fill(0);
     b.fill(0);
     A.zeros();
@@ -187,9 +185,7 @@ Models::EPEC::make_LL_QP(const LeadAllPar &Params,    ///< The Parameters object
     //A(1, (Params.n_followers - 1) + 2 + follower) = 0;
     //Produce positive (zero) quantities and less than the cap
     B(0, 0) = 1;
-    B(1, 0) = -1;
     b(0) = Params.FollowerParam.capacities.at(follower);
-    b(1) = 0; // - Params.FollowerParam.capacities.at(follower)*0.05;
 
     Foll->set(std::move(Q), std::move(C), std::move(A), std::move(B), std::move(c), std::move(b));
 }
@@ -202,7 +198,7 @@ void Models::EPEC::make_LL_LeadCons(
         const unsigned int import_lim_cons, ///< Does a constraint on import limit exist or no limit?
         const unsigned int export_lim_cons, ///< Does a constraint on export limit exist or no limit?
         const unsigned int price_lim_cons,   ///< Does a constraint on price limit exist or no limit?
-        const unsigned int tax_lim_cons   ///< Does a constraint on tax caps exist or no limit?
+        const unsigned int activeTaxCaps   ///< Number of active Tax Caps constraints. If strictly positive, tax cap constraint(s) will be enforced
 ) const noexcept
 /**
  * Makes the leader level constraints for a country.
@@ -219,57 +215,61 @@ void Models::EPEC::make_LL_LeadCons(
  * The first two constraints above limit net imports and exports respectively. The third constraint limits local price. These constraints are added only if the RHS parameters are given as non-negative value. A default value of -1 to any of these parameters (given in Models::LeadAllPar @p Params object) ensures that these constraints are not added. The last constraint is <i>always</i> added. It ensures that the country does not export more than what it has produced + imported!
  */
 {
-    if (tax_lim_cons) {
+    if (activeTaxCaps > 0) {
+        //Tax Caps are active
         for (unsigned int follower = 0; follower < Params.n_followers; follower++) {
-            // Constraints for Tax limits
-            LeadCons(follower, Loc.at(Models::LeaderVars::Tax) + follower) = 1;
-            LeadRHS(follower) = Params.LeaderParam.max_tax;
+            if (Params.FollowerParam.tax_caps.at(follower) >= 0) {
+                // Constraints for Tax limits
+                LeadCons(follower, Loc.at(Models::LeaderVars::Tax) + follower) = 1;
+                LeadRHS(follower) = Params.FollowerParam.tax_caps.at(follower);
+            }
         }
     }
     // Export - import <= Local Production
     // (28b)
     for (unsigned int i = 0; i < Params.n_followers; i++)
         LeadCons.at(Params.n_followers, i) = -1;
-    LeadCons.at(Params.n_followers, Loc.at(Models::LeaderVars::NetExport)) = 1;
-    LeadCons.at(Params.n_followers, Loc.at(Models::LeaderVars::NetImport)) = -1;
+    LeadCons.at(activeTaxCaps, Loc.at(Models::LeaderVars::NetExport)) = 1;
+    LeadCons.at(activeTaxCaps, Loc.at(Models::LeaderVars::NetImport)) = -1;
     // Import limit - In more precise terms, everything that comes in minus everything that goes out should satisfy this limit
     // (28c)
     if (import_lim_cons) {
-        LeadCons(Params.n_followers + import_lim_cons, Loc.at(Models::LeaderVars::NetImport)) = 1;
-        LeadCons(Params.n_followers + import_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = -1;
-        LeadRHS(Params.n_followers + import_lim_cons) = Params.LeaderParam.import_limit;
+        LeadCons(activeTaxCaps + import_lim_cons, Loc.at(Models::LeaderVars::NetImport)) = 1;
+        LeadCons(activeTaxCaps + import_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = -1;
+        LeadRHS(activeTaxCaps + import_lim_cons) = Params.LeaderParam.import_limit;
     }
     // Export limit - In more precise terms, everything that goes out minus everything that comes in should satisfy this limit
     // (28d)
     if (export_lim_cons) {
-        LeadCons(Params.n_followers + import_lim_cons + export_lim_cons, Loc.at(Models::LeaderVars::NetExport)) = 1;
-        LeadCons(Params.n_followers + import_lim_cons + export_lim_cons, Loc.at(Models::LeaderVars::NetImport)) = -1;
-        LeadRHS(Params.n_followers + import_lim_cons + export_lim_cons) = Params.LeaderParam.export_limit;
+        LeadCons(activeTaxCaps + import_lim_cons + export_lim_cons,
+                 Loc.at(Models::LeaderVars::NetExport)) = 1;
+        LeadCons(activeTaxCaps + import_lim_cons + export_lim_cons,
+                 Loc.at(Models::LeaderVars::NetImport)) = -1;
+        LeadRHS(activeTaxCaps + import_lim_cons +
+                export_lim_cons) = Params.LeaderParam.export_limit;
     }
     // (28g)
     if (price_lim_cons) {
         for (unsigned int i = 0; i < Params.n_followers; i++)
-            LeadCons.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons,
+            LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons,
                         i) = -Params.DemandParam.beta;
-        LeadCons.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons,
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons,
                     Loc.at(Models::LeaderVars::NetImport)) = -Params.DemandParam.beta;
-        LeadCons.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons,
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons,
                     Loc.at(Models::LeaderVars::NetExport)) = Params.DemandParam.beta;
-        LeadRHS.at(Params.n_followers + price_lim_cons + import_lim_cons + export_lim_cons) =
+        LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons) =
                 Params.LeaderParam.price_limit - Params.DemandParam.alpha;
     }
-    if(VERBOSE){
-      cout << "\n********** Price Limit constraint: " << price_lim_cons;
-      cout << "\n********** Import Limit constraint: " << import_lim_cons;
-      cout << "\n********** Export Limit constraint: " << export_lim_cons;
-      cout << "\n********** Tax Limit constraint: " << tax_lim_cons << "\n\t";
-    }
-    for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
-    cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
-    for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
-    if(VERBOSE){
-      LeadCons.impl_print_dense("\nLeadCons:\n");
-      LeadRHS.print("\nLeadRHS");
+    if (VERBOSE) {
+        cout << "\n********** Price Limit constraint: " << price_lim_cons;
+        cout << "\n********** Import Limit constraint: " << import_lim_cons;
+        cout << "\n********** Export Limit constraint: " << export_lim_cons;
+        cout << "\n********** Tax Limit constraints: " << activeTaxCaps << "\n\t";
+        for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
+        cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
+        for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
+        LeadCons.impl_print_dense("\nLeadCons:\n");
+        LeadRHS.print("\nLeadRHS");
     }
 }
 
@@ -338,20 +338,21 @@ Models::EPEC::addCountry(
     if (Params.LeaderParam.import_limit >= 0) import_lim_cons = 1;
     if (Params.LeaderParam.export_limit >= 0) export_lim_cons = 1;
     if (Params.LeaderParam.price_limit >= 0) price_lim_cons = 1;
-    if (Params.LeaderParam.max_tax >= 0) tax_lim_cons = 1;
+    unsigned int activeTaxCaps = count_if(Params.FollowerParam.tax_caps.begin(), Params.FollowerParam.tax_caps.end(),
+                                          [](double i) { return i >= 0; });
 
     // cout<<" In addCountry: "<<Loc[Models::LeaderVars::End]<<endl;
     arma::sp_mat LeadCons(import_lim_cons +    // Import limit constraint
                           export_lim_cons +                // Export limit constraint
                           price_lim_cons +                    // Price limit constraint
-                          tax_lim_cons * Params.n_followers +                // Tax limit constraint
+                          activeTaxCaps +                // Tax limit constraints
                           1,                                // Export - import <= Domestic production
                           Loc[Models::LeaderVars::End]
     );
     arma::vec LeadRHS(import_lim_cons +
                       export_lim_cons +
                       price_lim_cons +
-                      tax_lim_cons * Params.n_followers +
+                      activeTaxCaps +
                       1, arma::fill::zeros);
 
     vector<shared_ptr<Game::QP_Param>> Players{};
@@ -383,9 +384,7 @@ Models::EPEC::addCountry(
     // Make Leader Constraints
     try {
         this->make_LL_LeadCons(LeadCons, LeadRHS, Params, Loc, import_lim_cons, export_lim_cons, price_lim_cons,
-                               tax_lim_cons);
-        LeadCons.print_dense("LeadCons");
-        cout << LeadRHS;
+                               activeTaxCaps);
     }
     catch (const char *e) {
         cerr << e << endl;
@@ -412,12 +411,12 @@ Models::EPEC::addCountry(
     auto N = std::make_shared<Game::NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
     this->name2nos[Params.name] = this->countries_LL.size();
     this->countries_LL.push_back(N);
-    Models::increaseVal(Loc, Models::LeaderVars::DualVar, N->getNduals());
-    Locations.push_back(Loc);
+    Models::increaseVal(Loc, Models::LeaderVars::DualVar,
+                        N->getNduals()); // N->getNduals() will sum the number of constraints in each lower level QP and provide the sum. Indeed, this is the number of dual variables for the lower level.
+    this->Locations.push_back(Loc);
     this->LeadConses.push_back(N->RewriteLeadCons());
-    // cout<<LeadCons<<N->RewriteLeadCons()<<LeadConses.back();
     this->AllLeadPars.push_back(Params);
-    nCountr++;
+    this->nCountr++;
     return *this;
 }
 
@@ -433,8 +432,8 @@ Models::EPEC::addTranspCosts(const arma::sp_mat &costs ///< The transportation c
         throw string(
                 "Error in Models::EPEC::addTranspCosts: EPEC object finalized. Call EPEC::unlock() to unlock this object first and then edit.");
     try {
-        if (this->nCountries != costs.n_rows || this->nCountries != costs.n_cols)
-            throw "Error in EPEC::addTranspCosts. Invalid size of Q";
+        if (this->nCountr != costs.n_rows || this->nCountr != costs.n_cols)
+            throw string("Error in EPEC::addTranspCosts. Invalid size of Q");
         else this->TranspCosts = arma::sp_mat(costs);
         this->TranspCosts.diag().zeros();        // Doesn't make sense for it to have a nonzero diagonal!
     }
@@ -477,8 +476,8 @@ finalize()
         /*
          * Below for loop adds space for each country's quantity imported from variable
          */
-        this->nImportMarkets = vector<unsigned int>(this->nCountries);
-        for (unsigned int i = 0; i < this->nCountries; i++)
+        this->nImportMarkets = vector<unsigned int>(this->nCountr);
+        for (unsigned int i = 0; i < this->nCountr; i++)
             this->add_Leaders_tradebalance_constraints(i);
 
         /*
@@ -486,14 +485,14 @@ finalize()
          */
         this->computeLeaderLocations(true);
 
-        this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountries);
-        this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountries);
-        this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountries);
-        for (unsigned int i = 0; i < this->nCountries; i++) // To add the corresponding Market Clearing constraint
+        this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
+        this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
+        this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
+        for (unsigned int i = 0; i < this->nCountr; i++) // To add the corresponding Market Clearing constraint
         {
             Game::QP_objective QP_obj;
             this->add_Dummy_Lead(i);
-            this->make_MC_leader(i);
+            // this->make_MC_leader(i); // Useless at the moment. Might as well comment this!
             this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
             this->make_obj_leader(i, *this->LeadObjec.at(i).get());
         }
@@ -528,7 +527,7 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
  * 	-	Updates the LeadLocs in Models::EPEC::Locations.at(i)
  */
 {
-    if (i >= this->nCountries)
+    if (i >= this->nCountr)
         throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. Bad argument");
     int nImp = 0;
     LeadLocs &Loc = this->Locations.at(i);
@@ -561,16 +560,13 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 1;
         if (VERBOSE)
             cout << "Single Country: imports are set to zero." << endl;
-        LL_Nash.addLeadCons(a, 0);
+        LL_Nash.addLeadCons(a, 0); // Export <= 0
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 0;
         a.at(Loc.at(Models::LeaderVars::NetExport)) = 1;
         if (VERBOSE)
             cout << "Single Country: exports are set to zero." << endl;
-        LL_Nash.addLeadCons(a, 0);
+        LL_Nash.addLeadCons(a, 0); // Import <= 0
     }
-    // Updating the variable locations
-    /*	Loc[Models::LeaderVars::CountryImport] = Loc.at(Models::LeaderVars::End);
-       Loc.at(Models::LeaderVars::End) += nImp;*/
 }
 
 void
@@ -584,11 +580,11 @@ Models::EPEC::make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const
     // Transportation matrix
     const arma::sp_mat &TrCo = this->TranspCosts;
     // Output matrices
-    MCRHS.zeros(this->nCountries);
-    MCLHS.zeros(this->nCountries, this->nVarEPEC);
+    MCRHS.zeros(this->nCountr);
+    MCLHS.zeros(this->nCountr, this->nVarinEPEC);
     // The MC constraint for each leader country
-    if (this->nCountries > 1) {
-        for (unsigned int i = 0; i < this->nCountries; ++i) {
+    if (this->nCountr > 1) {
+        for (unsigned int i = 0; i < this->nCountr; ++i) {
             MCLHS(i, this->getPosition(i, LeaderVars::NetExport)) = 1;
             for (auto val = TrCo.begin_row(i); val != TrCo.end_row(i); ++val) {
                 const unsigned int j = val.col(); // This is the country which is importing from "i"
@@ -615,11 +611,11 @@ Models::EPEC::make_MC_leader(const unsigned int i)
  * @details Writes the market clearing constraint as a Game::QP_Param and stores it in Models::EPEC::MC_QP
  */
 {
-    if (i >= this->nCountries)
+    if (i >= this->nCountr)
         throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. Bad argument");
     try {
         const arma::sp_mat &TrCo = this->TranspCosts;
-        const unsigned int nEPECvars = this->nVarEPEC;
+        const unsigned int nEPECvars = this->nVarinEPEC;
         const unsigned int nThisMCvars = 1;
         arma::sp_mat C(nThisMCvars, nEPECvars - nThisMCvars);
 
@@ -680,23 +676,23 @@ Models::EPEC::dataCheck(
         const bool chkLeadRHSes,        ///< Checks if Models::EPEC::LeadRHSes has size @p n
         const bool chknImportMarkets,    ///< Checks if Models::EPEC::nImportMarkets has size @p n
         const bool chkLocations,        ///< Checks if Models::EPEC::Locations has size @p n
-        const bool chkLeaderLocations,    ///< Checks if Models::EPEC::LeaderLocations has size @p n and Models::EPEC::nVarEPEC is set
+        const bool chkLeaderLocations,    ///< Checks if Models::EPEC::LeaderLocations has size @p n and Models::EPEC::nVarinEPEC is set
         const bool chkLeadObjec            ///< Checks if Models::EPEC::LeadObjec has size @p n
 ) const
 /**
  * Checks the data in Models::EPEC object, based on checking flags, @p n is the number of countries in the Models::EPEC object.
  */
 {
-    if (!chkAllLeadPars && AllLeadPars.size() != this->nCountries) return false;
-    if (!chkcountries_LL && countries_LL.size() != this->nCountries) return false;
-    if (!chkMC_QP && MC_QP.size() != this->nCountries) return false;
-    if (!chkLeadConses && LeadConses.size() != this->nCountries) return false;
-    if (!chkLeadRHSes && LeadRHSes.size() != this->nCountries) return false;
-    if (!chknImportMarkets && nImportMarkets.size() != this->nCountries) return false;
-    if (!chkLocations && Locations.size() != this->nCountries) return false;
-    if (!chkLeaderLocations && LeaderLocations.size() != this->nCountries) return false;
-    if (!chkLeaderLocations && this->nVarEPEC == 0) return false;
-    if (!chkLeadObjec && LeadObjec.size() != this->nCountries) return false;
+    if (!chkAllLeadPars && AllLeadPars.size() != this->nCountr) return false;
+    if (!chkcountries_LL && countries_LL.size() != this->nCountr) return false;
+    if (!chkMC_QP && MC_QP.size() != this->nCountr) return false;
+    if (!chkLeadConses && LeadConses.size() != this->nCountr) return false;
+    if (!chkLeadRHSes && LeadRHSes.size() != this->nCountr) return false;
+    if (!chknImportMarkets && nImportMarkets.size() != this->nCountr) return false;
+    if (!chkLocations && Locations.size() != this->nCountr) return false;
+    if (!chkLeaderLocations && LeaderLocations.size() != this->nCountr) return false;
+    if (!chkLeaderLocations && this->nVarinEPEC == 0) return false;
+    if (!chkLeadObjec && LeadObjec.size() != this->nCountr) return false;
     return true;
 }
 
@@ -704,7 +700,7 @@ void
 Models::EPEC::add_Dummy_Lead(const unsigned int i) {
     if (!this->dataCheck()) throw string("Error in Models::EPEC::add_Dummy_All_Lead: dataCheck() failed!");
 
-    const unsigned int nEPECvars = this->nVarEPEC;
+    const unsigned int nEPECvars = this->nVarinEPEC;
     const unsigned int nThisCountryvars = this->Locations.at(i).at(Models::LeaderVars::End);
 
     try {
@@ -731,13 +727,13 @@ Models::EPEC::add_Dummy_Lead(const unsigned int i) {
 
 void
 Models::EPEC::computeLeaderLocations(const bool addSpaceForMC) {
-    this->LeaderLocations = vector<unsigned int>(this->nCountries);
+    this->LeaderLocations = vector<unsigned int>(this->nCountr);
     this->LeaderLocations.at(0) = 0;
-    for (unsigned int i = 1; i < this->nCountries; i++)
+    for (unsigned int i = 1; i < this->nCountr; i++)
         this->LeaderLocations.at(i) = this->getPosition(i - 1, Models::LeaderVars::End) + (addSpaceForMC ? 0 : 0);
 
     this->nVarinEPEC =
-            this->getPosition(this->nCountries - 1, Models::LeaderVars::End) + (addSpaceForMC ? this->nCountries : 0);
+            this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + (addSpaceForMC ? this->nCountr : 0);
 }
 
 unsigned int
@@ -746,7 +742,7 @@ Models::EPEC::getPosition(const unsigned int countryCount, const Models::LeaderV
  * @brief Gets position of a variable in a country.
  */
 {
-    if (countryCount > this->nCountries) throw string("Error in Models::EPEC::getPosition: Bad Country Count");
+    if (countryCount >= this->nCountr) throw string("Error in Models::EPEC::getPosition: Bad Country Count");
     return this->LeaderLocations.at(countryCount) + this->Locations.at(countryCount).at(var);
 }
 
@@ -790,7 +786,7 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
  * Makes the objective function of each country.
  */
 {
-    const unsigned int nEPECvars = this->nVarEPEC;
+    const unsigned int nEPECvars = this->nVarinEPEC;
     const unsigned int nThisCountryvars = this->Locations.at(i).at(Models::LeaderVars::End);
     const LeadAllPar &Params = this->AllLeadPars.at(i);
     const arma::sp_mat &TrCo = this->TranspCosts;
@@ -804,10 +800,11 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
          count < Params.n_followers;
          j++, count++)
         QP_obj.c.at(j) = Params.FollowerParam.emission_costs.at(count);
-    if (this->nCountries > 1) {
+    if (this->nCountr > 1) {
         // export revenue term
         QP_obj.C(Loc.at(Models::LeaderVars::NetExport),
-                 this->getPosition(i, Models::LeaderVars::End) - nThisCountryvars) = -1;
+                // this->getPosition(i, Models::LeaderVars::End) - nThisCountryvars) = -1;
+                 this->getPosition(this->nCountr - 1, Models::LeaderVars::End) - nThisCountryvars + i) = -1;
         // Import cost term.
         unsigned int count{0};
         for (auto val = TrCo.begin_col(i); val != TrCo.end_col(i); ++val, ++count) {
@@ -815,7 +812,13 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
             QP_obj.c.at(Loc.at(Models::LeaderVars::CountryImport) + count) = (*val);
             // \pi^I*q^{I\to A}_{imp} term
             QP_obj.C.at(Loc.at(Models::LeaderVars::CountryImport) + count,
-                        this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
+                        this->getPosition(this->nCountr - 1, Models::LeaderVars::End) - nThisCountryvars +
+                        val.row()) = 1;
+            // this->Locations.at(val.row()).at(Models::LeaderVars::End)) = 1;
+            // this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
+            if (VERBOSE)
+                cout << "C value added at " << this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + val.row()
+                     << " for country " << i << endl;
         }
     }
 }
@@ -829,9 +832,9 @@ unique_ptr<GRBModel>
 Models::EPEC::Respond(const unsigned int i, const arma::vec &x) const {
     if (!this->finalized) throw string("Error in Models::EPEC::Respond: Model not finalized");
 
-    if (i >= this->nCountries) throw string("Error in Models::EPEC::Respond: Invalid country number");
+    if (i >= this->nCountr) throw string("Error in Models::EPEC::Respond: Invalid country number");
 
-    const unsigned int nEPECvars = this->nVarEPEC;
+    const unsigned int nEPECvars = this->nVarinEPEC;
     const unsigned int nThisCountryvars = this->Locations.at(i).at(Models::LeaderVars::End);
 
     if (x.n_rows != nEPECvars - nThisCountryvars)
@@ -851,26 +854,30 @@ Models::EPEC::make_country_QP()
 {
     static bool already_ran{false};
     if (!already_ran)
-        for (unsigned int i = 0; i < this->nCountries; ++i)
+        for (unsigned int i = 0; i < this->nCountr; ++i)
             this->make_country_QP(i);
-    for (unsigned int i = 0; i < this->nCountries; ++i) {
+    for (unsigned int i = 0; i < this->nCountr; ++i) {
         LeadLocs &Loc = this->Locations.at(i);
         // Adjusting "stuff" because we now have new convHull variables
         unsigned int convHullVarCount = this->LeadObjec.at(i)->Q.n_rows - Loc[Models::LeaderVars::End];
         // Location details
         Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy, convHullVarCount);
         // All other players' QP
-        if (this->nCountries > 1) {
-            for (unsigned int j = 0; j < this->nCountries; j++) {
+        if (this->nCountr > 1) {
+            for (unsigned int j = 0; j < this->nCountr; j++) {
                 if (i != j)
-                    this->country_QP.at(j)->addDummy(convHullVarCount, 0);
-                this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
+                    this->country_QP.at(j)->addDummy(convHullVarCount, 0,
+                                                     this->country_QP.at(j)->getNx() - this->nCountr
+                    );
+                // this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
             }
         }
     }
     this->computeLeaderLocations(true);
-    for (unsigned int i = 0; i < this->nCountries; ++i)
-        this->country_QP.at(i)->QP_Param::write("dat/countrQP_" + to_string(i), false);
+    if (VERBOSE) {
+        for (unsigned int i = 0; i < this->nCountr; ++i)
+            this->country_QP.at(i)->QP_Param::write("dat/countrQP_" + to_string(i), false);
+    }
 }
 
 void
@@ -886,16 +893,12 @@ Models::EPEC::make_country_QP(const unsigned int i)
  */
 {
     if (!this->finalized) throw string("Error in Models::EPEC::make_country_QP: Model not finalized");
-    if (i >= this->nCountries) throw string("Error in Models::EPEC::make_country_QP: Invalid country number");
+    if (i >= this->nCountr) throw string("Error in Models::EPEC::make_country_QP: Invalid country number");
     if (!this->country_QP.at(i).get()) {
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
-        if (VERBOSE) cout << "In EPEC::make_country_QP: " << Player_i_LCP.getCompl().size() << endl;
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
     }
-	// Debug line to remove
-	arma::vec x(this->country_QP.at(i)->getNx(), arma::fill::zeros);
-	this->country_QP.at(i)->solveFixed(x);
 }
 
 
@@ -918,7 +921,8 @@ Models::init(LeadLocs &L) {
     L[Models::LeaderVars::End] = 0;
 }
 
-Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
+Models::LeaderVars
+Models::operator+(Models::LeaderVars a, int b) {
     return static_cast<LeaderVars>(static_cast<int> (a) + b);
 }
 
@@ -937,25 +941,23 @@ Models::EPEC::findNashEq(bool write, string filename) {
         //if (VERBOSE) cout << *nashgame << endl;
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
 
-        if (write) this->nashgame->write("dat/NashGame", true, true);
+        if (VERBOSE) this->nashgame->write("dat/NashGame", false, true);
         //Using indicator constraints
         lcp->useIndicators = this->indicators;
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
+        if (VERBOSE) lcpmodel->write("dat/NashLCP.lp");
         lcpmodel->optimize();
-        if (VERBOSE) {
-            lcpmodel->write("dat/NashLCP.lp");
-            lcpmodel->write("dat/NashLCP.sol");
-        }
+        if (VERBOSE) cout << *nashgame;
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
         unsigned int temp;
         int status = lcpmodel->get(GRB_IntAttr_Status);
         if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
             try {
-
-                for (unsigned int i = 0; i < (unsigned int)Nvar; i++) {
+                if (VERBOSE) lcpmodel->write("dat/NashLCP.sol");
+                for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
                     //if (VERBOSE)
@@ -975,13 +977,15 @@ Models::EPEC::findNashEq(bool write, string filename) {
                 this->sol_z.save("dat/z_" + filename, arma::file_type::arma_ascii, VERBOSE);
                 try {
                     this->WriteCountry(0, "dat/Solution.txt", this->sol_x, false);
-                    for (unsigned int ell = 1; ell < this->nCountries; ++ell)
+                    for (unsigned int ell = 1; ell < this->nCountr; ++ell)
                         this->WriteCountry(ell, "dat/Solution.txt", this->sol_x, true);
                     this->write("dat/Solution.txt", true);
                 } catch (GRBException &e) {}
             }
-        } else
-            cout << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
+        } else {
+            cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
+            throw string("Models::EPEC::findNashEq: no nash equilibrium found.");
+        }
         //if (VERBOSE) Game::print(lcp->getCompl());
 
     } else {
@@ -991,17 +995,20 @@ Models::EPEC::findNashEq(bool write, string filename) {
 }
 
 
-void Models::EPEC::gur_WriteCountry_conv(const unsigned int i, string filename) const {
+void
+Models::EPEC::gur_WriteCountry_conv(const unsigned int i, string filename) const {
 
     if (!lcp) throw;
 }
 
-void Models::EPEC::gur_WriteEpecMip(const unsigned int i, string filename) const {
+void
+Models::EPEC::gur_WriteEpecMip(const unsigned int i, string filename) const {
 
     if (!lcp) throw;
 }
 
-string to_string(const GRBConstr &cons, const GRBModel &model) {
+string
+to_string(const GRBConstr &cons, const GRBModel &model) {
     const GRBVar *vars = model.getVars();
     const int nVars = model.get(GRB_IntAttr_NumVars);
     ostringstream oss;
@@ -1020,7 +1027,8 @@ string to_string(const GRBConstr &cons, const GRBModel &model) {
     return oss.str();
 }
 
-string to_string(const GRBVar &var) {
+string
+to_string(const GRBVar &var) {
     string name = var.get(GRB_StringAttr_VarName);
     return name.empty() ? "unNamedvar" : name;
 }
@@ -1050,7 +1058,7 @@ Models::EPEC::write(const string filename, bool append) const {
         file << "############### COUNTRY PARAMETERS ###############\n";
         file << "##################################################\n";
     }
-    for (unsigned int i = 0; i < this->nCountries; ++i)
+    for (unsigned int i = 0; i < this->nCountr; ++i)
         this->write(filename, i, (append || i));
 }
 
@@ -1104,8 +1112,11 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
     // FILE OPERATIONS END
 }
 
-void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, const string filename,
-                                 const arma::vec x) const {
+void
+Models::EPEC::WriteFollower(const unsigned int i,
+                            const unsigned int j,
+                            const string filename,
+                            const arma::vec x) const {
     ofstream file;
     file.open(filename, ios::app);
 
@@ -1135,6 +1146,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
     file << Models::prn::label << "Limit on production" << ":" << Models::prn::val << lim << "\n";
     //file << "x(): " << foll_lim + j << endl;
     file << Models::prn::label << "Tax imposed" << ":" << Models::prn::val << tax << "\n";
+    file << Models::prn::label << "Tax cap" << ":" << Params.FollowerParam.tax_caps.at(j) << tax << "\n";
     //file << "x(): " << foll_tax + j << endl;
     file << Models::prn::label << "  -Production cost function" << ":" << "\t C(q) = (" << lin << " + " << tax
          << ")*q + 0.5*" << quad << "*q^2\n" << Models::prn::label << " " << "=" << Models::prn::val
@@ -1147,7 +1159,8 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
     file.close();
 }
 
-void Models::EPEC::testQP(const unsigned int i) {
+void
+Models::EPEC::testQP(const unsigned int i) {
     QP_Param *QP = this->country_QP.at(i).get();
     arma::vec x;
     //if (VERBOSE) cout << *QP << endl;
@@ -1176,7 +1189,8 @@ void Models::EPEC::testQP(const unsigned int i) {
     }
 }
 
-void Models::EPEC::testLCP(const unsigned int i) {
+void
+Models::EPEC::testLCP(const unsigned int i) {
     auto country = this->get_LowerLevelNash(i);
     LCP CountryLCP = LCP(this->env, *country);
     CountryLCP.write("dat/LCP_" + to_string(i));

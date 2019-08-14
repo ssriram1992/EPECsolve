@@ -19,7 +19,12 @@ namespace Models {
         vector<double> costs_lin = {};    ///< Linear  coefficient of i-th follower's cost. Size of this vector should be equal to n_followers
         vector<double> capacities = {};    ///< Production capacity of each follower. Size of this vector should be equal to n_followers
         vector<double> emission_costs = {};    ///< Emission costs for unit quantity of the fuel. Emission costs feature only on the leader's problem
+        vector<double> tax_caps = {};    ///< Individual tax caps for each follower.
         vector<string> names = {};    ///< Optional Names for the Followers.
+        FollPar(vector<double> costs_quad_ = {}, vector<double> costs_lin_ = {}, vector<double> capacities_ = {},
+                vector<double> emission_costs_ = {}, double tax_caps_ = {}, vector<string> names_ = {})
+                : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
+                  emission_costs{emission_costs_}, tax_caps(tax_caps_, costs_quad_.size()), names{names_} {}
     };
 
 
@@ -34,10 +39,9 @@ namespace Models {
     struct LeadPar {
         double import_limit = -1;    ///< Maximum net import in the country. If no limit, set the value as -1;
         double export_limit = -1;    ///< Maximum net export in the country. If no limit, set the value as -1;
-        double max_tax = 10;    ///< Government decided increase in the shift in costs_lin of any player cannot exceed this value
         double price_limit = -1;    ///< Government does not want the price to exceed this limit
-        LeadPar(double max_tax = 10, double imp_lim = -1, double exp_lim = -1, double price_limit = -1)
-                : import_limit{imp_lim}, export_limit{exp_lim}, max_tax{max_tax}, price_limit{price_limit} {}
+        LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1)
+                : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit} {}
     };
 
 /// @brief Stores the parameters of a country model
@@ -135,7 +139,7 @@ namespace Models {
                               const unsigned int import_lim_cons = 1,
                               const unsigned int export_lim_cons = 1,
                               const unsigned int price_lim_cons = 1,
-                              const unsigned int tax_lim_cons = 1) const noexcept;
+                              const unsigned int activeTaxCaps = 0) const noexcept;
 
         void add_Leaders_tradebalance_constraints(const unsigned int i);
 
@@ -214,8 +218,9 @@ namespace Models {
 
         void WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const;
 
-        const arma::vec &x{sol_x};
-        const arma::vec &z{sol_z};
+        const arma::vec getx() const { return this->sol_x; }
+
+        const arma::vec getz() const { return this->sol_z; }
     };
 
 
