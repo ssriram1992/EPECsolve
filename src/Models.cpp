@@ -264,7 +264,7 @@ void Models::EPEC::make_LL_LeadCons(
         cout << "\n********** Price Limit constraint: " << price_lim_cons;
         cout << "\n********** Import Limit constraint: " << import_lim_cons;
         cout << "\n********** Export Limit constraint: " << export_lim_cons;
-        cout << "\n********** Tax Limit constraints: " << activeTaxCaps<< "\n\t";
+        cout << "\n********** Tax Limit constraints: " << activeTaxCaps << "\n\t";
         for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
         cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
         for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
@@ -821,7 +821,6 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
                      << " for country " << i << endl;
         }
     }
-    QP_obj.C.print("C from make_obj_leader " + to_string(i));
 }
 
 unique_ptr<GRBModel>
@@ -897,12 +896,9 @@ Models::EPEC::make_country_QP(const unsigned int i)
     if (i >= this->nCountr) throw string("Error in Models::EPEC::make_country_QP: Invalid country number");
     if (!this->country_QP.at(i).get()) {
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
-        // Player_i_LCP.LCPasMIP(false)->write("dat/country_QP_"+to_string(i)+".lp");
-        if (VERBOSE) cout << "In EPEC::make_country_QP: " << Player_i_LCP.getCompl().size() << endl;
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
     }
-    this->country_QP.at(i)->getC().print("Country: " + to_string(i));
 }
 
 
@@ -951,9 +947,9 @@ Models::EPEC::findNashEq(bool write, string filename) {
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        if (true) lcpmodel->write("dat/NashLCP.lp");
+        if (VERBOSE) lcpmodel->write("dat/NashLCP.lp");
         lcpmodel->optimize();
-        cout << *nashgame;
+        if (VERBOSE) cout << *nashgame;
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
         unsigned int temp;

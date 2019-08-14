@@ -26,13 +26,13 @@ bool Game::isZero(arma::sp_mat M, double tol) {
 arma::sp_mat Game::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC) {
     arma::sp_mat MMat(nR, nC);
     MMat.zeros();
-	bool flag = Mat.n_rows==7 && Mat.n_cols ==9 && 56<5;
+    bool flag = Mat.n_rows == 7 && Mat.n_cols == 9 && 56 < 5;
     if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
-		if(flag) Mat.print_dense("Input");
-		if(flag) cout<<Mat.n_rows<<" "<<Mat.n_cols<<" ";
+        if (flag) Mat.print_dense("Input");
+        if (flag) cout << Mat.n_rows << " " << Mat.n_cols << " ";
         if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
             MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
-		if(flag) MMat.print("Output");
+        if (flag) MMat.print("Output");
     } else {
         if (nR <= Mat.n_rows && nC <= Mat.n_cols)
             MMat = Mat.submat(0, 0, nR, nC);
@@ -826,15 +826,15 @@ Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
         throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible --- ") + to_string(a.n_elem) +
               string(" != ") + to_string(nC);
     auto nR = this->LeaderConstraints.n_rows;
-	if(VERBOSE) cout<<"In NashGame::addLeadCons\n";
-	if(VERBOSE) LeaderConstraints.print_dense("Before");
+    if (VERBOSE) cout << "In NashGame::addLeadCons\n";
+    if (VERBOSE) LeaderConstraints.print_dense("Before");
     this->LeaderConstraints = Game::resize_patch(this->LeaderConstraints, nR + 1, nC);
     // (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
     LeaderConstraints.row(nR) = a.t();
-    this->LeaderConsRHS = Game::resize_patch(this->LeaderConsRHS, nR+1);
+    this->LeaderConsRHS = Game::resize_patch(this->LeaderConsRHS, nR + 1);
     this->LeaderConsRHS(nR) = b;
-	if(VERBOSE) LeaderConstraints.print_dense("After");
-	if(VERBOSE) cout<<"Exiting NashGame::addLeadCons\n";
+    if (VERBOSE) LeaderConstraints.print_dense("After");
+    if (VERBOSE) cout << "Exiting NashGame::addLeadCons\n";
     return *this;
 }
 
