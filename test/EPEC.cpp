@@ -369,8 +369,9 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         FP.costs_lin = {10};
         FP.costs_quad = {0.5};
         FP.emission_costs = {6};
+        FP.tax_caps = {250};
         FP.names = {"Blu"};
-        Models::LeadAllPar Country(1, "One", FP, {300, 0.05}, {250, -1, -1, -1});
+        Models::LeadAllPar Country(1, "One", FP, {300, 0.05}, {-1, -1, -1});
         BOOST_TEST_MESSAGE("MaxTax:250 with alpha=300 and beta=0.05");
         BOOST_TEST_MESSAGE("Expected: q=66.666;t=250");
         GRBEnv env = GRBEnv();
@@ -432,8 +433,9 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         FP.costs_lin = {10};
         FP.costs_quad = {0.5};
         FP.emission_costs = {6};
+        FP.tax_caps = {-1};
         FP.names = {"Blu"};
-        Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1, -1});
+        Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -470,8 +472,9 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         FP.costs_lin = {10};
         FP.costs_quad = {0.5};
         FP.emission_costs = {6};
+        FP.tax_caps = {20};
         FP.names = {"Blu"};
-        Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05}, {20, -1, -1, -1});
+        Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -508,14 +511,15 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         FP.costs_lin = {10};
         FP.costs_quad = {0.5};
         FP.emission_costs = {6};
+        FP.tax_caps = {-1};
         FP.names = {"Blu"};
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
 
         Models::EPEC epec(&env);
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1, 299});
-        BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:290 with alpha=300 and beta=0.05");
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 299});
+        BOOST_TEST_MESSAGE("PriceLimit:299 with alpha=300 and beta=0.05");
         BOOST_TEST_MESSAGE("PriceLimit coincides with domestic demand price");
         BOOST_TEST_MESSAGE("Expected: q=20;p=299");
         BOOST_TEST_MESSAGE("testing Models::addCountry");
@@ -544,11 +548,12 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         FP.costs_lin = {10};
         FP.costs_quad = {0.5};
         FP.emission_costs = {6};
+        FP.tax_caps = {20};
         FP.names = {"Blu"};
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {20, -1, -1, 85});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 85});
 
         BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:85 with alpha=300 and beta=0.05");
         BOOST_TEST_MESSAGE("Expected: exception in findNashEq (infeasability PriceLimit<295)");
@@ -576,11 +581,12 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         FP.costs_lin = {10};
         FP.costs_quad = {0.5};
         FP.emission_costs = {6};
+        FP.tax_caps = {20};
         FP.names = {"Blu"};
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {20, -1, -1, 295});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 295});
 
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:290 with alpha=300 and beta=0.05");
@@ -621,8 +627,9 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP.costs_lin = {10, 4};
         FP.costs_quad = {5, 3};
         FP.emission_costs = {6, 10};
+        FP.tax_caps = {100, 100};
         FP.names = {"Rosso", "Bianco"};
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {100, -1, -1, 300});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 300});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -667,8 +674,9 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP.costs_lin = {130, 140};
         FP.costs_quad = {0.5, 0.9};
         FP.emission_costs = {6, 2};
+        FP.tax_caps = {100, 100};
         FP.names = {"Rosso", "Bianco"};
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.5}, {100, -1, -1, 300});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.5}, {-1, -1, 300});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -713,8 +721,9 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP5.costs_lin = {200, 150, 130, 100, 50};
         FP5.costs_quad = {5, 4, 3, 3, 2};
         FP5.emission_costs = {2, 4, 9, 10, 15};
+        FP5.tax_caps = {25, 25, 25, 25, 25};
         FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
-        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {25, -1, -1, -1});
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, -1});
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry");
         BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -759,8 +768,9 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP5.costs_lin = {20, 15, 13, 10, 5};
         FP5.costs_quad = {0.5, 0.4, 0.3, 0.3, 0.2};
         FP5.emission_costs = {2, 4, 9, 10, 15};
+        FP5.tax_caps = {100, 100, 100, 100, 100};
         FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
-        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {100, -1, -1, -1});
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, -1});
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry");
         BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -800,8 +810,9 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP5.costs_lin = {20, 15, 13, 10, 5};
         FP5.costs_quad = {0.5, 0.4, 0.3, 0.3, 0.2};
         FP5.emission_costs = {2, 4, 9, 10, 15};
+        FP5.tax_caps = {25, 25, 25, 25, 25};
         FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
-        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {100, -1, -1, 385});
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, 385});
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry");
         BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -834,9 +845,10 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP.costs_lin = {4};
         FP.costs_quad = {3};
         FP.emission_costs = {15};
+        FP.tax_caps = {100};
         FP.names = {"Rosso"};
-        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {100, -1, -1, 295});
-        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5}, {100, -1, -1, 285});
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
+        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5}, {-1, -1, 285});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
         TrCo.zeros(2,2);
@@ -910,16 +922,18 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP1.costs_lin = {130, 120};
         FP1.costs_quad = {0.5, 0.3};
         FP1.emission_costs = {6, 10};
+        FP1.tax_caps = {100, 100};
         FP1.names = {"OneGas", "OneCoal"};
-        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {100, 0, 0, 230});
+        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {0, 0, 230});
 
 
         FP2.capacities = {100, 80};
         FP2.costs_lin = {130, 140};
         FP2.costs_quad = {0.5, 0.9};
         FP2.emission_costs = {6, 1};
+        FP2.tax_caps = {100, 100};
         FP2.names = {"TwoGas", "TwoSolar"};
-        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {100, 0, 0, 240});
+        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {0, 0, 240});
 
 
         GRBEnv env = GRBEnv();
@@ -1001,16 +1015,18 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP1.costs_lin = {130, 120};
         FP1.costs_quad = {0.5, 0.3};
         FP1.emission_costs = {6, 10};
+        FP1.tax_caps = {100, 100};
         FP1.names = {"OneGas", "OneCoal"};
-        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {100, 100, 100, 230});
+        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {100, 100, 230});
 
 
         FP2.capacities = {100, 80};
         FP2.costs_lin = {130, 140};
         FP2.costs_quad = {0.5, 0.9};
         FP2.emission_costs = {6, 1};
+        FP2.tax_caps = {100, 100};
         FP2.names = {"TwoGas", "TwoSolar"};
-        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {100, 100, 100, 240});
+        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {100, 100, 240});
 
 
         GRBEnv env = GRBEnv();
