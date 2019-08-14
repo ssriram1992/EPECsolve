@@ -117,27 +117,29 @@ int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo) {
 int main() {
     Models::DemPar P;
     Models::FollPar FP, FP2, FP3, FP1, FP3a, FP2a;
-    Models::LeadPar L(0.4, -1, -1, -1);
+    Models::LeadPar L(-1, -1, -1);
 
 
     // Two followers Leader with price cap
-    Models::LeadAllPar LA_pc1(1, "USA", FP1, {40, 1.10}, {0.4, -1, -1, -1});
-    Models::LeadAllPar LA_pc2(1, "China", FP1, {60, 1.25}, {0.4, -1, -1, -1});
+    Models::LeadAllPar LA_pc1(1, "USA", FP1, {40, 1.10}, { -1, -1, -1});
+    Models::LeadAllPar LA_pc2(1, "China", FP1, {60, 1.25}, { -1, -1, -1});
     FP1.capacities = {100};
     FP1.costs_lin = {10};
     FP1.costs_quad = {5};
     FP1.emission_costs = {6};
+    FP1.tax_caps = {-1};
     FP1.names = {"US_follower"};
 
     FP.capacities = {100};
     FP.costs_lin = {4};
     FP.costs_quad = {0.25};
     FP.emission_costs = {10};
+    FP.tax_caps = {-1};
     FP.names = {"Eur_follower"};
 
     // Two followers Leader with price cap
-    Models::LeadAllPar Europe(1, "Europe", FP, {80, 0.15}, {-1, -1, -1, -1});
-    Models::LeadAllPar USA(1, "USA", FP1, {300, 0.05}, {100, -1, -1, -1});
+    Models::LeadAllPar Europe(1, "Europe", FP, {80, 0.15}, { -1, -1, -1});
+    Models::LeadAllPar USA(1, "USA", FP1, {300, 0.05}, {-1, -1, -1});
     // cout<<LA<<LA2;
     // cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
     arma::mat TrCo(2, 2);
