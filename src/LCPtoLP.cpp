@@ -1090,7 +1090,7 @@ Game::LCP::makeQP(
 Game::LCP &
 Game::LCP::makeQP(
         Game::QP_objective &QP_obj,
-        Game::QP_Param &QP
+        Game::QP_Param &QP 
 ) {
     vector<arma::sp_mat *> custAi{};
     vector<arma::vec *> custbi{};

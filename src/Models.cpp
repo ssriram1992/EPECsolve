@@ -861,7 +861,9 @@ Models::EPEC::make_country_QP()
         if (this->nCountr > 1) {
             for (unsigned int j = 0; j < this->nCountr; j++) {
                 if (i != j)
-                    this->country_QP.at(j)->addDummy(convHullVarCount, 0);
+                    this->country_QP.at(j)->addDummy(convHullVarCount, 0, 
+							this->country_QP.at(j)->getNx() - this->nCountr
+							);
                 // this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
             }
         }
