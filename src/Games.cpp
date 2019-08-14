@@ -26,9 +26,13 @@ bool Game::isZero(arma::sp_mat M, double tol) {
 arma::sp_mat Game::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC) {
     arma::sp_mat MMat(nR, nC);
     MMat.zeros();
+	bool flag = Mat.n_rows==7 && Mat.n_cols ==9 && 56<5;
     if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
+		if(flag) Mat.print_dense("Input");
+		if(flag) cout<<Mat.n_rows<<" "<<Mat.n_cols<<" ";
         if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
             MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
+		if(flag) MMat.print("Output");
     } else {
         if (nR <= Mat.n_rows && nC <= Mat.n_cols)
             MMat = Mat.submat(0, 0, nR, nC);
@@ -141,6 +145,8 @@ void Game::QP_Param::write(string filename, bool append) const {
 Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars, int position)
 /**
  * Adds dummy variables to a parameterized mathematical program
+ * @p position dictates the position at which the parameters can be added. -1 for adding at the end. 
+ * @warning @position cannot be set for @vars. @vars always added at the end.
  */
 {
     this->Nx += pars;
@@ -261,11 +267,6 @@ Game::MP_Param::dataCheck(bool forcesymm ///< Check if MP_Param::Q is symmetric
  * 	@returns true if all above checks are cleared. false otherwise.
  */
 {
-    if (forcesymm && !this->Q.is_symmetric()) {
-        if (VERBOSE) cout << "Q.is_symmetric()\n";
-        return false;
-    }
-
     if (this->Q.n_cols != Ny) {
         if (VERBOSE) cout << "Q.n_cols\n";
         return false;
@@ -301,10 +302,6 @@ bool Game::MP_Param::dataCheck(const QP_objective &obj, const QP_constraints &co
     unsigned int Ny = obj.Q.n_rows;
     unsigned int Nx = obj.C.n_cols;
     unsigned int Ncons = cons.b.size();
-    if (checkobj && !obj.Q.is_symmetric()) {
-        if (VERBOSE) cout << "Q.is_symmetric()\n";
-        return false;
-    }
 
     if (checkobj && obj.Q.n_cols != Ny) {
         if (VERBOSE) cout << "Q.n_cols\n";
@@ -829,11 +826,15 @@ Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
         throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible --- ") + to_string(a.n_elem) +
               string(" != ") + to_string(nC);
     auto nR = this->LeaderConstraints.n_rows;
-    this->LeaderConstraints.resize(nR + 1, nC);
+	if(VERBOSE) cout<<"In NashGame::addLeadCons\n";
+	if(VERBOSE) LeaderConstraints.print_dense("Before");
+    this->LeaderConstraints = Game::resize_patch(this->LeaderConstraints, nR + 1, nC);
     // (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
     LeaderConstraints.row(nR) = a.t();
-    this->LeaderConsRHS.resize(nR + 1);
+    this->LeaderConsRHS = Game::resize_patch(this->LeaderConsRHS, nR+1);
     this->LeaderConsRHS(nR) = b;
+	if(VERBOSE) LeaderConstraints.print_dense("After");
+	if(VERBOSE) cout<<"Exiting NashGame::addLeadCons\n";
     return *this;
 }
 

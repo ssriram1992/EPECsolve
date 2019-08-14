@@ -1054,13 +1054,13 @@ Game::LCP::makeQP(
     const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
 
 
-	cout<<"Inside makeQP()\n";
+	if(VERBOSE) cout<<"Inside makeQP()\n";
 	// cout<<"A: "<<A.n_rows<<" "<<A.n_cols<<"\n";
-	cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
+	if(VERBOSE) cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
     Game::QP_constraints QP_cons;
-	cout<<"LCP: "<<this->M.n_rows<<" "<<this->M.n_cols<<endl;
-	QP_obj.C.print_dense("C");
-	M.print_dense("M");
+	if(VERBOSE) cout<<"LCP: "<<this->M.n_rows<<" "<<this->M.n_cols<<endl;
+	if(VERBOSE) QP_obj.C.print_dense("C");
+	if(VERBOSE) M.print_dense("M");
 	for (const auto& comp:Compl)
 		cout<<comp.first<<","<<comp.second<<"\t";
 	cout<<endl;
@@ -1081,8 +1081,8 @@ Game::LCP::makeQP(
     QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
     // Setting the QP_Param object
     QP.set(QP_obj, QP_cons);
-	cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
-	cout<<"Outside makeQP()\n";
+	if(VERBOSE) cout << QP_obj.C.n_cols << " " << QP_obj.C.n_rows << endl;
+	if(VERBOSE) cout<<"Outside makeQP()\n";
     return *this;
 }
 

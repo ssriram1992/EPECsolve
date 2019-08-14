@@ -409,12 +409,11 @@ Models::EPEC::addCountry(
     auto N = std::make_shared<Game::NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
     this->name2nos[Params.name] = this->countries_LL.size();
     this->countries_LL.push_back(N);
-    Models::increaseVal(Loc, Models::LeaderVars::DualVar, N->getNduals());
-    Locations.push_back(Loc);
+    Models::increaseVal(Loc, Models::LeaderVars::DualVar, N->getNduals()); // N->getNduals() will sum the number of constraints in each lower level QP and provide the sum. Indeed, this is the number of dual variables for the lower level.
+    this->Locations.push_back(Loc);
     this->LeadConses.push_back(N->RewriteLeadCons());
-    // cout<<LeadCons<<N->RewriteLeadCons()<<LeadConses.back();
     this->AllLeadPars.push_back(Params);
-    nCountr++;
+    this->nCountr++;
     return *this;
 }
 
@@ -431,7 +430,7 @@ Models::EPEC::addTranspCosts(const arma::sp_mat &costs ///< The transportation c
                 "Error in Models::EPEC::addTranspCosts: EPEC object finalized. Call EPEC::unlock() to unlock this object first and then edit.");
     try {
         if (this->nCountr != costs.n_rows || this->nCountr != costs.n_cols)
-            throw "Error in EPEC::addTranspCosts. Invalid size of Q";
+            throw string("Error in EPEC::addTranspCosts. Invalid size of Q");
         else this->TranspCosts = arma::sp_mat(costs);
         this->TranspCosts.diag().zeros();        // Doesn't make sense for it to have a nonzero diagonal!
     }
@@ -490,7 +489,7 @@ finalize()
         {
             Game::QP_objective QP_obj;
             this->add_Dummy_Lead(i);
-            this->make_MC_leader(i);
+            // this->make_MC_leader(i); // Useless at the moment. Might as well comment this!
             this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
             this->make_obj_leader(i, *this->LeadObjec.at(i).get());
         }
@@ -558,16 +557,13 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 1;
         if (VERBOSE)
             cout << "Single Country: imports are set to zero." << endl;
-        LL_Nash.addLeadCons(a, 0);
+        LL_Nash.addLeadCons(a, 0); // Export <= 0
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 0;
         a.at(Loc.at(Models::LeaderVars::NetExport)) = 1;
         if (VERBOSE)
             cout << "Single Country: exports are set to zero." << endl;
-        LL_Nash.addLeadCons(a, 0);
+        LL_Nash.addLeadCons(a, 0); // Import <= 0
     }
-    // Updating the variable locations
-    /*	Loc[Models::LeaderVars::CountryImport] = Loc.at(Models::LeaderVars::End);
-       Loc.at(Models::LeaderVars::End) += nImp;*/
 }
 
 void
@@ -816,9 +812,10 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
 					this->getPosition(this->nCountr-1, Models::LeaderVars::End) -nThisCountryvars + val.row()) = 1;
 					// this->Locations.at(val.row()).at(Models::LeaderVars::End)) = 1;
                         // this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
-			cout<<"C value added at "<<this->getPosition(this->nCountr-1, Models::LeaderVars::End) + val.row() << " for country "<<i<<endl;
+			if(VERBOSE) cout<<"C value added at "<<this->getPosition(this->nCountr-1, Models::LeaderVars::End) + val.row() << " for country "<<i<<endl;
         }
     }
+	QP_obj.C.print("C from make_obj_leader "+to_string(i));
 }
 
 unique_ptr<GRBModel>
@@ -865,7 +862,7 @@ Models::EPEC::make_country_QP()
             for (unsigned int j = 0; j < this->nCountr; j++) {
                 if (i != j)
                     this->country_QP.at(j)->addDummy(convHullVarCount, 0);
-                this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
+                // this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
             }
         }
     }
@@ -897,6 +894,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
     }
+	this->country_QP.at(i)->getC().print("Country: "+to_string(i));
 }
 
 
@@ -919,7 +917,8 @@ Models::init(LeadLocs &L) {
     L[Models::LeaderVars::End] = 0;
 }
 
-Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
+Models::LeaderVars 
+Models::operator+(Models::LeaderVars a, int b) {
     return static_cast<LeaderVars>(static_cast<int> (a) + b);
 }
 
@@ -992,17 +991,20 @@ Models::EPEC::findNashEq(bool write, string filename) {
 }
 
 
-void Models::EPEC::gur_WriteCountry_conv(const unsigned int i, string filename) const {
+void 
+Models::EPEC::gur_WriteCountry_conv(const unsigned int i, string filename) const {
 
     if (!lcp) throw;
 }
 
-void Models::EPEC::gur_WriteEpecMip(const unsigned int i, string filename) const {
+void 
+Models::EPEC::gur_WriteEpecMip(const unsigned int i, string filename) const {
 
     if (!lcp) throw;
 }
 
-string to_string(const GRBConstr &cons, const GRBModel &model) {
+string 
+to_string(const GRBConstr &cons, const GRBModel &model) {
     const GRBVar *vars = model.getVars();
     const int nVars = model.get(GRB_IntAttr_NumVars);
     ostringstream oss;
@@ -1021,7 +1023,8 @@ string to_string(const GRBConstr &cons, const GRBModel &model) {
     return oss.str();
 }
 
-string to_string(const GRBVar &var) {
+string 
+to_string(const GRBVar &var) {
     string name = var.get(GRB_StringAttr_VarName);
     return name.empty() ? "unNamedvar" : name;
 }
@@ -1105,8 +1108,12 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
     // FILE OPERATIONS END
 }
 
-void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, const string filename,
-                                 const arma::vec x) const {
+void 
+Models::EPEC::WriteFollower(const unsigned int i, 
+		const unsigned int j, 
+		const string filename, 
+		const arma::vec x) const 
+{
     ofstream file;
     file.open(filename, ios::app);
 
@@ -1148,7 +1155,8 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j, con
     file.close();
 }
 
-void Models::EPEC::testQP(const unsigned int i) {
+void 
+Models::EPEC::testQP(const unsigned int i) {
     QP_Param *QP = this->country_QP.at(i).get();
     arma::vec x;
     //if (VERBOSE) cout << *QP << endl;
@@ -1177,7 +1185,8 @@ void Models::EPEC::testQP(const unsigned int i) {
     }
 }
 
-void Models::EPEC::testLCP(const unsigned int i) {
+void 
+Models::EPEC::testLCP(const unsigned int i) {
     auto country = this->get_LowerLevelNash(i);
     LCP CountryLCP = LCP(this->env, *country);
     CountryLCP.write("dat/LCP_" + to_string(i));

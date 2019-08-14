@@ -1,4 +1,5 @@
 #include<exception>
+#include<iomanip>
 #include<chrono>
 #include"../src/models.h"
 #include"../src/games.h"
@@ -832,10 +833,10 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP.capacities = {550};
         FP.costs_lin = {4};
         FP.costs_quad = {3};
-        FP.emission_costs = {10};
+        FP.emission_costs = {15};
         FP.names = {"Rosso"};
-        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {100, -1, -1, 299.99});
-        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5}, {100, -1, -1, -1});
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {100, -1, -1, 295});
+        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5}, {100, -1, -1, 285});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
         TrCo.zeros(2,2);
@@ -857,6 +858,19 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        cout
+                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
+        for (unsigned int i = 0; i < epec.nCountries; i++) {
+            cout << "********** Country number " << i + 1 << "\t\t" << "**********\n";
+            for (int j = 0; j < 9; j++) {
+                auto v = static_cast<Models::LeaderVars>(j);
+                cout << Models::prn::label << std::setfill('.') << v << Models::prn::val << std::setfill('.')
+                     << epec.getPosition(i, v) << endl;
+            }
+            cout << endl;
+        }
+        cout
+                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
         double margCountryOne = FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
                                 FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
         double margCountryTwo = FP.costs_quad[0] * epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
@@ -927,6 +941,19 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        cout
+                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
+        for (unsigned int i = 0; i < epec.nCountries; i++) {
+            cout << "********** Country number " << i + 1 << "\t\t" << "**********\n";
+            for (int j = 0; j < 9; j++) {
+                auto v = static_cast<Models::LeaderVars>(j);
+                cout << Models::prn::label << std::setfill('.') << v << Models::prn::val << std::setfill('.')
+                     << epec.getPosition(i, v) << endl;
+            }
+            cout << endl;
+        }
+        cout
+                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
         BOOST_TEST_MESSAGE("checking production");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 40, 0.01);
