@@ -1083,6 +1083,7 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
     for (unsigned int j = 0; j < Params.n_followers; ++j) prod += x.at(foll_prod + j);
     // Trade
     double Export{x.at(this->getPosition(i, Models::LeaderVars::NetExport))};
+    double exportPrice{x.at(this->getPosition(this->nCountr-1, Models::LeaderVars::End) +i)};
     double import{0};
     for (unsigned int j = this->getPosition(i, Models::LeaderVars::CountryImport);
          j < this->getPosition(i, Models::LeaderVars::CountryImport + 1); ++j)
@@ -1093,6 +1094,7 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
         file << Models::prn::label << "Net exports" << ":" << Models::prn::val << Export - import << "\n";
     else
         file << Models::prn::label << "Net imports" << ":" << Models::prn::val << import - Export << "\n";
+    file << Models::prn::label << "Export price" << ":" << Models::prn::val << exportPrice << "\n";
     file << Models::prn::label << " -> Total Export" << ":" << Models::prn::val << Export << "\n";
     file << Models::prn::label << " -> Total Import" << ":" << Models::prn::val << import << endl;
     file << Models::prn::label << "Domestic consumed quantity" << ":" << Models::prn::val << import - Export + prod
