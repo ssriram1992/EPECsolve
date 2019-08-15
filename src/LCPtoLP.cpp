@@ -372,8 +372,6 @@ Game::LCP::LCPasMIP(
         for (auto i:FixEq) model->addConstr(z[i], GRB_EQUAL, 0.0);
         model->update();
         if (!this->useIndicators) {
-            if (VERBOSE)
-                cout << "IntegerTol=" << this->eps_int << ";FeasabilityTol=OptimalityTol=" << this->eps << endl;
             model->set(GRB_DoubleParam_IntFeasTol, this->eps_int);
             model->set(GRB_DoubleParam_FeasibilityTol, this->eps);
             model->set(GRB_DoubleParam_OptimalityTol, this->eps);
@@ -557,13 +555,6 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
     locations.zeros(2, N);
     val.zeros(N);
 
-    if (VERBOSE) {
-        cout << "Found these polyhedra:" << endl;
-        for (unsigned int i = 0; i < nPoly; i++) {
-            Ai->at(i)->print_dense("A_" + to_string(i));
-            bi->at(i)->print("b_" + to_string(i));
-        }
-    }
 
     unsigned int count{0}, rowCount{0}, colCount{nC};
     for (unsigned int i = 0; i < nPoly; i++) {
@@ -601,7 +592,6 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
         rowCount += Acom.n_rows;
 
         colCount += nC;
-        if (VERBOSE) cout << "In compConvSize: " << i + 1 << " out of " << nPoly << endl;
     }
     A = arma::sp_mat(locations, val, nFinCons, nFinVar);
 }
@@ -980,10 +970,12 @@ Game::LCP::FixToPolies(
 {
     bool flag = false;
     vector<short int> MyFix(*Fix);
+	/*
     if (VERBOSE) {
         for (const auto v:MyFix) cout << v << " ";
         cout << endl;
     }
+	*/
     unsigned int i;
     for (i = 0; i < this->nR; i++) {
         if (Fix->at(i) == 0) {

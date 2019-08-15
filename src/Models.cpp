@@ -268,8 +268,6 @@ void Models::EPEC::make_LL_LeadCons(
         for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
         cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
         for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
-        LeadCons.impl_print_dense("\nLeadCons:\n");
-        LeadRHS.print("\nLeadRHS");
     }
 }
 
@@ -329,7 +327,6 @@ Models::EPEC::addCountry(
     Models::increaseVal(Loc, LeaderVars::Caps, Params.n_followers);
     Models::increaseVal(Loc, LeaderVars::Tax, Params.n_followers);
 
-    if (VERBOSE) cout << Loc.at(LeaderVars::Tax) << endl << " Country tax position above \n";
 
     // Loc[Models::LeaderVars::AddnVar] = 1;
 
@@ -544,11 +541,6 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
         arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
         a.at(Loc.at(Models::LeaderVars::NetImport)) = -1;
         a.subvec(Loc.at(LeaderVars::CountryImport), Loc.at(LeaderVars::CountryImport + 1) - 1).ones();
-        if (VERBOSE) {
-            cout << endl << " ______ " << endl;
-            for (auto v:Loc) cout << v.first << "\t\t\t" << v.second << endl;
-            cout << endl << " ______ " << endl;
-        }
 
         LL_Nash.addDummy(nImp, Loc.at(Models::LeaderVars::CountryImport));
         LL_Nash.addLeadCons(a, 0).addLeadCons(-a, 0);
@@ -816,9 +808,6 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
                         val.row()) = 1;
             // this->Locations.at(val.row()).at(Models::LeaderVars::End)) = 1;
             // this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
-            if (VERBOSE)
-                cout << "C value added at " << this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + val.row()
-                     << " for country " << i << endl;
         }
     }
 }
@@ -947,7 +936,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        if (VERBOSE) lcpmodel->write("dat/NashLCP.lp");
+        lcpmodel->write("dat/NashLCP.lp");
         lcpmodel->optimize();
         if (VERBOSE) cout << *nashgame;
         this->sol_x.zeros(Nvar);
@@ -956,7 +945,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
         int status = lcpmodel->get(GRB_IntAttr_Status);
         if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
             try {
-                if (VERBOSE) lcpmodel->write("dat/NashLCP.sol");
+                lcpmodel->write("dat/NashLCP.sol");
                 for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);

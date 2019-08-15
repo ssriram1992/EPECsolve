@@ -55,14 +55,6 @@ Game::operator<<(ostream &os, const Game::QP_Param &Q) {
     os << "Quadratic program with linear inequality constraints: " << endl;
     os << Q.getNy() << " decision variables parametrized by " << Q.getNx() << " variables" << endl;
     os << Q.getb().n_rows << " linear inequalities" << endl << endl;
-    if (VERBOSE) {
-        Q.getQ().print("Q");
-        Q.getc().print("c");
-        Q.getC().print("C");
-        Q.getA().print("A");
-        Q.getB().print("B");
-        Q.getb().print("b");
-    }
     return os;
 }
 
@@ -217,31 +209,24 @@ Game::MP_Param::dataCheck(bool forcesymm ///< Check if MP_Param::Q is symmetric
  */
 {
     if (this->Q.n_cols != Ny) {
-        if (VERBOSE) cout << "Q.n_cols\n";
         return false;
     }
     if (this->A.n_cols != Nx) {
-        if (VERBOSE) cout << A.n_cols << " " << Nx << "A.n_cols\n";
         return false;
     }        // Rest are matrix size compatibility checks
     if (this->B.n_cols != Ny) {
-        if (VERBOSE) cout << B.n_cols << " " << Ny << " B.n_cols\n";
         return false;
     }
     if (this->C.n_rows != Ny) {
-        if (VERBOSE) cout << "C.n_rows\n";
         return false;
     }
     if (this->c.size() != Ny) {
-        if (VERBOSE) cout << "c.n_rows\n";
         return false;
     }
     if (this->A.n_rows != Ncons) {
-        if (VERBOSE) cout << "A.n_rows\n";
         return false;
     }
     if (this->B.n_rows != Ncons) {
-        if (VERBOSE) cout << "B.n_rows\n";
         return false;
     }
     return true;
@@ -253,31 +238,24 @@ bool Game::MP_Param::dataCheck(const QP_objective &obj, const QP_constraints &co
     unsigned int Ncons = cons.b.size();
 
     if (checkobj && obj.Q.n_cols != Ny) {
-        if (VERBOSE) cout << "Q.n_cols\n";
         return false;
     }
     if (checkobj && obj.C.n_rows != Ny) {
-        if (VERBOSE) cout << "C.n_rows\n";
         return false;
     }
     if (checkobj && obj.c.size() != Ny) {
-        if (VERBOSE) cout << "c.n_rows\n";
         return false;
     }
     if (checkcons && cons.A.n_cols != Nx) {
-        if (VERBOSE) cout << cons.A.n_cols << " " << Nx << "A.n_cols\n";
         return false;
     }        // Rest are matrix size compatibility checks
     if (checkcons && cons.B.n_cols != Ny) {
-        if (VERBOSE) cout << cons.B.n_cols << " " << Ny << " B.n_cols\n";
         return false;
     }
     if (checkcons && cons.A.n_rows != Ncons) {
-        if (VERBOSE) cout << "A.n_rows\n";
         return false;
     }
     if (checkcons && cons.B.n_rows != Ncons) {
-        if (VERBOSE) cout << "B.n_rows\n";
         return false;
     }
     return true;
@@ -536,6 +514,7 @@ void Game::NashGame::set_positions()
     // Pushing back the end of dual position
     dual_position.at(Nplayers) = (dl_cnt);
 
+	/*
     if (VERBOSE) {
         cout << "Primals: ";
         for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i) << " ";
@@ -543,6 +522,7 @@ void Game::NashGame::set_positions()
         for (unsigned int i = 0; i < Nplayers + 1; i++) cout << dual_position.at(i) << " ";
         cout << endl;
     }
+	*/
 
 }
 
@@ -775,15 +755,11 @@ Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
         throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible --- ") + to_string(a.n_elem) +
               string(" != ") + to_string(nC);
     auto nR = this->LeaderConstraints.n_rows;
-    if (VERBOSE) cout << "In NashGame::addLeadCons\n";
-    if (VERBOSE) LeaderConstraints.print_dense("Before");
     this->LeaderConstraints = resize_patch(this->LeaderConstraints, nR + 1, nC);
     // (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
     LeaderConstraints.row(nR) = a.t();
     this->LeaderConsRHS = resize_patch(this->LeaderConsRHS, nR + 1);
     this->LeaderConsRHS(nR) = b;
-    if (VERBOSE) LeaderConstraints.print_dense("After");
-    if (VERBOSE) cout << "Exiting NashGame::addLeadCons\n";
     return *this;
 }
 
