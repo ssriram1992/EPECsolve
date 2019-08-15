@@ -7,8 +7,11 @@
 #include<armadillo>
 #include<iostream>
 #include<gurobi_c++.h>
+#include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
+#include <rapidjson/istreamwrapper.h>
 #include <rapidjson/prettywriter.h>
+
 
 using namespace rapidjson;
 
@@ -1119,6 +1122,124 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
     }
 }
 
+void Models::EPEC::writeInstance(string filename) const {
+    StringBuffer s;
+    PrettyWriter<StringBuffer> writer(s);
+    writer.StartObject();
+    writer.Key("nCountries");
+    writer.Uint(this->nCountr);
+    writer.Key("Countries");
+    writer.StartArray();
+    for (unsigned i = 0; i < this->nCountr; i++) {
+        writer.StartObject();
+
+        writer.Key("nFollowers");
+        writer.Uint(this->AllLeadPars.at(i).n_followers);
+
+        writer.Key("DemandParam");
+        writer.StartObject();
+        writer.Key("Alpha");
+        writer.Double(this->AllLeadPars.at(i).DemandParam.alpha);
+        writer.Key("Beta");
+        writer.Double(this->AllLeadPars.at(i).DemandParam.beta);
+        writer.EndObject();
+
+        writer.Key("LeaderParam");
+        writer.StartObject();
+        writer.Key("ImportLimit");
+        writer.Double(this->AllLeadPars.at(i).LeaderParam.import_limit);
+        writer.Key("ExportLimit");
+        writer.Double(this->AllLeadPars.at(i).LeaderParam.export_limit);
+        writer.Key("PriceLimit");
+        writer.Double(this->AllLeadPars.at(i).LeaderParam.price_limit);
+        writer.EndObject();
+
+        writer.Key("Followers");
+        writer.StartObject();
+
+        writer.Key("Capacities");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
+            writer.Double(this->AllLeadPars.at(i).FollowerParam.capacities.at(j));
+        writer.EndArray();
+
+        writer.Key("LinearCosts");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
+            writer.Double(this->AllLeadPars.at(i).FollowerParam.costs_lin.at(j));
+        writer.EndArray();
+
+        writer.Key("QuadraticCosts");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
+            writer.Double(this->AllLeadPars.at(i).FollowerParam.costs_quad.at(j));
+        writer.EndArray();
+
+        writer.Key("EmissionCosts");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
+            writer.Double(this->AllLeadPars.at(i).FollowerParam.emission_costs.at(j));
+        writer.EndArray();
+
+        writer.Key("TaxCaps");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
+            writer.Double(this->AllLeadPars.at(i).FollowerParam.tax_caps.at(j));
+        writer.EndArray();
+
+
+        writer.EndObject();
+
+        writer.EndObject();
+    }
+    writer.EndArray();
+    writer.EndObject();
+    ofstream file("dat/" + filename + ".json");
+    file << s.GetString();
+}
+vector<Models::LeadAllPar>
+Models::readInstance(string filename) {
+    ifstream ifs(filename + ".json");
+    IStreamWrapper isw(ifs);
+    Document d;
+    d.ParseStream(isw);
+    vector<Models::LeadAllPar> LAP = {};
+    assert(d.HasMember("nCountries"));
+    for (int i = 0; i < d["nCountries"].GetInt(); ++i) {
+        const Value &c = d["Countries"].GetArray()[i].GetObject();
+
+        Models::FollPar FP;
+        const Value &cap = c["Followers"]["Capacities"];
+        for (SizeType i = 0; i < cap.GetArray().Size(); i++) {
+            FP.capacities.push_back(cap[i].GetDouble());
+        }
+
+        const Value &lc = c["Followers"]["LinearCosts"];
+        for (SizeType i = 0; i < lc.GetArray().Size(); i++) {
+            FP.costs_lin.push_back(lc[i].GetDouble());
+        }
+        const Value &qc = c["Followers"]["QuadraticCosts"];
+        for (SizeType i = 0; i < qc.GetArray().Size(); i++) {
+            FP.costs_quad.push_back(qc[i].GetDouble());
+        }
+        const Value &ec = c["Followers"]["EmissionCosts"];
+        for (SizeType i = 0; i < ec.GetArray().Size(); i++) {
+            FP.emission_costs.push_back(ec[i].GetDouble());
+        }
+        const Value &tc = c["Followers"]["TaxCaps"];
+        for (SizeType i = 0; i < tc.GetArray().Size(); i++) {
+            FP.emission_costs.push_back(tc[i].GetDouble());
+        }
+        LAP.push_back(Models::LeadAllPar(FP.capacities.size(), to_string(i), FP,
+                                         {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
+                                          c["DemandParam"].GetObject()["Beta"].GetDouble()},
+                                         {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
+                                          c["LeaderParam"].GetObject()["ExportLimit"].GetDouble(),
+                                          c["LeaderParam"].GetObject()["PriceLimit"].GetDouble()}
+        ));
+    }
+    return LAP;
+}
 void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const {
     //if (!lcp) return;

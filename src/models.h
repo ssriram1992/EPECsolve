@@ -86,6 +86,8 @@ namespace Models {
 
     void init(LeadLocs &L);
 
+    vector<Models::LeadAllPar> readInstance(string filename);
+
     LeaderVars operator+(Models::LeaderVars a, int b);
 
 
@@ -219,6 +221,8 @@ namespace Models {
         void writeSolutionJSON(string filename, const arma::vec x, const arma::vec z) const ;
 
         void writeSolution(const int writeLevel, string filename) const;
+
+        void writeInstance(string filename) const;
 
         const arma::vec getx() const { return this->sol_x; }
 
