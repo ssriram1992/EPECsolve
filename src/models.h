@@ -70,8 +70,6 @@ namespace Models {
         ConvHullDummy,
         End
     };
-
-
     ostream &operator<<(ostream &ost, const FollPar P);
 
     ostream &operator<<(ostream &ost, const DemPar P);
@@ -113,7 +111,7 @@ namespace Models {
 
         GRBEnv *env;        ///< A gurobi environment to create and process the resulting LCP object.
         map<string, unsigned int> name2nos = {};
-        bool finalized{false};
+        bool finalized{false}, nashEq{false};
         unsigned int nCountr = 0;
 
         bool dataCheck(const bool chkAllLeadPars = true, const bool chkcountriesLL = true, const bool chkMC_QP = true,
@@ -197,7 +195,7 @@ namespace Models {
 
         EPEC &unlock();
 
-        void findNashEq(bool write = false, string filename = "x_NE.txt");
+        void findNashEq();
 
         // Data access methods
         Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
@@ -218,9 +216,14 @@ namespace Models {
 
         void WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const;
 
+        void writeSolutionJSON(string filename, const arma::vec x, const arma::vec z) const ;
+
+        void writeSolution(const int writeLevel, string filename) const;
+
         const arma::vec getx() const { return this->sol_x; }
 
         const arma::vec getz() const { return this->sol_z; }
+
     };
 
 
