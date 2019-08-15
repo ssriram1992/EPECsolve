@@ -450,6 +450,42 @@ Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons) {
     return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
 }
 
+
+void
+Game::QP_Param::save(string filename) const
+{
+	Utils::appendSave(this->Q, filename, string("QP_Param::Q"), true);
+	Utils::appendSave(this->A, filename, string("QP_Param::A"), false);
+	Utils::appendSave(this->B, filename, string("QP_Param::B"), false);
+	Utils::appendSave(this->C, filename, string("QP_Param::C"), false);
+	Utils::appendSave(this->b, filename, string("QP_Param::b"), false);
+	Utils::appendSave(this->c, filename, string("QP_Param::c"), false);
+	if(VERBOSE) cout<<"Saved to file "<<filename<<endl;
+}
+
+void 
+Game::QP_Param::load(string filename)
+{
+	arma::sp_mat Q, A, B, C;
+	arma::vec c, b;
+	long int pos{0};
+	cout<<"QP_Param "<<pos<<endl;
+	pos = Utils::appendRead(Q, filename, pos, string("QP_Param::Q"));
+	cout<<"QP_Param "<<pos<<endl;
+	pos = Utils::appendRead(A, filename, pos, string("QP_Param::A"));
+	cout<<"QP_Param "<<pos<<endl;
+	pos = Utils::appendRead(B, filename, pos, string("QP_Param::B"));
+	cout<<"QP_Param "<<pos<<endl;
+	pos = Utils::appendRead(C, filename, pos, string("QP_Param::C"));
+	cout<<"QP_Param "<<pos<<endl;
+	pos = Utils::appendRead(b, filename, pos, string("QP_Param::b"));
+	cout<<"QP_Param "<<pos<<endl;
+	pos = Utils::appendRead(c, filename, pos, string("QP_Param::c"));
+	cout<<"QP_Param "<<pos<<endl;
+	this->set(Q, C, A, B, c, b);
+}
+
+
 Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar,
                          arma::sp_mat LeadA, arma::vec LeadRHS) : LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /**

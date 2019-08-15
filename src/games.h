@@ -187,6 +187,8 @@ namespace Game {
         QP_Param &addDummy(unsigned int pars, unsigned int vars = 0, int position = -1) override;
 
         void write(string filename, bool append) const;
+		void save(string filename) const;
+		void load(string filename);
     };
 
 /**
