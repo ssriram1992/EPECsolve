@@ -7,7 +7,10 @@
 #include<armadillo>
 #include<iostream>
 #include<gurobi_c++.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/prettywriter.h>
 
+using namespace rapidjson;
 
 ostream &
 Models::operator<<(ostream &ost, const Models::prn l) {
@@ -916,7 +919,7 @@ Models::operator+(Models::LeaderVars a, int b) {
 }
 
 void
-Models::EPEC::findNashEq(bool write, string filename) {
+Models::EPEC::findNashEq() {
     if (this->country_QP.front() != nullptr) {
 
         int Nvar = this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
@@ -949,9 +952,6 @@ Models::EPEC::findNashEq(bool write, string filename) {
                 for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
-                    //if (VERBOSE)
-                    //    cout << "x_" + to_string(i) + ":" << this->sol_x(i) << "\t\tz_" + to_string(i) + ":"
-                    //         << this->sol_z(i) << endl;
                     temp = i;
                 }
 
@@ -961,16 +961,7 @@ Models::EPEC::findNashEq(bool write, string filename) {
                      << " "
                      << temp << endl;
             }
-            if (write) {
-                this->sol_x.save("dat/x_" + filename, arma::file_type::arma_ascii, VERBOSE);
-                this->sol_z.save("dat/z_" + filename, arma::file_type::arma_ascii, VERBOSE);
-                try {
-                    this->WriteCountry(0, "dat/Solution.txt", this->sol_x, false);
-                    for (unsigned int ell = 1; ell < this->nCountr; ++ell)
-                        this->WriteCountry(ell, "dat/Solution.txt", this->sol_x, true);
-                    this->write("dat/Solution.txt", true);
-                } catch (GRBException &e) {}
-            }
+            this->nashEq = true;
         } else {
             cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
             throw string("Models::EPEC::findNashEq: no nash equilibrium found.");
@@ -1051,6 +1042,82 @@ Models::EPEC::write(const string filename, bool append) const {
         this->write(filename, i, (append || i));
 }
 
+void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x, const arma::vec z) const {
+    StringBuffer s;
+    PrettyWriter<StringBuffer> writer(s);
+    writer.StartObject();
+    writer.Key("Meta");
+    writer.StartObject();
+    writer.Key("nCountries");
+    writer.Uint(this->nCountr);
+    writer.Key("nFollowers");
+    writer.StartArray();
+    for (unsigned i = 0; i < this->nCountr; i++)
+        writer.Uint(this->AllLeadPars.at(i).n_followers);
+    writer.EndArray();
+    writer.Key("Countries");
+    writer.StartArray();
+    for (unsigned i = 0; i < this->nCountr; i++) {
+        writer.StartObject();
+        writer.Key("FollowerStart");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::FollowerStart));
+        writer.Key("NetImport");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::NetImport));
+        writer.Key("NetExport");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::NetExport));
+        writer.Key("CountryImport");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::CountryImport));
+        writer.Key("Caps");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::Caps));
+        writer.Key("Tax");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::Tax));
+        writer.Key("DualVar");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::DualVar));
+        writer.Key("ConvHullDummy");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::ConvHullDummy));
+        writer.Key("End");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::End));
+        writer.Key("ShadowPrice");
+        writer.Uint(this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + i);
+        writer.EndObject();
+    }
+    writer.EndArray();
+    writer.EndObject();
+    writer.Key("Solution");
+    writer.StartObject();
+    writer.Key("x");
+    writer.StartArray();
+    for (unsigned i = 0; i < x.size(); i++)
+        writer.Double(x.at(i));
+    writer.EndArray();
+    writer.Key("z");
+    writer.StartArray();
+    for (unsigned i = 0; i < z.size(); i++)
+        writer.Double(z.at(i));
+    writer.EndArray();
+    writer.EndObject();
+    writer.EndObject();
+    ofstream file("dat/" + filename + ".json");
+    file << s.GetString();
+}
+
+void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
+    /**
+* @brief Computes the Nash Equilibrium in the EPEC instance
+* @p writeLevel is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both
+*/
+    if (this->nashEq) {
+        if (writeLevel == 1 || writeLevel == 2) {
+            this->WriteCountry(0, "dat/Solution" + filename + ".txt", this->sol_x, false);
+            for (unsigned int ell = 1; ell < this->nCountr; ++ell)
+                this->WriteCountry(ell, "dat/" + filename + ".txt", this->sol_x, true);
+            this->write("dat/Solution.txt", true);
+        }
+        if (writeLevel == 1 || writeLevel == 0) this->writeSolutionJSON(filename, this->sol_x, this->sol_z);
+    } else {
+        cerr << "Error in Models::EPEC::writeSolution: no solution to write." << endl;
+    }
+}
 
 void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const {
@@ -1072,7 +1139,7 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
     for (unsigned int j = 0; j < Params.n_followers; ++j) prod += x.at(foll_prod + j);
     // Trade
     double Export{x.at(this->getPosition(i, Models::LeaderVars::NetExport))};
-    double exportPrice{x.at(this->getPosition(this->nCountr-1, Models::LeaderVars::End) +i)};
+    double exportPrice{x.at(this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + i)};
     double import{0};
     for (unsigned int j = this->getPosition(i, Models::LeaderVars::CountryImport);
          j < this->getPosition(i, Models::LeaderVars::CountryImport + 1); ++j)

@@ -69,6 +69,7 @@ ELSE ()
     include_directories("/usr/local/include")
 ENDIF ()
 include_directories("src")
+include_directories("include")
 add_executable(EPEC
                src/EPEC.cpp
                src/epecsolve.h
@@ -76,6 +77,8 @@ add_executable(EPEC
                src/games.h
                src/LCPtoLP.cpp
                src/lcptolp.h
+               src/utils.h
+               src/Utils.cpp
                src/Models.cpp
                src/models.h)
 add_executable(EPECtest
@@ -83,6 +86,8 @@ add_executable(EPECtest
                src/games.h
                src/LCPtoLP.cpp
                src/lcptolp.h
+               src/utils.h
+               src/Utils.cpp
                src/Models.cpp
                src/models.h
                test/EPEC.cpp)
