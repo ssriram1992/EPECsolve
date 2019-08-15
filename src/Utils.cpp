@@ -77,6 +77,7 @@ void Utils::appendSave(
 
 	infile.seekg(0, infile.end); 	// Move to the end of the file
 	size = infile.tellg(); 			// Current position now, is the number of positions in the file!
+	infile.seekg(0);
 
 	buffer = new char[size]; 		// Now initialize buffer for the correct required size!
 
@@ -85,6 +86,7 @@ void Utils::appendSave(
 
 	outfile<<header<<"\n"<<size<<"\n"; 	// Write header information
 	outfile.write(buffer, size);		// Write the required information of sp_mat
+	outfile<<"\n";
 	outfile.close();					// and close it
 
 	delete buffer;
@@ -123,6 +125,7 @@ long int Utils::appendRead(
 	
 	ifstream infile(in, ios::in);
 	infile.seekg(pos);
+	cout<<"Reading file "<<in<<" at position "<<pos<<" to write "<<out<<endl;
 
 	string header_checkwith;
 	infile>>header_checkwith;
@@ -133,6 +136,7 @@ long int Utils::appendRead(
 	infile>>size; 	// Get the data size in bytes
 	buffer = new char[size];
 	infile.read(buffer, size);
+	// cout<<"Buffer "<<buffer<<endl;
 	pos = infile.tellg();
 	infile.close();
 
@@ -140,6 +144,7 @@ long int Utils::appendRead(
 	ofstream outfile(out, ios::out);
 	outfile.seekp(0);
 	outfile.write(buffer+1, size - 1); // First character weirdly is a new line character! If problem persists, disable this
+	cout<<buffer+1<<endl;
 	outfile.close();
 
 	return pos;
@@ -157,7 +162,7 @@ long int Utils::appendRead(
  * @returns The end position from which the next data object can be read.
  */
 {
-	Utils::appendRead(string("dat/_zz.csv"), in, pos, header);
+	pos = Utils::appendRead(string("dat/_zz.csv"), in, pos, header);
 
 	// Now use armadillo inbuilt function to read from dat/_zz.csv!
 	matrix.load("dat/_zz.csv");
@@ -194,4 +199,51 @@ long int appendRead(vector<double> &v, const string in, long int pos, const stri
 	pos = infile.tellg();
 	infile.close();
 	return pos;
+}
+
+void Utils::appendSave(
+		const vec &matrix,		///< The arma::vec to be saved
+		const string out, 				///< File name of the output file 
+		const string header, 			///< A header that might be used to check data correctness
+		bool erase					///< Should the vec be appended to the current file or overwritten
+		)
+{
+	matrix.save("dat/_zz.csv", arma_ascii);
+	Utils::appendSave(string("dat/_zz.csv"), out, header, erase);
+}
+
+long int Utils::appendRead(
+		vec &matrix, 		///< Read and store the solution in this matrix.
+		const string in, 				///< File to read from (could be file very many data is appended one below another)
+		long int pos,			///< Position in the long file where reading should start
+		const string header 		///< Any header to check data sanctity
+		)
+{
+	long size;
+	unsigned int nR, nC;
+	string buffers;
+	string checkwith;
+	ifstream in_file(in, ios::in);
+	in_file.seekg(pos);
+	
+	in_file>>checkwith;
+	if(header != "" && checkwith != header)
+		throw string("Error in Utils::appendRead<vec>. Wrong header. Expected: "+header+" Found: "+checkwith);
+	in_file>>size;
+	in_file>>buffers;
+	in_file>>nR>>nC;
+	matrix.zeros(nR);
+	for(unsigned int i=0; i<nR; ++i)
+	{
+		double val;
+		in_file>>val;
+		matrix.at(i) = val;
+	}
+
+	pos = in_file.tellg();
+	in_file.close();
+
+
+	return pos;
+
 }
