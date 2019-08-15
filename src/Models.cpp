@@ -1103,17 +1103,17 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x, const a
 
 void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
     /**
-* @brief Computes the Nash Equilibrium in the EPEC instance
+* @brief Writes the computed Nash Equilibrium in the EPEC instance
 * @p writeLevel is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both
 */
     if (this->nashEq) {
         if (writeLevel == 1 || writeLevel == 2) {
             this->WriteCountry(0, "dat/Solution" + filename + ".txt", this->sol_x, false);
             for (unsigned int ell = 1; ell < this->nCountr; ++ell)
-                this->WriteCountry(ell, "dat/" + filename + ".txt", this->sol_x, true);
-            this->write("dat/Solution.txt", true);
+                this->WriteCountry(ell, "dat/Solution" + filename + ".txt", this->sol_x, true);
+            this->write("dat/Solution"+filename+".txt", true);
         }
-        if (writeLevel == 1 || writeLevel == 0) this->writeSolutionJSON(filename, this->sol_x, this->sol_z);
+        if (writeLevel == 2 || writeLevel == 0) this->writeSolutionJSON(filename, this->sol_x, this->sol_z);
     } else {
         cerr << "Error in Models::EPEC::writeSolution: no solution to write." << endl;
     }
