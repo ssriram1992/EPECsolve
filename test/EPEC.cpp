@@ -1115,14 +1115,14 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_TEST_MESSAGE("Testing 3 Countries with a follower each -  with tax cap and price cap.");
         Models::FollPar FP;
         FP.capacities = {550, 30};
-        FP.costs_lin = {140, 150};
+        FP.costs_lin = {200, 225};
         FP.costs_quad = {0.3, 0.2};
-        FP.emission_costs = {15, 1};
-        FP.tax_caps = {100, 10};
+        FP.emission_costs = {275, 100};
+        FP.tax_caps = {100, 100};
         FP.names = {"Rosso", "Bianco"};
         Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
         Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285});
-        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 315});
+        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 295});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(3, 3);
         TrCo.zeros(3,3);

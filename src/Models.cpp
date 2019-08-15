@@ -1148,7 +1148,7 @@ Models::EPEC::WriteFollower(const unsigned int i,
     file << Models::prn::label << "Limit on production" << ":" << Models::prn::val << lim << "\n";
     //file << "x(): " << foll_lim + j << endl;
     file << Models::prn::label << "Tax imposed" << ":" << Models::prn::val << tax << "\n";
-    file << Models::prn::label << "Tax cap" << ":" << Params.FollowerParam.tax_caps.at(j) << tax << "\n";
+    // file << Models::prn::label << "Tax cap" << ":" << Params.FollowerParam.tax_caps.at(j) << tax << "\n";
     //file << "x(): " << foll_tax + j << endl;
     file << Models::prn::label << "  -Production cost function" << ":" << "\t C(q) = (" << lin << " + " << tax
          << ")*q + 0.5*" << quad << "*q^2\n" << Models::prn::label << " " << "=" << Models::prn::val
