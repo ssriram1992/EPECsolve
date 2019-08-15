@@ -165,3 +165,33 @@ long int Utils::appendRead(
 	return pos;
 }
 
+void appendSave(const vector<double> v, const string out, const string header, bool erase)
+{ 
+	ofstream outfile(out, erase?ios::out:ios::app);
+	outfile<<header<<"\n"<<v.size()<<"\n";
+	for(const double x:v)
+		outfile<<x<<"\n";
+	outfile.close();
+}
+
+long int appendRead(vector<double> &v, const string in, long int pos, const string header)
+{
+	unsigned long int size;
+	ifstream infile(in, ios::in);
+	infile.seekg(pos);
+
+	string header_checkwith;
+	infile>>header_checkwith;
+
+	if(header!="" && header != header_checkwith)
+		throw string("Error in Utils::appendRead<sp_mat>. Wrong header. Expected: "+header+" Found: "+header_checkwith);
+	
+	infile>>size;
+
+	v.resize(size);
+	for(unsigned int i=0; i<size; ++i)
+		infile>>v[i];
+	pos = infile.tellg();
+	infile.close();
+	return pos;
+}

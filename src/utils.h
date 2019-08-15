@@ -1,5 +1,5 @@
-#ifndef EPEC_H
-#define EPEC_H
+#ifndef UTILS_H
+#define UTILS_H
 #include"epecsolve.h"
 #include<armadillo>
 #include<fstream>
@@ -17,6 +17,9 @@ namespace Utils{
 
 	long int appendRead(const string out, const string in, long int pos, const string header="");
 	long int appendRead(sp_mat &matrix, const string in, long int pos, const string header="");
+
+	void appendSave(const vector<double> v, const string out, const string header = "", bool erase=false);
+	long int appendRead(vector<double> &v, const string in, long int pos, const string header="");
 };
 
 #endif
