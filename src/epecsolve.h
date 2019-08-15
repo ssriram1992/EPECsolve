@@ -44,5 +44,6 @@ namespace Models {
 #include "games.h"
 #include "lcptolp.h"
 #include "models.h"
+#include "utils.h"
 
 #endif

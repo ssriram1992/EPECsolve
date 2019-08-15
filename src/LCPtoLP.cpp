@@ -7,6 +7,7 @@
 // #define VERBOSE true
 
 using namespace std;
+using namespace Utils;
 
 bool
 operator==(vector<int> Fix1, vector<int> Fix2)

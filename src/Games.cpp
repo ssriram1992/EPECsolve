@@ -6,6 +6,7 @@
 #include <algorithm>
 
 using namespace std;
+using namespace Utils;
 
 bool Game::isZero(arma::mat M, double tol) {
     return (arma::min(arma::min(abs(M))) <= tol);
@@ -18,58 +19,6 @@ bool Game::isZero(arma::sp_mat M, double tol) {
 // {
 // return(arma::min(abs(M)) <= tol);
 // }
-
-// Armadillo patch for inbuild resize
-// unisgned uword in row and column indexes create some problems with empty matrix
-// which is the case with empty constraints matrices
-// For arma::sp_mat
-arma::sp_mat Game::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC) {
-    arma::sp_mat MMat(nR, nC);
-    MMat.zeros();
-    bool flag = Mat.n_rows == 7 && Mat.n_cols == 9 && 56 < 5;
-    if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
-        if (flag) Mat.print_dense("Input");
-        if (flag) cout << Mat.n_rows << " " << Mat.n_cols << " ";
-        if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
-            MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
-        if (flag) MMat.print("Output");
-    } else {
-        if (nR <= Mat.n_rows && nC <= Mat.n_cols)
-            MMat = Mat.submat(0, 0, nR, nC);
-        else
-            throw string(
-                    "Error in resize() - the patch for arma::resize. Either both dimension should be larger or both should be smaller!");
-    }
-    return MMat;
-}
-
-// For arma::mat
-arma::mat Game::resize_patch(const arma::mat &Mat, const unsigned int nR, const unsigned int nC) {
-    arma::mat MMat(nR, nC);
-    MMat.zeros();
-    if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
-        if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
-            MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
-    } else {
-        if (nR <= Mat.n_rows && nC <= Mat.n_cols)
-            MMat = Mat.submat(0, 0, nR, nC);
-        else
-            throw string(
-                    "Error in resize() - the patch for arma::resize. Either both dimension should be larger or both should be smaller!");
-    }
-    return MMat;
-}
-
-// For arma::vec
-arma::vec Game::resize_patch(const arma::vec &Mat, const unsigned int nR) {
-    arma::vec MMat(nR);
-    MMat.zeros();
-    if (nR > Mat.n_rows)
-        MMat.subvec(0, Mat.n_rows - 1) = Mat;
-    else
-        MMat = Mat.subvec(0, nR);
-    return MMat;
-}
 
 
 template
@@ -798,7 +747,7 @@ Game::NashGame &Game::NashGame::addDummy(unsigned int par, int position)
         auto nnC = this->LeaderConstraints.n_cols;
         switch (position) {
             case -1:
-                this->LeaderConstraints.resize(nnR, nnC + par);
+                this->LeaderConstraints=resize_patch(this->LeaderConstraints, nnR, nnC + par);
                 break;
             case 0:
                 this->LeaderConstraints = arma::join_rows(arma::zeros<arma::sp_mat>(nnR, par), this->LeaderConstraints);
@@ -828,10 +777,10 @@ Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
     auto nR = this->LeaderConstraints.n_rows;
     if (VERBOSE) cout << "In NashGame::addLeadCons\n";
     if (VERBOSE) LeaderConstraints.print_dense("Before");
-    this->LeaderConstraints = Game::resize_patch(this->LeaderConstraints, nR + 1, nC);
+    this->LeaderConstraints = resize_patch(this->LeaderConstraints, nR + 1, nC);
     // (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
     LeaderConstraints.row(nR) = a.t();
-    this->LeaderConsRHS = Game::resize_patch(this->LeaderConsRHS, nR + 1);
+    this->LeaderConsRHS = resize_patch(this->LeaderConsRHS, nR + 1);
     this->LeaderConsRHS(nR) = b;
     if (VERBOSE) LeaderConstraints.print_dense("After");
     if (VERBOSE) cout << "Exiting NashGame::addLeadCons\n";
