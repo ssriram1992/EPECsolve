@@ -2,6 +2,7 @@
 #define EPECSOLVE_H
 
 #define VERBOSE false
+#define EPECVERSION 0.1
 
 #include <map>
 #include <iostream>
