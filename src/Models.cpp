@@ -954,7 +954,7 @@ Models::EPEC::findNashEq() {
         this->lcpmodel = lcp->LCPasMIP(false);
 
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        lcpmodel->write("dat/NashLCP.lp");
+        if (VERBOSE) lcpmodel->write("dat/NashLCP.lp");
         lcpmodel->optimize();
         if (VERBOSE) cout << *nashgame;
         this->sol_x.zeros(Nvar);
@@ -963,7 +963,7 @@ Models::EPEC::findNashEq() {
         int status = lcpmodel->get(GRB_IntAttr_Status);
         if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
             try {
-                lcpmodel->write("dat/NashLCP.sol");
+                if (VERBOSE) lcpmodel->write("dat/NashLCP.sol");
                 for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
@@ -1116,7 +1116,7 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x, const a
     writer.EndArray();
     writer.EndObject();
     writer.EndObject();
-    ofstream file("dat/" + filename + ".json");
+    ofstream file(filename + ".json");
     file << s.GetString();
 }
 
@@ -1127,10 +1127,10 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
     */
     if (this->nashEq) {
         if (writeLevel == 1 || writeLevel == 2) {
-            this->WriteCountry(0, "dat/Solution" + filename + ".txt", this->sol_x, false);
+            this->WriteCountry(0, filename + ".txt", this->sol_x, false);
             for (unsigned int ell = 1; ell < this->nCountr; ++ell)
-                this->WriteCountry(ell, "dat/Solution" + filename + ".txt", this->sol_x, true);
-            this->write("dat/Solution" + filename + ".txt", true);
+                this->WriteCountry(ell, filename + ".txt", this->sol_x, true);
+            this->write(filename + ".txt", true);
         }
         if (writeLevel == 2 || writeLevel == 0) this->writeSolutionJSON(filename, this->sol_x, this->sol_z);
     } else {
@@ -1222,7 +1222,7 @@ Models::writeInstance(string filename, EPECInstance epec) {
     }
     writer.EndArray();
     writer.EndObject();
-    ofstream file("dat/" + filename + ".json");
+    ofstream file(filename + ".json");
     file << s.GetString();
     file.close();
 }
@@ -1237,49 +1237,55 @@ Models::readInstance(string filename) {
     ifstream ifs(filename + ".json");
     IStreamWrapper isw(ifs);
     Document d;
-    d.ParseStream(isw);
-    vector<Models::LeadAllPar> LAP = {};
-    assert(d.HasMember("nCountries"));
-    int nCountries = d["nCountries"].GetInt();
-    arma::sp_mat TrCo;
-    TrCo.zeros(nCountries, nCountries);
-    for (int j = 0; j < nCountries; ++j) {
-        const Value &c = d["Countries"].GetArray()[j].GetObject();
+    try {
+        d.ParseStream(isw);
+        vector<Models::LeadAllPar> LAP = {};
+        assert(d.HasMember("nCountries"));
+        int nCountries = d["nCountries"].GetInt();
+        arma::sp_mat TrCo;
+        TrCo.zeros(nCountries, nCountries);
+        for (int j = 0; j < nCountries; ++j) {
+            const Value &c = d["Countries"].GetArray()[j].GetObject();
 
-        Models::FollPar FP;
-        const Value &cap = c["Followers"]["Capacities"];
-        for (SizeType i = 0; i < cap.GetArray().Size(); i++) {
-            FP.capacities.push_back(cap[i].GetDouble());
+            Models::FollPar FP;
+            const Value &cap = c["Followers"]["Capacities"];
+            for (SizeType i = 0; i < cap.GetArray().Size(); i++) {
+                FP.capacities.push_back(cap[i].GetDouble());
+            }
+            const Value &lc = c["Followers"]["LinearCosts"];
+            for (SizeType i = 0; i < lc.GetArray().Size(); i++) {
+                FP.costs_lin.push_back(lc[i].GetDouble());
+            }
+            const Value &qc = c["Followers"]["QuadraticCosts"];
+            for (SizeType i = 0; i < qc.GetArray().Size(); i++) {
+                FP.costs_quad.push_back(qc[i].GetDouble());
+            }
+            const Value &ec = c["Followers"]["EmissionCosts"];
+            for (SizeType i = 0; i < ec.GetArray().Size(); i++) {
+                FP.emission_costs.push_back(ec[i].GetDouble());
+            }
+            const Value &tc = c["Followers"]["TaxCaps"];
+            for (SizeType i = 0; i < tc.GetArray().Size(); i++) {
+                FP.tax_caps.push_back(tc[i].GetDouble());
+            }
+            for (SizeType i = 0; i < c["TransportationCosts"].GetArray().Size(); i++) {
+                TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
+            }
+            LAP.push_back(Models::LeadAllPar(FP.capacities.size(), to_string(j), FP,
+                                             {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
+                                              c["DemandParam"].GetObject()["Beta"].GetDouble()},
+                                             {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
+                                              c["LeaderParam"].GetObject()["ExportLimit"].GetDouble(),
+                                              c["LeaderParam"].GetObject()["PriceLimit"].GetDouble()}
+            ));
         }
-        const Value &lc = c["Followers"]["LinearCosts"];
-        for (SizeType i = 0; i < lc.GetArray().Size(); i++) {
-            FP.costs_lin.push_back(lc[i].GetDouble());
-        }
-        const Value &qc = c["Followers"]["QuadraticCosts"];
-        for (SizeType i = 0; i < qc.GetArray().Size(); i++) {
-            FP.costs_quad.push_back(qc[i].GetDouble());
-        }
-        const Value &ec = c["Followers"]["EmissionCosts"];
-        for (SizeType i = 0; i < ec.GetArray().Size(); i++) {
-            FP.emission_costs.push_back(ec[i].GetDouble());
-        }
-        const Value &tc = c["Followers"]["TaxCaps"];
-        for (SizeType i = 0; i < tc.GetArray().Size(); i++) {
-            FP.tax_caps.push_back(tc[i].GetDouble());
-        }
-        for (SizeType i = 0; i < c["TransportationCosts"].GetArray().Size(); i++) {
-            TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
-        }
-        LAP.push_back(Models::LeadAllPar(FP.capacities.size(), to_string(j), FP,
-                                         {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
-                                          c["DemandParam"].GetObject()["Beta"].GetDouble()},
-                                         {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
-                                          c["LeaderParam"].GetObject()["ExportLimit"].GetDouble(),
-                                          c["LeaderParam"].GetObject()["PriceLimit"].GetDouble()}
-        ));
+        ifs.close();
+        return EPECInstance(LAP, TrCo);
     }
-    ifs.close();
-    return EPECInstance(LAP, TrCo);
+    catch (exception &e) {
+        cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
+        throw;
+    }
 }
 
 void

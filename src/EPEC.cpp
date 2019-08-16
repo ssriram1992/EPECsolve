@@ -2,151 +2,78 @@
 #include<memory>
 #include<exception>
 #include"models.h"
-#include<ctime>
-#include<cstdlib>
 #include<gurobi_c++.h>
 #include<armadillo>
-#include<iostream>
 #include<iomanip>
 
 using namespace std;
 
-
-int BilevelTest(Models::LeadAllPar LA) {
-    GRBEnv env = GRBEnv();
-    arma::sp_mat M;
-    arma::vec q;
-    perps Compl;
-    arma::sp_mat Aa;
-    arma::vec b;
-    Models::EPEC epec(&env);
-    try {
-        arma::sp_mat TrCo(1, 1);
-        TrCo(0, 0) = 0;
-        epec.addCountry(LA).addTranspCosts(TrCo).finalize();
-        epec.make_country_QP();
-        epec.testLCP(0);
-        try { epec.testQP(0); } catch (...) { cerr << "Cannot test QP" << endl; }
-        epec.findNashEq(true);
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
-        for (unsigned int i = 0; i < epec.nCountries; i++) {
-            cout << "********** Country number " << i + 1 << "\t\t" << "**********\n";
-            for (int j = 0; j < 9; j++) {
-                auto v = static_cast<Models::LeaderVars>(j);
-                cout << Models::prn::label << std::setfill('.') << v << Models::prn::val << std::setfill('.')
-                     << epec.getPosition(i, v) << endl;
-            }
-            cout << endl;
-        }
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
-
-    }
-    catch (const char *e) {
-        cerr << e << endl;
-        throw;
-    }
-    catch (string e) {
-        cerr << "String: " << e << endl;
-        throw;
-    }
-    catch (exception &e) {
-        cerr << "Exception: " << e.what() << endl;
-        throw;
-    }
-    catch (GRBException &e) {
-        cerr << "GRBException: " << e.getErrorCode() << ": " << e.getMessage() << endl;
-        throw;
-    }
-    return 0;
+static void show_usage(std::string name) {
+    cerr << "Usage: " << name << " InstanceFile" << endl
+         << "InstanceFile:\t\tThe path and file name of the JSON instance. **default: dat/Instance (.json automatically added)**\n\n"
+         << "Options:\n"
+         << "\t-h\t\t\tShow this help message\n"
+         << "\t-v\t\t\tShow the version of EPEC\n"
+         << "\t-r\t\t\tDictates the path and file name of the solution file. *default: dat/Solution (.json automatically added)**\n"
+         // << "\t-l\t\t\tDictates the 'loquacity' of EPEC. Default: 0 (non-verbose); 1 (verbose)\n"
+         << "\t-s\t\t\tDictates the writeLevel for EPEC solution. Default: 0 (only JSON); 1 (only Human Readable); 2 (both)\n"
+         << endl;
 }
 
-int LCPtest(Models::LeadAllPar LA, Models::LeadAllPar LA2, arma::sp_mat TrCo) {
-    GRBEnv env = GRBEnv();
-    // GRBModel* model=nullptr;
-    arma::sp_mat M;
-    arma::vec q;
-    perps Compl;
-    // Game::LCP *MyNashGame = nullptr;
-    arma::sp_mat Aa;
-    arma::vec b;
-    Models::EPEC epec(&env);
-    try {
-        epec.addCountry(LA, 0).addCountry(LA2, 0).addTranspCosts(TrCo).finalize();
-        epec.make_country_QP();
-        // try{epec.testQP(0);}catch(...){}
-        // try{epec.testQP(1);}catch(...){}
-        // epec.testCountry(1);
-        // epec.testCountry(0);
-        epec.findNashEq(true);
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
-        for (unsigned int i = 0; i < epec.nCountries; i++) {
-            cout << "********** Country number " << i + 1 << "\t\t" << "**********\n";
-            for (int j = 0; j < 9; j++) {
-                auto v = static_cast<Models::LeaderVars>(j);
-                cout << Models::prn::label << std::setfill('.') << v << Models::prn::val << std::setfill('.')
-                     << epec.getPosition(i, v) << endl;
+int main(int argc, char *argv[]) {
+    /**
+    * @brief Pushes an instance from a file to the EPEC code
+    * @p arg1 contains the
+    */
+    if (argc < 2) {
+        show_usage(argv[0]);
+        return 1;
+    }
+    string resFile = "dat/Solution";
+    string instanceFile = "dat/Instance";
+    int writeLevel = 0;
+
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if ((arg == "-h")) {
+            show_usage(argv[0]);
+            return 0;
+        } else if ((arg == "-v")) {
+            cout << "EPEC v" << to_string(EPECVERSION) << endl;
+            return 0;
+        } else if ((arg == "-r")) {
+            if (i + 1 < argc) {
+                resFile = argv[++i];
+            } else {
+                cerr << "-r option requires one argument." << endl;
+                return 1;
             }
-            cout << endl;
+        } else if ((arg == "-s")) {
+            if (i + 1 < argc) {
+                writeLevel = strtol(argv[++i], NULL, 10);
+            } else {
+                cerr << "-s option requires one argument." << endl;
+                return 1;
+            }
+        } else {
+            instanceFile = argv[i];
         }
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
     }
-    catch (const char *e) {
-        cerr << e << endl;
-        throw;
+    Models::EPECInstance Instance = Models::readInstance(instanceFile);
+    if (Instance.Countries.size() < 1) {
+        cerr << "Error: instance is empty" << endl;
+        return 1;
     }
-    catch (string e) {
-        cerr << "String: " << e << endl;
-        throw;
-    }
-    catch (exception &e) {
-        cerr << "Exception: " << e.what() << endl;
-        throw;
-    }
-    catch (GRBException &e) {
-        cerr << "GRBException: " << e.getErrorCode() << ": " << e.getMessage() << endl;
-        throw;
-    }
-    return 0;
-}
-
-
-int main() {
-    Models::DemPar P;
-    Models::FollPar FP, FP2, FP3, FP1, FP3a, FP2a;
-    Models::LeadPar L(-1, -1, -1);
-
-
-    // Two followers Leader with price cap
-    Models::LeadAllPar LA_pc1(1, "USA", FP1, {40, 1.10}, { -1, -1, -1});
-    Models::LeadAllPar LA_pc2(1, "China", FP1, {60, 1.25}, { -1, -1, -1});
-    FP1.capacities = {100};
-    FP1.costs_lin = {10};
-    FP1.costs_quad = {5};
-    FP1.emission_costs = {6};
-    FP1.tax_caps = {-1};
-    FP1.names = {"US_follower"};
-
-    FP.capacities = {100};
-    FP.costs_lin = {4};
-    FP.costs_quad = {0.25};
-    FP.emission_costs = {10};
-    FP.tax_caps = {-1};
-    FP.names = {"Eur_follower"};
-
-    // Two followers Leader with price cap
-    Models::LeadAllPar Europe(1, "Europe", FP, {80, 0.15}, { -1, -1, -1});
-    Models::LeadAllPar USA(1, "USA", FP1, {300, 0.05}, {-1, -1, -1});
-    // cout<<LA<<LA2;
-    // cout<<LA.FollowerParam.capacities.size()<<" "<<LA.FollowerParam.costs_lin.size()<<" "<<LA.FollowerParam.costs_quad.size()<<endl;
-    arma::mat TrCo(2, 2);
-    TrCo << 0 << 1 << arma::endr << 1 << 0;
-    //LCPtest(Europe, USA, static_cast<arma::sp_mat>(TrCo));
-    BilevelTest(USA);
-
+    GRBEnv env = GRBEnv();
+    Models::EPEC epec(&env);
+    for (int j = 0; j < Instance.Countries.size(); ++j)
+        epec.addCountry(Instance.Countries.at(j));
+    epec.addTranspCosts(Instance.TransportationCosts);
+    epec.finalize();
+    epec.make_country_QP();
+    epec.findNashEq();
+    epec.writeSolution(writeLevel, resFile);
     return 0;
 } 
 
