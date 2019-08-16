@@ -861,10 +861,9 @@ Models::EPEC::make_country_QP()
 {
     static bool already_ran{false};
     if (!already_ran)
-        for (unsigned int i = 0; i < this->nCountr; ++i) {
+        for (unsigned int i = 0; i < this->nCountr; ++i)
             this->make_country_QP(i);
-            this->Stats.feasiblePolyhedra.push_back(this->country_QP.at(i)->getFeasiblePolyhedra());
-        }
+
     for (unsigned int i = 0; i < this->nCountr; ++i) {
         LeadLocs &Loc = this->Locations.at(i);
         // Adjusting "stuff" because we now have new convHull variables
@@ -907,6 +906,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
+        this->Stats.feasiblePolyhedra.push_back(Player_i_LCP.getFeasiblePolyhedra());
     }
 }
 

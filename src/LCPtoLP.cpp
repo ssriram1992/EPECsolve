@@ -1057,7 +1057,7 @@ Game::LCP::makeQP(
     QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
     QP_obj.C = resize_patch(QP_obj.C, Ny, Nx_old);
     QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
-    QP.setFeasiblePolyhedra(custAi.size());
+    this->feasiblePolyhedra = custAi.size();
     // Setting the QP_Param object
     QP.set(QP_obj, QP_cons);
     return *this;
