@@ -452,35 +452,33 @@ Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons) {
 
 
 void
-Game::QP_Param::save(string filename, bool erase ) const
-{
-	Utils::appendSave(string("QP_Param"), filename, erase);
-	Utils::appendSave(this->Q, filename, string("QP_Param::Q"), false);
-	Utils::appendSave(this->A, filename, string("QP_Param::A"), false);
-	Utils::appendSave(this->B, filename, string("QP_Param::B"), false);
-	Utils::appendSave(this->C, filename, string("QP_Param::C"), false);
-	Utils::appendSave(this->b, filename, string("QP_Param::b"), false);
-	Utils::appendSave(this->c, filename, string("QP_Param::c"), false);
-	if(VERBOSE) cout<<"Saved QP_Param to file "<<filename<<endl;
+Game::QP_Param::save(string filename, bool erase) const {
+    Utils::appendSave(string("QP_Param"), filename, erase);
+    Utils::appendSave(this->Q, filename, string("QP_Param::Q"), false);
+    Utils::appendSave(this->A, filename, string("QP_Param::A"), false);
+    Utils::appendSave(this->B, filename, string("QP_Param::B"), false);
+    Utils::appendSave(this->C, filename, string("QP_Param::C"), false);
+    Utils::appendSave(this->b, filename, string("QP_Param::b"), false);
+    Utils::appendSave(this->c, filename, string("QP_Param::c"), false);
+    if (VERBOSE) cout << "Saved QP_Param to file " << filename << endl;
 }
 
 long int
-Game::QP_Param::load(string filename, long int pos)
-{
-	arma::sp_mat Q, A, B, C;
-	arma::vec c, b;
-	string headercheck;
-	pos = Utils::appendRead(headercheck, filename, pos);
-	if(headercheck!="QP_Param")
-		throw string("Error in QP_Param::load: In valid header - ")+headercheck;
-	pos = Utils::appendRead(Q, filename, pos, string("QP_Param::Q"));
-	pos = Utils::appendRead(A, filename, pos, string("QP_Param::A"));
-	pos = Utils::appendRead(B, filename, pos, string("QP_Param::B"));
-	pos = Utils::appendRead(C, filename, pos, string("QP_Param::C"));
-	pos = Utils::appendRead(b, filename, pos, string("QP_Param::b"));
-	pos = Utils::appendRead(c, filename, pos, string("QP_Param::c"));
-	this->set(Q, C, A, B, c, b);
-	return pos;
+Game::QP_Param::load(string filename, long int pos) {
+    arma::sp_mat Q, A, B, C;
+    arma::vec c, b;
+    string headercheck;
+    pos = Utils::appendRead(headercheck, filename, pos);
+    if (headercheck != "QP_Param")
+        throw string("Error in QP_Param::load: In valid header - ") + headercheck;
+    pos = Utils::appendRead(Q, filename, pos, string("QP_Param::Q"));
+    pos = Utils::appendRead(A, filename, pos, string("QP_Param::A"));
+    pos = Utils::appendRead(B, filename, pos, string("QP_Param::B"));
+    pos = Utils::appendRead(C, filename, pos, string("QP_Param::C"));
+    pos = Utils::appendRead(b, filename, pos, string("QP_Param::b"));
+    pos = Utils::appendRead(c, filename, pos, string("QP_Param::c"));
+    this->set(Q, C, A, B, c, b);
+    return pos;
 }
 
 
@@ -521,59 +519,57 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
 }
 
 void
-Game::NashGame::save(string filename, bool erase) const
-{
-	Utils::appendSave(string("NashGame"), filename, erase);
-	Utils::appendSave(this->Nplayers, filename, string("NashGame::Nplayers"), false);
-	for(unsigned int i=0; i< this->Nplayers;++i)
-		this->Players.at(i)->save(filename, false);
-	Utils::appendSave(this->MarketClearing, filename, string("NashGame::MarketClearing"), false);
-	Utils::appendSave(this->MCRHS, filename, string("NashGame::MCRHS"), false);
-	Utils::appendSave(this->LeaderConstraints, filename, string("NashGame::LeaderConstraints"), false);
-	Utils::appendSave(this->LeaderConsRHS, filename, string("NashGame::LeaderConsRHS"), false);
-	Utils::appendSave(this->n_LeadVar, filename, string("NashGame::n_LeadVar"), false);
-	if(VERBOSE) cout<<"Saved NashGame to file "<<filename<<endl;
+Game::NashGame::save(string filename, bool erase) const {
+    Utils::appendSave(string("NashGame"), filename, erase);
+    Utils::appendSave(this->Nplayers, filename, string("NashGame::Nplayers"), false);
+    for (unsigned int i = 0; i < this->Nplayers; ++i)
+        this->Players.at(i)->save(filename, false);
+    Utils::appendSave(this->MarketClearing, filename, string("NashGame::MarketClearing"), false);
+    Utils::appendSave(this->MCRHS, filename, string("NashGame::MCRHS"), false);
+    Utils::appendSave(this->LeaderConstraints, filename, string("NashGame::LeaderConstraints"), false);
+    Utils::appendSave(this->LeaderConsRHS, filename, string("NashGame::LeaderConsRHS"), false);
+    Utils::appendSave(this->n_LeadVar, filename, string("NashGame::n_LeadVar"), false);
+    if (VERBOSE) cout << "Saved NashGame to file " << filename << endl;
 }
 
 long int
-Game::NashGame::load(string filename, long int pos)
-{
-	if(!this->env)
-		throw string("Error in NashGame::load: To load NashGame from file, it has to be constructed using NashGame(GRBEnv*) constructor");
+Game::NashGame::load(string filename, long int pos) {
+    if (!this->env)
+        throw string(
+                "Error in NashGame::load: To load NashGame from file, it has to be constructed using NashGame(GRBEnv*) constructor");
 
-	string headercheck;
-	pos = Utils::appendRead(headercheck, filename, pos);
-	if(headercheck!="NashGame")
-		throw string("Error in NashGame::load: In valid header - ")+headercheck;
+    string headercheck;
+    pos = Utils::appendRead(headercheck, filename, pos);
+    if (headercheck != "NashGame")
+        throw string("Error in NashGame::load: In valid header - ") + headercheck;
 
 
-	unsigned int Nplayers;
-	pos = Utils::appendRead(Nplayers, filename, pos, string("NashGame::Nplayers"));
+    unsigned int Nplayers;
+    pos = Utils::appendRead(Nplayers, filename, pos, string("NashGame::Nplayers"));
 
-	vector<shared_ptr<QP_Param>> Players;
-	Players.resize(Nplayers);
-	for(unsigned int i=0; i< Nplayers;++i)
-	{
-		// Players.at(i) = std::make_shared<Game::QP_Param>(this->env);
-		auto temp = shared_ptr<Game::QP_Param>(new Game::QP_Param(this->env));
-		Players.at(i) = temp;
-		pos = Players.at(i)->load(filename, pos);
-	}
+    vector<shared_ptr<QP_Param>> Players;
+    Players.resize(Nplayers);
+    for (unsigned int i = 0; i < Nplayers; ++i) {
+        // Players.at(i) = std::make_shared<Game::QP_Param>(this->env);
+        auto temp = shared_ptr<Game::QP_Param>(new Game::QP_Param(this->env));
+        Players.at(i) = temp;
+        pos = Players.at(i)->load(filename, pos);
+    }
 
-	arma::sp_mat MarketClearing;
-	pos = Utils::appendRead(MarketClearing, filename, pos, string("NashGame::MarketClearing"));
+    arma::sp_mat MarketClearing;
+    pos = Utils::appendRead(MarketClearing, filename, pos, string("NashGame::MarketClearing"));
 
-	arma::vec MCRHS;
-	pos = Utils::appendRead(MCRHS, filename, pos, string("NashGame::MCRHS"));
+    arma::vec MCRHS;
+    pos = Utils::appendRead(MCRHS, filename, pos, string("NashGame::MCRHS"));
 
-	arma::sp_mat LeaderConstraints;
-	pos = Utils::appendRead(LeaderConstraints, filename, pos, string("NashGame::LeaderConstraints"));
+    arma::sp_mat LeaderConstraints;
+    pos = Utils::appendRead(LeaderConstraints, filename, pos, string("NashGame::LeaderConstraints"));
 
-	arma::vec LeaderConsRHS;
-	pos = Utils::appendRead(LeaderConsRHS, filename, pos, string("NashGame::LeaderConsRHS"));
+    arma::vec LeaderConsRHS;
+    pos = Utils::appendRead(LeaderConsRHS, filename, pos, string("NashGame::LeaderConsRHS"));
 
-	unsigned int n_LeadVar;
-	pos = Utils::appendRead(n_LeadVar, filename, pos, string("NashGame::n_LeadVar"));
+    unsigned int n_LeadVar;
+    pos = Utils::appendRead(n_LeadVar, filename, pos, string("NashGame::n_LeadVar"));
 
     // Setting the class variables
     this->n_LeadVar = n_LeadVar;
@@ -587,7 +583,7 @@ Game::NashGame::load(string filename, long int pos)
 
     this->set_positions();
 
-	return pos;
+    return pos;
 }
 
 void Game::NashGame::set_positions()
@@ -618,7 +614,7 @@ void Game::NashGame::set_positions()
     // Pushing back the end of dual position
     dual_position.at(Nplayers) = (dl_cnt);
 
-	/*
+    /*
     if (VERBOSE) {
         cout << "Primals: ";
         for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i) << " ";
@@ -626,7 +622,7 @@ void Game::NashGame::set_positions()
         for (unsigned int i = 0; i < Nplayers + 1; i++) cout << dual_position.at(i) << " ";
         cout << endl;
     }
-	*/
+    */
 
 }
 
@@ -831,7 +827,7 @@ Game::NashGame &Game::NashGame::addDummy(unsigned int par, int position)
         auto nnC = this->LeaderConstraints.n_cols;
         switch (position) {
             case -1:
-                this->LeaderConstraints=resize_patch(this->LeaderConstraints, nnR, nnC + par);
+                this->LeaderConstraints = resize_patch(this->LeaderConstraints, nnR, nnC + par);
                 break;
             case 0:
                 this->LeaderConstraints = arma::join_rows(arma::zeros<arma::sp_mat>(nnR, par), this->LeaderConstraints);

@@ -61,8 +61,7 @@ Game::LCP::defConst(GRBEnv *env)
     RelAllPol = new vector<vector<short int> *>{};
     Ai = new vector<arma::sp_mat *>{};
     bi = new vector<arma::vec *>{};
-    if (VERBOSE)
-        this->RlxdModel.set(GRB_IntParam_OutputFlag, 0);
+    this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
     this->env = env;
     this->nR = this->M.n_rows;
     this->nC = this->M.n_cols;
@@ -178,11 +177,10 @@ Game::LCP::makeRelaxed()
 {
     try {
         if (this->madeRlxdModel) return;
-        if (!VERBOSE) {
-            RlxdModel.set(GRB_IntParam_LogToConsole, 0);
-        }
         GRBVar x[nC], z[nR];
-        if (VERBOSE) cout << "In LCP::makeRelaxed(): " << nR << " " << nC << endl;
+        if (VERBOSE)
+            cout << "LCP::makeRelaxed() is creating a model with : " << nR << " variables and  " << nC << " constraints"
+                 << endl;
         for (unsigned int i = 0; i < nC; i++)
             x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "x_" + to_string(i));
         for (unsigned int i = 0; i < nR; i++)
@@ -492,7 +490,6 @@ int Game::ConvexHull(
     Game::compConvSize(A, nFinCons, nFinVar, Ai, bi, Acom, bcom);
 
     // Counting rows completed
-    if (VERBOSE) { cout << "In Convex Hull computation!" << endl; }
     /****************** SLOW LOOP BEWARE *******************/
     for (unsigned int i = 0; i < nPoly; i++) {
         if (VERBOSE) cout << "Game::ConvexHull: Handling Polyhedron " << i + 1 << " out of " << nPoly << endl;
@@ -518,7 +515,6 @@ int Game::ConvexHull(
     // Third Constraint RHS
     b.at(FirstCons + nC * 2) = 1;
     b.at(FirstCons + nC * 2 + 1) = -1;
-    if (VERBOSE) cout << "Convex Hull A:" << A.n_rows << "x" << A.n_cols << endl;
     return 0;
 }
 
@@ -945,7 +941,6 @@ Game::LCP::FixToPoly(
     if (add) {
         custom ? (custAi->push_back(Aii)) : (this->Ai->push_back(Aii));
         custom ? custbi->push_back(bii) : this->bi->push_back(bii);
-        if (VERBOSE) cout << custom << " Pushed a new polyhedron! No: " << custAi->size() << endl;
     }
     return *this;
 }
