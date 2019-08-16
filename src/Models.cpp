@@ -1164,6 +1164,12 @@ Models::EPECInstance::save(string filename) {
         writer.Key("nFollowers");
         writer.Uint(this->Countries.at(i).n_followers);
 
+        writer.Key("Name");
+        string currName = this->Countries.at(i).name;
+        char nameArray[currName.length()+1];
+        strcpy(nameArray, currName.c_str());
+        writer.String(nameArray);
+
         writer.Key("DemandParam");
         writer.StartObject();
         writer.Key("Alpha");
@@ -1190,6 +1196,16 @@ Models::EPECInstance::save(string filename) {
 
         writer.Key("Followers");
         writer.StartObject();
+
+        writer.Key("Names");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++) {
+            string currName = this->Countries.at(i).FollowerParam.names.at(j);
+            char nameArray[currName.length()+1];
+            strcpy(nameArray, currName.c_str());
+            writer.String(nameArray);
+        }
+        writer.EndArray();
 
         writer.Key("Capacities");
         writer.StartArray();
@@ -1275,10 +1291,14 @@ Models::EPECInstance::load(string filename) {
                 for (SizeType i = 0; i < tc.GetArray().Size(); i++) {
                     FP.tax_caps.push_back(tc[i].GetDouble());
                 }
+                const Value &nm = c["Followers"]["Names"];
+                for (SizeType i = 0; i < nm.GetArray().Size(); i++) {
+                    FP.names.push_back(nm[i].GetString());
+                }
                 for (SizeType i = 0; i < c["TransportationCosts"].GetArray().Size(); i++) {
                     TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
                 }
-                LAP.push_back(Models::LeadAllPar(FP.capacities.size(), to_string(j), FP,
+                LAP.push_back(Models::LeadAllPar(FP.capacities.size(), c["Name"].GetString(), FP,
                                                  {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
                                                   c["DemandParam"].GetObject()["Beta"].GetDouble()},
                                                  {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
