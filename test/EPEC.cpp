@@ -267,6 +267,13 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
 		BOOST_CHECK_NO_THROW(N2.load("test/Nash.dat"));
 		BOOST_CHECK_NO_THROW(N2.save("test/Nash2.dat"));
 
+		BOOST_TEST_MESSAGE("LCP load/save test");
+		BOOST_CHECK_NO_THROW(lcp.save("test/lcp.dat"));
+
+		LCP lcp2(&env);
+		BOOST_CHECK_NO_THROW(lcp2.load("test/lcp.dat"));
+		BOOST_CHECK_NO_THROW(lcp2.save("test/lcp2.dat"));
+
     }
 
     BOOST_AUTO_TEST_CASE(ConvexHull_test) {

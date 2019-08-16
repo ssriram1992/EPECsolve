@@ -35,7 +35,7 @@ namespace Game {
         arma::sp_mat M; ///< M in @f$Mx+q@f$ that defines the LCP
         arma::vec q;    ///< q in @f$Mx+q@f$ that defines the LCP
         perps Compl;    ///< Compl stores data in <Eqn, Var> form.
-        unsigned int LeadStart, LeadEnd, nLeader;
+        unsigned int LeadStart{1}, LeadEnd{0}, nLeader{0};
         arma::sp_mat _A = {};
         arma::vec _b = {};           ///< Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$ Ax\le b@f$ too!
         // Temporary data
@@ -101,6 +101,8 @@ namespace Game {
         /// Class has no default constructors
         LCP() = delete;
 
+		LCP(GRBEnv *e):env{e}, RlxdModel(e){}; ///< This constructor flor loading LCP from a file
+
         LCP(GRBEnv *env, arma::sp_mat M, arma::vec q,
             unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A = {},
             arma::vec b = {}); // Constructor with M,q,leader posn
@@ -165,6 +167,8 @@ namespace Game {
         LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
 
         void write(string filename, bool append = true) const;
+		void save(string filename, bool erase = true) const;
+		long int load(string filename, long int pos = 0);
     };
 }; // namespace Game
 #endif

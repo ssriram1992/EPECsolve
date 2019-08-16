@@ -130,7 +130,7 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N) : RlxdModel(*env)
     arma::vec q;
     perps Compl;
     N.FormulateLCP(M, q, Compl);
-    LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getMCLeadRHS());
+    // LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getMCLeadRHS());
 
 
     // This is a constructor code! Remember to delete
@@ -144,8 +144,12 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N) : RlxdModel(*env)
     sort(Compl.begin(), Compl.end(),
          [](pair<unsigned int, unsigned int> a, pair<unsigned int, unsigned int> b) { return a.first < b.first; }
     );
+	cout<<Compl.size()<<endl;
     for (auto p:Compl)
         if (p.first != p.second) {
+			cout<<"*\n*\n*\n";
+			cout<<this->LeadStart<<endl;
+			cout<<"*\n*\n*\n";
             this->LeadStart = p.first;
             this->LeadEnd = p.second - 1;
             this->nLeader = this->LeadEnd - this->LeadStart + 1;
@@ -1195,7 +1199,8 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::
     return model;
 }
 
-void Game::LCP::write(string filename, bool append) const {
+void 
+Game::LCP::write(string filename, bool append) const {
     ofstream outfile(filename, append ? ios::app : ios::out);
 
     outfile << nR << " rows and " << nC << " columns in the LCP\n";
@@ -1208,4 +1213,59 @@ void Game::LCP::write(string filename, bool append) const {
     outfile << "A: " << this->_A;
     outfile << "b: " << this->_b;
     outfile.close();
+}
+
+void
+Game::LCP::save(string filename, bool erase) const
+{
+	Utils::appendSave(string("LCP"), filename, erase); 
+	Utils::appendSave(this->M, filename, string("LCP::M"), false);
+	Utils::appendSave(this->q, filename, string("LCP::q"), false);
+
+	Utils::appendSave(this->LeadStart, filename, string("LCP::LeadStart"), false);
+	Utils::appendSave(this->LeadEnd, filename, string("LCP::LeadEnd"), false);
+
+	Utils::appendSave(this->_A, filename, string("LCP::_A"), false);
+	Utils::appendSave(this->_b, filename, string("LCP::_b"), false);
+
+	if(VERBOSE) cout<<"Saved LCP to file "<<filename<<endl;
+}
+
+
+long int
+Game::LCP::load(string filename, long int pos)
+{
+	if(!this->env)
+		throw string("Error in LCP::load: To load LCP from file, it has to be constructed using LCP(GRBEnv*) constructor");
+
+	string headercheck;
+	pos = Utils::appendRead(headercheck, filename, pos);
+	if(headercheck!="LCP")
+		throw string("Error in LCP::load: In valid header - ")+headercheck;
+
+	arma::sp_mat M, A;
+	arma::vec q, b;
+	unsigned int LeadStart, LeadEnd; 
+	pos = Utils::appendRead(M, filename, pos, string("LCP::M"));
+	pos = Utils::appendRead(q, filename, pos, string("LCP::q"));
+	pos = Utils::appendRead(LeadStart, filename, pos, string("LCP::LeadStart"));
+	pos = Utils::appendRead(LeadEnd, filename, pos, string("LCP::LeadEnd"));
+	pos = Utils::appendRead(A, filename, pos, string("LCP::_A"));
+	pos = Utils::appendRead(b, filename, pos, string("LCP::_b"));
+
+	this-> M = M;
+	this->q = q;
+	this->_A = A;
+	this->_b = b;
+    defConst(env);
+    this->LeadStart = LeadStart;
+    this->LeadEnd = LeadEnd;
+
+    this->nLeader = this->LeadEnd - this->LeadStart + 1;
+    this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
+    for (unsigned int i = 0; i < M.n_rows; i++) {
+        unsigned int count = i < LeadStart ? i : i + nLeader;
+        Compl.push_back({i, count});
+	} 
+	return pos;
 }
