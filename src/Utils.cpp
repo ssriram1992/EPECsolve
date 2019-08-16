@@ -93,9 +93,6 @@ long int Utils::appendRead(
  * @returns The end position from which the next data object can be read.
  */
 {
-	long int size; 		// How many bytes to read?
-	char * buffer;		// Read to where?
-
 	unsigned int nR, nC, nnz;
 	
 	ifstream infile(in, ios::in);
@@ -213,4 +210,62 @@ long int Utils::appendRead(
 	in_file.close();
 
 	return pos; 
+}
+
+
+void Utils::appendSave(const long int v, const string out, const string header, bool erase)
+/**
+ * Utility to save a long int to file
+ */
+{ 
+	ofstream outfile(out, erase?ios::out:ios::app);
+	outfile<<header<<"\n";
+	outfile<<v<<"\n";
+	outfile.close();
+}
+
+long int  Utils::appendRead(long int &v, const string in, long int pos, const string header)
+{ 
+	ifstream infile(in, ios::in);
+	infile.seekg(pos);
+
+	string header_checkwith;
+	infile>>header_checkwith;
+
+	if(header!="" && header != header_checkwith)
+		throw string("Error in Utils::appendRead<long int>. Wrong header. Expected: "+header+" Found: "+header_checkwith);
+
+	long int val;
+	infile>>val;
+	v = val;
+
+	pos = infile.tellg();
+	infile.close();
+
+	return pos;
+}
+
+void Utils::appendSave(const string v, const string out, bool erase)
+/**
+ * Utility to save a long int to file
+ */
+{ 
+	ofstream outfile(out, erase?ios::out:ios::app);
+	outfile<<v<<"\n";
+	outfile.close();
+}
+
+long int  Utils::appendRead(string &v, const string in, long int pos)
+{ 
+	ifstream infile(in, ios::in);
+	infile.seekg(pos);
+
+	string val;
+	infile>>val;
+	v = val;
+
+	pos = infile.tellg();
+	infile.close();
+
+	return pos;
 }

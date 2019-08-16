@@ -23,6 +23,16 @@ namespace Utils{
 	// Saving and retrieving an std::vector<double>
 	void appendSave(const vector<double> v, const string out, const string header = "", bool erase=false);
 	long int appendRead(vector<double> &v, const string in, long int pos, const string header="");
+
+	// Saving string
+	void appendSave(const string v, const string out, bool erase=false);
+	long int appendRead(string &v, const string in, long int pos);
+
+	// Saving A long int
+	void appendSave(const long int v, const string out, const string header = "", bool erase=false);
+	long int appendRead(long int &v, const string in, long int pos, const string header="");
+	
+
 };
 
 #endif
