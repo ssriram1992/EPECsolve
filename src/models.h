@@ -22,10 +22,6 @@ namespace Models {
         vector<double> tax_caps = {};    ///< Individual tax caps for each follower.
         vector<string> names = {};    ///< Optional Names for the Followers.
         FollPar(vector<double> costs_quad_ = {}, vector<double> costs_lin_ = {}, vector<double> capacities_ = {},
-                vector<double> emission_costs_ = {}, double tax_caps_ = {}, vector<string> names_ = {})
-                : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
-                  emission_costs{emission_costs_}, tax_caps(tax_caps_, costs_quad_.size()), names{names_} {}
-        FollPar(vector<double> costs_quad_ = {}, vector<double> costs_lin_ = {}, vector<double> capacities_ = {},
                 vector<double> emission_costs_ = {}, vector<double> tax_caps_ = {}, vector<string> names_ = {})
                 : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
                   emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
