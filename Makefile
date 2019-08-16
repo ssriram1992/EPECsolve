@@ -1,5 +1,6 @@
 # File name and output name
-EPEC_HOME=/home/sanksrir/Documents/code/EPEC
+# EPEC_HOME=/home/sanksrir/Documents/code/EPEC
+EPEC_HOME=/home/sriram/Dropbox/code/EPEC/code
 SRC=$(EPEC_HOME)/src
 OBJ=$(EPEC_HOME)/obj
 BIN=$(EPEC_HOME)/bin
@@ -10,11 +11,14 @@ OUTPUT=$(BIN)/$(PROJECT)
 ARGS=
 
 # Logging
-BOOST_HOME=/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0
-BOOST_LIB_D=$(BOOST_HOME)/lib/libboost_
+# BOOST_HOME=/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0
+BOOST_HOME=/home/sriram/Install/boost_1_70_0
+# BOOST_LIB_D=$(BOOST_HOME)/lib/libboost_
+BOOST_LIB_D=$(BOOST_HOME)/stage/lib/libboost_
 # BOOSTLIB=$(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a $(BOOST_LIB_D)prg_exec_monitor.a -lpthread
 BOOSTLIB=$(BOOST_LIB_D)unit_test_framework.a -lpthread
-BOOSTOPT=-I $(BOOST_HOME)/include $(BOOSTLIB) 
+# BOOSTOPT=-I $(BOOST_HOME)/include $(BOOSTLIB) 
+BOOSTOPT=-I $(BOOST_HOME) $(BOOSTLIB) 
 
 # Armadillo stuff
 ARMA=/opt/armadillo-code
@@ -25,8 +29,8 @@ ARMALIB=-larmadillo
 ARMAOPT=$(ARMAINC) $(ARMALIB)
 
 # Gurobi stuff
-# GUR=/opt/gurobi810/linux64
-GUR=/home/gurobi/8.1.0/linux64
+GUR=/opt/gurobi811/linux64
+# GUR=/home/gurobi/8.1.0/linux64
 # GUR=/opt/gurobi/gurobi801/linux64
 GURINC=-I $(GUR)/include 
 # GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi80 -lm 
@@ -37,7 +41,8 @@ GUROPT=$(GURINC) $(GURLIB)
 # Generic objects not requiring changes
 GCC=g++
 # GCC=g++-4.8
-OTHEROPTS= -O2 -std=c++11
+#OTHEROPTS= -O2 -std=c++11 -I include/
+OTHEROPTS= -g3 -std=c++11 -I include/
 OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS)
 
 runEPEC: compileEPEC
@@ -47,6 +52,11 @@ valgrind: compileEPEC
 	valgrind --leak-check=full --show-leak-kinds=all  -v ./$(OUTPUT) $(ARGS)
 
 compileEPEC: EPEC
+
+makeInstances:  $(FILEEPEC) $(OBJ)/makeTests.o 
+	@echo making the test instances...
+	$(GCC) $(FILEEPEC) $(OBJ)/makeTests.o  $(OPTS) -o bin/genTestInstances
+	./bin/genTestInstances
 
 EPEC: $(FILEEPEC) $(OBJ)/EPEC.o 
 	@echo Compiling...
@@ -67,6 +77,8 @@ $(OBJ)/Models.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/Models.cpp
 $(OBJ)/Utils.o: $(SRC)/epecsolve.h $(SRC)/utils.h $(SRC)/Utils.cpp
 	$(GCC) -c $(SRC)/Utils.cpp $(OPTS) -o $(OBJ)/Utils.o
 
+$(OBJ)/makeTests.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/makeTests.cpp
+	$(GCC) -c $(SRC)/makeTests.cpp $(OPTS) -o $(OBJ)/makeTests.o
 clean:
 	rm -rf $(OUTPUT) $(EPEC_HOME)/test/EPEC
 	rm -rf $(OBJ)/*.o
@@ -78,7 +90,7 @@ docDetailed:
 	doxygen docs/refDetConf
 
 edit: 
-	vim -p src/epecsolve.h src/Games.cpp src/LCPtoLP.cpp  src/Models.cpp src/EPEC.cpp
+	vim -p src/epecsolve.h src/Games.cpp src/LCPtoLP.cpp  src/Models.cpp src/Utils.cpp
 
 tag:
 	ctags src/*.cpp src/*.h
