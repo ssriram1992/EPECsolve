@@ -81,6 +81,17 @@ add_executable(EPEC
                src/Utils.cpp
                src/Models.cpp
                src/models.h)
+add_executable(EPECInstances
+               src/makeTests.cpp
+               src/epecsolve.h
+               src/Games.cpp
+               src/games.h
+               src/LCPtoLP.cpp
+               src/lcptolp.h
+               src/utils.h
+               src/Utils.cpp
+               src/Models.cpp
+               src/models.h)
 add_executable(EPECtest
                src/Games.cpp
                src/games.h
@@ -93,6 +104,7 @@ add_executable(EPECtest
                test/EPEC.cpp)
 
 target_link_libraries(EPEC ${GUROBI_LIBRARIES})
+target_link_libraries(EPECInstances ${GUROBI_LIBRARIES})
 if (ROSSOBIANCO)
     target_link_libraries(EPECtest /home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0/lib/libboost_unit_test_framework.a ${GUROBI_LIBRARIES})
 ELSE ()

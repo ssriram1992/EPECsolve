@@ -1241,59 +1241,69 @@ Models::EPECInstance::load(string filename) {
      * @p filename dictates the name of the JSON instance file
     */
     ifstream ifs(filename + ".json");
-    IStreamWrapper isw(ifs);
-    Document d;
-    try {
-        d.ParseStream(isw);
-        vector<Models::LeadAllPar> LAP = {};
-        assert(d.HasMember("nCountries"));
-        int nCountries = d["nCountries"].GetInt();
-        arma::sp_mat TrCo;
-        TrCo.zeros(nCountries, nCountries);
-        for (int j = 0; j < nCountries; ++j) {
-            const Value &c = d["Countries"].GetArray()[j].GetObject();
+    if (ifs.good()) {
 
-            Models::FollPar FP;
-            const Value &cap = c["Followers"]["Capacities"];
-            for (SizeType i = 0; i < cap.GetArray().Size(); i++) {
-                FP.capacities.push_back(cap[i].GetDouble());
+        IStreamWrapper isw(ifs);
+        Document d;
+        try {
+            d.ParseStream(isw);
+            vector<Models::LeadAllPar> LAP = {};
+            int nCountries = d["nCountries"].GetInt();
+            arma::sp_mat TrCo;
+            TrCo.zeros(nCountries, nCountries);
+            for (int j = 0; j < nCountries; ++j) {
+                const Value &c = d["Countries"].GetArray()[j].GetObject();
+
+                Models::FollPar FP;
+                const Value &cap = c["Followers"]["Capacities"];
+                for (SizeType i = 0; i < cap.GetArray().Size(); i++) {
+                    FP.capacities.push_back(cap[i].GetDouble());
+                }
+                const Value &lc = c["Followers"]["LinearCosts"];
+                for (SizeType i = 0; i < lc.GetArray().Size(); i++) {
+                    FP.costs_lin.push_back(lc[i].GetDouble());
+                }
+                const Value &qc = c["Followers"]["QuadraticCosts"];
+                for (SizeType i = 0; i < qc.GetArray().Size(); i++) {
+                    FP.costs_quad.push_back(qc[i].GetDouble());
+                }
+                const Value &ec = c["Followers"]["EmissionCosts"];
+                for (SizeType i = 0; i < ec.GetArray().Size(); i++) {
+                    FP.emission_costs.push_back(ec[i].GetDouble());
+                }
+                const Value &tc = c["Followers"]["TaxCaps"];
+                for (SizeType i = 0; i < tc.GetArray().Size(); i++) {
+                    FP.tax_caps.push_back(tc[i].GetDouble());
+                }
+                for (SizeType i = 0; i < c["TransportationCosts"].GetArray().Size(); i++) {
+                    TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
+                }
+                LAP.push_back(Models::LeadAllPar(FP.capacities.size(), to_string(j), FP,
+                                                 {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
+                                                  c["DemandParam"].GetObject()["Beta"].GetDouble()},
+                                                 {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
+                                                  c["LeaderParam"].GetObject()["ExportLimit"].GetDouble(),
+                                                  c["LeaderParam"].GetObject()["PriceLimit"].GetDouble()}
+                ));
             }
-            const Value &lc = c["Followers"]["LinearCosts"];
-            for (SizeType i = 0; i < lc.GetArray().Size(); i++) {
-                FP.costs_lin.push_back(lc[i].GetDouble());
-            }
-            const Value &qc = c["Followers"]["QuadraticCosts"];
-            for (SizeType i = 0; i < qc.GetArray().Size(); i++) {
-                FP.costs_quad.push_back(qc[i].GetDouble());
-            }
-            const Value &ec = c["Followers"]["EmissionCosts"];
-            for (SizeType i = 0; i < ec.GetArray().Size(); i++) {
-                FP.emission_costs.push_back(ec[i].GetDouble());
-            }
-            const Value &tc = c["Followers"]["TaxCaps"];
-            for (SizeType i = 0; i < tc.GetArray().Size(); i++) {
-                FP.tax_caps.push_back(tc[i].GetDouble());
-            }
-            for (SizeType i = 0; i < c["TransportationCosts"].GetArray().Size(); i++) {
-                TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
-            }
-            LAP.push_back(Models::LeadAllPar(FP.capacities.size(), to_string(j), FP,
-                                             {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
-                                              c["DemandParam"].GetObject()["Beta"].GetDouble()},
-                                             {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
-                                              c["LeaderParam"].GetObject()["ExportLimit"].GetDouble(),
-                                              c["LeaderParam"].GetObject()["PriceLimit"].GetDouble()}
-            ));
+            ifs.close();
+            this->Countries = LAP;
+            this->TransportationCosts = TrCo;
         }
-        ifs.close();
-        this->Countries = LAP;
-        this->TransportationCosts = TrCo;
-    }
-    catch (exception &e) {
-        cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
+        catch (exception &e) {
+            cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
+            throw;
+        }
+        catch (...) {
+            cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
+            throw;
+        }
+    } else {
+        cerr << "Exception in Models::readInstance : file instance not found." << endl;
         throw;
     }
 }
+
 
 void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const {
