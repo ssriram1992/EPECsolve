@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     */
     if (argc < 2) {
         show_usage(argv[0]);
-        return 1;
+        return 0;
     }
     string resFile = "dat/Solution";
     string instanceFile = "dat/Instance";
@@ -51,28 +51,28 @@ int main(int argc, char *argv[]) {
                 resFile = argv[++i];
             } else {
                 cerr << "-r option requires one argument." << endl;
-                return 1;
+                return 0;
             }
         } else if ((arg == "-rf")) {
             if (i + 1 < argc) {
                 resultsFile = argv[++i];
             } else {
                 cerr << "-rf option requires one argument." << endl;
-                return 1;
+                return 0;
             }
         } else if ((arg == "-s")) {
             if (i + 1 < argc) {
                 writeLevel = strtol(argv[++i], NULL, 10);
             } else {
                 cerr << "-s option requires one argument." << endl;
-                return 1;
+                return 0;
             }
         } else if ((arg == "-t")) {
             if (i + 1 < argc) {
                 nThreads = strtol(argv[++i], NULL, 10);
             } else {
                 cerr << "-t option requires one argument." << endl;
-                return 1;
+                return 0;
             }
         } else {
             instanceFile = argv[i];
