@@ -64,7 +64,7 @@ namespace Models {
         arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
 
         EPECInstance(string filename) {
-            this->readInstance(filename);
+            this->load(filename);
         }   ///< Constructor from instance file
         EPECInstance(vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_) : Countries{Countries_},
                                                                                     TransportationCosts{Transp_} {}
@@ -257,9 +257,7 @@ namespace Models {
 
         const EPECInstance getInstance() const { return EPECInstance(this->AllLeadPars, this->TranspCosts); }
 
-        cost EPECStatistics
-
-        getStatistics() const { return this->Stats; }
+        const EPECStatistics getStatistics() const { return this->Stats; }
 
     };
 
