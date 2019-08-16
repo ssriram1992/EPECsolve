@@ -568,13 +568,9 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
         // Set imports and exporta to zero
         arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 1;
-        if (VERBOSE)
-            cout << "Single Country: imports are set to zero." << endl;
         LL_Nash.addLeadCons(a, 0); // Export <= 0
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 0;
         a.at(Loc.at(Models::LeaderVars::NetExport)) = 1;
-        if (VERBOSE)
-            cout << "Single Country: exports are set to zero." << endl;
         LL_Nash.addLeadCons(a, 0); // Import <= 0
     }
 }
@@ -884,7 +880,7 @@ Models::EPEC::make_country_QP()
     this->computeLeaderLocations(true);
     if (VERBOSE) {
         for (unsigned int i = 0; i < this->nCountr; ++i)
-            this->country_QP.at(i)->QP_Param::write("dat/countrQP_" + to_string(i), false);
+            this->country_QP.at(i)->QP_Param::write("dat/debug/countrQP_" + to_string(i), false);
     }
 }
 
@@ -947,16 +943,15 @@ Models::EPEC::findNashEq() {
         this->make_MC_cons(MC, MCRHS);
         this->nashgame = std::unique_ptr<Game::NashGame>(
                 new Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb));
-        //if (VERBOSE) cout << *nashgame << endl;
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
 
-        if (VERBOSE) this->nashgame->write("dat/NashGame", false, true);
+        if (VERBOSE) this->nashgame->write("dat/debug/NashGame", false, true);
         //Using indicator constraints
         lcp->useIndicators = this->indicators;
 
         this->lcpmodel = lcp->LCPasMIP(false);
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        if (VERBOSE) lcpmodel->write("dat/NashLCP.lp");
+        if (VERBOSE) lcpmodel->write("dat/debug/NashLCP.lp");
         this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
         this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
         this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
@@ -969,7 +964,7 @@ Models::EPEC::findNashEq() {
         int status = lcpmodel->get(GRB_IntAttr_Status);
         if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
             try {
-                if (VERBOSE) lcpmodel->write("dat/NashLCP.sol");
+                if (VERBOSE) lcpmodel->write("dat/debug/NashLCP.sol");
                 for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
@@ -1425,12 +1420,11 @@ void
 Models::EPEC::testQP(const unsigned int i) {
     QP_Param *QP = this->country_QP.at(i).get();
     arma::vec x;
-    //if (VERBOSE) cout << *QP << endl;
     x.ones(QP->getNx());
     x.fill(555);
-    if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
+    cout << "*** COUNTRY QP TEST***\n";
     std::unique_ptr<GRBModel> model = QP->solveFixed(x);
-    if (VERBOSE) model->write("dat/CountryQP_" + to_string(i) + ".lp");
+    model->write("dat/debug/CountryQP_" + to_string(i) + ".lp");
     int status = model->get(GRB_IntAttr_Status);
     if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
         arma::vec sol;
