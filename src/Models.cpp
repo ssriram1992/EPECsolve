@@ -985,12 +985,10 @@ Models::EPEC::findNashEq() {
             this->Stats.status = true;
         } else {
             cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
-            throw string("Models::EPEC::findNashEq: no nash equilibrium found.");
         }
-        //if (VERBOSE) Game::print(lcp->getCompl());
 
     } else {
-        cerr << "GRBException in Models::EPEC::findNashEq : no country QP has been made." << endl;
+        cerr << "Exception in Models::EPEC::findNashEq : no country QP has been made." << endl;
         throw;
     }
 }
@@ -1166,7 +1164,7 @@ Models::EPECInstance::save(string filename) {
 
         writer.Key("Name");
         string currName = this->Countries.at(i).name;
-        char nameArray[currName.length()+1];
+        char nameArray[currName.length() + 1];
         strcpy(nameArray, currName.c_str());
         writer.String(nameArray);
 
@@ -1201,7 +1199,7 @@ Models::EPECInstance::save(string filename) {
         writer.StartArray();
         for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++) {
             string currName = this->Countries.at(i).FollowerParam.names.at(j);
-            char nameArray[currName.length()+1];
+            char nameArray[currName.length() + 1];
             strcpy(nameArray, currName.c_str());
             writer.String(nameArray);
         }

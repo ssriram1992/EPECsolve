@@ -18,7 +18,7 @@ static void show_usage(std::string name) {
          << "\t-rf\t\t\tDictates the path and file name of the general results file. *default: dat/results.csv **\n"
          // << "\t-l\t\t\tDictates the 'loquacity' of EPEC. Default: 0 (non-verbose); 1 (verbose)\n"
          << "\t-s\t\t\tDictates the writeLevel for EPEC solution. Default: 0 (only JSON); 1 (only Human Readable); 2 (both)\n"
-         << "\t-g\t\t\tNumber of threads for Gurobi. Default: 1; int (number of cores); 0 (auto)\n"
+         << "\t-t\t\t\tNumber of threads for Gurobi and OPEN_BLAS. Default: 1; int (number of cores); 0 (auto)\n"
          << endl;
 }
 
@@ -67,11 +67,11 @@ int main(int argc, char *argv[]) {
                 cerr << "-s option requires one argument." << endl;
                 return 1;
             }
-        } else if ((arg == "-g")) {
+        } else if ((arg == "-t")) {
             if (i + 1 < argc) {
                 nThreads = strtol(argv[++i], NULL, 10);
             } else {
-                cerr << "-g option requires one argument." << endl;
+                cerr << "-t option requires one argument." << endl;
                 return 1;
             }
         } else {
