@@ -70,10 +70,10 @@ namespace Models {
                                                                                     TransportationCosts{Transp_} {}
         ///< Constructor from instance objects
 
-        EPECInstance readInstance(string filename);
+        void load(string filename);
         ///< Reads the EPECInstance from a file
 
-        void writeInstance(string filename);
+        void save(string filename);
         ///< Writes the EPECInstance from a file
     };
 

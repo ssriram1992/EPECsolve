@@ -1139,7 +1139,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
 }
 
 void
-Models::EPECInstance::writeInstance(string filename) {
+Models::EPECInstance::save(string filename) {
     /**
     * @brief Writes the current EPEC instance to the standard JSON instance file
      * @p filename dictates the name of the JSON instance file
@@ -1152,7 +1152,7 @@ Models::EPECInstance::writeInstance(string filename) {
     writer.Uint(this->Countries.size());
     writer.Key("Countries");
     writer.StartArray();
-    for (unsigned i = 0; i < this.Countries.size(); i++) {
+    for (unsigned i = 0; i < this->Countries.size(); i++) {
         writer.StartObject();
 
         writer.Key("nFollowers");
@@ -1228,8 +1228,8 @@ Models::EPECInstance::writeInstance(string filename) {
 }
 
 
-Models::EPECInstance
-Models::EPECInstance::readInstance(string filename) {
+void
+Models::EPECInstance::load(string filename) {
     /**
     * @brief Reads an instance file and return a vector of @p LeadAllPar that can be fed to the EPEC class
      * @p filename dictates the name of the JSON instance file
@@ -1282,7 +1282,6 @@ Models::EPECInstance::readInstance(string filename) {
         ifs.close();
         this->Countries = LAP;
         this->TransportationCosts=TrCo;
-        return *this;
     }
     catch (exception &e) {
         cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
