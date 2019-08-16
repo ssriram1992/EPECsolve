@@ -40,6 +40,8 @@ Models::operator<<(ostream &ost, const Models::FollPar P) {
     for (auto a:P.costs_quad) ost << Models::prn::val << a;
     ost << endl << Models::prn::label << "Production capacities" << ":\t";
     for (auto a:P.capacities) ost << Models::prn::val << (a < 0 ? std::numeric_limits<double>::infinity() : a);
+    ost << endl << Models::prn::label << "Tax Caps" << ":\t";
+    for (auto a:P.tax_caps) ost << Models::prn::val << (a < 0 ? std::numeric_limits<double>::infinity() : a);
     ost << endl;
     return ost;
 }
@@ -68,6 +70,16 @@ Models::operator<<(ostream &ost, const Models::LeadPar P) {
     ost << endl;
     return ost;
 }
+
+ostream &
+Models::operator<<(ostream &ost, const Models::EPECInstance I) {
+    ost << "EPEC Instance: " << endl;
+    ost << "******************" << endl;
+    for (auto a:I.Countries) ost << a << endl;
+    ost << "Transportation Costs:" << endl << I.TransportationCosts << endl;
+    return ost;
+}
+
 
 ostream &
 Models::operator<<(ostream &ost, const Models::LeadAllPar P) {
@@ -1046,6 +1058,10 @@ Models::EPEC::write(const string filename, bool append) const {
 }
 
 void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x, const arma::vec z) const {
+    /**
+    * @brief Writes the computed Nash Equilibrium in the standard JSON solution file
+    * @p filename dictates the name of the .JSON solution file
+    */
     StringBuffer s;
     PrettyWriter<StringBuffer> writer(s);
     writer.StartObject();
@@ -1106,15 +1122,15 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x, const a
 
 void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
     /**
-* @brief Writes the computed Nash Equilibrium in the EPEC instance
-* @p writeLevel is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both
-*/
+    * @brief Writes the computed Nash Equilibrium in the EPEC instance
+    * @p writeLevel is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both
+    */
     if (this->nashEq) {
         if (writeLevel == 1 || writeLevel == 2) {
             this->WriteCountry(0, "dat/Solution" + filename + ".txt", this->sol_x, false);
             for (unsigned int ell = 1; ell < this->nCountr; ++ell)
                 this->WriteCountry(ell, "dat/Solution" + filename + ".txt", this->sol_x, true);
-            this->write("dat/Solution"+filename+".txt", true);
+            this->write("dat/Solution" + filename + ".txt", true);
         }
         if (writeLevel == 2 || writeLevel == 0) this->writeSolutionJSON(filename, this->sol_x, this->sol_z);
     } else {
@@ -1122,36 +1138,48 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
     }
 }
 
-void Models::EPEC::writeInstance(string filename) const {
+void
+Models::writeInstance(string filename, EPECInstance epec) {
+    /**
+    * @brief Writes the current EPEC instance to the standard JSON instance file
+     * @p filename dictates the name of the JSON instance file
+     * @p epec contains the @p EPECInstance object with the data
+    */
     StringBuffer s;
     PrettyWriter<StringBuffer> writer(s);
     writer.StartObject();
     writer.Key("nCountries");
-    writer.Uint(this->nCountr);
+    writer.Uint(epec.Countries.size());
     writer.Key("Countries");
     writer.StartArray();
-    for (unsigned i = 0; i < this->nCountr; i++) {
+    for (unsigned i = 0; i < epec.Countries.size(); i++) {
         writer.StartObject();
 
         writer.Key("nFollowers");
-        writer.Uint(this->AllLeadPars.at(i).n_followers);
+        writer.Uint(epec.Countries.at(i).n_followers);
 
         writer.Key("DemandParam");
         writer.StartObject();
         writer.Key("Alpha");
-        writer.Double(this->AllLeadPars.at(i).DemandParam.alpha);
+        writer.Double(epec.Countries.at(i).DemandParam.alpha);
         writer.Key("Beta");
-        writer.Double(this->AllLeadPars.at(i).DemandParam.beta);
+        writer.Double(epec.Countries.at(i).DemandParam.beta);
         writer.EndObject();
+
+        writer.Key("TransportationCosts");
+        writer.StartArray();
+        for (unsigned j = 0; j < epec.Countries.size(); j++)
+            writer.Double(epec.TransportationCosts(i, j));
+        writer.EndArray();
 
         writer.Key("LeaderParam");
         writer.StartObject();
         writer.Key("ImportLimit");
-        writer.Double(this->AllLeadPars.at(i).LeaderParam.import_limit);
+        writer.Double(epec.Countries.at(i).LeaderParam.import_limit);
         writer.Key("ExportLimit");
-        writer.Double(this->AllLeadPars.at(i).LeaderParam.export_limit);
+        writer.Double(epec.Countries.at(i).LeaderParam.export_limit);
         writer.Key("PriceLimit");
-        writer.Double(this->AllLeadPars.at(i).LeaderParam.price_limit);
+        writer.Double(epec.Countries.at(i).LeaderParam.price_limit);
         writer.EndObject();
 
         writer.Key("Followers");
@@ -1159,32 +1187,32 @@ void Models::EPEC::writeInstance(string filename) const {
 
         writer.Key("Capacities");
         writer.StartArray();
-        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
-            writer.Double(this->AllLeadPars.at(i).FollowerParam.capacities.at(j));
+        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
+            writer.Double(epec.Countries.at(i).FollowerParam.capacities.at(j));
         writer.EndArray();
 
         writer.Key("LinearCosts");
         writer.StartArray();
-        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
-            writer.Double(this->AllLeadPars.at(i).FollowerParam.costs_lin.at(j));
+        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
+            writer.Double(epec.Countries.at(i).FollowerParam.costs_lin.at(j));
         writer.EndArray();
 
         writer.Key("QuadraticCosts");
         writer.StartArray();
-        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
-            writer.Double(this->AllLeadPars.at(i).FollowerParam.costs_quad.at(j));
+        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
+            writer.Double(epec.Countries.at(i).FollowerParam.costs_quad.at(j));
         writer.EndArray();
 
         writer.Key("EmissionCosts");
         writer.StartArray();
-        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
-            writer.Double(this->AllLeadPars.at(i).FollowerParam.emission_costs.at(j));
+        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
+            writer.Double(epec.Countries.at(i).FollowerParam.emission_costs.at(j));
         writer.EndArray();
 
         writer.Key("TaxCaps");
         writer.StartArray();
-        for (unsigned j = 0; j < this->AllLeadPars.at(i).n_followers; j++)
-            writer.Double(this->AllLeadPars.at(i).FollowerParam.tax_caps.at(j));
+        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
+            writer.Double(epec.Countries.at(i).FollowerParam.tax_caps.at(j));
         writer.EndArray();
 
 
@@ -1196,24 +1224,33 @@ void Models::EPEC::writeInstance(string filename) const {
     writer.EndObject();
     ofstream file("dat/" + filename + ".json");
     file << s.GetString();
+    file.close();
 }
-vector<Models::LeadAllPar>
+
+
+Models::EPECInstance
 Models::readInstance(string filename) {
+    /**
+    * @brief Reads an instance file and return a vector of @p LeadAllPar that can be fed to the EPEC class
+     * @p filename dictates the name of the JSON instance file
+    */
     ifstream ifs(filename + ".json");
     IStreamWrapper isw(ifs);
     Document d;
     d.ParseStream(isw);
     vector<Models::LeadAllPar> LAP = {};
     assert(d.HasMember("nCountries"));
-    for (int i = 0; i < d["nCountries"].GetInt(); ++i) {
-        const Value &c = d["Countries"].GetArray()[i].GetObject();
+    int nCountries = d["nCountries"].GetInt();
+    arma::sp_mat TrCo;
+    TrCo.zeros(nCountries, nCountries);
+    for (int j = 0; j < nCountries; ++j) {
+        const Value &c = d["Countries"].GetArray()[j].GetObject();
 
         Models::FollPar FP;
         const Value &cap = c["Followers"]["Capacities"];
         for (SizeType i = 0; i < cap.GetArray().Size(); i++) {
             FP.capacities.push_back(cap[i].GetDouble());
         }
-
         const Value &lc = c["Followers"]["LinearCosts"];
         for (SizeType i = 0; i < lc.GetArray().Size(); i++) {
             FP.costs_lin.push_back(lc[i].GetDouble());
@@ -1228,9 +1265,12 @@ Models::readInstance(string filename) {
         }
         const Value &tc = c["Followers"]["TaxCaps"];
         for (SizeType i = 0; i < tc.GetArray().Size(); i++) {
-            FP.emission_costs.push_back(tc[i].GetDouble());
+            FP.tax_caps.push_back(tc[i].GetDouble());
         }
-        LAP.push_back(Models::LeadAllPar(FP.capacities.size(), to_string(i), FP,
+        for (SizeType i = 0; i < c["TransportationCosts"].GetArray().Size(); i++) {
+            TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
+        }
+        LAP.push_back(Models::LeadAllPar(FP.capacities.size(), to_string(j), FP,
                                          {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
                                           c["DemandParam"].GetObject()["Beta"].GetDouble()},
                                          {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
@@ -1238,8 +1278,10 @@ Models::readInstance(string filename) {
                                           c["LeaderParam"].GetObject()["PriceLimit"].GetDouble()}
         ));
     }
-    return LAP;
+    ifs.close();
+    return EPECInstance(LAP, TrCo);
 }
+
 void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const {
     //if (!lcp) return;
