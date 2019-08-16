@@ -183,13 +183,13 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
 
 
 		BOOST_TEST_MESSAGE("QP_Param test for file save");
-		q1.save("test/q1.dat");
-		q2.save("test/q2.dat");
+		q1.save("test/q1.dat", true);
+		q2.save("test/q2.dat", true);
 		BOOST_TEST_MESSAGE("Saved QP_Param objects");
 		QP_Param q1loader(&env);
-		q1loader.load("test/q1.dat");
+		q1loader.load("test/q1.dat", 0);
 		QP_Param q2loader(&env);
-		q2loader.load("test/q2.dat");
+		q2loader.load("test/q2.dat", 0);
 
 		BOOST_CHECK_MESSAGE(q1loader==q1, "Save/load test 1 works well");
 		BOOST_CHECK_MESSAGE(q2loader==q2, "Save/load test 2 works well");

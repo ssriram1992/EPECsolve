@@ -452,9 +452,9 @@ Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons) {
 
 
 void
-Game::QP_Param::save(string filename) const
+Game::QP_Param::save(string filename, bool erase ) const
 {
-	Utils::appendSave(this->Q, filename, string("QP_Param::Q"), true);
+	Utils::appendSave(this->Q, filename, string("QP_Param::Q"), erase);
 	Utils::appendSave(this->A, filename, string("QP_Param::A"), false);
 	Utils::appendSave(this->B, filename, string("QP_Param::B"), false);
 	Utils::appendSave(this->C, filename, string("QP_Param::C"), false);
@@ -463,12 +463,11 @@ Game::QP_Param::save(string filename) const
 	if(VERBOSE) cout<<"Saved to file "<<filename<<endl;
 }
 
-void 
-Game::QP_Param::load(string filename)
+long int  
+Game::QP_Param::load(string filename, long int pos)
 {
 	arma::sp_mat Q, A, B, C;
 	arma::vec c, b;
-	long int pos{0};
 	pos = Utils::appendRead(Q, filename, pos, string("QP_Param::Q"));
 	pos = Utils::appendRead(A, filename, pos, string("QP_Param::A"));
 	pos = Utils::appendRead(B, filename, pos, string("QP_Param::B"));
@@ -476,6 +475,7 @@ Game::QP_Param::load(string filename)
 	pos = Utils::appendRead(b, filename, pos, string("QP_Param::b"));
 	pos = Utils::appendRead(c, filename, pos, string("QP_Param::c"));
 	this->set(Q, C, A, B, c, b);
+	return pos;
 }
 
 
