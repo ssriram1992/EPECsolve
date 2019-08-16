@@ -44,14 +44,14 @@ int main(int argc, char *argv[]) {
             return 0;
         } else if ((arg == "-r")) {
             if (i + 1 < argc) {
-                resFile = argv[i++];
+                resFile = argv[++i];
             } else {
                 cerr << "-r option requires one argument." << endl;
                 return 1;
             }
         } else if ((arg == "-s")) {
             if (i + 1 < argc) {
-                writeLevel = strtol(argv[i++], NULL, 10);
+                writeLevel = strtol(argv[++i], NULL, 10);
             } else {
                 cerr << "-s option requires one argument." << endl;
                 return 1;
