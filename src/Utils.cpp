@@ -4,6 +4,7 @@
 
 using namespace std;
 using namespace arma;
+
 // Armadillo patch for inbuild resize
 // unsigned uword in row and column indexes create some problems with empty matrix
 // which is the case with empty constraints matrices
@@ -54,166 +55,162 @@ arma::vec Utils::resize_patch(const arma::vec &Mat, const unsigned int nR) {
 
 
 void Utils::appendSave(
-		const sp_mat &matrix,		///< The arma::sp_mat to be saved
-		const string out, 				///< File name of the output file 
-		const string header, 			///< A header that might be used to check data correctness
-		bool erase					///< Should the matrix be appended to the current file or overwritten
-		)
+        const sp_mat &matrix,        ///< The arma::sp_mat to be saved
+        const string out,                ///< File name of the output file
+        const string header,            ///< A header that might be used to check data correctness
+        bool erase                    ///< Should the matrix be appended to the current file or overwritten
+)
 /**
  * Utility to append an arma::sp_mat to a data file.
  */
 {
-	// Using C++ file operations to copy the data into the target given by @out 
-	unsigned int nR{0}, nC{0}, nnz{0};
+    // Using C++ file operations to copy the data into the target given by @out
+    unsigned int nR{0}, nC{0}, nnz{0};
 
-	ofstream outfile(out, erase?ios::out:ios::app);
+    ofstream outfile(out, erase ? ios::out : ios::app);
 
-	nR = matrix.n_rows;
-	nC = matrix.n_cols;
-	nnz = matrix.n_nonzero;
+    nR = matrix.n_rows;
+    nC = matrix.n_cols;
+    nnz = matrix.n_nonzero;
 
-	outfile<<header<<"\n";
-	outfile<<nR<<"\t"<<nC<<"\t"<<nnz<<"\n";
-	for(auto it = matrix.begin(); it!=matrix.end();++it) 
-		outfile<<it.row()<<"\t"<<it.col()<<"\t"<<(*it)<<"\n"; // Write the required information of sp_mat
-	outfile<<"\n";
-	outfile.close();					// and close it
+    outfile << header << "\n";
+    outfile << nR << "\t" << nC << "\t" << nnz << "\n";
+    for (auto it = matrix.begin(); it != matrix.end(); ++it)
+        outfile << it.row() << "\t" << it.col() << "\t" << (*it) << "\n"; // Write the required information of sp_mat
+    outfile << "\n";
+    outfile.close();                    // and close it
 }
 
 
-
 long int Utils::appendRead(
-		sp_mat &matrix, 		///< Read and store the solution in this matrix.
-		const string in, 				///< File to read from (could be file very many data is appended one below another)
-		long int pos,			///< Position in the long file where reading should start
-		const string header 		///< Any header to check data sanctity
-		)
+        sp_mat &matrix,        ///< Read and store the solution in this matrix.
+        const string in,                ///< File to read from (could be file very many data is appended one below another)
+        long int pos,            ///< Position in the long file where reading should start
+        const string header        ///< Any header to check data sanctity
+)
 /**
  * Utility to read an arma::sp_mat from a long file.
  * @returns The end position from which the next data object can be read.
  */
 {
-	unsigned int nR, nC, nnz;
-	
-	ifstream infile(in, ios::in);
-	infile.seekg(pos);
+    unsigned int nR, nC, nnz;
 
-	string header_checkwith;
-	infile>>header_checkwith;
+    ifstream infile(in, ios::in);
+    infile.seekg(pos);
 
-	if(header!="" && header != header_checkwith)
-		throw string("Error in Utils::appendRead<sp_mat>. Wrong header. Expected: "+header+" Found: "+header_checkwith);
+    string header_checkwith;
+    infile >> header_checkwith;
 
-	infile>>nR>>nC>>nnz;
-	if(nR == 0 || nC == 0) 
-		matrix.set_size(nR, nC);
-	else{
-		arma::umat locations(2, nnz);
-		arma::vec values(nnz);
+    if (header != "" && header != header_checkwith)
+        throw string("Error in Utils::appendRead<sp_mat>. Wrong header. Expected: " + header + " Found: " +
+                     header_checkwith);
 
-		unsigned int r, c; double val;
+    infile >> nR >> nC >> nnz;
+    if (nR == 0 || nC == 0)
+        matrix.set_size(nR, nC);
+    else {
+        arma::umat locations(2, nnz);
+        arma::vec values(nnz);
 
-		for(unsigned int i=0; i<nnz; ++i)
-		{
-			infile>>r>>c>>val;
-			locations(0, i) = r; 
-			locations(1, i) = c;
-			values(i) = val;
-		}
-		matrix = arma::sp_mat(locations, values, nR, nC);
-	}
+        unsigned int r, c;
+        double val;
 
-	pos = infile.tellg();
-	infile.close();
+        for (unsigned int i = 0; i < nnz; ++i) {
+            infile >> r >> c >> val;
+            locations(0, i) = r;
+            locations(1, i) = c;
+            values(i) = val;
+        }
+        matrix = arma::sp_mat(locations, values, nR, nC);
+    }
+
+    pos = infile.tellg();
+    infile.close();
 
 
-	return pos;
+    return pos;
 }
 
-void appendSave(const vector<double> v, const string out, const string header, bool erase)
-{ 
-	ofstream outfile(out, erase?ios::out:ios::app);
-	outfile<<header<<"\n"<<v.size()<<"\n";
-	for(const double x:v)
-		outfile<<x<<"\n";
-	outfile.close();
+void appendSave(const vector<double> v, const string out, const string header, bool erase) {
+    ofstream outfile(out, erase ? ios::out : ios::app);
+    outfile << header << "\n" << v.size() << "\n";
+    for (const double x:v)
+        outfile << x << "\n";
+    outfile.close();
 }
 
-long int appendRead(vector<double> &v, const string in, long int pos, const string header)
-{
-	unsigned long int size;
-	ifstream infile(in, ios::in);
-	infile.seekg(pos);
+long int appendRead(vector<double> &v, const string in, long int pos, const string header) {
+    unsigned long int size;
+    ifstream infile(in, ios::in);
+    infile.seekg(pos);
 
-	string header_checkwith;
-	infile>>header_checkwith;
+    string header_checkwith;
+    infile >> header_checkwith;
 
-	if(header!="" && header != header_checkwith)
-		throw string("Error in Utils::appendRead<sp_mat>. Wrong header. Expected: "+header+" Found: "+header_checkwith);
-	
-	infile>>size;
+    if (header != "" && header != header_checkwith)
+        throw string("Error in Utils::appendRead<sp_mat>. Wrong header. Expected: " + header + " Found: " +
+                     header_checkwith);
 
-	v.resize(size);
-	for(unsigned int i=0; i<size; ++i)
-		infile>>v[i];
-	pos = infile.tellg();
-	infile.close();
-	return pos;
+    infile >> size;
+
+    v.resize(size);
+    for (unsigned int i = 0; i < size; ++i)
+        infile >> v[i];
+    pos = infile.tellg();
+    infile.close();
+    return pos;
 }
 
 void Utils::appendSave(
-		const vec &matrix,		///< The arma::vec to be saved
-		const string out, 				///< File name of the output file 
-		const string header, 			///< A header that might be used to check data correctness
-		bool erase					///< Should the vec be appended to the current file or overwritten
-		)
-{
-	// Using C++ file operations to copy the data into the target given by @out 
-	unsigned int nR{0};
+        const vec &matrix,        ///< The arma::vec to be saved
+        const string out,                ///< File name of the output file
+        const string header,            ///< A header that might be used to check data correctness
+        bool erase                    ///< Should the vec be appended to the current file or overwritten
+) {
+    // Using C++ file operations to copy the data into the target given by @out
+    unsigned int nR{0};
 
-	ofstream outfile(out, erase?ios::out:ios::app);
+    ofstream outfile(out, erase ? ios::out : ios::app);
 
-	nR = matrix.n_rows;
+    nR = matrix.n_rows;
 
-	outfile<<header<<"\n";
-	
-	outfile<<nR<<"\n";
-	for(auto it = matrix.begin(); it!=matrix.end();++it) 
-		outfile<<(*it)<<"\n"; // Write the required information of sp_mat
-	outfile<<"\n";
-	outfile.close();					// and close it
+    outfile << header << "\n";
+
+    outfile << nR << "\n";
+    for (auto it = matrix.begin(); it != matrix.end(); ++it)
+        outfile << (*it) << "\n"; // Write the required information of sp_mat
+    outfile << "\n";
+    outfile.close();                    // and close it
 }
 
 long int Utils::appendRead(
-		vec &matrix, 		///< Read and store the solution in this matrix.
-		const string in, 				///< File to read from (could be file very many data is appended one below another)
-		long int pos,			///< Position in the long file where reading should start
-		const string header 		///< Any header to check data sanctity
-		)
-{
-	long size;
-	unsigned int nR;
-	string buffers;
-	string checkwith;
-	ifstream in_file(in, ios::in);
-	in_file.seekg(pos);
-	
-	in_file>>checkwith;
-	if(header != "" && checkwith != header)
-		throw string("Error in Utils::appendRead<vec>. Wrong header. Expected: "+header+" Found: "+checkwith);
-	in_file>>nR;
-	matrix.zeros(nR);
-	for(unsigned int i=0; i<nR; ++i)
-	{
-		double val;
-		in_file>>val;
-		matrix.at(i) = val;
-	}
+        vec &matrix,        ///< Read and store the solution in this matrix.
+        const string in,                ///< File to read from (could be file very many data is appended one below another)
+        long int pos,            ///< Position in the long file where reading should start
+        const string header        ///< Any header to check data sanctity
+) {
+    long size;
+    unsigned int nR;
+    string buffers;
+    string checkwith;
+    ifstream in_file(in, ios::in);
+    in_file.seekg(pos);
 
-	pos = in_file.tellg();
-	in_file.close();
+    in_file >> checkwith;
+    if (header != "" && checkwith != header)
+        throw string("Error in Utils::appendRead<vec>. Wrong header. Expected: " + header + " Found: " + checkwith);
+    in_file >> nR;
+    matrix.zeros(nR);
+    for (unsigned int i = 0; i < nR; ++i) {
+        double val;
+        in_file >> val;
+        matrix.at(i) = val;
+    }
 
-	return pos; 
+    pos = in_file.tellg();
+    in_file.close();
+
+    return pos;
 }
 
 
@@ -221,86 +218,86 @@ void Utils::appendSave(const long int v, const string out, const string header, 
 /**
  * Utility to save a long int to file
  */
-{ 
-	ofstream outfile(out, erase?ios::out:ios::app);
-	outfile<<header<<"\n";
-	outfile<<v<<"\n";
-	outfile.close();
+{
+    ofstream outfile(out, erase ? ios::out : ios::app);
+    outfile << header << "\n";
+    outfile << v << "\n";
+    outfile.close();
 }
 
-long int  Utils::appendRead(long int &v, const string in, long int pos, const string header)
-{ 
-	ifstream infile(in, ios::in);
-	infile.seekg(pos);
+long int Utils::appendRead(long int &v, const string in, long int pos, const string header) {
+    ifstream infile(in, ios::in);
+    infile.seekg(pos);
 
-	string header_checkwith;
-	infile>>header_checkwith;
+    string header_checkwith;
+    infile >> header_checkwith;
 
-	if(header!="" && header != header_checkwith)
-		throw string("Error in Utils::appendRead<long int>. Wrong header. Expected: "+header+" Found: "+header_checkwith);
+    if (header != "" && header != header_checkwith)
+        throw string("Error in Utils::appendRead<long int>. Wrong header. Expected: " + header + " Found: " +
+                     header_checkwith);
 
-	long int val;
-	infile>>val;
-	v = val;
+    long int val;
+    infile >> val;
+    v = val;
 
-	pos = infile.tellg();
-	infile.close();
+    pos = infile.tellg();
+    infile.close();
 
-	return pos;
+    return pos;
 }
 
 void Utils::appendSave(const unsigned int v, const string out, const string header, bool erase)
 /**
  * Utility to save a long int to file
  */
-{ 
-	ofstream outfile(out, erase?ios::out:ios::app);
-	outfile<<header<<"\n";
-	outfile<<v<<"\n";
-	outfile.close();
+{
+    ofstream outfile(out, erase ? ios::out : ios::app);
+    outfile << header << "\n";
+    outfile << v << "\n";
+    outfile.close();
 }
 
-long int  Utils::appendRead(unsigned int &v, const string in, long int pos, const string header)
-{ 
-	ifstream infile(in, ios::in);
-	infile.seekg(pos);
+long int Utils::appendRead(unsigned int &v, const string in, long int pos, const string header) {
+    ifstream infile(in, ios::in);
+    infile.seekg(pos);
 
-	string header_checkwith;
-	infile>>header_checkwith;
+    string header_checkwith;
+    infile >> header_checkwith;
 
-	if(header!="" && header != header_checkwith)
-		throw string("Error in Utils::appendRead<unsigned int>. Wrong header. Expected: "+header+" Found: "+header_checkwith);
+    if (header != "" && header != header_checkwith)
+        throw string("Error in Utils::appendRead<unsigned int>. Wrong header. Expected: " + header + " Found: " +
+                     header_checkwith);
 
-	unsigned int val;
-	infile>>val;
-	v = val;
+    unsigned int val;
+    infile >> val;
+    v = val;
 
-	pos = infile.tellg();
-	infile.close();
+    pos = infile.tellg();
+    infile.close();
 
-	return pos;
+    return pos;
 }
+
 void Utils::appendSave(const string v, const string out, bool erase)
 /**
  * Utility to save a long int to file
  */
-{ 
-	ofstream outfile(out, erase?ios::out:ios::app);
-	outfile<<v<<"\n";
-	outfile.close();
+{
+    ofstream outfile(out, erase ? ios::out : ios::app);
+    outfile << v << "\n";
+    outfile.close();
 }
 
-long int  Utils::appendRead(string &v, const string in, long int pos)
-{ 
-	ifstream infile(in, ios::in);
-	infile.seekg(pos);
+long int Utils::appendRead(string &v, const string in, long int pos) {
+    ifstream infile(in, ios::in);
+    infile.seekg(pos);
 
-	string val;
-	infile>>val;
-	v = val;
+    string val;
+    infile >> val;
+    v = val;
 
-	pos = infile.tellg();
-	infile.close();
+    pos = infile.tellg();
+    infile.close();
 
-	return pos;
+    return pos;
 }

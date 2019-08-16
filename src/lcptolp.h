@@ -102,7 +102,7 @@ namespace Game {
         /// Class has no default constructors
         LCP() = delete;
 
-		LCP(GRBEnv *e):env{e}, RlxdModel(e){}; ///< This constructor flor loading LCP from a file
+        LCP(GRBEnv *e) : env{e}, RlxdModel(e) {}; ///< This constructor flor loading LCP from a file
 
         LCP(GRBEnv *env, arma::sp_mat M, arma::vec q,
             unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A = {},
@@ -170,8 +170,10 @@ namespace Game {
         const int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 
         void write(string filename, bool append = true) const;
-		void save(string filename, bool erase = true) const;
-		long int load(string filename, long int pos = 0);
+
+        void save(string filename, bool erase = true) const;
+
+        long int load(string filename, long int pos = 0);
     };
 }; // namespace Game
 #endif

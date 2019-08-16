@@ -944,27 +944,28 @@ Models::EPEC::findNashEq() {
         this->nashgame = std::unique_ptr<Game::NashGame>(
                 new Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb));
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
-
-        if (VERBOSE) this->nashgame->write("dat/debug/NashGame", false, true);
         //Using indicator constraints
         lcp->useIndicators = this->indicators;
 
         this->lcpmodel = lcp->LCPasMIP(false);
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        if (VERBOSE) lcpmodel->write("dat/debug/NashLCP.lp");
+        if (VERBOSE) {
+            lcpmodel->write("dat/debug/NashLCP.lp");
+            this->nashgame->write("dat/debug/NashGame", false, true);
+            cout << *nashgame;
+        }
+
         this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
         this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
         this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
         lcpmodel->optimize();
         this->Stats.wallClockTime = lcpmodel->get(GRB_DoubleAttr_Runtime);
-        if (VERBOSE) cout << *nashgame;
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
         unsigned int temp;
         int status = lcpmodel->get(GRB_IntAttr_Status);
         if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
             try {
-                if (VERBOSE) lcpmodel->write("dat/debug/NashLCP.sol");
                 for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
