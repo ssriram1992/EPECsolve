@@ -23,4 +23,7 @@ cmake-build-debug/*
 dat/*
 EPECtest
 EPECsolve
+EPECInstances
 cmake-*
+*.dat
+bin/

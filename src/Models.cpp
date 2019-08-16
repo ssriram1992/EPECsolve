@@ -1,5 +1,5 @@
 // #include "models.h"
-#include"epecsolve.h"
+#include"models.h"
 #include<iomanip>
 #include<map>
 #include<memory>
@@ -7,7 +7,13 @@
 #include<armadillo>
 #include<iostream>
 #include<gurobi_c++.h>
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/prettywriter.h>
 
+
+using namespace rapidjson;
 
 ostream &
 Models::operator<<(ostream &ost, const Models::prn l) {
@@ -34,6 +40,8 @@ Models::operator<<(ostream &ost, const Models::FollPar P) {
     for (auto a:P.costs_quad) ost << Models::prn::val << a;
     ost << endl << Models::prn::label << "Production capacities" << ":\t";
     for (auto a:P.capacities) ost << Models::prn::val << (a < 0 ? std::numeric_limits<double>::infinity() : a);
+    ost << endl << Models::prn::label << "Tax Caps" << ":\t";
+    for (auto a:P.tax_caps) ost << Models::prn::val << (a < 0 ? std::numeric_limits<double>::infinity() : a);
     ost << endl;
     return ost;
 }
@@ -62,6 +70,16 @@ Models::operator<<(ostream &ost, const Models::LeadPar P) {
     ost << endl;
     return ost;
 }
+
+ostream &
+Models::operator<<(ostream &ost, const Models::EPECInstance I) {
+    ost << "EPEC Instance: " << endl;
+    ost << "******************" << endl;
+    for (auto a:I.Countries) ost << a << endl;
+    ost << "Transportation Costs:" << endl << I.TransportationCosts << endl;
+    return ost;
+}
+
 
 ostream &
 Models::operator<<(ostream &ost, const Models::LeadAllPar P) {
@@ -268,8 +286,6 @@ void Models::EPEC::make_LL_LeadCons(
         for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
         cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
         for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
-        LeadCons.impl_print_dense("\nLeadCons:\n");
-        LeadRHS.print("\nLeadRHS");
     }
 }
 
@@ -329,7 +345,6 @@ Models::EPEC::addCountry(
     Models::increaseVal(Loc, LeaderVars::Caps, Params.n_followers);
     Models::increaseVal(Loc, LeaderVars::Tax, Params.n_followers);
 
-    if (VERBOSE) cout << Loc.at(LeaderVars::Tax) << endl << " Country tax position above \n";
 
     // Loc[Models::LeaderVars::AddnVar] = 1;
 
@@ -544,11 +559,6 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
         arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
         a.at(Loc.at(Models::LeaderVars::NetImport)) = -1;
         a.subvec(Loc.at(LeaderVars::CountryImport), Loc.at(LeaderVars::CountryImport + 1) - 1).ones();
-        if (VERBOSE) {
-            cout << endl << " ______ " << endl;
-            for (auto v:Loc) cout << v.first << "\t\t\t" << v.second << endl;
-            cout << endl << " ______ " << endl;
-        }
 
         LL_Nash.addDummy(nImp, Loc.at(Models::LeaderVars::CountryImport));
         LL_Nash.addLeadCons(a, 0).addLeadCons(-a, 0);
@@ -558,13 +568,9 @@ Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
         // Set imports and exporta to zero
         arma::vec a(Loc.at(Models::LeaderVars::End) - LL_Nash.getNduals(), arma::fill::zeros);
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 1;
-        if (VERBOSE)
-            cout << "Single Country: imports are set to zero." << endl;
         LL_Nash.addLeadCons(a, 0); // Export <= 0
         a.at(Loc.at(Models::LeaderVars::NetImport)) = 0;
         a.at(Loc.at(Models::LeaderVars::NetExport)) = 1;
-        if (VERBOSE)
-            cout << "Single Country: exports are set to zero." << endl;
         LL_Nash.addLeadCons(a, 0); // Import <= 0
     }
 }
@@ -816,9 +822,6 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
                         val.row()) = 1;
             // this->Locations.at(val.row()).at(Models::LeaderVars::End)) = 1;
             // this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
-            if (VERBOSE)
-                cout << "C value added at " << this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + val.row()
-                     << " for country " << i << endl;
         }
     }
 }
@@ -856,6 +859,7 @@ Models::EPEC::make_country_QP()
     if (!already_ran)
         for (unsigned int i = 0; i < this->nCountr; ++i)
             this->make_country_QP(i);
+
     for (unsigned int i = 0; i < this->nCountr; ++i) {
         LeadLocs &Loc = this->Locations.at(i);
         // Adjusting "stuff" because we now have new convHull variables
@@ -876,7 +880,7 @@ Models::EPEC::make_country_QP()
     this->computeLeaderLocations(true);
     if (VERBOSE) {
         for (unsigned int i = 0; i < this->nCountr; ++i)
-            this->country_QP.at(i)->QP_Param::write("dat/countrQP_" + to_string(i), false);
+            this->country_QP.at(i)->QP_Param::write("dat/debug/countrQP_" + to_string(i), false);
     }
 }
 
@@ -898,6 +902,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
         Game::LCP Player_i_LCP = Game::LCP(this->env, *this->countries_LL.at(i).get());
         this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
         Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(), *this->country_QP.at(i).get());
+        this->Stats.feasiblePolyhedra.push_back(Player_i_LCP.getFeasiblePolyhedra());
     }
 }
 
@@ -927,7 +932,7 @@ Models::operator+(Models::LeaderVars a, int b) {
 }
 
 void
-Models::EPEC::findNashEq(bool write, string filename) {
+Models::EPEC::findNashEq() {
     if (this->country_QP.front() != nullptr) {
 
         int Nvar = this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
@@ -938,31 +943,32 @@ Models::EPEC::findNashEq(bool write, string filename) {
         this->make_MC_cons(MC, MCRHS);
         this->nashgame = std::unique_ptr<Game::NashGame>(
                 new Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb));
-        //if (VERBOSE) cout << *nashgame << endl;
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
-
-        if (VERBOSE) this->nashgame->write("dat/NashGame", false, true);
         //Using indicator constraints
         lcp->useIndicators = this->indicators;
-        this->lcpmodel = lcp->LCPasMIP(false);
 
+        this->lcpmodel = lcp->LCPasMIP(false);
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        if (VERBOSE) lcpmodel->write("dat/NashLCP.lp");
+        if (VERBOSE) {
+            lcpmodel->write("dat/debug/NashLCP.lp");
+            this->nashgame->write("dat/debug/NashGame", false, true);
+            cout << *nashgame;
+        }
+
+        this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
+        this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
+        this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
         lcpmodel->optimize();
-        if (VERBOSE) cout << *nashgame;
+        this->Stats.wallClockTime = lcpmodel->get(GRB_DoubleAttr_Runtime);
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
         unsigned int temp;
         int status = lcpmodel->get(GRB_IntAttr_Status);
         if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
             try {
-                if (VERBOSE) lcpmodel->write("dat/NashLCP.sol");
                 for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
                     this->sol_z(i) = lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
-                    //if (VERBOSE)
-                    //    cout << "x_" + to_string(i) + ":" << this->sol_x(i) << "\t\tz_" + to_string(i) + ":"
-                    //         << this->sol_z(i) << endl;
                     temp = i;
                 }
 
@@ -972,24 +978,13 @@ Models::EPEC::findNashEq(bool write, string filename) {
                      << " "
                      << temp << endl;
             }
-            if (write) {
-                this->sol_x.save("dat/x_" + filename, arma::file_type::arma_ascii, VERBOSE);
-                this->sol_z.save("dat/z_" + filename, arma::file_type::arma_ascii, VERBOSE);
-                try {
-                    this->WriteCountry(0, "dat/Solution.txt", this->sol_x, false);
-                    for (unsigned int ell = 1; ell < this->nCountr; ++ell)
-                        this->WriteCountry(ell, "dat/Solution.txt", this->sol_x, true);
-                    this->write("dat/Solution.txt", true);
-                } catch (GRBException &e) {}
-            }
+            this->Stats.status = true;
         } else {
             cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
-            throw string("Models::EPEC::findNashEq: no nash equilibrium found.");
         }
-        //if (VERBOSE) Game::print(lcp->getCompl());
 
     } else {
-        cerr << "GRBException in Models::EPEC::findNashEq : no country QP has been made." << endl;
+        cerr << "Exception in Models::EPEC::findNashEq : no country QP has been made." << endl;
         throw;
     }
 }
@@ -1062,6 +1057,267 @@ Models::EPEC::write(const string filename, bool append) const {
         this->write(filename, i, (append || i));
 }
 
+void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x, const arma::vec z) const {
+    /**
+    * @brief Writes the computed Nash Equilibrium in the standard JSON solution file
+    * @p filename dictates the name of the .JSON solution file
+    */
+    StringBuffer s;
+    PrettyWriter<StringBuffer> writer(s);
+    writer.StartObject();
+    writer.Key("Meta");
+    writer.StartObject();
+    writer.Key("nCountries");
+    writer.Uint(this->nCountr);
+    writer.Key("nFollowers");
+    writer.StartArray();
+    for (unsigned i = 0; i < this->nCountr; i++)
+        writer.Uint(this->AllLeadPars.at(i).n_followers);
+    writer.EndArray();
+    writer.Key("Countries");
+    writer.StartArray();
+    for (unsigned i = 0; i < this->nCountr; i++) {
+        writer.StartObject();
+        writer.Key("FollowerStart");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::FollowerStart));
+        writer.Key("NetImport");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::NetImport));
+        writer.Key("NetExport");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::NetExport));
+        writer.Key("CountryImport");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::CountryImport));
+        writer.Key("Caps");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::Caps));
+        writer.Key("Tax");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::Tax));
+        writer.Key("DualVar");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::DualVar));
+        writer.Key("ConvHullDummy");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::ConvHullDummy));
+        writer.Key("End");
+        writer.Uint(this->getPosition(i, Models::LeaderVars::End));
+        writer.Key("ShadowPrice");
+        writer.Uint(this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + i);
+        writer.EndObject();
+    }
+    writer.EndArray();
+    writer.EndObject();
+    writer.Key("Solution");
+    writer.StartObject();
+    writer.Key("x");
+    writer.StartArray();
+    for (unsigned i = 0; i < x.size(); i++)
+        writer.Double(x.at(i));
+    writer.EndArray();
+    writer.Key("z");
+    writer.StartArray();
+    for (unsigned i = 0; i < z.size(); i++)
+        writer.Double(z.at(i));
+    writer.EndArray();
+    writer.EndObject();
+    writer.EndObject();
+    ofstream file(filename + ".json");
+    file << s.GetString();
+}
+
+void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
+    /**
+    * @brief Writes the computed Nash Equilibrium in the EPEC instance
+    * @p writeLevel is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both
+    */
+    if (this->Stats.status) {
+        if (writeLevel == 1 || writeLevel == 2) {
+            this->WriteCountry(0, filename + ".txt", this->sol_x, false);
+            for (unsigned int ell = 1; ell < this->nCountr; ++ell)
+                this->WriteCountry(ell, filename + ".txt", this->sol_x, true);
+            this->write(filename + ".txt", true);
+        }
+        if (writeLevel == 2 || writeLevel == 0) this->writeSolutionJSON(filename, this->sol_x, this->sol_z);
+    } else {
+        cerr << "Error in Models::EPEC::writeSolution: no solution to write." << endl;
+    }
+}
+
+void
+Models::EPECInstance::save(string filename) {
+    /**
+    * @brief Writes the current EPEC instance to the standard JSON instance file
+     * @p filename dictates the name of the JSON instance file
+     * @p epec contains the @p EPECInstance object with the data
+    */
+    StringBuffer s;
+    PrettyWriter<StringBuffer> writer(s);
+    writer.StartObject();
+    writer.Key("nCountries");
+    writer.Uint(this->Countries.size());
+    writer.Key("Countries");
+    writer.StartArray();
+    for (unsigned i = 0; i < this->Countries.size(); i++) {
+        writer.StartObject();
+
+        writer.Key("nFollowers");
+        writer.Uint(this->Countries.at(i).n_followers);
+
+        writer.Key("Name");
+        string currName = this->Countries.at(i).name;
+        char nameArray[currName.length() + 1];
+        strcpy(nameArray, currName.c_str());
+        writer.String(nameArray);
+
+        writer.Key("DemandParam");
+        writer.StartObject();
+        writer.Key("Alpha");
+        writer.Double(this->Countries.at(i).DemandParam.alpha);
+        writer.Key("Beta");
+        writer.Double(this->Countries.at(i).DemandParam.beta);
+        writer.EndObject();
+
+        writer.Key("TransportationCosts");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->Countries.size(); j++)
+            writer.Double(this->TransportationCosts(i, j));
+        writer.EndArray();
+
+        writer.Key("LeaderParam");
+        writer.StartObject();
+        writer.Key("ImportLimit");
+        writer.Double(this->Countries.at(i).LeaderParam.import_limit);
+        writer.Key("ExportLimit");
+        writer.Double(this->Countries.at(i).LeaderParam.export_limit);
+        writer.Key("PriceLimit");
+        writer.Double(this->Countries.at(i).LeaderParam.price_limit);
+        writer.EndObject();
+
+        writer.Key("Followers");
+        writer.StartObject();
+
+        writer.Key("Names");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++) {
+            string currName = this->Countries.at(i).FollowerParam.names.at(j);
+            char nameArray[currName.length() + 1];
+            strcpy(nameArray, currName.c_str());
+            writer.String(nameArray);
+        }
+        writer.EndArray();
+
+        writer.Key("Capacities");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.capacities.at(j));
+        writer.EndArray();
+
+        writer.Key("LinearCosts");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.costs_lin.at(j));
+        writer.EndArray();
+
+        writer.Key("QuadraticCosts");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.costs_quad.at(j));
+        writer.EndArray();
+
+        writer.Key("EmissionCosts");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.emission_costs.at(j));
+        writer.EndArray();
+
+        writer.Key("TaxCaps");
+        writer.StartArray();
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.tax_caps.at(j));
+        writer.EndArray();
+
+
+        writer.EndObject();
+
+        writer.EndObject();
+    }
+    writer.EndArray();
+    writer.EndObject();
+    ofstream file(filename + ".json");
+    file << s.GetString();
+    file.close();
+}
+
+
+void
+Models::EPECInstance::load(string filename) {
+    /**
+    * @brief Reads an instance file and return a vector of @p LeadAllPar that can be fed to the EPEC class
+     * @p filename dictates the name of the JSON instance file
+    */
+    ifstream ifs(filename + ".json");
+    if (ifs.good()) {
+
+        IStreamWrapper isw(ifs);
+        Document d;
+        try {
+            d.ParseStream(isw);
+            vector<Models::LeadAllPar> LAP = {};
+            int nCountries = d["nCountries"].GetInt();
+            arma::sp_mat TrCo;
+            TrCo.zeros(nCountries, nCountries);
+            for (int j = 0; j < nCountries; ++j) {
+                const Value &c = d["Countries"].GetArray()[j].GetObject();
+
+                Models::FollPar FP;
+                const Value &cap = c["Followers"]["Capacities"];
+                for (SizeType i = 0; i < cap.GetArray().Size(); i++) {
+                    FP.capacities.push_back(cap[i].GetDouble());
+                }
+                const Value &lc = c["Followers"]["LinearCosts"];
+                for (SizeType i = 0; i < lc.GetArray().Size(); i++) {
+                    FP.costs_lin.push_back(lc[i].GetDouble());
+                }
+                const Value &qc = c["Followers"]["QuadraticCosts"];
+                for (SizeType i = 0; i < qc.GetArray().Size(); i++) {
+                    FP.costs_quad.push_back(qc[i].GetDouble());
+                }
+                const Value &ec = c["Followers"]["EmissionCosts"];
+                for (SizeType i = 0; i < ec.GetArray().Size(); i++) {
+                    FP.emission_costs.push_back(ec[i].GetDouble());
+                }
+                const Value &tc = c["Followers"]["TaxCaps"];
+                for (SizeType i = 0; i < tc.GetArray().Size(); i++) {
+                    FP.tax_caps.push_back(tc[i].GetDouble());
+                }
+                const Value &nm = c["Followers"]["Names"];
+                for (SizeType i = 0; i < nm.GetArray().Size(); i++) {
+                    FP.names.push_back(nm[i].GetString());
+                }
+                for (SizeType i = 0; i < c["TransportationCosts"].GetArray().Size(); i++) {
+                    TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
+                }
+                LAP.push_back(Models::LeadAllPar(FP.capacities.size(), c["Name"].GetString(), FP,
+                                                 {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
+                                                  c["DemandParam"].GetObject()["Beta"].GetDouble()},
+                                                 {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
+                                                  c["LeaderParam"].GetObject()["ExportLimit"].GetDouble(),
+                                                  c["LeaderParam"].GetObject()["PriceLimit"].GetDouble()}
+                ));
+            }
+            ifs.close();
+            this->Countries = LAP;
+            this->TransportationCosts = TrCo;
+        }
+        catch (exception &e) {
+            cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
+            throw;
+        }
+        catch (...) {
+            cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
+            throw;
+        }
+    } else {
+        cerr << "Exception in Models::readInstance : file instance not found." << endl;
+        throw;
+    }
+}
+
 
 void
 Models::EPEC::WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append) const {
@@ -1083,6 +1339,7 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
     for (unsigned int j = 0; j < Params.n_followers; ++j) prod += x.at(foll_prod + j);
     // Trade
     double Export{x.at(this->getPosition(i, Models::LeaderVars::NetExport))};
+    double exportPrice{x.at(this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + i)};
     double import{0};
     for (unsigned int j = this->getPosition(i, Models::LeaderVars::CountryImport);
          j < this->getPosition(i, Models::LeaderVars::CountryImport + 1); ++j)
@@ -1093,6 +1350,7 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
         file << Models::prn::label << "Net exports" << ":" << Models::prn::val << Export - import << "\n";
     else
         file << Models::prn::label << "Net imports" << ":" << Models::prn::val << import - Export << "\n";
+    file << Models::prn::label << "Export price" << ":" << Models::prn::val << exportPrice << "\n";
     file << Models::prn::label << " -> Total Export" << ":" << Models::prn::val << Export << "\n";
     file << Models::prn::label << " -> Total Import" << ":" << Models::prn::val << import << endl;
     file << Models::prn::label << "Domestic consumed quantity" << ":" << Models::prn::val << import - Export + prod
@@ -1146,7 +1404,7 @@ Models::EPEC::WriteFollower(const unsigned int i,
     file << Models::prn::label << "Limit on production" << ":" << Models::prn::val << lim << "\n";
     //file << "x(): " << foll_lim + j << endl;
     file << Models::prn::label << "Tax imposed" << ":" << Models::prn::val << tax << "\n";
-    file << Models::prn::label << "Tax cap" << ":" << Params.FollowerParam.tax_caps.at(j) << tax << "\n";
+    // file << Models::prn::label << "Tax cap" << ":" << Params.FollowerParam.tax_caps.at(j) << tax << "\n";
     //file << "x(): " << foll_tax + j << endl;
     file << Models::prn::label << "  -Production cost function" << ":" << "\t C(q) = (" << lin << " + " << tax
          << ")*q + 0.5*" << quad << "*q^2\n" << Models::prn::label << " " << "=" << Models::prn::val
@@ -1163,12 +1421,11 @@ void
 Models::EPEC::testQP(const unsigned int i) {
     QP_Param *QP = this->country_QP.at(i).get();
     arma::vec x;
-    //if (VERBOSE) cout << *QP << endl;
     x.ones(QP->getNx());
     x.fill(555);
-    if (VERBOSE) cout << "*** COUNTRY QP TEST***\n";
+    cout << "*** COUNTRY QP TEST***\n";
     std::unique_ptr<GRBModel> model = QP->solveFixed(x);
-    if (VERBOSE) model->write("dat/CountryQP_" + to_string(i) + ".lp");
+    model->write("dat/debug/CountryQP_" + to_string(i) + ".lp");
     int status = model->get(GRB_IntAttr_Status);
     if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
         arma::vec sol;

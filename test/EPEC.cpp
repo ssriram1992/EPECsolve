@@ -181,15 +181,21 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_MESSAGE(abs(q1.getc().at(Ny)) < 1e-4, "c check after addDummy(0, 1, 1)");
 
 
-        BOOST_TEST_MESSAGE("QP_Param.addDummy(1, 0, 0) test");
-        BOOST_WARN_MESSAGE(false, "Not yet implemented");
 
+		BOOST_TEST_MESSAGE("QP_Param test for file save");
+		q1.save("test/q1.dat", true);
+		q2.save("test/q2.dat", true);
+		BOOST_TEST_MESSAGE("Saved QP_Param objects");
+		QP_Param q1loader(&env);
+		q1loader.load("test/q1.dat", 0);
+		QP_Param q2loader(&env);
+		q2loader.load("test/q2.dat", 0);
 
-        BOOST_TEST_MESSAGE("QP_Param.addDummy(1, 0, -1) test");
-        BOOST_WARN_MESSAGE(false, "Not yet implemented");
-
-
+		BOOST_CHECK_MESSAGE(q1loader==q1, "Save/load test 1 works well");
+		BOOST_CHECK_MESSAGE(q2loader==q2, "Save/load test 2 works well");
+				
     }
+
 
     BOOST_AUTO_TEST_CASE(NashGame_test) {
         BOOST_TEST_MESSAGE("\n\n");
@@ -253,6 +259,20 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X));
         BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X), 28.271, 0.001);
         BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X), 27.8037, 0.001);
+
+		BOOST_TEST_MESSAGE("NashGame load/save test");
+		BOOST_CHECK_NO_THROW(Nash.save("test/Nash.dat"));
+
+		NashGame N2(&env);
+		BOOST_CHECK_NO_THROW(N2.load("test/Nash.dat"));
+		BOOST_CHECK_NO_THROW(N2.save("test/Nash2.dat"));
+
+		BOOST_TEST_MESSAGE("LCP load/save test");
+		BOOST_CHECK_NO_THROW(lcp.save("test/lcp.dat"));
+
+		LCP lcp2(&env);
+		BOOST_CHECK_NO_THROW(lcp2.load("test/lcp.dat"));
+		BOOST_CHECK_NO_THROW(lcp2.save("test/lcp2.dat"));
 
     }
 
@@ -389,7 +409,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec2.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec2.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec2.findNashEq());
         BOOST_TEST_MESSAGE("Testing results (with indicators)");
         double q1 = epec2.getx().at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0), t1 = epec2.getx().at(
                 epec2.getPosition(0, Models::LeaderVars::Tax) + 0);
@@ -408,7 +428,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec3.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec3.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec3.findNashEq());
         BOOST_TEST_MESSAGE("Testing results (with bigM)");
         BOOST_CHECK_CLOSE(epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) + 0), q1, 0.001);
         BOOST_CHECK_CLOSE(epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), t1, 0.001);
@@ -454,7 +474,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_TEST_MESSAGE("Testing results:");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 0, 0.001);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 290, 0.01);
@@ -493,7 +513,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_TEST_MESSAGE("Testing results:");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
@@ -532,7 +552,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_CHECK_NO_THROW(epec.testLCP(0));
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_TEST_MESSAGE("Testing results:");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 20, 0.001);
     }
@@ -601,7 +621,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_TEST_MESSAGE("Testing results:");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.001);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 20, 0.01);
@@ -646,11 +666,13 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
-        double margRosso = FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-                           FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-        double margBianco = FP.costs_quad[1] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) +
-                            FP.costs_lin[1] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1);
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
+        double margRosso =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margBianco =
+                FP.costs_quad[1] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) +
+                FP.costs_lin[1] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1);
         BOOST_CHECK_MESSAGE(margRosso > margBianco, "Checking marginal cost of Rosso > marginal cost of Bianco");
         BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) >
                             epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
@@ -694,7 +716,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_TEST_MESSAGE("checking production levels");
         BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) >
                             epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
@@ -734,7 +756,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_TEST_MESSAGE("checking taxation");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 25, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 25, 0.01);
@@ -781,7 +803,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_TEST_MESSAGE("checking taxation");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
@@ -842,16 +864,16 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_TEST_MESSAGE("Testing 2 Countries with a follower each -  with tax cap and price cap.");
         Models::FollPar FP;
         FP.capacities = {550};
-        FP.costs_lin = {4};
-        FP.costs_quad = {3};
-        FP.emission_costs = {15};
+        FP.costs_lin = {140};
+        FP.costs_quad = {0.3};
+        FP.emission_costs = {290};
         FP.tax_caps = {100};
         FP.names = {"Rosso"};
         Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
         Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5}, {-1, -1, 285});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
-        TrCo.zeros(2,2);
+        TrCo.zeros(2, 2);
         TrCo(0, 1) = 1;
         TrCo(1, 0) = TrCo(0, 1);
 
@@ -869,25 +891,17 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
-        for (unsigned int i = 0; i < epec.nCountries; i++) {
-            cout << "********** Country number " << i + 1 << "\t\t" << "**********\n";
-            for (int j = 0; j < 9; j++) {
-                auto v = static_cast<Models::LeaderVars>(j);
-                cout << Models::prn::label << std::setfill('.') << v << Models::prn::val << std::setfill('.')
-                     << epec.getPosition(i, v) << endl;
-            }
-            cout << endl;
-        }
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
-        double margCountryOne = FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-                                FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-        double margCountryTwo = FP.costs_quad[0] * epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
-                                FP.costs_lin[0] + epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
-        cout << margCountryOne << "\t" << margCountryTwo << endl;
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
+        double margCountryOne =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margCountryTwo =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+        BOOST_CHECK_MESSAGE(margCountryTwo < margCountryOne, "checking marginal costs");
+        BOOST_CHECK_MESSAGE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) >
+                            epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
+                            "checking production");
 
     }
 
@@ -938,7 +952,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
 
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
-        TrCo.zeros(2,2);
+        TrCo.zeros(2, 2);
         TrCo(0, 1) = 1;
         TrCo(1, 0) = TrCo(0, 1);
 
@@ -954,7 +968,8 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
+        BOOST_CHECK_NO_THROW(epec.writeSolution(0,"Solution"));
         cout
                 << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
         for (unsigned int i = 0; i < epec.nCountries; i++) {
@@ -986,23 +1001,23 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         /* Expected answer for this problem */
         /************************************/
         /* One:
-         *  Exports                     38.57
-         * 	Total production: 			178.57
+         *  Imports                     27.50
+         * 	Total production: 			112.50
          * 		OneGas production:		100
-         * 		OneCoal production:		78.57
+         * 		OneCoal production:		12.50
          * 	Taxes:
          * 		OneGas tax:				0.00
-         * 		OneCoal tax:			47.14
+         * 		OneCoal tax:			100.00
          *
          * 	Price:						230
          *
          * Two:
-         *  Imports                     38.57
-         * 	Total production: 			81.43
-         * 		TwoGas production:		10.00
+         *  Exports                     27.50
+         * 	Total production: 			147.50
+         * 		TwoGas production:		76.07
          * 		TwoSolar production:	71.43
          * 	Taxes:
-         * 		TwoGas tax:				100.00
+         * 		TwoGas tax:				33.93
          * 		TwoSolar tax:			0.00
          *
          * 	Price:						240
@@ -1031,7 +1046,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
 
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
-        TrCo.zeros(2,2);
+        TrCo.zeros(2, 2);
         TrCo(0, 1) = 1;
         TrCo(1, 0) = TrCo(0, 1);
 
@@ -1047,22 +1062,220 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_NO_THROW(epec.findNashEq(true));
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_TEST_MESSAGE("checking production");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 78.57, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 10, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 12.50, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 76.07, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 71.43, 0.01);
         BOOST_TEST_MESSAGE("checking taxation");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 47.14, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 33.93, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
         BOOST_TEST_MESSAGE("checking exports/imports");
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::NetExport)), 38.57, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::NetImport) ), 38.57, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::NetExport)), 27.50, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::NetImport)), 27.50, 0.01);
 
     }
 
+    BOOST_AUTO_TEST_CASE(C3F1_test) {
+        /** Testing three countries (C3) with a single follower (F1)
+        *  LeaderConstraints: price caps [295,285,315] and tax cap 100
+        *  The follower with the lowest marginal cost will produce more
+        **/
+        BOOST_TEST_MESSAGE("Testing 3 Countries with a follower each -  with tax cap and price cap.");
+        Models::FollPar FP;
+        FP.capacities = {550};
+        FP.costs_lin = {140};
+        FP.costs_quad = {0.3};
+        FP.emission_costs = {15};
+        FP.tax_caps = {100};
+        FP.names = {"Rosso"};
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
+        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285});
+        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 315});
+        GRBEnv env = GRBEnv();
+        arma::sp_mat TrCo(3, 3);
+        TrCo.zeros(3, 3);
+        TrCo(0, 1) = 1;
+        TrCo(1, 0) = TrCo(0, 1);
+        TrCo(0, 2) = 2;
+        TrCo(2, 0) = TrCo(0, 2);
+        TrCo(1, 2) = 1.5;
+        TrCo(2, 1) = TrCo(1, 2);
+
+        BOOST_TEST_MESSAGE("MaxTax:100, PriceLimit:[295,285,315] with alpha=300 and beta=0.05");
+        Models::EPEC epec(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry (0)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country0));
+        BOOST_TEST_MESSAGE("testing Models::addCountry (1)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
+        BOOST_TEST_MESSAGE("testing Models::addCountry (2)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country2));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
+        double margCountryOne =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margCountryTwo =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+        double margCountryThree =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0);
+        BOOST_CHECK_MESSAGE(margCountryTwo > margCountryOne && margCountryTwo < margCountryThree,
+                            "checking marginal costs");
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 45.07, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0), 56.25, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 0), 84.62, 0.01);
+
+    }
+
+    BOOST_AUTO_TEST_CASE(C3F2_test) {
+        /** Testing three countries (C3) with two followers each (F2)
+        *  LeaderConstraints: price caps [295,285,315] and tax caps [100,10]
+        *  The follower with the lowest marginal cost will produce more
+        **/
+        BOOST_TEST_MESSAGE("Testing 3 Countries with a follower each -  with tax cap and price cap.");
+        Models::FollPar FP;
+        FP.capacities = {550, 30};
+        FP.costs_lin = {200, 225};
+        FP.costs_quad = {0.3, 0.2};
+        FP.emission_costs = {275, 100};
+        FP.tax_caps = {100, 100};
+        FP.names = {"Rosso", "Bianco"};
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
+        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285});
+        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 295});
+        GRBEnv env = GRBEnv();
+        arma::sp_mat TrCo(3, 3);
+        TrCo.zeros(3, 3);
+        TrCo(0, 1) = 1;
+        TrCo(1, 0) = TrCo(0, 1);
+        TrCo(0, 2) = 2;
+        TrCo(2, 0) = TrCo(0, 2);
+        TrCo(1, 2) = 1.5;
+        TrCo(2, 1) = TrCo(1, 2);
+
+        BOOST_TEST_MESSAGE("MaxTax:100, PriceLimit:[295,285,315] with alpha=300 and beta=0.05");
+        Models::EPEC epec(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry (0)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country0));
+        BOOST_TEST_MESSAGE("testing Models::addCountry (1)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
+        BOOST_TEST_MESSAGE("testing Models::addCountry (2)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country2));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
+        double margCountryOne =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margCountryTwo =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+        double margCountryThree =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0);
+        BOOST_CHECK_MESSAGE(margCountryTwo > margCountryOne && margCountryTwo < margCountryThree,
+                            "checking marginal costs");
+        BOOST_TEST_MESSAGE("checking production on Bianco-followers");
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
+        BOOST_TEST_MESSAGE("checking tax on Bianco-followers");
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 10, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 1), 0, 0.01);
+        BOOST_TEST_MESSAGE("checking tax on Rosso-followers");
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0), 100, 0.01);
+
+
+    }
+
+    BOOST_AUTO_TEST_CASE(C2F2_test2) {
+        /** Testing three countries (C3) with two followers each (F2)
+        *  LeaderConstraints: price caps [295,285,315] and tax caps [100,10]
+        *  The follower with the lowest marginal cost will produce more
+        **/
+        BOOST_TEST_MESSAGE("Testing 2 Countries with a follower each -  with tax cap and price cap.");
+        Models::FollPar FP;
+        FP.capacities = {550, 30};
+        FP.costs_lin = {200, 225};
+        FP.costs_quad = {0.3, 0.2};
+        FP.emission_costs = {275, 100};
+        FP.tax_caps = {100, 100};
+        FP.names = {"Rosso", "Bianco"};
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
+        // Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285});
+        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 295});
+        GRBEnv env = GRBEnv();
+        arma::sp_mat TrCo(2, 2);
+        TrCo.zeros(2, 2);
+        TrCo(0, 1) = 1;
+        TrCo(1, 0) = TrCo(0, 1);
+        // TrCo(0, 2) = 2;
+        // TrCo(2, 0) = TrCo(0, 2);
+        // TrCo(1, 2) = 1.5;
+        // TrCo(2, 1) = TrCo(1, 2);
+
+        BOOST_TEST_MESSAGE("MaxTax:100, PriceLimit:[295,285,315] with alpha=300 and beta=0.05");
+        Models::EPEC epec(&env);
+        BOOST_TEST_MESSAGE("testing Models::addCountry (0)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country0));
+        // BOOST_TEST_MESSAGE("testing Models::addCountry (1)");
+        // BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
+        BOOST_TEST_MESSAGE("testing Models::addCountry (2)");
+        BOOST_CHECK_NO_THROW(epec.addCountry(Country2));
+        BOOST_TEST_MESSAGE("testing Models::addTranspCost");
+        BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
+        BOOST_TEST_MESSAGE("testing Models::finalize");
+        BOOST_CHECK_NO_THROW(epec.finalize());
+        BOOST_TEST_MESSAGE("testing Models::make_country_QP");
+        BOOST_CHECK_NO_THROW(epec.make_country_QP());
+        BOOST_TEST_MESSAGE("testing Models::findNashEq");
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
+		epec.writeSolution(2, "epec");
+		/*
+        double margCountryOne =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+        double margCountryTwo =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+        double margCountryThree =
+                FP.costs_quad[0] * epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 0) +
+                FP.costs_lin[0] + epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0);
+        BOOST_CHECK_MESSAGE(margCountryTwo > margCountryOne && margCountryTwo < margCountryThree,
+                            "checking marginal costs");
+        BOOST_TEST_MESSAGE("checking production on Bianco-followers");
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
+        BOOST_TEST_MESSAGE("checking tax on Bianco-followers");
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 10, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 1), 0, 0.01);
+        BOOST_TEST_MESSAGE("checking tax on Rosso-followers");
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0), 100, 0.01);
+
+		*/ 
+    }
 BOOST_AUTO_TEST_SUITE_END()
 

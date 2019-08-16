@@ -22,9 +22,9 @@ namespace Models {
         vector<double> tax_caps = {};    ///< Individual tax caps for each follower.
         vector<string> names = {};    ///< Optional Names for the Followers.
         FollPar(vector<double> costs_quad_ = {}, vector<double> costs_lin_ = {}, vector<double> capacities_ = {},
-                vector<double> emission_costs_ = {}, double tax_caps_ = {}, vector<string> names_ = {})
+                vector<double> emission_costs_ = {}, vector<double> tax_caps_ = {}, vector<string> names_ = {})
                 : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
-                  emission_costs{emission_costs_}, tax_caps(tax_caps_, costs_quad_.size()), names{names_} {}
+                  emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
     };
 
 
@@ -58,6 +58,34 @@ namespace Models {
         }
     };
 
+/// @brief Stores a single Instance
+    struct EPECInstance {
+        vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
+        arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
+
+        EPECInstance(string filename) {
+            this->load(filename);
+        }   ///< Constructor from instance file
+        EPECInstance(vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_) : Countries{Countries_},
+                                                                                    TransportationCosts{Transp_} {}
+        ///< Constructor from instance objects
+
+        void load(string filename);
+        ///< Reads the EPECInstance from a file
+
+        void save(string filename);
+        ///< Writes the EPECInstance from a file
+    };
+
+    /// @brief Stores statistics for a (solved) EPEC instance
+    struct EPECStatistics {
+        bool status = {false}; ///< Boolean status: true if the instance has a NashEquilibrium
+        int numVar = {-1};///< Number of variables in findNashEq model
+        int numConstraints = {-1};///< Number of constraints in findNashEq model
+        int numNonZero = {-1};///< Number of non-zero coefficients in the constraint matrix of findNashEq model
+        vector<int> feasiblePolyhedra = {}; ///< Vector containing the number of non-void polyhedra, indexed by leader (country)
+        double wallClockTime = {-1.0};
+    };
 
     enum class LeaderVars {
         FollowerStart,
@@ -71,7 +99,6 @@ namespace Models {
         End
     };
 
-
     ostream &operator<<(ostream &ost, const FollPar P);
 
     ostream &operator<<(ostream &ost, const DemPar P);
@@ -81,6 +108,8 @@ namespace Models {
     ostream &operator<<(ostream &ost, const LeadAllPar P);
 
     ostream &operator<<(ostream &ost, const LeaderVars l);
+
+    ostream &operator<<(ostream &ost, EPECInstance I);
 
     using LeadLocs=map<LeaderVars, unsigned int>;
 
@@ -104,6 +133,7 @@ namespace Models {
         vector<unsigned int> nImportMarkets = {};    ///< Number of countries from which the i-th country imports
         vector<LeadLocs> Locations = {};            ///< Location of variables for each country
         vector<unsigned int> LeaderLocations = {};    ///< Location of each leader
+        EPECStatistics Stats = {};
 
         unique_ptr<Game::NashGame> nashgame;
         unique_ptr<Game::LCP> lcp;
@@ -113,7 +143,7 @@ namespace Models {
 
         GRBEnv *env;        ///< A gurobi environment to create and process the resulting LCP object.
         map<string, unsigned int> name2nos = {};
-        bool finalized{false};
+        bool finalized{false}, nashEq{false};
         unsigned int nCountr = 0;
 
         bool dataCheck(const bool chkAllLeadPars = true, const bool chkcountriesLL = true, const bool chkMC_QP = true,
@@ -145,6 +175,8 @@ namespace Models {
 
         void make_MC_leader(const unsigned int i);
 
+        void make_country_QP(const unsigned int i);
+
         void make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const;
 
         void computeLeaderLocations(const bool addSpaceForMC = false);
@@ -152,6 +184,11 @@ namespace Models {
         void add_Dummy_Lead(const unsigned int i);
 
         void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj);
+
+        void
+        WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append = true) const;
+
+        void WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const;
 
         arma::vec sol_x, sol_z;
 
@@ -169,8 +206,6 @@ namespace Models {
         void testQP(const unsigned int i);
 
         void testLCP(const unsigned int i);
-
-        void make_country_QP(const unsigned int i);
 
         void make_country_QP();
 
@@ -197,7 +232,7 @@ namespace Models {
 
         EPEC &unlock();
 
-        void findNashEq(bool write = false, string filename = "x_NE.txt");
+        void findNashEq();
 
         // Data access methods
         Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
@@ -213,14 +248,21 @@ namespace Models {
 
         void gur_WriteEpecMip(const unsigned int i, string filename) const;
 
-        void
-        WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append = true) const;
+        void writeSolutionJSON(string filename, const arma::vec x, const arma::vec z) const;
 
-        void WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const;
+        void writeSolution(const int writeLevel, string filename) const;
 
         const arma::vec getx() const { return this->sol_x; }
 
         const arma::vec getz() const { return this->sol_z; }
+
+        ///@brief Get the current EPECInstance loaded
+        const EPECInstance getInstance() const { return EPECInstance(this->AllLeadPars, this->TranspCosts); }
+
+        ///@brief Get the EPECStatistics object for the current instance
+        const EPECStatistics getStatistics() const { return this->Stats; }
+
+
     };
 
 

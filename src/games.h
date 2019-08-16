@@ -18,12 +18,6 @@ namespace Game {
     bool isZero(arma::sp_mat M, double tol = 1e-6);
 
 // bool isZero(arma::vec M, double tol = 1e-6);
-    arma::sp_mat resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC);
-
-    arma::mat resize_patch(const arma::mat &Mat, const unsigned int nR, const unsigned int nC);
-
-    arma::vec resize_patch(const arma::vec &Mat, const unsigned int nR);
-
 ///@brief struct to handle the objective params of MP_Param/QP_Param
 ///@details Refer QP_Param class for what Q, C and c mean.
     typedef struct QP_objective {
@@ -193,6 +187,10 @@ namespace Game {
         QP_Param &addDummy(unsigned int pars, unsigned int vars = 0, int position = -1) override;
 
         void write(string filename, bool append) const;
+
+        void save(string filename, bool erase = true) const;
+
+        long int load(string filename, long int pos = 0);
     };
 
 /**
@@ -210,6 +208,7 @@ namespace Game {
  */
     class NashGame {
     private:
+        GRBEnv *env = nullptr;
         arma::sp_mat LeaderConstraints;          ///< Upper level leader constraints LHS
         arma::vec LeaderConsRHS;              ///< Upper level leader constraints RHS
         unsigned int Nplayers;                  ///< Number of players in the Nash Game
@@ -234,6 +233,7 @@ namespace Game {
         void set_positions();
 
     public: // Constructors
+        NashGame(GRBEnv *e) : env{e} {}; ///< To be used only when NashGame is being loaded from a file.
         NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
                  arma::vec MCRHS, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {}, arma::vec LeadRHS = {});
 
@@ -300,6 +300,10 @@ namespace Game {
         NashGame &addLeadCons(const arma::vec &a, double b);
 
         void write(string filename, bool append = true, bool KKT = false) const;
+
+        void save(string filename, bool erase = true) const;
+
+        long int load(string filename, long int pos = 0);
     };
 
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);

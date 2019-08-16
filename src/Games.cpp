@@ -6,6 +6,7 @@
 #include <algorithm>
 
 using namespace std;
+using namespace Utils;
 
 bool Game::isZero(arma::mat M, double tol) {
     return (arma::min(arma::min(abs(M))) <= tol);
@@ -18,58 +19,6 @@ bool Game::isZero(arma::sp_mat M, double tol) {
 // {
 // return(arma::min(abs(M)) <= tol);
 // }
-
-// Armadillo patch for inbuild resize
-// unisgned uword in row and column indexes create some problems with empty matrix
-// which is the case with empty constraints matrices
-// For arma::sp_mat
-arma::sp_mat Game::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC) {
-    arma::sp_mat MMat(nR, nC);
-    MMat.zeros();
-    bool flag = Mat.n_rows == 7 && Mat.n_cols == 9 && 56 < 5;
-    if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
-        if (flag) Mat.print_dense("Input");
-        if (flag) cout << Mat.n_rows << " " << Mat.n_cols << " ";
-        if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
-            MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
-        if (flag) MMat.print("Output");
-    } else {
-        if (nR <= Mat.n_rows && nC <= Mat.n_cols)
-            MMat = Mat.submat(0, 0, nR, nC);
-        else
-            throw string(
-                    "Error in resize() - the patch for arma::resize. Either both dimension should be larger or both should be smaller!");
-    }
-    return MMat;
-}
-
-// For arma::mat
-arma::mat Game::resize_patch(const arma::mat &Mat, const unsigned int nR, const unsigned int nC) {
-    arma::mat MMat(nR, nC);
-    MMat.zeros();
-    if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
-        if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
-            MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
-    } else {
-        if (nR <= Mat.n_rows && nC <= Mat.n_cols)
-            MMat = Mat.submat(0, 0, nR, nC);
-        else
-            throw string(
-                    "Error in resize() - the patch for arma::resize. Either both dimension should be larger or both should be smaller!");
-    }
-    return MMat;
-}
-
-// For arma::vec
-arma::vec Game::resize_patch(const arma::vec &Mat, const unsigned int nR) {
-    arma::vec MMat(nR);
-    MMat.zeros();
-    if (nR > Mat.n_rows)
-        MMat.subvec(0, Mat.n_rows - 1) = Mat;
-    else
-        MMat = Mat.subvec(0, nR);
-    return MMat;
-}
 
 
 template
@@ -106,14 +55,6 @@ Game::operator<<(ostream &os, const Game::QP_Param &Q) {
     os << "Quadratic program with linear inequality constraints: " << endl;
     os << Q.getNy() << " decision variables parametrized by " << Q.getNx() << " variables" << endl;
     os << Q.getb().n_rows << " linear inequalities" << endl << endl;
-    if (VERBOSE) {
-        Q.getQ().print("Q");
-        Q.getc().print("c");
-        Q.getC().print("C");
-        Q.getA().print("A");
-        Q.getB().print("B");
-        Q.getb().print("b");
-    }
     return os;
 }
 
@@ -145,7 +86,7 @@ void Game::QP_Param::write(string filename, bool append) const {
 Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars, int position)
 /**
  * Adds dummy variables to a parameterized mathematical program
- * @p position dictates the position at which the parameters can be added. -1 for adding at the end. 
+ * @p position dictates the position at which the parameters can be added. -1 for adding at the end.
  * @warning @position cannot be set for @vars. @vars always added at the end.
  */
 {
@@ -268,31 +209,24 @@ Game::MP_Param::dataCheck(bool forcesymm ///< Check if MP_Param::Q is symmetric
  */
 {
     if (this->Q.n_cols != Ny) {
-        if (VERBOSE) cout << "Q.n_cols\n";
         return false;
     }
     if (this->A.n_cols != Nx) {
-        if (VERBOSE) cout << A.n_cols << " " << Nx << "A.n_cols\n";
         return false;
     }        // Rest are matrix size compatibility checks
     if (this->B.n_cols != Ny) {
-        if (VERBOSE) cout << B.n_cols << " " << Ny << " B.n_cols\n";
         return false;
     }
     if (this->C.n_rows != Ny) {
-        if (VERBOSE) cout << "C.n_rows\n";
         return false;
     }
     if (this->c.size() != Ny) {
-        if (VERBOSE) cout << "c.n_rows\n";
         return false;
     }
     if (this->A.n_rows != Ncons) {
-        if (VERBOSE) cout << "A.n_rows\n";
         return false;
     }
     if (this->B.n_rows != Ncons) {
-        if (VERBOSE) cout << "B.n_rows\n";
         return false;
     }
     return true;
@@ -304,31 +238,24 @@ bool Game::MP_Param::dataCheck(const QP_objective &obj, const QP_constraints &co
     unsigned int Ncons = cons.b.size();
 
     if (checkobj && obj.Q.n_cols != Ny) {
-        if (VERBOSE) cout << "Q.n_cols\n";
         return false;
     }
     if (checkobj && obj.C.n_rows != Ny) {
-        if (VERBOSE) cout << "C.n_rows\n";
         return false;
     }
     if (checkobj && obj.c.size() != Ny) {
-        if (VERBOSE) cout << "c.n_rows\n";
         return false;
     }
     if (checkcons && cons.A.n_cols != Nx) {
-        if (VERBOSE) cout << cons.A.n_cols << " " << Nx << "A.n_cols\n";
         return false;
     }        // Rest are matrix size compatibility checks
     if (checkcons && cons.B.n_cols != Ny) {
-        if (VERBOSE) cout << cons.B.n_cols << " " << Ny << " B.n_cols\n";
         return false;
     }
     if (checkcons && cons.A.n_rows != Ncons) {
-        if (VERBOSE) cout << "A.n_rows\n";
         return false;
     }
     if (checkcons && cons.B.n_rows != Ncons) {
-        if (VERBOSE) cout << "B.n_rows\n";
         return false;
     }
     return true;
@@ -371,10 +298,10 @@ unique_ptr<GRBModel>
 Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
 )
 /**
- * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality. 
+ * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality.
  *
  * In terms of game theory, this can be viewed as <i>the best response</i> for a set of decisions by other players.
- * 
+ *
  */
 {
     this->make_yQy();
@@ -458,7 +385,7 @@ Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N, arma::vec &q) const
 /// @brief Compute the KKT conditions for the given QP
 /**
  * Writes the KKT condition of the parameterized QP
- * As per the convention, y is the decision variable for the QP and 
+ * As per the convention, y is the decision variable for the QP and
  * that is parameterized in x
  * The KKT conditions are
  * \f$0 \leq y \perp  My + Nx + q \geq 0\f$
@@ -523,11 +450,43 @@ Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons) {
     return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
 }
 
+
+void
+Game::QP_Param::save(string filename, bool erase) const {
+    Utils::appendSave(string("QP_Param"), filename, erase);
+    Utils::appendSave(this->Q, filename, string("QP_Param::Q"), false);
+    Utils::appendSave(this->A, filename, string("QP_Param::A"), false);
+    Utils::appendSave(this->B, filename, string("QP_Param::B"), false);
+    Utils::appendSave(this->C, filename, string("QP_Param::C"), false);
+    Utils::appendSave(this->b, filename, string("QP_Param::b"), false);
+    Utils::appendSave(this->c, filename, string("QP_Param::c"), false);
+    if (VERBOSE) cout << "Saved QP_Param to file " << filename << endl;
+}
+
+long int
+Game::QP_Param::load(string filename, long int pos) {
+    arma::sp_mat Q, A, B, C;
+    arma::vec c, b;
+    string headercheck;
+    pos = Utils::appendRead(headercheck, filename, pos);
+    if (headercheck != "QP_Param")
+        throw string("Error in QP_Param::load: In valid header - ") + headercheck;
+    pos = Utils::appendRead(Q, filename, pos, string("QP_Param::Q"));
+    pos = Utils::appendRead(A, filename, pos, string("QP_Param::A"));
+    pos = Utils::appendRead(B, filename, pos, string("QP_Param::B"));
+    pos = Utils::appendRead(C, filename, pos, string("QP_Param::C"));
+    pos = Utils::appendRead(b, filename, pos, string("QP_Param::b"));
+    pos = Utils::appendRead(c, filename, pos, string("QP_Param::c"));
+    this->set(Q, C, A, B, c, b);
+    return pos;
+}
+
+
 Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar,
                          arma::sp_mat LeadA, arma::vec LeadRHS) : LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /**
  * @brief
- * Construct a NashGame by giving a vector of pointers to 
+ * Construct a NashGame by giving a vector of pointers to
  * QP_Param, defining each player's game
  * A set of Market clearing constraints and its RHS
  * And if there are leader variables, the number of leader vars.
@@ -537,11 +496,11 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
  * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
  *
- * In the correct ordering of variables, have the 
- * Market clearing equations ready. 
+ * In the correct ordering of variables, have the
+ * Market clearing equations ready.
  *
  * Now call this constructor.
- * It will allocate appropriate space for the dual variables 
+ * It will allocate appropriate space for the dual variables
  * for each player.
  *
  */
@@ -557,6 +516,74 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
     this->dual_position.resize(this->Nplayers + 1);
 
     this->set_positions();
+}
+
+void
+Game::NashGame::save(string filename, bool erase) const {
+    Utils::appendSave(string("NashGame"), filename, erase);
+    Utils::appendSave(this->Nplayers, filename, string("NashGame::Nplayers"), false);
+    for (unsigned int i = 0; i < this->Nplayers; ++i)
+        this->Players.at(i)->save(filename, false);
+    Utils::appendSave(this->MarketClearing, filename, string("NashGame::MarketClearing"), false);
+    Utils::appendSave(this->MCRHS, filename, string("NashGame::MCRHS"), false);
+    Utils::appendSave(this->LeaderConstraints, filename, string("NashGame::LeaderConstraints"), false);
+    Utils::appendSave(this->LeaderConsRHS, filename, string("NashGame::LeaderConsRHS"), false);
+    Utils::appendSave(this->n_LeadVar, filename, string("NashGame::n_LeadVar"), false);
+    if (VERBOSE) cout << "Saved NashGame to file " << filename << endl;
+}
+
+long int
+Game::NashGame::load(string filename, long int pos) {
+    if (!this->env)
+        throw string(
+                "Error in NashGame::load: To load NashGame from file, it has to be constructed using NashGame(GRBEnv*) constructor");
+
+    string headercheck;
+    pos = Utils::appendRead(headercheck, filename, pos);
+    if (headercheck != "NashGame")
+        throw string("Error in NashGame::load: In valid header - ") + headercheck;
+
+
+    unsigned int Nplayers;
+    pos = Utils::appendRead(Nplayers, filename, pos, string("NashGame::Nplayers"));
+
+    vector<shared_ptr<QP_Param>> Players;
+    Players.resize(Nplayers);
+    for (unsigned int i = 0; i < Nplayers; ++i) {
+        // Players.at(i) = std::make_shared<Game::QP_Param>(this->env);
+        auto temp = shared_ptr<Game::QP_Param>(new Game::QP_Param(this->env));
+        Players.at(i) = temp;
+        pos = Players.at(i)->load(filename, pos);
+    }
+
+    arma::sp_mat MarketClearing;
+    pos = Utils::appendRead(MarketClearing, filename, pos, string("NashGame::MarketClearing"));
+
+    arma::vec MCRHS;
+    pos = Utils::appendRead(MCRHS, filename, pos, string("NashGame::MCRHS"));
+
+    arma::sp_mat LeaderConstraints;
+    pos = Utils::appendRead(LeaderConstraints, filename, pos, string("NashGame::LeaderConstraints"));
+
+    arma::vec LeaderConsRHS;
+    pos = Utils::appendRead(LeaderConsRHS, filename, pos, string("NashGame::LeaderConsRHS"));
+
+    unsigned int n_LeadVar;
+    pos = Utils::appendRead(n_LeadVar, filename, pos, string("NashGame::n_LeadVar"));
+
+    // Setting the class variables
+    this->n_LeadVar = n_LeadVar;
+    this->Players = Players;
+    this->Nplayers = Nplayers;
+    this->MarketClearing = MarketClearing;
+    this->MCRHS = MCRHS;
+    // Setting the size of class variable vectors
+    this->primal_position.resize(this->Nplayers + 1);
+    this->dual_position.resize(this->Nplayers + 1);
+
+    this->set_positions();
+
+    return pos;
 }
 
 void Game::NashGame::set_positions()
@@ -587,6 +614,7 @@ void Game::NashGame::set_positions()
     // Pushing back the end of dual position
     dual_position.at(Nplayers) = (dl_cnt);
 
+    /*
     if (VERBOSE) {
         cout << "Primals: ";
         for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i) << " ";
@@ -594,6 +622,7 @@ void Game::NashGame::set_positions()
         for (unsigned int i = 0; i < Nplayers + 1; i++) cout << dual_position.at(i) << " ";
         cout << endl;
     }
+    */
 
 }
 
@@ -606,7 +635,7 @@ Game::NashGame::FormulateLCP(
         string M_name,        ///< File name to be used to write  M
         string q_name        ///< File name to be used to write  M
 ) const {
-/// @brief Formulates the LCP corresponding to the Nash game. 
+/// @brief Formulates the LCP corresponding to the Nash game.
 /// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
 /**
  * Computes the KKT conditions for each Player, calling QP_Param::KKT. Arranges them systematically to return M, q
@@ -738,7 +767,7 @@ arma::sp_mat
 Game::NashGame::RewriteLeadCons() const
 /** @brief Rewrites leader constraint adjusting for dual variables.
  * Rewrites leader constraints given earlier with added empty columns and spaces corresponding to Market clearing duals and other equation duals.
- * 
+ *
  * This becomes important if the Lower level complementarity problem is passed to LCP with upper level constraints.
  */
 {
@@ -798,7 +827,7 @@ Game::NashGame &Game::NashGame::addDummy(unsigned int par, int position)
         auto nnC = this->LeaderConstraints.n_cols;
         switch (position) {
             case -1:
-                this->LeaderConstraints.resize(nnR, nnC + par);
+                this->LeaderConstraints = resize_patch(this->LeaderConstraints, nnR, nnC + par);
                 break;
             case 0:
                 this->LeaderConstraints = arma::join_rows(arma::zeros<arma::sp_mat>(nnR, par), this->LeaderConstraints);
@@ -826,15 +855,11 @@ Game::NashGame &Game::NashGame::addLeadCons(const arma::vec &a, double b)
         throw string("Error in NashGame::addLeadCons: Leader constraint size incompatible --- ") + to_string(a.n_elem) +
               string(" != ") + to_string(nC);
     auto nR = this->LeaderConstraints.n_rows;
-    if (VERBOSE) cout << "In NashGame::addLeadCons\n";
-    if (VERBOSE) LeaderConstraints.print_dense("Before");
-    this->LeaderConstraints = Game::resize_patch(this->LeaderConstraints, nR + 1, nC);
+    this->LeaderConstraints = resize_patch(this->LeaderConstraints, nR + 1, nC);
     // (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t() already works in newer versions of armadillo
     LeaderConstraints.row(nR) = a.t();
-    this->LeaderConsRHS = Game::resize_patch(this->LeaderConsRHS, nR + 1);
+    this->LeaderConsRHS = resize_patch(this->LeaderConsRHS, nR + 1);
     this->LeaderConsRHS(nR) = b;
-    if (VERBOSE) LeaderConstraints.print_dense("After");
-    if (VERBOSE) cout << "Exiting NashGame::addLeadCons\n";
     return *this;
 }
 

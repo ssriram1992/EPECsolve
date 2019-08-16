@@ -7,6 +7,7 @@
 // #define VERBOSE true
 
 using namespace std;
+using namespace Utils;
 
 bool
 operator==(vector<int> Fix1, vector<int> Fix2)
@@ -60,8 +61,7 @@ Game::LCP::defConst(GRBEnv *env)
     RelAllPol = new vector<vector<short int> *>{};
     Ai = new vector<arma::sp_mat *>{};
     bi = new vector<arma::vec *>{};
-    if (VERBOSE)
-        this->RlxdModel.set(GRB_IntParam_OutputFlag, 0);
+    this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
     this->env = env;
     this->nR = this->M.n_rows;
     this->nC = this->M.n_cols;
@@ -129,7 +129,7 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N) : RlxdModel(*env)
     arma::vec q;
     perps Compl;
     N.FormulateLCP(M, q, Compl);
-    LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getMCLeadRHS());
+    // LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getMCLeadRHS());
 
 
     // This is a constructor code! Remember to delete
@@ -177,11 +177,10 @@ Game::LCP::makeRelaxed()
 {
     try {
         if (this->madeRlxdModel) return;
-        if (!VERBOSE) {
-            RlxdModel.set(GRB_IntParam_LogToConsole, 0);
-        }
         GRBVar x[nC], z[nR];
-        if (VERBOSE) cout << "In LCP::makeRelaxed(): " << nR << " " << nC << endl;
+        if (VERBOSE)
+            cout << "LCP::makeRelaxed() is creating a model with : " << nR << " variables and  " << nC << " constraints"
+                 << endl;
         for (unsigned int i = 0; i < nC; i++)
             x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "x_" + to_string(i));
         for (unsigned int i = 0; i < nR; i++)
@@ -371,8 +370,6 @@ Game::LCP::LCPasMIP(
         for (auto i:FixEq) model->addConstr(z[i], GRB_EQUAL, 0.0);
         model->update();
         if (!this->useIndicators) {
-            if (VERBOSE)
-                cout << "IntegerTol=" << this->eps_int << ";FeasabilityTol=OptimalityTol=" << this->eps << endl;
             model->set(GRB_DoubleParam_IntFeasTol, this->eps_int);
             model->set(GRB_DoubleParam_FeasibilityTol, this->eps);
             model->set(GRB_DoubleParam_OptimalityTol, this->eps);
@@ -493,7 +490,6 @@ int Game::ConvexHull(
     Game::compConvSize(A, nFinCons, nFinVar, Ai, bi, Acom, bcom);
 
     // Counting rows completed
-    if (VERBOSE) { cout << "In Convex Hull computation!" << endl; }
     /****************** SLOW LOOP BEWARE *******************/
     for (unsigned int i = 0; i < nPoly; i++) {
         if (VERBOSE) cout << "Game::ConvexHull: Handling Polyhedron " << i + 1 << " out of " << nPoly << endl;
@@ -519,7 +515,6 @@ int Game::ConvexHull(
     // Third Constraint RHS
     b.at(FirstCons + nC * 2) = 1;
     b.at(FirstCons + nC * 2 + 1) = -1;
-    if (VERBOSE) cout << "Convex Hull A:" << A.n_rows << "x" << A.n_cols << endl;
     return 0;
 }
 
@@ -556,13 +551,6 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
     locations.zeros(2, N);
     val.zeros(N);
 
-    if (VERBOSE) {
-        cout << "Found these polyhedra:" << endl;
-        for (unsigned int i = 0; i < nPoly; i++) {
-            Ai->at(i)->print_dense("A_" + to_string(i));
-            bi->at(i)->print("b_" + to_string(i));
-        }
-    }
 
     unsigned int count{0}, rowCount{0}, colCount{nC};
     for (unsigned int i = 0; i < nPoly; i++) {
@@ -600,7 +588,6 @@ void Game::compConvSize(arma::sp_mat &A,    ///< Output parameter
         rowCount += Acom.n_rows;
 
         colCount += nC;
-        if (VERBOSE) cout << "In compConvSize: " << i + 1 << " out of " << nPoly << endl;
     }
     A = arma::sp_mat(locations, val, nFinCons, nFinVar);
 }
@@ -954,7 +941,6 @@ Game::LCP::FixToPoly(
     if (add) {
         custom ? (custAi->push_back(Aii)) : (this->Ai->push_back(Aii));
         custom ? custbi->push_back(bii) : this->bi->push_back(bii);
-        if (VERBOSE) cout << custom << " Pushed a new polyhedron! No: " << custAi->size() << endl;
     }
     return *this;
 }
@@ -979,10 +965,12 @@ Game::LCP::FixToPolies(
 {
     bool flag = false;
     vector<short int> MyFix(*Fix);
+    /*
     if (VERBOSE) {
         for (const auto v:MyFix) cout << v << " ";
         cout << endl;
     }
+    */
     unsigned int i;
     for (i = 0; i < this->nR; i++) {
         if (Fix->at(i) == 0) {
@@ -1064,6 +1052,7 @@ Game::LCP::makeQP(
     QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
     QP_obj.C = resize_patch(QP_obj.C, Ny, Nx_old);
     QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
+    this->feasiblePolyhedra = custAi.size();
     // Setting the QP_Param object
     QP.set(QP_obj, QP_cons);
     return *this;
@@ -1202,7 +1191,8 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::
     return model;
 }
 
-void Game::LCP::write(string filename, bool append) const {
+void
+Game::LCP::write(string filename, bool append) const {
     ofstream outfile(filename, append ? ios::app : ios::out);
 
     outfile << nR << " rows and " << nC << " columns in the LCP\n";
@@ -1215,4 +1205,58 @@ void Game::LCP::write(string filename, bool append) const {
     outfile << "A: " << this->_A;
     outfile << "b: " << this->_b;
     outfile.close();
+}
+
+void
+Game::LCP::save(string filename, bool erase) const {
+    Utils::appendSave(string("LCP"), filename, erase);
+    Utils::appendSave(this->M, filename, string("LCP::M"), false);
+    Utils::appendSave(this->q, filename, string("LCP::q"), false);
+
+    Utils::appendSave(this->LeadStart, filename, string("LCP::LeadStart"), false);
+    Utils::appendSave(this->LeadEnd, filename, string("LCP::LeadEnd"), false);
+
+    Utils::appendSave(this->_A, filename, string("LCP::_A"), false);
+    Utils::appendSave(this->_b, filename, string("LCP::_b"), false);
+
+    if (VERBOSE) cout << "Saved LCP to file " << filename << endl;
+}
+
+
+long int
+Game::LCP::load(string filename, long int pos) {
+    if (!this->env)
+        throw string(
+                "Error in LCP::load: To load LCP from file, it has to be constructed using LCP(GRBEnv*) constructor");
+
+    string headercheck;
+    pos = Utils::appendRead(headercheck, filename, pos);
+    if (headercheck != "LCP")
+        throw string("Error in LCP::load: In valid header - ") + headercheck;
+
+    arma::sp_mat M, A;
+    arma::vec q, b;
+    unsigned int LeadStart, LeadEnd;
+    pos = Utils::appendRead(M, filename, pos, string("LCP::M"));
+    pos = Utils::appendRead(q, filename, pos, string("LCP::q"));
+    pos = Utils::appendRead(LeadStart, filename, pos, string("LCP::LeadStart"));
+    pos = Utils::appendRead(LeadEnd, filename, pos, string("LCP::LeadEnd"));
+    pos = Utils::appendRead(A, filename, pos, string("LCP::_A"));
+    pos = Utils::appendRead(b, filename, pos, string("LCP::_b"));
+
+    this->M = M;
+    this->q = q;
+    this->_A = A;
+    this->_b = b;
+    defConst(env);
+    this->LeadStart = LeadStart;
+    this->LeadEnd = LeadEnd;
+
+    this->nLeader = this->LeadEnd - this->LeadStart + 1;
+    this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
+    for (unsigned int i = 0; i < M.n_rows; i++) {
+        unsigned int count = i < LeadStart ? i : i + nLeader;
+        Compl.push_back({i, count});
+    }
+    return pos;
 }
