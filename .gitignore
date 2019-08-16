@@ -24,3 +24,4 @@ dat/*
 EPECtest
 EPECsolve
 cmake-*
+*.dat

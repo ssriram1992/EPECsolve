@@ -181,15 +181,6 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_MESSAGE(abs(q1.getc().at(Ny)) < 1e-4, "c check after addDummy(0, 1, 1)");
 
 
-		/*
-        BOOST_TEST_MESSAGE("QP_Param.addDummy(1, 0, 0) test");
-        BOOST_WARN_MESSAGE(false, "Not yet implemented");
-
-
-        BOOST_TEST_MESSAGE("QP_Param.addDummy(1, 0, -1) test");
-        BOOST_WARN_MESSAGE(false, "Not yet implemented");
-		*/
-
 
 		BOOST_TEST_MESSAGE("QP_Param test for file save");
 		q1.save("test/q1.dat");

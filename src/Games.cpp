@@ -469,19 +469,12 @@ Game::QP_Param::load(string filename)
 	arma::sp_mat Q, A, B, C;
 	arma::vec c, b;
 	long int pos{0};
-	cout<<"QP_Param "<<pos<<endl;
 	pos = Utils::appendRead(Q, filename, pos, string("QP_Param::Q"));
-	cout<<"QP_Param "<<pos<<endl;
 	pos = Utils::appendRead(A, filename, pos, string("QP_Param::A"));
-	cout<<"QP_Param "<<pos<<endl;
 	pos = Utils::appendRead(B, filename, pos, string("QP_Param::B"));
-	cout<<"QP_Param "<<pos<<endl;
 	pos = Utils::appendRead(C, filename, pos, string("QP_Param::C"));
-	cout<<"QP_Param "<<pos<<endl;
 	pos = Utils::appendRead(b, filename, pos, string("QP_Param::b"));
-	cout<<"QP_Param "<<pos<<endl;
 	pos = Utils::appendRead(c, filename, pos, string("QP_Param::c"));
-	cout<<"QP_Param "<<pos<<endl;
 	this->set(Q, C, A, B, c, b);
 }
 
