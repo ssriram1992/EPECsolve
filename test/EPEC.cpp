@@ -260,6 +260,13 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X), 28.271, 0.001);
         BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X), 27.8037, 0.001);
 
+		BOOST_TEST_MESSAGE("NashGame load/save test");
+		BOOST_CHECK_NO_THROW(Nash.save("test/Nash.dat"));
+
+		NashGame N2(&env);
+		BOOST_CHECK_NO_THROW(N2.load("test/Nash.dat"));
+		BOOST_CHECK_NO_THROW(N2.save("test/Nash2.dat"));
+
     }
 
     BOOST_AUTO_TEST_CASE(ConvexHull_test) {

@@ -105,23 +105,27 @@ long int Utils::appendRead(
 		throw string("Error in Utils::appendRead<sp_mat>. Wrong header. Expected: "+header+" Found: "+header_checkwith);
 
 	infile>>nR>>nC>>nnz;
-	arma::umat locations(2, nnz);
-	arma::vec values(nnz);
+	if(nR == 0 || nC == 0) 
+		matrix.set_size(nR, nC);
+	else{
+		arma::umat locations(2, nnz);
+		arma::vec values(nnz);
 
-	unsigned int r, c; double val;
+		unsigned int r, c; double val;
 
-	for(unsigned int i=0; i<nnz; ++i)
-	{
-		infile>>r>>c>>val;
-		locations(0, i) = r; 
-		locations(1, i) = c;
-		values(i) = val;
+		for(unsigned int i=0; i<nnz; ++i)
+		{
+			infile>>r>>c>>val;
+			locations(0, i) = r; 
+			locations(1, i) = c;
+			values(i) = val;
+		}
+		matrix = arma::sp_mat(locations, values, nR, nC);
 	}
 
 	pos = infile.tellg();
 	infile.close();
 
-	matrix = arma::sp_mat(locations, values, nR, nC);
 
 	return pos;
 }
@@ -245,6 +249,37 @@ long int  Utils::appendRead(long int &v, const string in, long int pos, const st
 	return pos;
 }
 
+void Utils::appendSave(const unsigned int v, const string out, const string header, bool erase)
+/**
+ * Utility to save a long int to file
+ */
+{ 
+	ofstream outfile(out, erase?ios::out:ios::app);
+	outfile<<header<<"\n";
+	outfile<<v<<"\n";
+	outfile.close();
+}
+
+long int  Utils::appendRead(unsigned int &v, const string in, long int pos, const string header)
+{ 
+	ifstream infile(in, ios::in);
+	infile.seekg(pos);
+
+	string header_checkwith;
+	infile>>header_checkwith;
+
+	if(header!="" && header != header_checkwith)
+		throw string("Error in Utils::appendRead<unsigned int>. Wrong header. Expected: "+header+" Found: "+header_checkwith);
+
+	unsigned int val;
+	infile>>val;
+	v = val;
+
+	pos = infile.tellg();
+	infile.close();
+
+	return pos;
+}
 void Utils::appendSave(const string v, const string out, bool erase)
 /**
  * Utility to save a long int to file

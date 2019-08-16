@@ -206,6 +206,7 @@ namespace Game {
  */
     class NashGame {
     private:
+		GRBEnv* env=nullptr;
         arma::sp_mat LeaderConstraints;          ///< Upper level leader constraints LHS
         arma::vec LeaderConsRHS;              ///< Upper level leader constraints RHS
         unsigned int Nplayers;                  ///< Number of players in the Nash Game
@@ -230,6 +231,7 @@ namespace Game {
         void set_positions();
 
     public: // Constructors
+		NashGame(GRBEnv* e):env{e}{}; ///< To be used only when NashGame is being loaded from a file.
         NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
                  arma::vec MCRHS, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {}, arma::vec LeadRHS = {});
 
@@ -296,6 +298,8 @@ namespace Game {
         NashGame &addLeadCons(const arma::vec &a, double b);
 
         void write(string filename, bool append = true, bool KKT = false) const;
+		void save(string filename, bool erase=true) const;
+		long int load(string filename, long int pos = 0); 
     };
 
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
