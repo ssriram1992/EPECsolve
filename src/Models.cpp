@@ -951,11 +951,15 @@ Models::EPEC::findNashEq() {
         if (VERBOSE) this->nashgame->write("dat/NashGame", false, true);
         //Using indicator constraints
         lcp->useIndicators = this->indicators;
-        this->lcpmodel = lcp->LCPasMIP(false);
 
+        this->lcpmodel = lcp->LCPasMIP(false);
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
         if (VERBOSE) lcpmodel->write("dat/NashLCP.lp");
+        this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
+        this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
+        this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
         lcpmodel->optimize();
+        this->Stats.wallClockTime = lcpmodel->get(GRB_DoubleAttr_Runtime);
         if (VERBOSE) cout << *nashgame;
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
@@ -976,7 +980,7 @@ Models::EPEC::findNashEq() {
                      << " "
                      << temp << endl;
             }
-            this->nashEq = true;
+            this->Stats.status = true;
         } else {
             cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
             throw string("Models::EPEC::findNashEq: no nash equilibrium found.");
@@ -1125,7 +1129,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
     * @brief Writes the computed Nash Equilibrium in the EPEC instance
     * @p writeLevel is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both
     */
-    if (this->nashEq) {
+    if (this->Stats.status) {
         if (writeLevel == 1 || writeLevel == 2) {
             this->WriteCountry(0, filename + ".txt", this->sol_x, false);
             for (unsigned int ell = 1; ell < this->nCountr; ++ell)
@@ -1281,7 +1285,7 @@ Models::EPECInstance::load(string filename) {
         }
         ifs.close();
         this->Countries = LAP;
-        this->TransportationCosts=TrCo;
+        this->TransportationCosts = TrCo;
     }
     catch (exception &e) {
         cerr << "Exception in Models::readInstance : cannot read instance file." << endl;

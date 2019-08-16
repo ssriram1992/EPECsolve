@@ -60,8 +60,8 @@ namespace Models {
 
 /// @brief Stores a single Instance
     struct EPECInstance {
-        vector<Models::LeadAllPar> Countries = {};
-        arma::sp_mat TransportationCosts = {};
+        vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
+        arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
 
         EPECInstance(string filename) {
             this->readInstance(filename);
@@ -77,6 +77,14 @@ namespace Models {
         ///< Writes the EPECInstance from a file
     };
 
+    /// @brief Stores statistics for a (solved) EPEC instance
+    struct EPECStatistics {
+        bool status = {false}; ///< Boolean status: true if the instance has a NashEquilibrium
+        int numVar = {-1};///< Number of variables in findNashEq model
+        int numConstraints = {-1};///< Number of constraints in findNashEq model
+        int numNonZero = {-1};///< Number of non-zero coefficients in the constraint matrix of findNashEq model
+        double wallClockTime = {-1.0};
+    };
 
     enum class LeaderVars {
         FollowerStart,
@@ -124,6 +132,7 @@ namespace Models {
         vector<unsigned int> nImportMarkets = {};    ///< Number of countries from which the i-th country imports
         vector<LeadLocs> Locations = {};            ///< Location of variables for each country
         vector<unsigned int> LeaderLocations = {};    ///< Location of each leader
+        EPECStatistics Stats = {};
 
         unique_ptr<Game::NashGame> nashgame;
         unique_ptr<Game::LCP> lcp;
@@ -247,6 +256,10 @@ namespace Models {
         const arma::vec getz() const { return this->sol_z; }
 
         const EPECInstance getInstance() const { return EPECInstance(this->AllLeadPars, this->TranspCosts); }
+
+        cost EPECStatistics
+
+        getStatistics() const { return this->Stats; }
 
     };
 
