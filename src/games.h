@@ -136,7 +136,6 @@ namespace Game {
         GRBEnv *env;
         GRBModel QuadModel;
         bool made_yQy;
-        int feasiblePolyhedra = {-1};
 
         int make_yQy();
 
@@ -167,10 +166,6 @@ namespace Game {
         QP_Param &set(const QP_objective &obj, const QP_constraints &cons) final;
 
         QP_Param &set(QP_objective &&obj, QP_constraints &&cons) final;
-
-        void setFeasiblePolyhedra(int num) { this->feasiblePolyhedra = num; }
-
-        const int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 
         bool operator==(const QP_Param &Q2) const;
 

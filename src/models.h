@@ -175,6 +175,8 @@ namespace Models {
 
         void make_MC_leader(const unsigned int i);
 
+        void make_country_QP(const unsigned int i);
+
         void make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const;
 
         void computeLeaderLocations(const bool addSpaceForMC = false);
@@ -204,8 +206,6 @@ namespace Models {
         void testQP(const unsigned int i);
 
         void testLCP(const unsigned int i);
-
-        void make_country_QP(const unsigned int i);
 
         void make_country_QP();
 

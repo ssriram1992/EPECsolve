@@ -41,6 +41,7 @@ namespace Game {
         // Temporary data
         bool madeRlxdModel{false}; ///< Keep track if LCP::RlxdModel is made
         unsigned int nR, nC;
+        int feasiblePolyhedra{-1};
         /// LCP feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra
         vector<vector<short int> *> *AllPolyhedra, *RelAllPol;
         vector<arma::sp_mat *> *Ai, *Rel_Ai;
@@ -165,6 +166,8 @@ namespace Game {
                     Game::QP_objective &QP_obj, Game::QP_Param &QP);
 
         LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
+
+        const int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 
         void write(string filename, bool append = true) const;
 		void save(string filename, bool erase = true) const;
