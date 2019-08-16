@@ -15,6 +15,7 @@ static void show_usage(std::string name) {
          << "\t-h\t\t\tShow this help message\n"
          << "\t-v\t\t\tShow the version of EPEC\n"
          << "\t-r\t\t\tDictates the path and file name of the solution file. *default: dat/Solution (.json automatically added)**\n"
+         << "\t-rf\t\t\tDictates the path and file name of the general results file. *default: results.csv **\n"
          // << "\t-l\t\t\tDictates the 'loquacity' of EPEC. Default: 0 (non-verbose); 1 (verbose)\n"
          << "\t-s\t\t\tDictates the writeLevel for EPEC solution. Default: 0 (only JSON); 1 (only Human Readable); 2 (both)\n"
          << endl;
@@ -31,6 +32,7 @@ int main(int argc, char *argv[]) {
     }
     string resFile = "dat/Solution";
     string instanceFile = "dat/Instance";
+    string resultsFile = "results.csv";
     int writeLevel = 0;
 
 
@@ -49,6 +51,13 @@ int main(int argc, char *argv[]) {
                 cerr << "-r option requires one argument." << endl;
                 return 1;
             }
+        } else if ((arg == "-rf")) {
+            if (i + 1 < argc) {
+                resultsFile = argv[++i];
+            } else {
+                cerr << "-rf option requires one argument." << endl;
+                return 1;
+            }
         } else if ((arg == "-s")) {
             if (i + 1 < argc) {
                 writeLevel = strtol(argv[++i], NULL, 10);
@@ -60,8 +69,8 @@ int main(int argc, char *argv[]) {
             instanceFile = argv[i];
         }
     }
-    Models::EPECInstance Instance = Models::readInstance(instanceFile);
-    if (Instance.Countries.size() < 1) {
+    Models::EPECInstance Instance(instanceFile);
+    if (Instance.Countries.empty()) {
         cerr << "Error: instance is empty" << endl;
         return 1;
     }
@@ -74,6 +83,10 @@ int main(int argc, char *argv[]) {
     epec.make_country_QP();
     epec.findNashEq();
     epec.writeSolution(writeLevel, resFile);
+    std::ofstream results(resultsFile);
+    // Instance_name, nCountries, nFollowers
+    results << instanceFile << ";" <<endl;
+    results.close();
     return 0;
 } 
 

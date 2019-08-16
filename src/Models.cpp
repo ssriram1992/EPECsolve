@@ -1139,7 +1139,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
 }
 
 void
-Models::writeInstance(string filename, EPECInstance epec) {
+Models::EPECInstance::writeInstance(string filename) {
     /**
     * @brief Writes the current EPEC instance to the standard JSON instance file
      * @p filename dictates the name of the JSON instance file
@@ -1149,37 +1149,37 @@ Models::writeInstance(string filename, EPECInstance epec) {
     PrettyWriter<StringBuffer> writer(s);
     writer.StartObject();
     writer.Key("nCountries");
-    writer.Uint(epec.Countries.size());
+    writer.Uint(this->Countries.size());
     writer.Key("Countries");
     writer.StartArray();
-    for (unsigned i = 0; i < epec.Countries.size(); i++) {
+    for (unsigned i = 0; i < this.Countries.size(); i++) {
         writer.StartObject();
 
         writer.Key("nFollowers");
-        writer.Uint(epec.Countries.at(i).n_followers);
+        writer.Uint(this->Countries.at(i).n_followers);
 
         writer.Key("DemandParam");
         writer.StartObject();
         writer.Key("Alpha");
-        writer.Double(epec.Countries.at(i).DemandParam.alpha);
+        writer.Double(this->Countries.at(i).DemandParam.alpha);
         writer.Key("Beta");
-        writer.Double(epec.Countries.at(i).DemandParam.beta);
+        writer.Double(this->Countries.at(i).DemandParam.beta);
         writer.EndObject();
 
         writer.Key("TransportationCosts");
         writer.StartArray();
-        for (unsigned j = 0; j < epec.Countries.size(); j++)
-            writer.Double(epec.TransportationCosts(i, j));
+        for (unsigned j = 0; j < this->Countries.size(); j++)
+            writer.Double(this->TransportationCosts(i, j));
         writer.EndArray();
 
         writer.Key("LeaderParam");
         writer.StartObject();
         writer.Key("ImportLimit");
-        writer.Double(epec.Countries.at(i).LeaderParam.import_limit);
+        writer.Double(this->Countries.at(i).LeaderParam.import_limit);
         writer.Key("ExportLimit");
-        writer.Double(epec.Countries.at(i).LeaderParam.export_limit);
+        writer.Double(this->Countries.at(i).LeaderParam.export_limit);
         writer.Key("PriceLimit");
-        writer.Double(epec.Countries.at(i).LeaderParam.price_limit);
+        writer.Double(this->Countries.at(i).LeaderParam.price_limit);
         writer.EndObject();
 
         writer.Key("Followers");
@@ -1187,32 +1187,32 @@ Models::writeInstance(string filename, EPECInstance epec) {
 
         writer.Key("Capacities");
         writer.StartArray();
-        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
-            writer.Double(epec.Countries.at(i).FollowerParam.capacities.at(j));
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.capacities.at(j));
         writer.EndArray();
 
         writer.Key("LinearCosts");
         writer.StartArray();
-        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
-            writer.Double(epec.Countries.at(i).FollowerParam.costs_lin.at(j));
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.costs_lin.at(j));
         writer.EndArray();
 
         writer.Key("QuadraticCosts");
         writer.StartArray();
-        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
-            writer.Double(epec.Countries.at(i).FollowerParam.costs_quad.at(j));
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.costs_quad.at(j));
         writer.EndArray();
 
         writer.Key("EmissionCosts");
         writer.StartArray();
-        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
-            writer.Double(epec.Countries.at(i).FollowerParam.emission_costs.at(j));
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.emission_costs.at(j));
         writer.EndArray();
 
         writer.Key("TaxCaps");
         writer.StartArray();
-        for (unsigned j = 0; j < epec.Countries.at(i).n_followers; j++)
-            writer.Double(epec.Countries.at(i).FollowerParam.tax_caps.at(j));
+        for (unsigned j = 0; j < this->Countries.at(i).n_followers; j++)
+            writer.Double(this->Countries.at(i).FollowerParam.tax_caps.at(j));
         writer.EndArray();
 
 
@@ -1229,7 +1229,7 @@ Models::writeInstance(string filename, EPECInstance epec) {
 
 
 Models::EPECInstance
-Models::readInstance(string filename) {
+Models::EPECInstance::readInstance(string filename) {
     /**
     * @brief Reads an instance file and return a vector of @p LeadAllPar that can be fed to the EPEC class
      * @p filename dictates the name of the JSON instance file
@@ -1280,7 +1280,9 @@ Models::readInstance(string filename) {
             ));
         }
         ifs.close();
-        return EPECInstance(LAP, TrCo);
+        this->Countries = LAP;
+        this->TransportationCosts=TrCo;
+        return *this;
     }
     catch (exception &e) {
         cerr << "Exception in Models::readInstance : cannot read instance file." << endl;

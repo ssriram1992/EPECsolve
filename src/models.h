@@ -63,8 +63,18 @@ namespace Models {
         vector<Models::LeadAllPar> Countries = {};
         arma::sp_mat TransportationCosts = {};
 
+        EPECInstance(string filename) {
+            this->readInstance(filename);
+        }   ///< Constructor from instance file
         EPECInstance(vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_) : Countries{Countries_},
                                                                                     TransportationCosts{Transp_} {}
+        ///< Constructor from instance objects
+
+        EPECInstance readInstance(string filename);
+        ///< Reads the EPECInstance from a file
+
+        void writeInstance(string filename);
+        ///< Writes the EPECInstance from a file
     };
 
 
@@ -97,10 +107,6 @@ namespace Models {
     void increaseVal(LeadLocs &L, const LeaderVars start, const unsigned int val, const bool startnext = true);
 
     void init(LeadLocs &L);
-
-    EPECInstance readInstance(string filename);
-
-    void writeInstance(string filename, EPECInstance instance);
 
     LeaderVars operator+(Models::LeaderVars a, int b);
 
@@ -240,7 +246,7 @@ namespace Models {
 
         const arma::vec getz() const { return this->sol_z; }
 
-        const EPECInstance getInstance() const { return EPECInstance(this->AllLeadPars,this->TranspCosts); }
+        const EPECInstance getInstance() const { return EPECInstance(this->AllLeadPars, this->TranspCosts); }
 
     };
 
