@@ -32,6 +32,9 @@ namespace Utils{
 	void appendSave(const long int v, const string out, const string header = "", bool erase=false);
 	long int appendRead(long int &v, const string in, long int pos, const string header="");
 	
+	// Saving A unsigned int
+	void appendSave(const unsigned int v, const string out, const string header = "", bool erase=false);
+	long int appendRead(unsigned int &v, const string in, long int pos, const string header="");
 
 };
 

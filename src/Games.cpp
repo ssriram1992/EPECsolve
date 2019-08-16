@@ -86,7 +86,7 @@ void Game::QP_Param::write(string filename, bool append) const {
 Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars, int position)
 /**
  * Adds dummy variables to a parameterized mathematical program
- * @p position dictates the position at which the parameters can be added. -1 for adding at the end. 
+ * @p position dictates the position at which the parameters can be added. -1 for adding at the end.
  * @warning @position cannot be set for @vars. @vars always added at the end.
  */
 {
@@ -298,10 +298,10 @@ unique_ptr<GRBModel>
 Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
 )
 /**
- * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality. 
+ * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve the parameterized quadratic program to  optimality.
  *
  * In terms of game theory, this can be viewed as <i>the best response</i> for a set of decisions by other players.
- * 
+ *
  */
 {
     this->make_yQy();
@@ -385,7 +385,7 @@ Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N, arma::vec &q) const
 /// @brief Compute the KKT conditions for the given QP
 /**
  * Writes the KKT condition of the parameterized QP
- * As per the convention, y is the decision variable for the QP and 
+ * As per the convention, y is the decision variable for the QP and
  * that is parameterized in x
  * The KKT conditions are
  * \f$0 \leq y \perp  My + Nx + q \geq 0\f$
@@ -454,20 +454,25 @@ Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons) {
 void
 Game::QP_Param::save(string filename, bool erase ) const
 {
-	Utils::appendSave(this->Q, filename, string("QP_Param::Q"), erase);
+	Utils::appendSave(string("QP_Param"), filename, erase);
+	Utils::appendSave(this->Q, filename, string("QP_Param::Q"), false);
 	Utils::appendSave(this->A, filename, string("QP_Param::A"), false);
 	Utils::appendSave(this->B, filename, string("QP_Param::B"), false);
 	Utils::appendSave(this->C, filename, string("QP_Param::C"), false);
 	Utils::appendSave(this->b, filename, string("QP_Param::b"), false);
 	Utils::appendSave(this->c, filename, string("QP_Param::c"), false);
-	if(VERBOSE) cout<<"Saved to file "<<filename<<endl;
+	if(VERBOSE) cout<<"Saved QP_Param to file "<<filename<<endl;
 }
 
-long int  
+long int
 Game::QP_Param::load(string filename, long int pos)
 {
 	arma::sp_mat Q, A, B, C;
 	arma::vec c, b;
+	string headercheck;
+	pos = Utils::appendRead(headercheck, filename, pos);
+	if(headercheck!="QP_Param")
+		throw string("Error in QP_Param::load: In valid header - ")+headercheck;
 	pos = Utils::appendRead(Q, filename, pos, string("QP_Param::Q"));
 	pos = Utils::appendRead(A, filename, pos, string("QP_Param::A"));
 	pos = Utils::appendRead(B, filename, pos, string("QP_Param::B"));
@@ -483,7 +488,7 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
                          arma::sp_mat LeadA, arma::vec LeadRHS) : LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /**
  * @brief
- * Construct a NashGame by giving a vector of pointers to 
+ * Construct a NashGame by giving a vector of pointers to
  * QP_Param, defining each player's game
  * A set of Market clearing constraints and its RHS
  * And if there are leader variables, the number of leader vars.
@@ -493,11 +498,11 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
  * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
  *
- * In the correct ordering of variables, have the 
- * Market clearing equations ready. 
+ * In the correct ordering of variables, have the
+ * Market clearing equations ready.
  *
  * Now call this constructor.
- * It will allocate appropriate space for the dual variables 
+ * It will allocate appropriate space for the dual variables
  * for each player.
  *
  */
@@ -513,6 +518,76 @@ Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, 
     this->dual_position.resize(this->Nplayers + 1);
 
     this->set_positions();
+}
+
+void
+Game::NashGame::save(string filename, bool erase) const
+{
+	Utils::appendSave(string("NashGame"), filename, erase);
+	Utils::appendSave(this->Nplayers, filename, string("NashGame::Nplayers"), false);
+	for(unsigned int i=0; i< this->Nplayers;++i)
+		this->Players.at(i)->save(filename, false);
+	Utils::appendSave(this->MarketClearing, filename, string("NashGame::MarketClearing"), false);
+	Utils::appendSave(this->MCRHS, filename, string("NashGame::MCRHS"), false);
+	Utils::appendSave(this->LeaderConstraints, filename, string("NashGame::LeaderConstraints"), false);
+	Utils::appendSave(this->LeaderConsRHS, filename, string("NashGame::LeaderConsRHS"), false);
+	Utils::appendSave(this->n_LeadVar, filename, string("NashGame::n_LeadVar"), false);
+	if(VERBOSE) cout<<"Saved NashGame to file "<<filename<<endl;
+}
+
+long int
+Game::NashGame::load(string filename, long int pos)
+{
+	if(!this->env)
+		throw string("Error in NashGame::load: To load NashGame from file, it has to be constructed using NashGame(GRBEnv*) constructor");
+
+	string headercheck;
+	pos = Utils::appendRead(headercheck, filename, pos);
+	if(headercheck!="NashGame")
+		throw string("Error in NashGame::load: In valid header - ")+headercheck;
+
+
+	unsigned int Nplayers;
+	pos = Utils::appendRead(Nplayers, filename, pos, string("NashGame::Nplayers"));
+
+	vector<shared_ptr<QP_Param>> Players;
+	Players.resize(Nplayers);
+	for(unsigned int i=0; i< Nplayers;++i)
+	{
+		// Players.at(i) = std::make_shared<Game::QP_Param>(this->env);
+		auto temp = shared_ptr<Game::QP_Param>(new Game::QP_Param(this->env));
+		Players.at(i) = temp;
+		pos = Players.at(i)->load(filename, pos);
+	}
+
+	arma::sp_mat MarketClearing;
+	pos = Utils::appendRead(MarketClearing, filename, pos, string("NashGame::MarketClearing"));
+
+	arma::vec MCRHS;
+	pos = Utils::appendRead(MCRHS, filename, pos, string("NashGame::MCRHS"));
+
+	arma::sp_mat LeaderConstraints;
+	pos = Utils::appendRead(LeaderConstraints, filename, pos, string("NashGame::LeaderConstraints"));
+
+	arma::vec LeaderConsRHS;
+	pos = Utils::appendRead(LeaderConsRHS, filename, pos, string("NashGame::LeaderConsRHS"));
+
+	unsigned int n_LeadVar;
+	pos = Utils::appendRead(n_LeadVar, filename, pos, string("NashGame::n_LeadVar"));
+
+    // Setting the class variables
+    this->n_LeadVar = n_LeadVar;
+    this->Players = Players;
+    this->Nplayers = Nplayers;
+    this->MarketClearing = MarketClearing;
+    this->MCRHS = MCRHS;
+    // Setting the size of class variable vectors
+    this->primal_position.resize(this->Nplayers + 1);
+    this->dual_position.resize(this->Nplayers + 1);
+
+    this->set_positions();
+
+	return pos;
 }
 
 void Game::NashGame::set_positions()
@@ -564,7 +639,7 @@ Game::NashGame::FormulateLCP(
         string M_name,        ///< File name to be used to write  M
         string q_name        ///< File name to be used to write  M
 ) const {
-/// @brief Formulates the LCP corresponding to the Nash game. 
+/// @brief Formulates the LCP corresponding to the Nash game.
 /// @warning Does not return the leader constraints. Use NashGame::RewriteLeadCons() to handle them
 /**
  * Computes the KKT conditions for each Player, calling QP_Param::KKT. Arranges them systematically to return M, q
@@ -696,7 +771,7 @@ arma::sp_mat
 Game::NashGame::RewriteLeadCons() const
 /** @brief Rewrites leader constraint adjusting for dual variables.
  * Rewrites leader constraints given earlier with added empty columns and spaces corresponding to Market clearing duals and other equation duals.
- * 
+ *
  * This becomes important if the Lower level complementarity problem is passed to LCP with upper level constraints.
  */
 {
