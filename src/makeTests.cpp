@@ -148,7 +148,7 @@ void MakeCountry()
 			{
 				if(i==0 && j==0 && k==0) 
 					break;
-				for(double perclim=0.6; perclim <= 0.9; perclim += 0.1)
+				for(double perclim=0.8; perclim <= 0.95; perclim += 0.05)
 				{
 					makeLeader(i, j, k, intRandom(give), intRandom(give), intRandom(give), perclim); 
 					makeLeader(i, j, k, intRandom(give), intRandom(give), intRandom(give), perclim);
@@ -191,7 +191,7 @@ void MakeInstance(int nCountries = 2)
 
 int main()
 { 
-	for(int i=0; i<50; ++i) MakeInstance(2);
-	for(int i=0; i<50; ++i) MakeInstance(3);
+	for(int i=0; i<50; ++i) MakeInstance(4);
+	for(int i=0; i<50; ++i) MakeInstance(5);
 	return 0;
 }
