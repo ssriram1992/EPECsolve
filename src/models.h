@@ -58,6 +58,15 @@ namespace Models {
         }
     };
 
+/// @brief Stores a single Instance
+    struct EPECInstance {
+        vector<Models::LeadAllPar> Countries = {};
+        arma::sp_mat TransportationCosts = {};
+
+        EPECInstance(vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_) : Countries{Countries_},
+                                                                                    TransportationCosts{Transp_} {}
+    };
+
 
     enum class LeaderVars {
         FollowerStart,
@@ -70,6 +79,7 @@ namespace Models {
         ConvHullDummy,
         End
     };
+
     ostream &operator<<(ostream &ost, const FollPar P);
 
     ostream &operator<<(ostream &ost, const DemPar P);
@@ -80,13 +90,17 @@ namespace Models {
 
     ostream &operator<<(ostream &ost, const LeaderVars l);
 
+    ostream &operator<<(ostream &ost, EPECInstance I);
+
     using LeadLocs=map<LeaderVars, unsigned int>;
 
     void increaseVal(LeadLocs &L, const LeaderVars start, const unsigned int val, const bool startnext = true);
 
     void init(LeadLocs &L);
 
-    vector<Models::LeadAllPar> readInstance(string filename);
+    EPECInstance readInstance(string filename);
+
+    void writeInstance(string filename, EPECInstance instance);
 
     LeaderVars operator+(Models::LeaderVars a, int b);
 
@@ -153,6 +167,11 @@ namespace Models {
 
         void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj);
 
+        void
+        WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append = true) const;
+
+        void WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const;
+
         arma::vec sol_x, sol_z;
 
     public: // Attributes
@@ -213,20 +232,15 @@ namespace Models {
 
         void gur_WriteEpecMip(const unsigned int i, string filename) const;
 
-        void
-        WriteCountry(const unsigned int i, const string filename, const arma::vec x, const bool append = true) const;
-
-        void WriteFollower(const unsigned int i, const unsigned int j, const string filename, const arma::vec x) const;
-
-        void writeSolutionJSON(string filename, const arma::vec x, const arma::vec z) const ;
+        void writeSolutionJSON(string filename, const arma::vec x, const arma::vec z) const;
 
         void writeSolution(const int writeLevel, string filename) const;
-
-        void writeInstance(string filename) const;
 
         const arma::vec getx() const { return this->sol_x; }
 
         const arma::vec getz() const { return this->sol_z; }
+
+        const EPECInstance getInstance() const { return EPECInstance(this->AllLeadPars,this->TranspCosts); }
 
     };
 
