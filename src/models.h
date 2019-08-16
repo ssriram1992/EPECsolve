@@ -83,6 +83,7 @@ namespace Models {
         int numVar = {-1};///< Number of variables in findNashEq model
         int numConstraints = {-1};///< Number of constraints in findNashEq model
         int numNonZero = {-1};///< Number of non-zero coefficients in the constraint matrix of findNashEq model
+        vector<int> feasiblePolyhedra = {}; ///< Vector containing the number of non-void polyhedra, indexed by leader (country)
         double wallClockTime = {-1.0};
     };
 
@@ -255,9 +256,12 @@ namespace Models {
 
         const arma::vec getz() const { return this->sol_z; }
 
+        ///@brief Get the current EPECInstance loaded
         const EPECInstance getInstance() const { return EPECInstance(this->AllLeadPars, this->TranspCosts); }
 
+        ///@brief Get the EPECStatistics object for the current instance
         const EPECStatistics getStatistics() const { return this->Stats; }
+
 
     };
 

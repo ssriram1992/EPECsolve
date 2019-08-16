@@ -3,8 +3,7 @@
 #include<exception>
 #include"models.h"
 #include<gurobi_c++.h>
-#include<armadillo>
-#include<iomanip>
+#include <ctime>
 
 using namespace std;
 
@@ -15,7 +14,7 @@ static void show_usage(std::string name) {
          << "\t-h\t\t\tShow this help message\n"
          << "\t-v\t\t\tShow the version of EPEC\n"
          << "\t-r\t\t\tDictates the path and file name of the solution file. *default: dat/Solution (.json automatically added)**\n"
-         << "\t-rf\t\t\tDictates the path and file name of the general results file. *default: results.csv **\n"
+         << "\t-rf\t\t\tDictates the path and file name of the general results file. *default: dat/results.csv **\n"
          // << "\t-l\t\t\tDictates the 'loquacity' of EPEC. Default: 0 (non-verbose); 1 (verbose)\n"
          << "\t-s\t\t\tDictates the writeLevel for EPEC solution. Default: 0 (only JSON); 1 (only Human Readable); 2 (both)\n"
          << endl;
@@ -32,7 +31,7 @@ int main(int argc, char *argv[]) {
     }
     string resFile = "dat/Solution";
     string instanceFile = "dat/Instance";
-    string resultsFile = "results.csv";
+    string resultsFile = "dat/results.csv";
     int writeLevel = 0;
 
 
@@ -69,11 +68,20 @@ int main(int argc, char *argv[]) {
             instanceFile = argv[i];
         }
     }
+
+    // --------------------------------
+    // LOADING INSTANCE
+    // --------------------------------
     Models::EPECInstance Instance(instanceFile);
     if (Instance.Countries.empty()) {
         cerr << "Error: instance is empty" << endl;
         return 1;
     }
+
+    // --------------------------------
+    // TEST STARTS
+    // --------------------------------
+    clock_t time_start = clock();
     GRBEnv env = GRBEnv();
     Models::EPEC epec(&env);
     for (int j = 0; j < Instance.Countries.size(); ++j)
@@ -82,10 +90,25 @@ int main(int argc, char *argv[]) {
     epec.finalize();
     epec.make_country_QP();
     epec.findNashEq();
+    clock_t time_stop = clock();
+    double CPUTime = 1000.0 * (time_stop - time_start) / CLOCKS_PER_SEC;
+
+    // --------------------------------
+    // WRITING STATISTICS AND SOLUTION
+    // --------------------------------
     epec.writeSolution(writeLevel, resFile);
-    std::ofstream results(resultsFile);
-    // Instance_name, nCountries, nFollowers
-    results << instanceFile << ";" <<endl;
+    Models::EPECStatistics stat = epec.getStatistics();
+    std::ofstream results(resultsFile, ios::app);
+    stringstream PolyT;
+    copy(stat.feasiblePolyhedra.begin(), stat.feasiblePolyhedra.end(), ostream_iterator<int>(PolyT, " "));
+
+    // Instance_name, nCountries, nFollowers (array indexed by country), status (boolean, solved or not), numPolyhedra (array indexed by country), numVar, numConstraints, numNonZero, CPUTime
+    results << instanceFile << ";" << to_string(Instance.Countries.size()) << ";[";
+    for (auto &Countrie : Instance.Countries)
+        results << " " << to_string(Countrie.n_followers);
+    results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];" << to_string(stat.numVar) << ";"
+            << to_string(stat.numConstraints)
+            << ";" << to_string(stat.numNonZero) << ";" << to_string(CPUTime) << "\n";
     results.close();
     return 0;
 } 

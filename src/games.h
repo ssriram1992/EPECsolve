@@ -136,6 +136,7 @@ namespace Game {
         GRBEnv *env;
         GRBModel QuadModel;
         bool made_yQy;
+        int feasiblePolyhedra = {-1};
 
         int make_yQy();
 
@@ -167,6 +168,10 @@ namespace Game {
 
         QP_Param &set(QP_objective &&obj, QP_constraints &&cons) final;
 
+        void setFeasiblePolyhedra(int num) { this->feasiblePolyhedra = num; }
+
+        const int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
+
         bool operator==(const QP_Param &Q2) const;
 
         // Other methods
@@ -187,8 +192,10 @@ namespace Game {
         QP_Param &addDummy(unsigned int pars, unsigned int vars = 0, int position = -1) override;
 
         void write(string filename, bool append) const;
-		void save(string filename, bool erase = true) const;
-		long int load(string filename, long int pos = 0);
+
+        void save(string filename, bool erase = true) const;
+
+        long int load(string filename, long int pos = 0);
     };
 
 /**
@@ -206,7 +213,7 @@ namespace Game {
  */
     class NashGame {
     private:
-		GRBEnv* env=nullptr;
+        GRBEnv *env = nullptr;
         arma::sp_mat LeaderConstraints;          ///< Upper level leader constraints LHS
         arma::vec LeaderConsRHS;              ///< Upper level leader constraints RHS
         unsigned int Nplayers;                  ///< Number of players in the Nash Game
@@ -231,7 +238,7 @@ namespace Game {
         void set_positions();
 
     public: // Constructors
-		NashGame(GRBEnv* e):env{e}{}; ///< To be used only when NashGame is being loaded from a file.
+        NashGame(GRBEnv *e) : env{e} {}; ///< To be used only when NashGame is being loaded from a file.
         NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
                  arma::vec MCRHS, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {}, arma::vec LeadRHS = {});
 
@@ -298,8 +305,10 @@ namespace Game {
         NashGame &addLeadCons(const arma::vec &a, double b);
 
         void write(string filename, bool append = true, bool KKT = false) const;
-		void save(string filename, bool erase=true) const;
-		long int load(string filename, long int pos = 0); 
+
+        void save(string filename, bool erase = true) const;
+
+        long int load(string filename, long int pos = 0);
     };
 
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);

@@ -861,8 +861,10 @@ Models::EPEC::make_country_QP()
 {
     static bool already_ran{false};
     if (!already_ran)
-        for (unsigned int i = 0; i < this->nCountr; ++i)
+        for (unsigned int i = 0; i < this->nCountr; ++i) {
             this->make_country_QP(i);
+            this->Stats.feasiblePolyhedra.push_back(this->country_QP.at(i)->getFeasiblePolyhedra());
+        }
     for (unsigned int i = 0; i < this->nCountr; ++i) {
         LeadLocs &Loc = this->Locations.at(i);
         // Adjusting "stuff" because we now have new convHull variables
