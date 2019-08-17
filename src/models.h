@@ -79,7 +79,7 @@ namespace Models {
 
     /// @brief Stores statistics for a (solved) EPEC instance
     struct EPECStatistics {
-        bool status = {false}; ///< Boolean status: true if the instance has a NashEquilibrium
+        int status = {0}; ///<status: 1: nashEq found. 0:no nashEq found. 2:timeLimit
         int numVar = {-1};///< Number of variables in findNashEq model
         int numConstraints = {-1};///< Number of constraints in findNashEq model
         int numNonZero = {-1};///< Number of non-zero coefficients in the constraint matrix of findNashEq model

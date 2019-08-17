@@ -1,7 +1,7 @@
 dataFolder="dat"
 resultsFolder=${dataFolder}/results
 resultsFile=${resultsFolder}/results.csv
-numThreads=8
+numThreads=12
 mkdir ${resultsFolder}
 for ex in $(ls ${dataFolder}/*.json); do
       instanceName=${ex/.json/}

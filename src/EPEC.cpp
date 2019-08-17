@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
     // WRITING STATISTICS AND SOLUTION
     // --------------------------------
     Models::EPECStatistics stat = epec.getStatistics();
-    if (stat.status) epec.writeSolution(writeLevel, resFile);
+    if (stat.status == 1) epec.writeSolution(writeLevel, resFile);
     ifstream existCheck(resultsFile);
     std::ofstream results(resultsFile, ios::app);
     if (!existCheck.good()) {

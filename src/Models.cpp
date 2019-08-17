@@ -980,9 +980,14 @@ Models::EPEC::findNashEq() {
                      << " "
                      << temp << endl;
             }
-            this->Stats.status = true;
+            this->Stats.status = 1;
         } else {
-            cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
+            if (status == GRB_TIME_LIMIT) {
+                this->Stats.status = 2;
+                cerr << "Models::EPEC::findNashEq: no nash equilibrium found (timeLimit)." << endl;
+            }
+            else
+                cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
         }
 
     } else {
@@ -1127,7 +1132,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
     * @brief Writes the computed Nash Equilibrium in the EPEC instance
     * @p writeLevel is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both
     */
-    if (this->Stats.status) {
+    if (this->Stats.status == 1) {
         if (writeLevel == 1 || writeLevel == 2) {
             this->WriteCountry(0, filename + ".txt", this->sol_x, false);
             for (unsigned int ell = 1; ell < this->nCountr; ++ell)
