@@ -2,91 +2,45 @@
 #include<cstdlib>
 #include<iterator>
 #include<ctime>
-#include<math.h>
 #include"models.h"
 #include<gurobi_c++.h>
+#include<boost/program_options.hpp>
 
 using namespace std;
+using namespace boost::program_options;
+namespace po = boost::program_options;
 
-static void show_usage(std::string name) {
-    cerr << "Usage: " << name << " InstanceFile" << endl
-         << "InstanceFile:\t\tThe path and file name of the JSON instance. **default: dat/Instance (.json automatically added)**\n\n"
-         << "Options:\n"
-         << "\t-h\t\t\tShow this help message\n"
-         << "\t-v\t\t\tShow the version of EPEC\n"
-         << "\t-r\t\t\tDictates the path and file name of the solution file. **default: dat/Solution (.json automatically added)**\n"
-         << "\t-tl\t\t\tDictates the timelimit for EPEC. **default: inf****\n"
-         << "\t-rf\t\t\tDictates the path and file name of the general results file. **default: dat/results.csv **\n"
-         // << "\t-l\t\t\tDictates the 'loquacity' of EPEC. Default: 0 (non-verbose); 1 (verbose)\n"
-         << "\t-s\t\t\tDictates the writeLevel for EPEC solution. Default: 0 (only JSON); 1 (only Human Readable); 2 (both)\n"
-         << "\t-t\t\t\tNumber of threads for Gurobi and OPEN_BLAS. Default: 1; int (number of cores); 0 (auto)\n"
-         << endl;
-}
+int main(int argc, char **argv)
+{
+    string resFile,instanceFile="",logFile;
+    int writeLevel,nThreads;
+    double timeLimit;
+    po::options_description desc("EPEC: Allowed options");
+    desc.add_options()
+            ("help,h", "Shows this help message")
+            ("version,v", "Shows EPEC version")
+            ("input,i", po::value<string>(&instanceFile), "Sets the input path/filename of the instance file (.json appended automatically)")
+            ("solution,s", po::value<string>(&resFile)->default_value("dat/Solution"), "Sets the output path/filename of the solution file (.json appended automatically)")
+            ("log,l", po::value<string>(&logFile)->default_value("dat/Results.csv"), "Sets the output path/filename of the log file")
+            ("timelimit,tl", po::value<double>(&timeLimit)->default_value(-1.0), "Sets the timelimit for solving the Nash Equilibrium model")
+            ("writelevel,w", po::value<int>(&writeLevel)->default_value(0), "Sets the writeLevel param. 0: only Json. 1: only human-readable. 2:both")
+            ("threads,t", po::value<int>(&nThreads)->default_value(1), "Sets the number of Threads for Gurobi")
+            ;
 
-int main(int argc, char *argv[]) {
-    /**
-    * @brief Pushes an instance from a file to the EPEC code
-    * @p arg1 contains the
-    */
-    if (argc < 2) {
-        show_usage(argv[0]);
-        return 0;
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::store(po::command_line_parser(argc, argv). options(desc).run(), vm);
+    po::notify(vm);
+
+    if(vm.count("help")){
+        cout << desc;
+        return EXIT_SUCCESS;
     }
-    string resFile = "dat/Solution";
-    string instanceFile = "dat/Instance";
-    string resultsFile = "dat/results.csv";
-    int writeLevel = 0;
-    int nThreads = 1;
-    double timeLimit = -1;
-
-
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if ((arg == "-h")) {
-            show_usage(argv[0]);
-            return 0;
-        } else if ((arg == "-v")) {
-            cout << "EPEC v" << to_string(EPECVERSION) << endl;
-            return 0;
-        } else if ((arg == "-r")) {
-            if (i + 1 < argc) {
-                resFile = argv[++i];
-            } else {
-                cerr << "-r option requires one argument." << endl;
-                return 0;
-            }
-        } else if ((arg == "-rf")) {
-            if (i + 1 < argc) {
-                resultsFile = argv[++i];
-            } else {
-                cerr << "-rf option requires one argument." << endl;
-                return 0;
-            }
-        } else if ((arg == "-s")) {
-            if (i + 1 < argc) {
-                writeLevel = strtol(argv[++i], NULL, 10);
-            } else {
-                cerr << "-s option requires one argument." << endl;
-                return 0;
-            }
-        } else if ((arg == "-t")) {
-            if (i + 1 < argc) {
-                nThreads = strtol(argv[++i], NULL, 10);
-            } else {
-                cerr << "-t option requires one argument." << endl;
-                return 0;
-            }
-        } else if ((arg == "-tl")) {
-            if (i + 1 < argc) {
-                timeLimit = strtod(argv[++i], NULL);
-            } else {
-                cerr << "-t option requires one argument." << endl;
-                return 0;
-            }
-        } else {
-            instanceFile = argv[i];
-        }
+    if (instanceFile == ""){
+        cout << "-i [--input] option missing"<<endl;
+        return EXIT_SUCCESS;
     }
+
 
     // --------------------------------
     // LOADING INSTANCE
@@ -126,8 +80,8 @@ int main(int argc, char *argv[]) {
     // --------------------------------
     Models::EPECStatistics stat = epec.getStatistics();
     if (stat.status == 1) epec.writeSolution(writeLevel, resFile);
-    ifstream existCheck(resultsFile);
-    std::ofstream results(resultsFile, ios::app);
+    ifstream existCheck(logFile);
+    std::ofstream results(logFile, ios::app);
     if (!existCheck.good()) {
         results
                 << "Instance;Countries;Followers;Status;numFeasiblePolyhedra;numVar;numConstraints;numNonZero;CPUTime (ms)\n";
@@ -143,6 +97,7 @@ int main(int argc, char *argv[]) {
             << to_string(stat.numConstraints)
             << ";" << to_string(stat.numNonZero) << ";" << to_string(CPUTime) << "\n";
     results.close();
-    return 0;
+
+    return EXIT_SUCCESS;
 } 
 

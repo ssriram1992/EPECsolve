@@ -966,7 +966,7 @@ Models::EPEC::findNashEq() {
         this->sol_z.zeros(Nvar);
         unsigned int temp;
         int status = lcpmodel->get(GRB_IntAttr_Status);
-        if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL) {
+        if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL || status==GRB_SOLUTION_LIMIT) {
             try {
                 for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);

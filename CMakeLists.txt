@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.14)
 project(EPECsolve)
 add_compile_options(-std=c++11)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_SHARED_LINKER_FLAGS "-lgurobi_c++ -lgurobi81 -larmadillo -lblas -llapack -lm -lpthread")
+set(CMAKE_SHARED_LINKER_FLAGS "-lgurobi_c++ -lgurobi81 -larmadillo -lblas -llapack -lm -lpthread -lboost_program_options")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 #From https://github.com/LiangliangNan/PolyFit/blob/master/cmake/FindGUROBI.cmake
 if (NOT GUROBI_FOUND)
@@ -103,10 +103,12 @@ add_executable(EPECtest
                src/models.h
                test/EPEC.cpp)
 
-target_link_libraries(EPEC ${GUROBI_LIBRARIES})
+
 target_link_libraries(EPECInstances ${GUROBI_LIBRARIES})
 if (ROSSOBIANCO)
+    target_link_libraries(EPEC /home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0/lib/libboost_program_options.a ${GUROBI_LIBRARIES})
     target_link_libraries(EPECtest /home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0/lib/libboost_unit_test_framework.a ${GUROBI_LIBRARIES})
 ELSE ()
+    target_link_libraries(EPEC /usr/local/boost-1.70.0/lib/libboost_program_options.a ${GUROBI_LIBRARIES})
     target_link_libraries(EPECtest /usr/local/boost-1.70.0/lib/libboost_unit_test_framework.a ${GUROBI_LIBRARIES})
 ENDIF ()
