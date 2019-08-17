@@ -536,5 +536,6 @@ namespace Game {
 	Game::NashGame Nash2(&env);
 	Nash2.load("dat/Nash.dat"); // Loads the object into memory.
  * @endcode
+ * Now that you are aware of most of the functionalities of Game::NashGame, let us switch to the next tutorial on @link LCP_Example LCP @endlink.
  *
  */

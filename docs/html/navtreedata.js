@@ -30,6 +30,7 @@ var NAVTREE =
     ] ],
     [ "Game::QP_Param Example", "QP_Param_Example.html", null ],
     [ "Game::NashGame and LCP Example", "NashGame_Example.html", null ],
+    [ "Game::LCP Example", "LCP_Example.html", null ],
     [ "Todo List", "todo.html", null ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
@@ -66,7 +67,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "Games_8cpp.html",
-"classModels_1_1EPEC.html#aa12d1e6f5237d58d74ef56b93cea45be"
+"classModels_1_1EPEC.html#a9f830ccbcfa7d487c004a6efa7ddd890"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

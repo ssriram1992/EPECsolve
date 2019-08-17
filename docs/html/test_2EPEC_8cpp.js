@@ -19,6 +19,7 @@ var test_2EPEC_8cpp =
     [ "BOOST_AUTO_TEST_CASE", "test_2EPEC_8cpp.html#ad0c699f82ddca9839ddfdb345fdb77ba", null ],
     [ "BOOST_AUTO_TEST_CASE", "test_2EPEC_8cpp.html#a701dc30e254694053d99b5535a9f168b", null ],
     [ "BOOST_AUTO_TEST_CASE", "test_2EPEC_8cpp.html#a1e76ad7b1069acda765f9db2d66107b9", null ],
+    [ "BOOST_AUTO_TEST_CASE", "test_2EPEC_8cpp.html#af8e8f572e339c5d3f9ac7f1f1bf9e420", null ],
     [ "BOOST_AUTO_TEST_CASE", "test_2EPEC_8cpp.html#af6057a25369bb3d51ce471d0ba2522f5", null ],
     [ "BOOST_AUTO_TEST_CASE", "test_2EPEC_8cpp.html#afefbdafb7597d2f57145eeb74f7650dd", null ]
 ];

@@ -61,3 +61,11 @@
 \form#60:$q_1=28.271$
 \form#61:$q_2=27.8037$
 \form#62:$ 0 \le x \perp Mx + q \ge 0 $
+\form#63:\begin{eqnarray} Ax + By \leq b\\ 0 \leq x \perp Mx + Ny + q \geq 0 \end{eqnarray}
+\form#64:\begin{align*} x_1 + x_2 + x_3 \le 12\\ 0\le x_2 \le 2\\ 0\le x_1 \perp x_4 - 1 \ge 0\\ 0 \le x_3 \perp 2x_3 + x_5 \ge 0\\ 0 \le x_4 \perp -x_1 + x_2 + 10 \ge 0\\ 0 \le x_5 \perp x_2 - x_3 + 5 \ge 0 \end{align*}
+\form#65:\begin{align*} x_1 + x_2 + x_3 \le 12\\ 0\le x_1 \perp x_4 - 1 \ge 0\\ 0\le x_2 \le 2 \qquad \text{(No complementarity)}\\ 0 \le x_3 \perp 2x_3 + x_5 \ge 0\\ 0 \le x_4 \perp -x_1 + x_2 + 10 \ge 0\\ 0 \le x_5 \perp x_2 - x_3 + 5 \ge 0 \end{align*}
+\form#66:\begin{align*} x_1 + x_2 + x_3 \le 12\\ 0\le x_1 \perp x_4 - 1 \ge 0\\ 0\le x_2 \le 2 \\ 0 \le x_3 \perp 2x_3 + x_5 \ge 0\\ 0 \le x_4 \perp -x_1 + x_2 + 10 \ge 0\\ 0 \le x_5 \perp x_2 - x_3 + 5 \ge 0 \end{align*}
+\form#67:$ x_2 $
+\form#68:$x_2$
+\form#69:\begin{align} x_1 &= 10 + t\\ x_2 &= t\\ x_3 &= 0\\ x_4 &= 1\\ x_5 &= 0 \end{align}
+\form#70:$t \in [0, 1]$

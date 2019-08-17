@@ -276,6 +276,42 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
 
     }
 
+	BOOST_AUTO_TEST_CASE(LCP_test){
+			// For the problem in LCP tutorial.
+		arma::sp_mat M(4, 5); // We have four complementarity eqns and 5 variables.
+		arma::vec q(4);
+		M.zeros(); 
+		// First eqn
+		M(0, 3) = 1;
+		q(0) = -1;
+		// Second eqn
+		M(1, 2) = 2;
+		M(1, 4)  = 1;
+		q(1) = 0;
+		// Third eqn
+		M(2, 0) = -1;
+		M(2, 1) = 1;
+		q(2) = 10;
+		// Fourth eqn
+		M(3, 1) = 1 ;
+		M(3, 2) = -1;
+		q(3) = 5;
+		// Other common constraints
+		arma::sp_mat A(2, 5); arma::vec b;
+		A.zeros(); 
+		// x_2 <= 2 constraint
+		A(0, 1) = 1;
+		b(0) = 2;
+		// x_1 + x_2 + x_3 <= 12 constraint
+		A(1, 0) = 1;
+		A(1, 1) = 1;
+		A(1, 2) = 1;
+		b(1) = 12;
+		// Creating the LCP object
+		GRBEnv env;
+		LCP lcp = LCP(&env, M, q, 1, 1, A, b);
+	}
+
     BOOST_AUTO_TEST_CASE(ConvexHull_test) {
 
         /** Testing the convexHull method
