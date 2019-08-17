@@ -530,4 +530,11 @@ namespace Game {
  * 
  * The solution to this problem can be obtained as @f$q_1=28.271@f$, @f$q_2=27.8037@f$.
  *
+ * And note that, just like Game::QP_Param, Game::NashGame can also be saved to and loaded from an external file.
+ * @code
+ 	Nash.save("dat/Nash.dat"); //Saves the object
+	Game::NashGame Nash2(&env);
+	Nash2.load("dat/Nash.dat"); // Loads the object into memory.
+ * @endcode
+ *
  */
