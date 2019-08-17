@@ -958,13 +958,15 @@ Models::EPEC::findNashEq() {
         this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
         this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
         this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
+        if (this->timeLimit > 0)
+            this->lcpmodel->set(GRB_DoubleParam_TimeLimit, this->timeLimit);
         lcpmodel->optimize();
         this->Stats.wallClockTime = lcpmodel->get(GRB_DoubleAttr_Runtime);
         this->sol_x.zeros(Nvar);
         this->sol_z.zeros(Nvar);
         unsigned int temp;
         int status = lcpmodel->get(GRB_IntAttr_Status);
-        if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE && status != GRB_INFEASIBLE) {
+        if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL) {
             try {
                 for (unsigned int i = 0; i < (unsigned int) Nvar; i++) {
                     this->sol_x(i) = lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
@@ -978,9 +980,14 @@ Models::EPEC::findNashEq() {
                      << " "
                      << temp << endl;
             }
-            this->Stats.status = true;
+            this->Stats.status = 1;
         } else {
-            cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
+            if (status == GRB_TIME_LIMIT) {
+                this->Stats.status = 2;
+                cerr << "Models::EPEC::findNashEq: no nash equilibrium found (timeLimit)." << endl;
+            }
+            else
+                cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
         }
 
     } else {
@@ -1125,7 +1132,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
     * @brief Writes the computed Nash Equilibrium in the EPEC instance
     * @p writeLevel is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both
     */
-    if (this->Stats.status) {
+    if (this->Stats.status == 1) {
         if (writeLevel == 1 || writeLevel == 2) {
             this->WriteCountry(0, filename + ".txt", this->sol_x, false);
             for (unsigned int ell = 1; ell < this->nCountr; ++ell)

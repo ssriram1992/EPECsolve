@@ -14,8 +14,9 @@ static void show_usage(std::string name) {
          << "Options:\n"
          << "\t-h\t\t\tShow this help message\n"
          << "\t-v\t\t\tShow the version of EPEC\n"
-         << "\t-r\t\t\tDictates the path and file name of the solution file. *default: dat/Solution (.json automatically added)**\n"
-         << "\t-rf\t\t\tDictates the path and file name of the general results file. *default: dat/results.csv **\n"
+         << "\t-r\t\t\tDictates the path and file name of the solution file. **default: dat/Solution (.json automatically added)**\n"
+         << "\t-tl\t\t\tDictates the timelimit for EPEC. **default: inf****\n"
+         << "\t-rf\t\t\tDictates the path and file name of the general results file. **default: dat/results.csv **\n"
          // << "\t-l\t\t\tDictates the 'loquacity' of EPEC. Default: 0 (non-verbose); 1 (verbose)\n"
          << "\t-s\t\t\tDictates the writeLevel for EPEC solution. Default: 0 (only JSON); 1 (only Human Readable); 2 (both)\n"
          << "\t-t\t\t\tNumber of threads for Gurobi and OPEN_BLAS. Default: 1; int (number of cores); 0 (auto)\n"
@@ -36,6 +37,7 @@ int main(int argc, char *argv[]) {
     string resultsFile = "dat/results.csv";
     int writeLevel = 0;
     int nThreads = 1;
+    double timeLimit = -1;
 
 
     for (int i = 1; i < argc; ++i) {
@@ -74,6 +76,13 @@ int main(int argc, char *argv[]) {
                 cerr << "-t option requires one argument." << endl;
                 return 0;
             }
+        } else if ((arg == "-tl")) {
+            if (i + 1 < argc) {
+                timeLimit = strtod(argv[++i], NULL);
+            } else {
+                cerr << "-t option requires one argument." << endl;
+                return 0;
+            }
         } else {
             instanceFile = argv[i];
         }
@@ -94,10 +103,12 @@ int main(int argc, char *argv[]) {
     clock_t time_start = clock();
     GRBEnv env = GRBEnv();
     env.set(GRB_IntParam_Threads, nThreads);
-    char envThreads[(int) ceil((nThreads + 1) / 10)];
+    /*char envThreads[(int) ceil((nThreads + 1) / 10)];
     strcpy(envThreads, to_string(nThreads).c_str());
     setenv("OPENBLAS_NUM_THREADS", envThreads, true);
+     */
     Models::EPEC epec(&env);
+    epec.timeLimit = timeLimit;
     for (int j = 0; j < Instance.Countries.size(); ++j)
         epec.addCountry(Instance.Countries.at(j));
     epec.addTranspCosts(Instance.TransportationCosts);
@@ -114,7 +125,7 @@ int main(int argc, char *argv[]) {
     // WRITING STATISTICS AND SOLUTION
     // --------------------------------
     Models::EPECStatistics stat = epec.getStatistics();
-    if (stat.status) epec.writeSolution(writeLevel, resFile);
+    if (stat.status == 1) epec.writeSolution(writeLevel, resFile);
     ifstream existCheck(resultsFile);
     std::ofstream results(resultsFile, ios::app);
     if (!existCheck.good()) {

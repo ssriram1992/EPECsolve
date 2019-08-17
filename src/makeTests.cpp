@@ -177,6 +177,7 @@ void MakeInstance(int nCountries = 2) {
 }
 
 int main() {
+    for (int i = 0; i < 50; ++i) MakeInstance(3);
     for (int i = 0; i < 50; ++i) MakeInstance(4);
     for (int i = 0; i < 50; ++i) MakeInstance(5);
     return 0;
