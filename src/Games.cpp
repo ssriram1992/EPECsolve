@@ -87,7 +87,7 @@ Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars, i
 /**
  * Adds dummy variables to a parameterized mathematical program
  * @p position dictates the position at which the parameters can be added. -1 for adding at the end.
- * @warning @position cannot be set for @vars. @vars always added at the end.
+ * @warning @p position cannot be set for @p vars. @p vars always added at the end.
  */
 {
     this->Nx += pars;
@@ -465,6 +465,22 @@ Game::QP_Param::save(string filename, bool erase) const {
 
 long int
 Game::QP_Param::load(string filename, long int pos) {
+	/**
+	 * @brief Loads the @p QP_Param object stored in a file.  Before calling this function, use the constructor QP_Param::QP_Param(GRBEnv *env) to initialize.
+	 * @details Loads the @p QP_Param object stored in a file.  Before calling this function, use the constructor QP_Param::QP_Param(GRBEnv *env) to initialize.
+	 * Example usage:
+	 * @code{.cpp}
+	 * int main()
+	 * {
+	 * 		GRBEnv env;
+	 * 		Game::QP_Param q1(&env);
+	 * 		q1.load("./dat/q1data.dat");
+	 * 		std::cout<<q1<<endl;
+	 * 		return 0;
+	 * }
+	 * @endcode
+	 *
+	 */
     arma::sp_mat Q, A, B, C;
     arma::vec c, b;
     string headercheck;
@@ -534,6 +550,22 @@ Game::NashGame::save(string filename, bool erase) const {
 
 long int
 Game::NashGame::load(string filename, long int pos) {
+	/**
+	 * @brief Loads the @p NashGame object stored in a file.  Before calling this function, use the constructor NashGame::NashGame(GRBEnv *env) to initialize.
+	 * @details Loads the @p NashGame object stored in a file.  Before calling this function, use the constructor NashGame::NashGame(GRBEnv *env) to initialize.
+	 * Example usage:
+	 * @code{.cpp}
+	 * int main()
+	 * {
+	 * 		GRBEnv env;
+	 * 		Game::NashGame N(&env);
+	 * 		N.load("./dat/Ndata.dat");
+	 * 		std::cout<<N<<endl;
+	 * 		return 0;
+	 * }
+	 * @endcode
+	 *
+	 */
     if (!this->env)
         throw string(
                 "Error in NashGame::load: To load NashGame from file, it has to be constructed using NashGame(GRBEnv*) constructor");

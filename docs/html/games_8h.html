@@ -9,6 +9,14 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(initResizable);
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +54,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('games_8h.html','');});
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,11 +85,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
@@ -121,12 +141,6 @@ Functions</h2></td></tr>
 <tr class="separator:a3d8f95f2d5e7c0bcba16c32863b8a482"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51325d57a47d02551698662525864ef1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#a51325d57a47d02551698662525864ef1">Game::isZero</a> (arma::sp_mat M, double tol=1e-6)</td></tr>
 <tr class="separator:a51325d57a47d02551698662525864ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf65f62920c0dd2344d9092988e8e928"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#abf65f62920c0dd2344d9092988e8e928">Game::resize_patch</a> (const arma::sp_mat &amp;Mat, const unsigned int nR, const unsigned int nC)</td></tr>
-<tr class="separator:abf65f62920c0dd2344d9092988e8e928"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa66bac01eb496f00c8e32470351a30d8"><td class="memItemLeft" align="right" valign="top">arma::mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#aa66bac01eb496f00c8e32470351a30d8">Game::resize_patch</a> (const arma::mat &amp;Mat, const unsigned int nR, const unsigned int nC)</td></tr>
-<tr class="separator:aa66bac01eb496f00c8e32470351a30d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a242496e8197848024f6b73c7a8a3538a"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#a242496e8197848024f6b73c7a8a3538a">Game::resize_patch</a> (const arma::vec &amp;Mat, const unsigned int nR)</td></tr>
-<tr class="separator:a242496e8197848024f6b73c7a8a3538a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5de9da6265b1d8233c1969a24a541175"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#a5de9da6265b1d8233c1969a24a541175">Game::operator&lt;&lt;</a> (ostream &amp;os, const <a class="el" href="classGame_1_1QP__Param.html">QP_Param</a> &amp;Q)</td></tr>
 <tr class="separator:a5de9da6265b1d8233c1969a24a541175"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa33fd56716c09c955efc6f66576ec15a"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#aa33fd56716c09c955efc6f66576ec15a">Game::operator&lt;&lt;</a> (ostream &amp;ost, const <a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> &amp;C)</td></tr>
@@ -135,11 +149,15 @@ Functions</h2></td></tr>
 <tr class="separator:a16b26dcd7a86efa5ee74ce6e1d709aea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.16
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="games_8h.html">games.h</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.16 </li>
+  </ul>
+</div>
 </body>
 </html>

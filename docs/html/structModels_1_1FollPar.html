@@ -9,6 +9,14 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(initResizable);
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +54,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('structModels_1_1FollPar.html','');});
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,13 +85,9 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespaceModels.html">Models</a></li><li class="navelem"><a class="el" href="structModels_1_1FollPar.html">FollPar</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
 <div class="title">Models::FollPar Struct Reference</div>  </div>
@@ -78,6 +99,11 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="models_8h_source.html">models.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a87b41b23a2fc0abe0e4f315a51aa6678"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1FollPar.html#a87b41b23a2fc0abe0e4f315a51aa6678">FollPar</a> (vector&lt; double &gt; costs_quad_={}, vector&lt; double &gt; costs_lin_={}, vector&lt; double &gt; capacities_={}, vector&lt; double &gt; emission_costs_={}, vector&lt; double &gt; tax_caps_={}, vector&lt; string &gt; names_={})</td></tr>
+<tr class="separator:a87b41b23a2fc0abe0e4f315a51aa6678"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr class="memitem:a55746125a9d34c969a27fe0c577a8fb2"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1FollPar.html#a55746125a9d34c969a27fe0c577a8fb2">costs_quad</a> = {}</td></tr>
@@ -92,6 +118,9 @@ Data Fields</h2></td></tr>
 <tr class="memitem:abc07ccf3fe8d14990aee5a2a824a226b"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1FollPar.html#abc07ccf3fe8d14990aee5a2a824a226b">emission_costs</a> = {}</td></tr>
 <tr class="memdesc:abc07ccf3fe8d14990aee5a2a824a226b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emission costs for unit quantity of the fuel. Emission costs feature only on the leader's problem.  <a href="#abc07ccf3fe8d14990aee5a2a824a226b">More...</a><br /></td></tr>
 <tr class="separator:abc07ccf3fe8d14990aee5a2a824a226b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0799e4bf19cde99ac55402390a3338df"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1FollPar.html#a0799e4bf19cde99ac55402390a3338df">tax_caps</a> = {}</td></tr>
+<tr class="memdesc:a0799e4bf19cde99ac55402390a3338df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Individual tax caps for each follower.  <a href="#a0799e4bf19cde99ac55402390a3338df">More...</a><br /></td></tr>
+<tr class="separator:a0799e4bf19cde99ac55402390a3338df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24bde6b28a0fab1b339c016fb97685da"><td class="memItemLeft" align="right" valign="top">vector&lt; string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1FollPar.html#a24bde6b28a0fab1b339c016fb97685da">names</a> = {}</td></tr>
 <tr class="memdesc:a24bde6b28a0fab1b339c016fb97685da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional Names for the Followers.  <a href="#a24bde6b28a0fab1b339c016fb97685da">More...</a><br /></td></tr>
 <tr class="separator:a24bde6b28a0fab1b339c016fb97685da"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -100,7 +129,70 @@ Data Fields</h2></td></tr>
 <div class="textblock"><p>Stores the parameters of the follower in a country model. </p>
 
 <p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00017">17</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
-</div><h2 class="groupheader">Field Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a87b41b23a2fc0abe0e4f315a51aa6678"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87b41b23a2fc0abe0e4f315a51aa6678">&#9670;&nbsp;</a></span>FollPar()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Models::FollPar::FollPar </td>
+          <td>(</td>
+          <td class="paramtype">vector&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>costs_quad_</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>costs_lin_</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>capacities_</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>emission_costs_</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>tax_caps_</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector&lt; string &gt;&#160;</td>
+          <td class="paramname"><em>names_</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00024">24</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Field Documentation</h2>
 <a id="afb8e83227eaf5daabece506d10c0dc6b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afb8e83227eaf5daabece506d10c0dc6b">&#9670;&nbsp;</a></span>capacities</h2>
 
@@ -187,6 +279,24 @@ Data Fields</h2></td></tr>
 
 <p>Optional Names for the Followers. </p>
 
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00023">23</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+
+</div>
+</div>
+<a id="a0799e4bf19cde99ac55402390a3338df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0799e4bf19cde99ac55402390a3338df">&#9670;&nbsp;</a></span>tax_caps</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;double&gt; Models::FollPar::tax_caps = {}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Individual tax caps for each follower. </p>
+
 <p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00022">22</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
 
 </div>
@@ -195,11 +305,15 @@ Data Fields</h2></td></tr>
 <li><a class="el" href="models_8h_source.html">models.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.16
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceModels.html">Models</a></li><li class="navelem"><a class="el" href="structModels_1_1FollPar.html">FollPar</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.16 </li>
+  </ul>
+</div>
 </body>
 </html>

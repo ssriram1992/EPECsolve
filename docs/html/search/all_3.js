@@ -10,6 +10,7 @@ var searchData=
   ['convhulldummy',['ConvHullDummy',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea2afd0bab7c35873bc8dd372c6d255448',1,'Models']]],
   ['costs_5flin',['costs_lin',['../structModels_1_1FollPar.html#aaa36c0543e54c59699f0da4164e65b5b',1,'Models::FollPar']]],
   ['costs_5fquad',['costs_quad',['../structModels_1_1FollPar.html#a55746125a9d34c969a27fe0c577a8fb2',1,'Models::FollPar']]],
+  ['countries',['Countries',['../structModels_1_1EPECInstance.html#a33b4b7a619654eb3ef7636443ec867bb',1,'Models::EPECInstance']]],
   ['countries_5fll',['countries_LL',['../classModels_1_1EPEC.html#a82eab96ef7e7c45219555958d67e29a1',1,'Models::EPEC']]],
   ['country_5fqp',['country_QP',['../classModels_1_1EPEC.html#aaf4329d9fc37b38c59b4f2f459daac2c',1,'Models::EPEC']]],
   ['countryimport',['CountryImport',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eabaf050cedcda40eabc94d4a7bd5116cb',1,'Models']]]

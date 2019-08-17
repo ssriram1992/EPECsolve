@@ -9,6 +9,14 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(initResizable);
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -47,6 +55,22 @@ $(function() {
 /* @license-end */</script>
 <div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('globals.html','');});
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -62,52 +86,92 @@ $(function() {
 </div>
 
 <div class="contents">
-<div class="textblock">Here is a list of all functions, variables, defines, enums, and typedefs with links to the files they belong to:</div><ul>
-<li>BilevelTest()
-: <a class="el" href="EPEC_8cpp.html#ad47263d168e2bd59fb9834c5fe05eca9">EPEC.cpp</a>
+<div class="textblock">Here is a list of all functions, variables, defines, enums, and typedefs with links to the files they belong to:</div>
+
+<h3><a id="index_a"></a>- a -</h3><ul>
+<li>appendRead()
+: <a class="el" href="Utils_8cpp.html#a6141782364a882df606206a15b8f1c53">Utils.cpp</a>
 </li>
-<li>LCPtest()
-: <a class="el" href="EPEC_8cpp.html#a29a8a567507a4fe9e7396a7116c87d07">EPEC.cpp</a>
+<li>appendSave()
+: <a class="el" href="Utils_8cpp.html#aa44609e9c72c3b487f9315a2722bd77b">Utils.cpp</a>
 </li>
+</ul>
+
+
+<h3><a id="index_b"></a>- b -</h3><ul>
+<li>BOOST_AUTO_TEST_CASE()
+: <a class="el" href="test_2EPEC_8cpp.html#afefbdafb7597d2f57145eeb74f7650dd">test/EPEC.cpp</a>
+</li>
+<li>BOOST_TEST_MODULE
+: <a class="el" href="test_2EPEC_8cpp.html#a6b2a3852db8bb19ab6909bac01859985">test/EPEC.cpp</a>
+</li>
+</ul>
+
+
+<h3><a id="index_e"></a>- e -</h3><ul>
+<li>EPECVERSION
+: <a class="el" href="epecsolve_8h.html#ac7db89415a8dfe3d99b6c3897e79ba06">epecsolve.h</a>
+</li>
+</ul>
+
+
+<h3><a id="index_m"></a>- m -</h3><ul>
 <li>main()
-: <a class="el" href="EPEC_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">EPEC.cpp</a>
+: <a class="el" href="src_2EPEC_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">src/EPEC.cpp</a>
 </li>
+</ul>
+
+
+<h3><a id="index_o"></a>- o -</h3><ul>
 <li>operator&lt;()
 : <a class="el" href="epecsolve_8h.html#a33351f0df9a0c52ea10f977a7d316c9c">epecsolve.h</a>
 , <a class="el" href="LCPtoLP_8cpp.html#a33351f0df9a0c52ea10f977a7d316c9c">LCPtoLP.cpp</a>
 </li>
 <li>operator&lt;&lt;()
-: <a class="el" href="epecsolve_8h.html#a673b99b174be70e4406db4e9bd4a6d7a">epecsolve.h</a>
-, <a class="el" href="Games_8cpp.html#ac141d19a0d3a545e2e91c13bf691b135">Games.cpp</a>
-, <a class="el" href="epecsolve_8h.html#a480587ff8bece891c1e6fc76e6ee59e4">epecsolve.h</a>
-, <a class="el" href="Games_8cpp.html#a480587ff8bece891c1e6fc76e6ee59e4">Games.cpp</a>
+: <a class="el" href="Games_8cpp.html#ac141d19a0d3a545e2e91c13bf691b135">Games.cpp</a>
 , <a class="el" href="epecsolve_8h.html#afcce0d6b3621f2353bd9213035628984">epecsolve.h</a>
+, <a class="el" href="Games_8cpp.html#a673b99b174be70e4406db4e9bd4a6d7a">Games.cpp</a>
+, <a class="el" href="epecsolve_8h.html#a673b99b174be70e4406db4e9bd4a6d7a">epecsolve.h</a>
 </li>
 <li>operator==()
-: <a class="el" href="LCPtoLP_8cpp.html#a9c46a6075d048234e717904ca4d9546f">LCPtoLP.cpp</a>
-, <a class="el" href="epecsolve_8h.html#a9c46a6075d048234e717904ca4d9546f">epecsolve.h</a>
+: <a class="el" href="epecsolve_8h.html#a9c46a6075d048234e717904ca4d9546f">epecsolve.h</a>
+, <a class="el" href="LCPtoLP_8cpp.html#a9c46a6075d048234e717904ca4d9546f">LCPtoLP.cpp</a>
 </li>
 <li>operator&gt;()
 : <a class="el" href="LCPtoLP_8cpp.html#a136d29bec787625964a6167c8dae8704">LCPtoLP.cpp</a>
 </li>
+</ul>
+
+
+<h3><a id="index_p"></a>- p -</h3><ul>
 <li>perps
 : <a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">epecsolve.h</a>
 </li>
+</ul>
+
+
+<h3><a id="index_t"></a>- t -</h3><ul>
 <li>to_string()
 : <a class="el" href="models_8h.html#aea048442ba1b089376473071654d3358">models.h</a>
-, <a class="el" href="Models_8cpp.html#aea048442ba1b089376473071654d3358">Models.cpp</a>
-, <a class="el" href="models_8h.html#ac1662fe1a2beec43dc10c18c10ff00d2">models.h</a>
+, <a class="el" href="Models_8cpp.html#ac1662fe1a2beec43dc10c18c10ff00d2">Models.cpp</a>
 </li>
+</ul>
+
+
+<h3><a id="index_v"></a>- v -</h3><ul>
 <li>VERBOSE
 : <a class="el" href="epecsolve_8h.html#a42f8c497a1968074f38bf5055c650dca">epecsolve.h</a>
 </li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.16
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.16 </li>
+  </ul>
+</div>
 </body>
 </html>

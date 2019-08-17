@@ -9,6 +9,8 @@ var searchData=
   ['getc',['getC',['../classGame_1_1MP__Param.html#a291cbbacbfa31c5c102f2a8fc0fcb16f',1,'Game::MP_Param::getC() const final'],['../classGame_1_1MP__Param.html#a7cb939e706a99e695bcb96c43d673f08',1,'Game::MP_Param::getc() const final']]],
   ['getcompl',['getCompl',['../classGame_1_1LCP.html#a56d3a73e7eea32833e3fc4f08c910e7f',1,'Game::LCP']]],
   ['getdualloc',['getDualLoc',['../classGame_1_1NashGame.html#aff52d0e942ec759e8bcfeb2054602c0f',1,'Game::NashGame']]],
+  ['getfeasiblepolyhedra',['getFeasiblePolyhedra',['../classGame_1_1LCP.html#a2d134c3bc5810f26d8f8e5fa9a6c62d1',1,'Game::LCP']]],
+  ['getinstance',['getInstance',['../classModels_1_1EPEC.html#a32f76f4e828f8f7ffa6d76f889b60bc5',1,'Models::EPEC']]],
   ['getleaderloc',['getLeaderLoc',['../classGame_1_1NashGame.html#a44edfcdfc067edcbea485b9c3f1040c8',1,'Game::NashGame']]],
   ['getleadrhs',['getLeadRHS',['../classGame_1_1NashGame.html#a3ee08aede90db91f0c38b283c8fa003c',1,'Game::NashGame']]],
   ['getlend',['getLEnd',['../classGame_1_1LCP.html#a7f2af6c2fa07ccde5173e88662f307d0',1,'Game::LCP']]],
@@ -27,8 +29,13 @@ var searchData=
   ['getny',['getNy',['../classGame_1_1MP__Param.html#a9bfc41513aa12a3fe9dd40222e46f36c',1,'Game::MP_Param']]],
   ['getposition',['getPosition',['../classModels_1_1EPEC.html#a1d74390d88d7f5236d502eba172864ca',1,'Models::EPEC::getPosition(const unsigned int countryCount, const LeaderVars var=LeaderVars::FollowerStart) const'],['../classModels_1_1EPEC.html#a4a7fef43db0df43496c5bb88a6884de0',1,'Models::EPEC::getPosition(const string countryCount, const LeaderVars var=LeaderVars::FollowerStart) const']]],
   ['getprimalloc',['getPrimalLoc',['../classGame_1_1NashGame.html#a0c72cfd05756f5f63c9d92eaece3e921',1,'Game::NashGame']]],
-  ['getq',['getq',['../classGame_1_1LCP.html#a3cc8c85eca98fb717a4487dc7ed692cd',1,'Game::LCP::getq()'],['../classGame_1_1MP__Param.html#a3965799d2dfb02726f55ebe84e3493e7',1,'Game::MP_Param::getQ()']]],
+  ['getq',['getQ',['../classGame_1_1MP__Param.html#a3965799d2dfb02726f55ebe84e3493e7',1,'Game::MP_Param::getQ()'],['../classGame_1_1LCP.html#a3cc8c85eca98fb717a4487dc7ed692cd',1,'Game::LCP::getq()']]],
   ['getqstar',['getqstar',['../classGame_1_1LCP.html#a52df9c31f5d00c00803fe1a6f4b60534',1,'Game::LCP']]],
+  ['getstatistics',['getStatistics',['../classModels_1_1EPEC.html#a59b3fb7a1dbf66881103a5eb3377f452',1,'Models::EPEC']]],
+  ['getx',['getx',['../classModels_1_1EPEC.html#afcd37872c553acd3f9d6c4cb5f7b30b5',1,'Models::EPEC']]],
+  ['getz',['getz',['../classModels_1_1EPEC.html#a37439da14e30f88feee407f0669ffde5',1,'Models::EPEC']]],
   ['gur_5fwritecountry_5fconv',['gur_WriteCountry_conv',['../classModels_1_1EPEC.html#a54eedf915987cc66e280be0b58df48cc',1,'Models::EPEC']]],
-  ['gur_5fwriteepecmip',['gur_WriteEpecMip',['../classModels_1_1EPEC.html#ab914cc9be4894d0ab20881290d896330',1,'Models::EPEC']]]
+  ['gur_5fwriteepecmip',['gur_WriteEpecMip',['../classModels_1_1EPEC.html#ab914cc9be4894d0ab20881290d896330',1,'Models::EPEC']]],
+  ['game_3a_3anashgame_20and_20lcp_20example',['Game::NashGame and LCP Example',['../NashGame_Example.html',1,'']]],
+  ['game_3a_3aqp_5fparam_20example',['Game::QP_Param Example',['../QP_Param_Example.html',1,'']]]
 ];

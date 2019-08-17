@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['x',['x',['../classModels_1_1EPEC.html#a97257125b959b2999b331c9f8b9f7aa6',1,'Models::EPEC']]]
+  ['wallclocktime',['wallClockTime',['../structModels_1_1EPECStatistics.html#a7c1189c5ca7c5c886f8832b8b0388d38',1,'Models::EPECStatistics']]]
 ];

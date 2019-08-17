@@ -5,11 +5,13 @@
 using namespace std;
 using namespace arma;
 
-// Armadillo patch for inbuild resize
-// unsigned uword in row and column indexes create some problems with empty matrix
-// which is the case with empty constraints matrices
-// For arma::sp_mat
 arma::sp_mat Utils::resize_patch(const arma::sp_mat &Mat, const unsigned int nR, const unsigned int nC) {
+/**
+ @brief Armadillo patch for resizing sp_mat
+ @details Armadillo sp_mat::resize() is not robust as it initializes garbage values to new columns.
+ This fixes the problem by creating new columns with guaranteed zero values.
+ For arma::sp_mat
+ */
     arma::sp_mat MMat(nR, nC);
     MMat.zeros();
     if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
@@ -27,6 +29,12 @@ arma::sp_mat Utils::resize_patch(const arma::sp_mat &Mat, const unsigned int nR,
 
 // For arma::mat
 arma::mat Utils::resize_patch(const arma::mat &Mat, const unsigned int nR, const unsigned int nC) {
+/**
+ @brief Armadillo patch for resizing mat
+ @details Armadillo mat::resize() is not robust as it initializes garbage values to new columns.
+ This fixes the problem by creating new columns with guaranteed zero values.
+ For arma::mat
+ */
     arma::mat MMat(nR, nC);
     MMat.zeros();
     if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
@@ -44,6 +52,12 @@ arma::mat Utils::resize_patch(const arma::mat &Mat, const unsigned int nR, const
 
 // For arma::vec
 arma::vec Utils::resize_patch(const arma::vec &Mat, const unsigned int nR) {
+/**
+ @brief Armadillo patch for resizing vec
+ @details Armadillo vec::resize() is not robust as it initializes garbage values to new columns.
+ This fixes the problem by creating new columns with guaranteed zero values.
+ For arma::vec
+ */
     arma::vec MMat(nR);
     MMat.zeros();
     if (nR > Mat.n_rows)
@@ -132,6 +146,9 @@ long int Utils::appendRead(
 }
 
 void appendSave(const vector<double> v, const string out, const string header, bool erase) {
+/**
+ * Utility to append an std::vector<double> to a data file.
+ */
     ofstream outfile(out, erase ? ios::out : ios::app);
     outfile << header << "\n" << v.size() << "\n";
     for (const double x:v)
@@ -143,6 +160,10 @@ long int appendRead(vector<double> &v, const string in, long int pos, const stri
     unsigned long int size;
     ifstream infile(in, ios::in);
     infile.seekg(pos);
+/**
+ * Utility to read an std::vector<double> from a long file.
+ * @returns The end position from which the next data object can be read.
+ */
 
     string header_checkwith;
     infile >> header_checkwith;
@@ -167,6 +188,9 @@ void Utils::appendSave(
         const string header,            ///< A header that might be used to check data correctness
         bool erase                    ///< Should the vec be appended to the current file or overwritten
 ) {
+/**
+ * Utility to append an arma::vec to a data file.
+ */
     // Using C++ file operations to copy the data into the target given by @out
     unsigned int nR{0};
 
@@ -189,7 +213,10 @@ long int Utils::appendRead(
         long int pos,            ///< Position in the long file where reading should start
         const string header        ///< Any header to check data sanctity
 ) {
-    long size;
+/**
+ * Utility to read an arma::vec from a long file.
+ * @returns The end position from which the next data object can be read.
+ */
     unsigned int nR;
     string buffers;
     string checkwith;
@@ -226,6 +253,10 @@ void Utils::appendSave(const long int v, const string out, const string header, 
 }
 
 long int Utils::appendRead(long int &v, const string in, long int pos, const string header) {
+/**
+ * Utility to read a long int from a long file.
+ * @returns The end position from which the next data object can be read.
+ */
     ifstream infile(in, ios::in);
     infile.seekg(pos);
 
@@ -289,6 +320,10 @@ void Utils::appendSave(const string v, const string out, bool erase)
 }
 
 long int Utils::appendRead(string &v, const string in, long int pos) {
+/**
+ * Utility to read a std::string from a long file.
+ * @returns The end position from which the next data object can be read.
+ */
     ifstream infile(in, ios::in);
     infile.seekg(pos);
 

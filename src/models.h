@@ -133,7 +133,7 @@ namespace Models {
         vector<unsigned int> nImportMarkets = {};    ///< Number of countries from which the i-th country imports
         vector<LeadLocs> Locations = {};            ///< Location of variables for each country
         vector<unsigned int> LeaderLocations = {};    ///< Location of each leader
-        EPECStatistics Stats = {};
+        EPECStatistics Stats = {};					///< Store run time information
 
         unique_ptr<Game::NashGame> nashgame;
         unique_ptr<Game::LCP> lcp;
@@ -283,3 +283,6 @@ namespace Models {
 };
 
 #endif
+
+/* Examples */
+
