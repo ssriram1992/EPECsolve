@@ -198,6 +198,8 @@ namespace Models {
         bool indicators = {
                 true}; ///< Controls the flag useIndicators in LCPtoLP class. If true, indicators constraints replace bigM ones.
 
+        double timeLimit = {-1}; ///< Controls the timeLimit (s) for findNashEq
+
         EPEC() = delete;
 
         EPEC(GRBEnv *env, arma::sp_mat TranspCosts = {}) : TranspCosts{TranspCosts}, env{env} {}
