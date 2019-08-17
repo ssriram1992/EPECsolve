@@ -1312,15 +1312,15 @@ Models::EPECInstance::load(string filename) {
             this->TransportationCosts = TrCo;
         }
         catch (exception &e) {
-            cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
+            cerr << "Exception in Models::load : cannot read instance file." << endl;
             throw;
         }
         catch (...) {
-            cerr << "Exception in Models::readInstance : cannot read instance file." << endl;
+            cerr << "Exception in Models::load : cannot read instance file." << endl;
             throw;
         }
     } else {
-        cerr << "Exception in Models::readInstance : file instance not found." << endl;
+        cerr << "Exception in Models::load : file instance not found." << endl;
         throw;
     }
 }
