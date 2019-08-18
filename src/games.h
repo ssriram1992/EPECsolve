@@ -299,8 +299,9 @@ namespace Game {
 
 		// Check solution and correctness
 		unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec x, bool fullvec = true) const;
+		arma::vec RespondSol(unsigned int player, const arma::vec x, bool fullvec = true) const;
 
-		bool isSolved(unsigned int *violPlayer, arma::vec *violSol) const;
+		bool isSolved(const arma::vec & sol, unsigned int *violPlayer, arma::vec *violSol, double tol=1e-6) const;
 
 		//  Modify NashGame members
 		

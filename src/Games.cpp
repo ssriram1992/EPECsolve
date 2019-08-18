@@ -1000,8 +1000,25 @@ Game::NashGame::Respond(
 	return this->Players.at(player)->solveFixed(solOther);
 }
 
+arma::vec
+Game::NashGame::RespondSol(
+		unsigned int player, 		///< Player whose optimal response is to be computed
+		const arma::vec x, 			///< A vector of pure strategies (either for all players or all other players)
+		bool fullvec 				///< Is @p x strategy of all players?
+		) const
+{
+	auto model = this->Respond(player, x, fullvec);
+	arma::vec sol;
+	unsigned int Nx = this->primal_position.at(player+1) - this->primal_position.at(player);
+	sol.zeros(Nx);
+	for (unsigned int i=0; i< Nx; ++i)
+		sol.at(i) = model->getVarByName("y_"+to_string(i)).get(GRB_DoubleAttr_X);
+
+	return sol;
+}
+
 bool 
-Game::NashGame::isSolved(const arma::vec& sol, unsigned int *violPlayer, arma::vec *violSol) const
+Game::NashGame::isSolved(const arma::vec& sol, unsigned int *violPlayer, arma::vec *violSol, double tol) const
 {
 	
 	return false;
