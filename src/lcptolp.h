@@ -102,7 +102,7 @@ namespace Game {
         /// Class has no default constructors
         LCP() = delete;
 
-        LCP(GRBEnv *e) : env{e}, RlxdModel(e) {}; ///< This constructor flor loading LCP from a file
+        LCP(GRBEnv *e) : env{e}, RlxdModel(*e) {}; ///< This constructor flor loading LCP from a file
 
         LCP(GRBEnv *env, arma::sp_mat M, arma::vec q,
             unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A = {},

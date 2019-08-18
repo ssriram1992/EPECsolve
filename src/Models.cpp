@@ -423,7 +423,7 @@ Models::EPEC::addCountry(
     arma::vec MCRHS(0, arma::fill::zeros);
 
     //Convert the country QP to a NashGame
-    auto N = std::make_shared<Game::NashGame>(Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
+    auto N = std::make_shared<Game::NashGame>(this->env, Players, MC, MCRHS, LeadVars, LeadCons, LeadRHS);
     this->name2nos[Params.name] = this->countries_LL.size();
     this->countries_LL.push_back(N);
     Models::increaseVal(Loc, Models::LeaderVars::DualVar,
@@ -846,6 +846,16 @@ Models::EPEC::Respond(const unsigned int i, const arma::vec &x) const {
     return this->country_QP.at(i).get()->solveFixed(x);
 }
 
+bool 
+Models::EPEC::isSolved(int * countryNumber, arma::vec * ProfDevn) const
+/**
+ * @todo Implementation to be done.
+ */
+{
+	BOOST_LOG_TRIVIAL(fatal)<<"NOT YET IMPLEMENTED";
+	return false;
+}
+
 void
 Models::EPEC::make_country_QP()
 /**
@@ -942,7 +952,7 @@ Models::EPEC::findNashEq() {
         dumb.zeros(0);
         this->make_MC_cons(MC, MCRHS);
         this->nashgame = std::unique_ptr<Game::NashGame>(
-                new Game::NashGame(this->country_QP, MC, MCRHS, 0, dumA, dumb));
+                new Game::NashGame(this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
         lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
         //Using indicator constraints
         lcp->useIndicators = this->indicators;

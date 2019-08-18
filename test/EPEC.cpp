@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_TEST_MESSAGE("\n\n");
         BOOST_TEST_MESSAGE("Testing Game::NashGame");
 
-        GRBEnv env;
+        GRBEnv env  = GRBEnv();
 
         /** First test is to create a duopoly **/
         /* PLAYER 1:
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         sp_mat MC(0, 2);
         vec MCRHS;
         MCRHS.set_size(0);
-        Game::NashGame Nash = Game::NashGame(q, MC, MCRHS);
+        Game::NashGame Nash = Game::NashGame(&env, q, MC, MCRHS);
 
         // Master check  -  LCP should be proper!
         sp_mat MM, MM_ref;
@@ -257,8 +257,8 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         // int Nvar = Nash.getNprimals() + Nash.getNduals() + Nash.getNshadow() + Nash.getNleaderVars();
         BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X));
         BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X));
-        BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X), 28.271, 0.001);
-        BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X), 27.8037, 0.001);
+        BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X), 28.271028, 0.001);
+        BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X), 27.803728, 0.001);
 
 		BOOST_TEST_MESSAGE("NashGame load/save test");
 		BOOST_CHECK_NO_THROW(Nash.save("test/Nash.dat"));
@@ -271,8 +271,21 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
 		BOOST_CHECK_NO_THROW(lcp.save("test/lcp.dat"));
 
 		LCP lcp2(&env);
+		lcp2.load("test/lcp.dat");
 		BOOST_CHECK_NO_THROW(lcp2.load("test/lcp.dat"));
 		BOOST_CHECK_NO_THROW(lcp2.save("test/lcp2.dat"));
+
+
+		arma::vec Nashsol(2);
+		Nashsol(0) = 28.271028; 
+		Nashsol(1) = 27.803738;
+
+		auto nashResp1 = Nash.Respond(0, Nashsol);
+		auto nashResp2 = Nash.Respond(1, Nashsol);
+
+		BOOST_CHECK_CLOSE(nashResp1->getVarByName("y_0").get(GRB_DoubleAttr_X), Nashsol(0), 0.0001);
+		BOOST_CHECK_CLOSE(nashResp2->getVarByName("y_0").get(GRB_DoubleAttr_X), Nashsol(1), 0.0001);
+
 
     }
 

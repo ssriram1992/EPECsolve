@@ -491,7 +491,7 @@ int Game::ConvexHull(
     // Counting rows completed
     /****************** SLOW LOOP BEWARE *******************/
     for (unsigned int i = 0; i < nPoly; i++) {
-         BOOST_LOG_TRIVIAL(trace) << "Game::ConvexHull: Handling Polyhedron " << i + 1 << " out of " << nPoly ;
+         BOOST_LOG_TRIVIAL(info) << "Game::ConvexHull: Handling Polyhedron " << i + 1 << " out of " << nPoly ;
         // First constraint in (4.31)
         // A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i); // Slowest line. Will arma improve this?
         // First constraint RHS
@@ -1234,6 +1234,7 @@ Game::LCP::load(string filename, long int pos) {
     defConst(env);
     this->LeadStart = LeadStart;
     this->LeadEnd = LeadEnd;
+
 
     this->nLeader = this->LeadEnd - this->LeadStart + 1;
     this->nLeader = this->nLeader > 0 ? this->nLeader : 0;

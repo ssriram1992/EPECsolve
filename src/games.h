@@ -234,11 +234,11 @@ namespace Game {
 
     public: // Constructors
         NashGame(GRBEnv *e) : env{e} {}; ///< To be used only when NashGame is being loaded from a file.
-        NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
+        NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
                  arma::vec MCRHS, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {}, arma::vec LeadRHS = {});
 
-        NashGame(unsigned int Nplayers, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {}, arma::vec LeadRHS = {})
-                : LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar} {
+        NashGame(GRBEnv* e, unsigned int Nplayers, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {}, arma::vec LeadRHS = {})
+                : env{e}, LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar} {
             Players.resize(this->Nplayers);
             primal_position.resize(this->Nplayers);
             dual_position.resize(this->Nplayers);
@@ -295,9 +295,18 @@ namespace Game {
                     -this->MCRHS);
         }
 
+		// Check solution and correctness
+		unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec x, bool fullvec = true) const;
+
+		bool isSolved(unsigned int *violPlayer, arma::vec *violSol) const;
+
+		//  Modify NashGame members
+		
         NashGame &addDummy(unsigned int par = 0, int position = -1);
 
         NashGame &addLeadCons(const arma::vec &a, double b);
+
+		// Read/Write Nashgame functions
 
         void write(string filename, bool append = true, bool KKT = false) const;
 
@@ -486,7 +495,8 @@ namespace Game {
  * Finally now, we can make the Game::NashGame object by invoking the constructor.
  *
  * @code
-        Game::NashGame Nash = Game::NashGame(q, MC, MCRHS);
+ * 		GRBEnv env;
+        Game::NashGame Nash = Game::NashGame(&env, q, MC, MCRHS);
  * @endcode
  *
  * Using traditional means, one can write a linear complementarity problem (LCP) to solve the above problem. The LCP is given as follows.
@@ -528,7 +538,19 @@ namespace Game {
  * @endcode
  * As was the case with Game::QP_Param::solveFixed, the above function returns a unique_ptr to GRBModel. And all native operations to the GRBModel can be performed and the solution be obtained.
  * 
- * The solution to this problem can be obtained as @f$q_1=28.271@f$, @f$q_2=27.8037@f$.
+ * The solution to this problem can be obtained as @f$q_1=28.271028@f$, @f$q_2=27.803728@f$. To indeed check that this solution is correct, one can create a solution vector and solve each player's Game::QP_Param and check that the solution indeed matches.
+ * @code
+		arma::vec Nashsol(2);
+		Nashsol(0) = model->getVarByName("x_0").get(GRB_DoubleAttr_X); // This is 28.271028
+		Nashsol(1) = model->getVarByName("x_1").get(GRB_DoubleAttr_X); // This is 27.803728
+
+		auto nashResp1 = Nash.Respond(0, Nashsol);
+		auto nashResp2 = Nash.Respond(1, Nashsol);
+
+		cout<<nashResp1->getVarByName("y_0").get(GRB_DoubleAttr_X)<<endl; // Should print 28.271028
+		cout<<nashResp2->getVarByName("y_0").get(GRB_DoubleAttr_X)<<endl; // Should print 27.803728
+ * @endcode
+ * One can, thus check that the values match the solution values obtained earlier.
  *
  * And note that, just like Game::QP_Param, Game::NashGame can also be saved to and loaded from an external file.
  * @code

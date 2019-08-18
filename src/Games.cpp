@@ -499,8 +499,8 @@ Game::QP_Param::load(string filename, long int pos) {
 }
 
 
-Game::NashGame::NashGame(vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar,
-                         arma::sp_mat LeadA, arma::vec LeadRHS) : LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
+Game::NashGame::NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar,
+                         arma::sp_mat LeadA, arma::vec LeadRHS) : env{e}, LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
 /**
  * @brief
  * Construct a NashGame by giving a vector of pointers to
@@ -949,4 +949,47 @@ void Game::NashGame::write(string filename, bool append, bool KKT) const {
 
 
     file.close();
+}
+
+unique_ptr<GRBModel> 
+Game::NashGame::Respond(
+		unsigned int player, 		///< Player whose optimal response is to be computed
+		const arma::vec x, 			///< A vector of pure strategies (either for all players or all other players)
+		bool fullvec 				///< Is @p x strategy of all players?
+		) const
+/**
+ * @brief Given the decision of other players, find the optimal response for player in position @p player
+ * @detail 
+ * Given the strategy of each player, returns a Gurobi Model that has the optimal strategy of the player at position @p player.
+ * @returns A unique_ptr to GRBModel
+ *
+ */
+{ 
+	arma::vec solOther;
+	unsigned int nVar{this->getNprimals()+this->getNshadow() + this->getNleaderVars()};
+	unsigned int nStart, nEnd;
+	nStart = this->primal_position.at(player); // Start of the player-th player's primals
+	nEnd = this->primal_position.at(player+1); // Start of the player+1-th player's primals or LeaderVrs if player is the last player.
+	if(fullvec)
+	{ 
+		solOther.zeros(nVar - nEnd + nStart);
+		if(nStart > 0)
+			solOther.subvec(0, nStart-1) = x.subvec(0, nStart-1);
+		if(nEnd < x.n_rows)
+			solOther.subvec(nStart, nVar + nStart - nEnd-1) = x.subvec(nEnd, nVar-1); // Discard any dual variables in x
+	}
+	else
+	{
+		solOther.zeros(nVar + nEnd - nStart);
+		solOther = x.subvec(0, nVar + nEnd - nStart - 1); // Discard any dual variables in x
+	}
+
+	return this->Players.at(player)->solveFixed(solOther);
+}
+
+bool 
+Game::NashGame::isSolved(const arma::vec& sol, unsigned int *violPlayer, arma::vec *violSol) const
+{
+	
+	return false;
 }

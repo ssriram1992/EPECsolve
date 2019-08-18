@@ -228,13 +228,16 @@ namespace Models {
 
         unsigned int getPosition(const string countryCount, const LeaderVars var = LeaderVars::FollowerStart) const;
 
+        EPEC &unlock();
+
+		// Solving and checking solutions 
+        void findNashEq();
+
         unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
 
         unique_ptr<GRBModel> Respond(const string name, const arma::vec &x) const;
 
-        EPEC &unlock();
-
-        void findNashEq();
+		bool isSolved(int * countryNumber, arma::vec * ProfDevn) const;
 
         // Data access methods
         Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
