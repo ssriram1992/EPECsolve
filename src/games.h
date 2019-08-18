@@ -298,10 +298,11 @@ namespace Game {
         }
 
 		// Check solution and correctness
-		unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec x, bool fullvec = true) const;
-		arma::vec RespondSol(unsigned int player, const arma::vec x, bool fullvec = true) const;
+		unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec &x, bool fullvec = true) const;
+		double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, bool fullvec = true) const;
+		arma::vec ComputeQPObjvals(const arma::vec &x, bool checkFeas=false) const;
 
-		bool isSolved(const arma::vec & sol, unsigned int *violPlayer, arma::vec *violSol, double tol=1e-6) const;
+		bool isSolved(const arma::vec & sol, unsigned int &violPlayer, arma::vec &violSol, double tol=1e-6) const;
 
 		//  Modify NashGame members
 		

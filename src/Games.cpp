@@ -458,7 +458,10 @@ double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x, 
 	if(checkFeas)
 	{
 		arma::vec slack = A*x + B*y - b;
-		if (slack.max() >= tol || y.min() <= -tol) // if infeasible
+		if(slack.n_rows)// if infeasible
+			if (slack.max() >= tol) 
+				return -GRB_INFINITY;
+		if ( y.min() <= -tol) // if infeasible
 			return -GRB_INFINITY;
 	}
 	arma::vec obj = 0.5* y.t()*Q*y + (C*x).t()*y + c.t()*y;
@@ -967,7 +970,7 @@ void Game::NashGame::write(string filename, bool append, bool KKT) const {
 unique_ptr<GRBModel> 
 Game::NashGame::Respond(
 		unsigned int player, 		///< Player whose optimal response is to be computed
-		const arma::vec x, 			///< A vector of pure strategies (either for all players or all other players)
+		const arma::vec &x, 			///< A vector of pure strategies (either for all players or all other players)
 		bool fullvec 				///< Is @p x strategy of all players?
 		) const
 /**
@@ -1000,26 +1003,63 @@ Game::NashGame::Respond(
 	return this->Players.at(player)->solveFixed(solOther);
 }
 
-arma::vec
+double
 Game::NashGame::RespondSol(
+		arma::vec& sol, 
 		unsigned int player, 		///< Player whose optimal response is to be computed
-		const arma::vec x, 			///< A vector of pure strategies (either for all players or all other players)
+		const arma::vec &x, 			///< A vector of pure strategies (either for all players or all other players)
 		bool fullvec 				///< Is @p x strategy of all players?
 		) const
 {
 	auto model = this->Respond(player, x, fullvec);
-	arma::vec sol;
 	unsigned int Nx = this->primal_position.at(player+1) - this->primal_position.at(player);
 	sol.zeros(Nx);
 	for (unsigned int i=0; i< Nx; ++i)
 		sol.at(i) = model->getVarByName("y_"+to_string(i)).get(GRB_DoubleAttr_X);
 
-	return sol;
+	return model->get(GRB_DoubleAttr_ObjVal);
+}
+
+
+arma::vec 
+Game::NashGame::ComputeQPObjvals(const arma::vec &x, bool checkFeas) const
+{
+	arma::vec vals; vals.zeros(this->Nplayers);
+	for (unsigned int i=0;i<this->Nplayers;++i)
+	{
+		unsigned int nVar{this->getNprimals()+this->getNshadow() + this->getNleaderVars()};
+		unsigned int nStart, nEnd;
+		nStart = this->primal_position.at(i); 
+		nEnd = this->primal_position.at(i+1);
+
+		arma::vec x_i, x_minus_i;
+
+		x_minus_i.zeros(nVar - nEnd + nStart);
+		if(nStart > 0)
+			x_minus_i.subvec(0, nStart-1) = x.subvec(0, nStart-1);
+		if(nEnd < x.n_rows)
+			x_minus_i.subvec(nStart, nVar + nStart - nEnd-1) = x.subvec(nEnd, nVar-1); // Discard any dual variables in x
+
+		x_i = x.subvec(nStart, nEnd-1);
+
+		vals.at(i) = this->Players.at(i)->computeObjective(x_i, x_minus_i, checkFeas); 
+	}
+
+	return vals;
 }
 
 bool 
-Game::NashGame::isSolved(const arma::vec& sol, unsigned int *violPlayer, arma::vec *violSol, double tol) const
+Game::NashGame::isSolved(const arma::vec& sol, unsigned int &violPlayer, arma::vec &violSol, double tol) const
 {
-	
-	return false;
+	arma::vec objvals = this->ComputeQPObjvals(sol, true);
+	for (unsigned int i=0;i<this->Nplayers;++i)
+	{
+		double val = this->RespondSol(violSol, i, sol, true);
+		if(abs(val-objvals.at(i)) > tol)
+		{
+			violPlayer = i; 
+			return false;
+		}
+	}
+	return true;
 }

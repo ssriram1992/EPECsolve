@@ -285,7 +285,9 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
 
 		BOOST_CHECK_CLOSE(nashResp1->getVarByName("y_0").get(GRB_DoubleAttr_X), Nashsol(0), 0.0001);
 		BOOST_CHECK_CLOSE(nashResp2->getVarByName("y_0").get(GRB_DoubleAttr_X), Nashsol(1), 0.0001);
-
+	
+		unsigned int temp1 ; arma::vec temp2;
+		BOOST_CHECK_MESSAGE(Nash.isSolved(Nashsol, temp1, temp2), "Checking that the Nashgame is solved correctly using isSolved()");
 
     }
 
