@@ -451,6 +451,19 @@ Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons) {
     return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
 }
 
+double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x, bool checkFeas, double tol) const
+{
+	if(y.n_rows != this->getNy()) throw string("Error in QP_Param::computeObjective: Invalid size of y");
+	if(x.n_rows != this->getNx()) throw string("Error in QP_Param::computeObjective: Invalid size of x");
+	if(checkFeas)
+	{
+		arma::vec slack = A*x + B*y - b;
+		if (slack.max() >= tol || y.min() <= -tol) // if infeasible
+			return -GRB_INFINITY;
+	}
+	arma::vec obj = 0.5* y.t()*Q*y + (C*x).t()*y + c.t()*y;
+	return obj(0);
+}
 
 void
 Game::QP_Param::save(string filename, bool erase) const {

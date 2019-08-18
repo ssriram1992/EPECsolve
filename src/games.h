@@ -174,6 +174,8 @@ namespace Game {
 
         std::unique_ptr<GRBModel> solveFixed(arma::vec x);
 
+		double computeObjective(const arma::vec &y, const arma::vec &x, bool checkFeas=true, double tol=1e-6) const;
+
         inline bool is_Playable(const QP_Param &P) const
         /// Checks if the current object can play a game with another Game::QP_Param object @p P.
         {
