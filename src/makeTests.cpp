@@ -6,6 +6,8 @@ vector<Models::FollPar> C, G, S; // Mnemonics for coal-like, gas-like and solar-
 
 vector<double> lincos = {150, 200, 220, 250, 275};
 vector<double> quadcos = {0, 0.1, 0.2, 0.3, 0.5};
+
+
 vector<double> emmcos = {25, 50, 100, 200, 300, 500};
 vector<double> taxcaps = {0, 50, 100, 150, 200, 250};
 vector<double> capacities = {50, 100, 130, 170, 200, 1000};

@@ -28,7 +28,7 @@ template
 ostream &
 operator<<(ostream &ost, vector<T> v) {
     for (auto elem:v) ost << elem << " ";
-    ost << endl;
+    ost << '\n';
     return ost;
 }
 
@@ -54,9 +54,9 @@ operator<<(ostream &ost, const perps &C) {
 
 ostream &
 Game::operator<<(ostream &os, const Game::QP_Param &Q) {
-    os << "Quadratic program with linear inequality constraints: " << endl;
-    os << Q.getNy() << " decision variables parametrized by " << Q.getNx() << " variables" << endl;
-    os << Q.getb().n_rows << " linear inequalities" << endl << endl;
+    os << "Quadratic program with linear inequality constraints: " << '\n';
+    os << Q.getNy() << " decision variables parametrized by " << Q.getNx() << " variables" << '\n';
+    os << Q.getb().n_rows << " linear inequalities" << '\n' << '\n';
     return os;
 }
 
@@ -333,20 +333,20 @@ Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
         model->optimize();
     }
     catch (const char *e) {
-        cerr << " Error in Game::QP_Param::solveFixed: " << e << endl;
+        cerr << " Error in Game::QP_Param::solveFixed: " << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String: Error in Game::QP_Param::solveFixed: " << e << endl;
+        cerr << "String: Error in Game::QP_Param::solveFixed: " << e << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception: Error in Game::QP_Param::solveFixed: " << e.what() << endl;
+        cerr << "Exception: Error in Game::QP_Param::solveFixed: " << e.what() << '\n';
         throw;
     }
     catch (GRBException &e) {
         cerr << "GRBException: Error in Game::QP_Param::solveFixed: " << e.getErrorCode() << "; " << e.getMessage()
-             << endl;
+             << '\n';
         throw;
     }
     return model;
@@ -365,15 +365,15 @@ Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars, i
     // Call the superclass function
     try { MP_Param::addDummy(pars, vars, position); }
     catch (const char *e) {
-        cerr << " Error in Game::QP_Param::addDummy: " << e << endl;
+        cerr << " Error in Game::QP_Param::addDummy: " << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String: Error in Game::QP_Param::addDummy: " << e << endl;
+        cerr << "String: Error in Game::QP_Param::addDummy: " << e << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception: Error in Game::QP_Param::addDummy: " << e.what() << endl;
+        cerr << "Exception: Error in Game::QP_Param::addDummy: " << e.what() << '\n';
         throw;
     }
 
@@ -418,7 +418,7 @@ Game::QP_Param::set(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::sp
     this->made_yQy = false;
     try { MP_Param::set(Q, C, A, B, c, b); }
     catch (string &e) {
-        cerr << "String: " << e << endl;
+        cerr << "String: " << e << '\n';
         throw string("Error in QP_Param::set: Invalid Data");
     }
     return *this;
@@ -433,7 +433,7 @@ Game::QP_Param::set(arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma::
     this->made_yQy = false;
     try { MP_Param::set(Q, C, A, B, c, b); }
     catch (string &e) {
-        cerr << "String: " << e << endl;
+        cerr << "String: " << e << '\n';
         throw string("Error in QP_Param::set: Invalid Data");
     }
     return *this;
@@ -492,7 +492,7 @@ Game::QP_Param::load(string filename, long int pos) {
 	 * 		GRBEnv env;
 	 * 		Game::QP_Param q1(&env);
 	 * 		q1.load("./dat/q1data.dat");
-	 * 		std::cout<<q1<<endl;
+	 * 		std::cout<<q1<<'\n';
 	 * 		return 0;
 	 * }
 	 * @endcode
@@ -577,7 +577,7 @@ Game::NashGame::load(string filename, long int pos) {
 	 * 		GRBEnv env;
 	 * 		Game::NashGame N(&env);
 	 * 		N.load("./dat/Ndata.dat");
-	 * 		std::cout<<N<<endl;
+	 * 		std::cout<<N<<'\n';
 	 * 		return 0;
 	 * }
 	 * @endcode
@@ -669,7 +669,7 @@ void Game::NashGame::set_positions()
         for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i) << " ";
         cout << "---MC_Dual:" << MC_dual_position << "---Leader: " << Leader_position << "Duals: ";
         for (unsigned int i = 0; i < Nplayers + 1; i++) cout << dual_position.at(i) << " ";
-        cout << endl;
+        cout << '\n';
     }
     */
 
@@ -709,7 +709,7 @@ Game::NashGame::FormulateLCP(
 
 
     for (unsigned int i = 0; i < Nplayers; i++) {
-        //cout << "-----Player " << i << endl;
+        //cout << "-----Player " << i << '\n';
         this->Players[i]->KKT(Mi[i], Ni[i], qi[i]);
         unsigned int Nprim, Ndual;
         Nprim = this->Players[i]->getNy();
@@ -717,33 +717,33 @@ Game::NashGame::FormulateLCP(
         // Adding the primal equations
         // Region 1 in Formulate LCP.ipe
         if (i > 0) { // For the first player, no need to add anything 'before' 0-th position
-            // cout << "Region 1" << endl;
+            // cout << "Region 1" << '\n';
             // cout << "\tM(" << this->primal_position.at(i) << "," << 0 << "," << this->primal_position.at(i + 1) - 1
             // << "-"
-            // << this->primal_position.at(i) - 1 << ")" << endl;
-            // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << this->primal_position.at(i) - 1 << ")" << endl;
+            // << this->primal_position.at(i) - 1 << ")" << '\n';
+            // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << this->primal_position.at(i) - 1 << ")" << '\n';
             M.submat(
                     this->primal_position.at(i), 0,
                     this->primal_position.at(i + 1) - 1, this->primal_position.at(i) - 1
             ) = Ni[i].submat(0, 0, Nprim - 1, this->primal_position.at(i) - 1);
         }
         // Region 2 in Formulate LCP.ipe
-        // cout << "Region 2" << endl;
+        // cout << "Region 2" << '\n';
         // cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i) << "-"
-        // << this->primal_position.at(i + 1) - 1 << "-" << this->primal_position.at(i + 1) - 1 << ")" << endl;
-        // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << Nprim - 1 << ")" << endl;
+        // << this->primal_position.at(i + 1) - 1 << "-" << this->primal_position.at(i + 1) - 1 << ")" << '\n';
+        // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," << Nprim - 1 << ")" << '\n';
         M.submat(
                 this->primal_position.at(i), this->primal_position.at(i),
                 this->primal_position.at(i + 1) - 1, this->primal_position.at(i + 1) - 1
         ) = Mi[i].submat(0, 0, Nprim - 1, Nprim - 1);
         // Region 3 in Formulate LCP.ipe
         if (this->primal_position.at(i + 1) != this->dual_position.at(0)) {
-            // cout << "Region 3" << endl;
+            // cout << "Region 3" << '\n';
             // cout << "\tM(" << this->primal_position.at(i) << "," << this->primal_position.at(i + 1) << "-"
-            // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(0) - 1 << ")" << endl;
+            // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(0) - 1 << ")" << '\n';
             // cout << "\t(" << 0 << "," << this->primal_position.at(i) << "-" << Nprim - 1 << "," << Ni[i].n_cols - 1
             // << ")"
-            // << endl;
+            // << '\n';
             M.submat(
                     this->primal_position.at(i), this->primal_position.at(i + 1),
                     this->primal_position.at(i + 1) - 1, this->dual_position.at(0) - 1
@@ -751,10 +751,10 @@ Game::NashGame::FormulateLCP(
         }
         // Region 4 in Formulate LCP.ipe
         if (this->dual_position.at(i) != this->dual_position.at(i + 1)) {
-            // cout << "Region 4" << endl;
+            // cout << "Region 4" << '\n';
             // cout << "\tM(" << this->primal_position.at(i) << "," << this->dual_position.at(i) << "-"
-            // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(i + 1) << ")" << endl;
-            // cout << "\t(" << 0 << "," << Nprim - 1 << "-" << Nprim - 1 << "," << Nprim + Ndual - 1 << ")" << endl;
+            // << this->primal_position.at(i + 1) - 1 << "-" << this->dual_position.at(i + 1) << ")" << '\n';
+            // cout << "\t(" << 0 << "," << Nprim - 1 << "-" << Nprim - 1 << "," << Nprim + Ndual - 1 << ")" << '\n';
             M.submat(
                     this->primal_position.at(i), this->dual_position.at(i),
                     this->primal_position.at(i + 1) - 1, this->dual_position.at(i + 1) - 1
@@ -848,15 +848,15 @@ Game::NashGame::RewriteLeadCons() const
         return arma::join_cols(A_out_expl, A_out_MC);
     }
     catch (const char *e) {
-        cerr << "Error in NashGame::RewriteLeadCons: " << e << endl;
+        cerr << "Error in NashGame::RewriteLeadCons: " << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String: Error in NashGame::RewriteLeadCons: " << e << endl;
+        cerr << "String: Error in NashGame::RewriteLeadCons: " << e << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception: Error in NashGame::RewriteLeadCons: " << e.what() << endl;
+        cerr << "Exception: Error in NashGame::RewriteLeadCons: " << e.what() << '\n';
         throw;
     }
 }

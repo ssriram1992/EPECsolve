@@ -34,51 +34,51 @@ Models::operator<<(ostream &ost, const Models::prn l) {
 
 ostream &
 Models::operator<<(ostream &ost, const Models::FollPar P) {
-    ost << "Follower Parameters: " << endl;
-    ost << "********************" << endl;
+    ost << "Follower Parameters: " << '\n';
+    ost << "********************" << '\n';
     ost << Models::prn::label << "Linear Costs" << ":\t";
     for (auto a:P.costs_lin) ost << Models::prn::val << a;
-    ost << endl << Models::prn::label << "Quadratic costs" << ":\t";
+    ost << '\n' << Models::prn::label << "Quadratic costs" << ":\t";
     for (auto a:P.costs_quad) ost << Models::prn::val << a;
-    ost << endl << Models::prn::label << "Production capacities" << ":\t";
+    ost << '\n' << Models::prn::label << "Production capacities" << ":\t";
     for (auto a:P.capacities) ost << Models::prn::val << (a < 0 ? std::numeric_limits<double>::infinity() : a);
-    ost << endl << Models::prn::label << "Tax Caps" << ":\t";
+    ost << '\n' << Models::prn::label << "Tax Caps" << ":\t";
     for (auto a:P.tax_caps) ost << Models::prn::val << (a < 0 ? std::numeric_limits<double>::infinity() : a);
-    ost << endl;
+    ost << '\n';
     return ost;
 }
 
 ostream &
 Models::operator<<(ostream &ost, const Models::DemPar P) {
-    ost << "Demand Parameters: " << endl;
-    ost << "******************" << endl;
-    ost << "Price\t\t =\t\t " << P.alpha << "\t-\t" << P.beta << "  x   Quantity" << endl;
+    ost << "Demand Parameters: " << '\n';
+    ost << "******************" << '\n';
+    ost << "Price\t\t =\t\t " << P.alpha << "\t-\t" << P.beta << "  x   Quantity" << '\n';
     return ost;
 }
 
 ostream &
 Models::operator<<(ostream &ost, const Models::LeadPar P) {
-    ost << "Leader Parameters: " << endl;
-    ost << "******************" << endl;
+    ost << "Leader Parameters: " << '\n';
+    ost << "******************" << '\n';
     ost << std::fixed;
     ost << Models::prn::label << "Export Limit" << ":" << Models::prn::val
         << (P.export_limit < 0 ? std::numeric_limits<double>::infinity() : P.export_limit);
-    ost << endl;
+    ost << '\n';
     ost << Models::prn::label << "Import Limit" << ":" << Models::prn::val
         << (P.import_limit < 0 ? std::numeric_limits<double>::infinity() : P.import_limit);
-    ost << endl;
+    ost << '\n';
     ost << Models::prn::label << "Price limit" << ":" << Models::prn::val
         << (P.price_limit < 0 ? std::numeric_limits<double>::infinity() : P.price_limit);
-    ost << endl;
+    ost << '\n';
     return ost;
 }
 
 ostream &
 Models::operator<<(ostream &ost, const Models::EPECInstance I) {
-    ost << "EPEC Instance: " << endl;
-    ost << "******************" << endl;
-    for (auto a:I.Countries) ost << a << endl;
-    ost << "Transportation Costs:" << endl << I.TransportationCosts << endl;
+    ost << "EPEC Instance: " << '\n';
+    ost << "******************" << '\n';
+    for (auto a:I.Countries) ost << a << '\n';
+    ost << "Transportation Costs:" << '\n' << I.TransportationCosts << '\n';
     return ost;
 }
 
@@ -90,7 +90,7 @@ Models::operator<<(ostream &ost, const Models::LeadAllPar P) {
     ost << "Leader Complete Description" << "\n";
     ost << "***************************" << "\n" << "\n";
     ost << Models::prn::label << "Number of followers" << ":" << Models::prn::val << P.n_followers << "\n " << "\n";
-    ost << endl << P.LeaderParam << endl << P.FollowerParam << endl << P.DemandParam << "\n";
+    ost << '\n' << P.LeaderParam << '\n' << P.FollowerParam << '\n' << P.DemandParam << "\n";
     ost << "***************************" << "\n" << "\n";
     return ost;
 }
@@ -327,9 +327,9 @@ Models::EPEC::addCountry(
 
     bool noError = false;
     try { noError = this->ParamValid(Params); }
-    catch (const char *e) { cerr << "Error in Models::EPEC::addCountry: " << e << endl; }
-    catch (string e) { cerr << "String: Error in Models::EPEC::addCountry: " << e << endl; }
-    catch (exception &e) { cerr << "Exception: Error in Models::EPEC::addCountry: " << e.what() << endl; }
+    catch (const char *e) { cerr << "Error in Models::EPEC::addCountry: " << e << '\n'; }
+    catch (string e) { cerr << "String: Error in Models::EPEC::addCountry: " << e << '\n'; }
+    catch (exception &e) { cerr << "Exception: Error in Models::EPEC::addCountry: " << e.what() << '\n'; }
     if (!noError) return *this;
 
     const unsigned int LeadVars = 2 + 2 * Params.n_followers +
@@ -356,7 +356,7 @@ Models::EPEC::addCountry(
     unsigned int activeTaxCaps = count_if(Params.FollowerParam.tax_caps.begin(), Params.FollowerParam.tax_caps.end(),
                                           [](double i) { return i >= 0; });
 
-    // cout<<" In addCountry: "<<Loc[Models::LeaderVars::End]<<endl;
+    // cout<<" In addCountry: "<<Loc[Models::LeaderVars::End]<<'\n';
     arma::sp_mat LeadCons(import_lim_cons +    // Import limit constraint
                           export_lim_cons +                // Export limit constraint
                           price_lim_cons +                    // Price limit constraint
@@ -380,19 +380,19 @@ Models::EPEC::addCountry(
         }
     }
     catch (const char *e) {
-        cerr << e << endl;
+        cerr << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String in Models::EPEC::addCountry : " << e << endl;
+        cerr << "String in Models::EPEC::addCountry : " << e << '\n';
         throw;
     }
     catch (GRBException &e) {
-        cerr << "GRBException in Models::EPEC::addCountry : " << e.getErrorCode() << ": " << e.getMessage() << endl;
+        cerr << "GRBException in Models::EPEC::addCountry : " << e.getErrorCode() << ": " << e.getMessage() << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception in Models::EPEC::addCountry : " << e.what() << endl;
+        cerr << "Exception in Models::EPEC::addCountry : " << e.what() << '\n';
         throw;
     }
 
@@ -402,19 +402,19 @@ Models::EPEC::addCountry(
                                activeTaxCaps);
     }
     catch (const char *e) {
-        cerr << e << endl;
+        cerr << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String: " << e << endl;
+        cerr << "String: " << e << '\n';
         throw;
     }
     catch (GRBException &e) {
-        cerr << "GRBException: " << e.getErrorCode() << ": " << e.getMessage() << endl;
+        cerr << "GRBException: " << e.getErrorCode() << ": " << e.getMessage() << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception in Models::EPEC::addCountry : " << e.what() << endl;
+        cerr << "Exception in Models::EPEC::addCountry : " << e.what() << '\n';
         throw;
     }
 
@@ -453,19 +453,19 @@ Models::EPEC::addTranspCosts(const arma::sp_mat &costs ///< The transportation c
         this->TranspCosts.diag().zeros();        // Doesn't make sense for it to have a nonzero diagonal!
     }
     catch (const char *e) {
-        cerr << e << endl;
+        cerr << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String in Models::EPEC::addTranspCosts : " << e << endl;
+        cerr << "String in Models::EPEC::addTranspCosts : " << e << '\n';
         throw;
     }
     catch (GRBException &e) {
-        cerr << "GRBException in Models::EPEC::addTranspCosts : " << e.getErrorCode() << ": " << e.getMessage() << endl;
+        cerr << "GRBException in Models::EPEC::addTranspCosts : " << e.getErrorCode() << ": " << e.getMessage() << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception in Models::EPEC::addTranspCosts : " << e.what() << endl;
+        cerr << "Exception in Models::EPEC::addTranspCosts : " << e.what() << '\n';
         throw;
     }
 
@@ -513,19 +513,19 @@ finalize()
         }
     }
     catch (const char *e) {
-        cerr << e << endl;
+        cerr << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String in Models::EPEC::finalize : " << e << endl;
+        cerr << "String in Models::EPEC::finalize : " << e << '\n';
         throw;
     }
     catch (GRBException &e) {
-        cerr << "GRBException in Models::EPEC::finalize : " << e.getErrorCode() << ": " << e.getMessage() << endl;
+        cerr << "GRBException in Models::EPEC::finalize : " << e.getErrorCode() << ": " << e.getMessage() << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception in Models::EPEC::finalize : " << e.what() << endl;
+        cerr << "Exception in Models::EPEC::finalize : " << e.what() << '\n';
         throw;
     }
     this->finalized = true;
@@ -656,19 +656,19 @@ Models::EPEC::make_MC_leader(const unsigned int i)
         );
     }
     catch (const char *e) {
-        cerr << e << endl;
+        cerr << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String in Models::EPEC::make_MC_leader : " << e << endl;
+        cerr << "String in Models::EPEC::make_MC_leader : " << e << '\n';
         throw;
     }
     catch (GRBException &e) {
-        cerr << "GRBException in Models::EPEC::make_MC_leader : " << e.getErrorCode() << ": " << e.getMessage() << endl;
+        cerr << "GRBException in Models::EPEC::make_MC_leader : " << e.getErrorCode() << ": " << e.getMessage() << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception in Models::EPEC::make_MC_leader : " << e.what() << endl;
+        cerr << "Exception in Models::EPEC::make_MC_leader : " << e.what() << '\n';
         throw;
     }
 }
@@ -713,20 +713,20 @@ Models::EPEC::add_Dummy_Lead(const unsigned int i) {
         this->countries_LL.at(i).get()->addDummy(nEPECvars - nThisCountryvars);
     }
     catch (const char *e) {
-        cerr << e << endl;
+        cerr << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String in Models::EPEC::add_Dummy_All_Lead : " << e << endl;
+        cerr << "String in Models::EPEC::add_Dummy_All_Lead : " << e << '\n';
         throw;
     }
     catch (GRBException &e) {
         cerr << "GRBException in Models::EPEC::add_Dummy_All_Lead : " << e.getErrorCode() << ": " << e.getMessage()
-             << endl;
+             << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception in Models::EPEC::add_Dummy_All_Lead : " << e.what() << endl;
+        cerr << "Exception in Models::EPEC::add_Dummy_All_Lead : " << e.what() << '\n';
         throw;
     }
 }
@@ -906,6 +906,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
  * @todo where is the error?
  */
 {
+	BOOST_LOG_TRIVIAL(info) << "Starting Convex hull computation of the country "<< this->AllLeadPars[i].name<< '\n';
     if (!this->finalized) throw string("Error in Models::EPEC::make_country_QP: Model not finalized");
     if (i >= this->nCountr) throw string("Error in Models::EPEC::make_country_QP: Invalid country number");
     if (!this->country_QP.at(i).get()) {
@@ -988,20 +989,20 @@ Models::EPEC::findNashEq() {
             catch (GRBException &e) {
                 cerr << "GRBException in Models::EPEC::findNashEq : " << e.getErrorCode() << ": " << e.getMessage()
                      << " "
-                     << temp << endl;
+                     << temp << '\n';
             }
             this->Stats.status = 1;
         } else {
             if (status == GRB_TIME_LIMIT) {
                 this->Stats.status = 2;
-                cerr << "Models::EPEC::findNashEq: no nash equilibrium found (timeLimit)." << endl;
+                cerr << "Models::EPEC::findNashEq: no nash equilibrium found (timeLimit)." << '\n';
             }
             else
-                cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << endl;
+                cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << '\n';
         }
 
     } else {
-        cerr << "Exception in Models::EPEC::findNashEq : no country QP has been made." << endl;
+        cerr << "Exception in Models::EPEC::findNashEq : no country QP has been made." << '\n';
         throw;
     }
 }
@@ -1151,7 +1152,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
         }
         if (writeLevel == 2 || writeLevel == 0) this->writeSolutionJSON(filename, this->sol_x, this->sol_z);
     } else {
-        cerr << "Error in Models::EPEC::writeSolution: no solution to write." << endl;
+        cerr << "Error in Models::EPEC::writeSolution: no solution to write." << '\n';
     }
 }
 
@@ -1322,15 +1323,15 @@ Models::EPECInstance::load(string filename) {
             this->TransportationCosts = TrCo;
         }
         catch (exception &e) {
-            cerr << "Exception in Models::load : cannot read instance file." << endl;
+            cerr << "Exception in Models::load : cannot read instance file." << '\n';
             throw;
         }
         catch (...) {
-            cerr << "Exception in Models::load : cannot read instance file." << endl;
+            cerr << "Exception in Models::load : cannot read instance file." << '\n';
             throw;
         }
     } else {
-        cerr << "Exception in Models::load : file instance not found." << endl;
+        cerr << "Exception in Models::load : file instance not found." << '\n';
         throw;
     }
 }
@@ -1369,7 +1370,7 @@ Models::EPEC::WriteCountry(const unsigned int i, const string filename, const ar
         file << Models::prn::label << "Net imports" << ":" << Models::prn::val << import - Export << "\n";
     file << Models::prn::label << "Export price" << ":" << Models::prn::val << exportPrice << "\n";
     file << Models::prn::label << " -> Total Export" << ":" << Models::prn::val << Export << "\n";
-    file << Models::prn::label << " -> Total Import" << ":" << Models::prn::val << import << endl;
+    file << Models::prn::label << " -> Total Import" << ":" << Models::prn::val << import << '\n';
     file << Models::prn::label << "Domestic consumed quantity" << ":" << Models::prn::val << import - Export + prod
          << "\n";
     file << Models::prn::label << "Domestic price" << ":" << Models::prn::val
@@ -1414,22 +1415,22 @@ Models::EPEC::WriteFollower(const unsigned int i,
     const double lin = Params.FollowerParam.costs_lin.at(j);
     const double quad = Params.FollowerParam.costs_quad.at(j);
 
-    file << Models::prn::label << "Quantity produced" << ":" << Models::prn::val << q << endl;
-    //file << "x(): " << foll_prod + j << endl;
+    file << Models::prn::label << "Quantity produced" << ":" << Models::prn::val << q << '\n';
+    //file << "x(): " << foll_prod + j << '\n';
     file << Models::prn::label << "Capacity of production" << ":" << Models::prn::val
          << Params.FollowerParam.capacities.at(j) << "\n";
     file << Models::prn::label << "Limit on production" << ":" << Models::prn::val << lim << "\n";
-    //file << "x(): " << foll_lim + j << endl;
+    //file << "x(): " << foll_lim + j << '\n';
     file << Models::prn::label << "Tax imposed" << ":" << Models::prn::val << tax << "\n";
     // file << Models::prn::label << "Tax cap" << ":" << Params.FollowerParam.tax_caps.at(j) << tax << "\n";
-    //file << "x(): " << foll_tax + j << endl;
+    //file << "x(): " << foll_tax + j << '\n';
     file << Models::prn::label << "  -Production cost function" << ":" << "\t C(q) = (" << lin << " + " << tax
          << ")*q + 0.5*" << quad << "*q^2\n" << Models::prn::label << " " << "=" << Models::prn::val
          << (lin + tax) * q + 0.5 * quad * q * q << "\n";
     file << Models::prn::label << "  -Marginal cost of production" << ":" << Models::prn::val << quad * q + lin + tax
          << "\n";
     file << Models::prn::label << "Emission cost" << ":" << Models::prn::val
-         << Params.FollowerParam.emission_costs.at(j) << endl;
+         << Params.FollowerParam.emission_costs.at(j) << '\n';
 
     file.close();
 }
@@ -1454,12 +1455,12 @@ Models::EPEC::testQP(const unsigned int i) {
                 sol.at(i) = p->get(GRB_DoubleAttr_X);
             }
         } catch (GRBException &e) {
-            cerr << "GRBException in Models::EPEC::testQP: " << e.getErrorCode() << ": " << e.getMessage() << endl;
+            cerr << "GRBException in Models::EPEC::testQP: " << e.getErrorCode() << ": " << e.getMessage() << '\n';
         }
         sol.save("dat/QP_Sol_" + to_string(i) + ".txt", arma::arma_ascii);
         this->WriteCountry(i, "dat/temp_" + to_string(i) + ".txt", sol, false);
     } else {
-        cout << "Models::EPEC::testQP: QP of country " << i << " is infeasible or unbounded." << endl;
+        cout << "Models::EPEC::testQP: QP of country " << i << " is infeasible or unbounded." << '\n';
     }
 }
 

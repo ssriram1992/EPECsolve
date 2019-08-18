@@ -208,19 +208,19 @@ Game::LCP::makeRelaxed()
         this->madeRlxdModel = true;
     }
     catch (const char *e) {
-        cerr << "Error in Game::LCP::makeRelaxed: " << e << endl;
+        cerr << "Error in Game::LCP::makeRelaxed: " << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String: Error in Game::LCP::makeRelaxed: " << e << endl;
+        cerr << "String: Error in Game::LCP::makeRelaxed: " << e << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception: Error in Game::LCP::makeRelaxed: " << e.what() << endl;
+        cerr << "Exception: Error in Game::LCP::makeRelaxed: " << e.what() << '\n';
         throw;
     }
     catch (GRBException &e) {
-        cerr << "GRBException: Error in Game::LCP::makeRelaxed: " << e.getErrorCode() << "; " << e.getMessage() << endl;
+        cerr << "GRBException: Error in Game::LCP::makeRelaxed: " << e.getErrorCode() << "; " << e.getMessage() << '\n';
         throw;
     }
 }
@@ -379,19 +379,19 @@ Game::LCP::LCPasMIP(
         return model;
     }
     catch (const char *e) {
-        cerr << "Error in Game::LCP::LCPasMIP: " << e << endl;
+        cerr << "Error in Game::LCP::LCPasMIP: " << e << '\n';
         throw;
     }
     catch (string e) {
-        cerr << "String: Error in Game::LCP::LCPasMIP: " << e << endl;
+        cerr << "String: Error in Game::LCP::LCPasMIP: " << e << '\n';
         throw;
     }
     catch (exception &e) {
-        cerr << "Exception: Error in Game::LCP::LCPasMIP: " << e.what() << endl;
+        cerr << "Exception: Error in Game::LCP::LCPasMIP: " << e.what() << '\n';
         throw;
     }
     catch (GRBException &e) {
-        cerr << "GRBException: Error in Game::LCP::LCPasMIP: " << e.getErrorCode() << "; " << e.getMessage() << endl;
+        cerr << "GRBException: Error in Game::LCP::LCPasMIP: " << e.getErrorCode() << "; " << e.getMessage() << '\n';
         throw;
     }
     return nullptr;
@@ -904,20 +904,20 @@ Game::LCP::FixToPoly(
             delete model;
         }
         catch (const char *e) {
-            cerr << "Error in Game::LCP::FixToPoly: " << e << endl;
+            cerr << "Error in Game::LCP::FixToPoly: " << e << '\n';
             throw;
         }
         catch (string e) {
-            cerr << "String: Error in Game::LCP::FixToPoly: " << e << endl;
+            cerr << "String: Error in Game::LCP::FixToPoly: " << e << '\n';
             throw;
         }
         catch (exception &e) {
-            cerr << "Exception: Error in Game::LCP::FixToPoly: " << e.what() << endl;
+            cerr << "Exception: Error in Game::LCP::FixToPoly: " << e.what() << '\n';
             throw;
         }
         catch (GRBException &e) {
             cerr << "GRBException: Error in Game::LCP::FixToPoly: " << e.getErrorCode() << ": " << e.getMessage()
-                 << endl;
+                 << '\n';
             throw;
         }
     }
@@ -951,7 +951,7 @@ Game::LCP::FixToPolies(
     /*
     if (VERBOSE) {
         for (const auto v:MyFix) cout << v << " ";
-        cout << endl;
+        cout << '\n';
     }
     */
     unsigned int i;
@@ -999,7 +999,7 @@ Game::LCP::addPolyhedron(
     this->FixToPolies(&Fix, true, true, &custAi, &custbi);
 
     if (custAi.empty()) {
-        cerr << "Empty vector of polyhedra given! Problem might be infeasible." << endl;
+        cerr << "Empty vector of polyhedra given! Problem might be infeasible." << '\n';
         // 0 <= -1 for infeasability
         *A = arma::sp_mat(1, this->M.n_cols);
         *b = arma::vec(1);
@@ -1082,19 +1082,19 @@ Game::LCP::LCPasQP(bool solve)
                 throw "LCP infeasible";
         }
         catch (const char *e) {
-            cerr << "Error in Game::LCP::LCPasQP: " << e << endl;
+            cerr << "Error in Game::LCP::LCPasQP: " << e << '\n';
             throw;
         }
         catch (string e) {
-            cerr << "String: Error in Game::LCP::LCPasQP: " << e << endl;
+            cerr << "String: Error in Game::LCP::LCPasQP: " << e << '\n';
             throw;
         }
         catch (exception &e) {
-            cerr << "Exception: Error in Game::LCP::LCPasQP: " << e.what() << endl;
+            cerr << "Exception: Error in Game::LCP::LCPasQP: " << e.what() << '\n';
             throw;
         }
         catch (GRBException &e) {
-            cerr << "GRBException: Error in Game::LCP::LCPasQP: " << e.getErrorCode() << "; " << e.getMessage() << endl;
+            cerr << "GRBException: Error in Game::LCP::LCPasQP: " << e.getErrorCode() << "; " << e.getMessage() << '\n';
             throw;
         }
     }
@@ -1131,11 +1131,11 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c, const arma::vec
         if (c.n_rows != this->nC) throw string("Bad size of c");
     }
     catch (exception &e) {
-        cerr << "Exception in Game::LCP::MPECasMIQP: " << e.what() << endl;
+        cerr << "Exception in Game::LCP::MPECasMIQP: " << e.what() << '\n';
         throw;
     }
     catch (string &e) {
-        cerr << "Exception in Game::LCP::MPECasMIQP: " << e << endl;
+        cerr << "Exception in Game::LCP::MPECasMIQP: " << e << '\n';
         throw;
     }
     arma::vec obj = c + Cx;
