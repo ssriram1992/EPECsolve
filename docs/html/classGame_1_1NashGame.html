@@ -9,14 +9,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript" src="navtreedata.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-  $(document).ready(initResizable);
-/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -54,23 +46,6 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
-</div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-      <div id="nav-sync" class="sync"></div>
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-$(document).ready(function(){initNavTree('classGame_1_1NashGame.html','');});
-/* @license-end */
-</script>
-<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -85,6 +60,11 @@ $(document).ready(function(){initNavTree('classGame_1_1NashGame.html','');});
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="namespaceGame.html">Game</a></li><li class="navelem"><a class="el" href="classGame_1_1NashGame.html">NashGame</a></li>  </ul>
+</div>
+</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
@@ -140,7 +120,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9822cf86f807f3bac5286b9e015dc759"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a9822cf86f807f3bac5286b9e015dc759">getMCLeadRHS</a> () const</td></tr>
 <tr class="separator:a9822cf86f807f3bac5286b9e015dc759"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f8b9352623a4c15d8186382027461b9"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a3f8b9352623a4c15d8186382027461b9">Respond</a> (unsigned int player, const arma::vec &amp;x, bool fullvec=true) const</td></tr>
-<tr class="memdesc:a3f8b9352623a4c15d8186382027461b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the decision of other players, find the optimal response for player in position <code>player</code> @detail Given the strategy of each player, returns a Gurobi Model that has the optimal strategy of the player at position <code>player</code>.  <a href="#a3f8b9352623a4c15d8186382027461b9">More...</a><br /></td></tr>
+<tr class="memdesc:a3f8b9352623a4c15d8186382027461b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the decision of other players, find the optimal response for player in position <code>player</code>.  <a href="#a3f8b9352623a4c15d8186382027461b9">More...</a><br /></td></tr>
 <tr class="separator:a3f8b9352623a4c15d8186382027461b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96b5e4e9d919d672cdce22be5a7b50fd"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a96b5e4e9d919d672cdce22be5a7b50fd">RespondSol</a> (arma::vec &amp;sol, unsigned int player, const arma::vec &amp;x, bool fullvec=true) const</td></tr>
 <tr class="separator:a96b5e4e9d919d672cdce22be5a7b50fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -937,8 +917,8 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Given the decision of other players, find the optimal response for player in position <code>player</code> @detail Given the strategy of each player, returns a Gurobi Model that has the optimal strategy of the player at position <code>player</code>. </p>
-<dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel </dd></dl>
+<p>Given the decision of other players, find the optimal response for player in position <code>player</code>. </p>
+<p>Given the strategy of each player, returns a Gurobi Model that has the optimal strategy of the player at position <code>player</code>. </p><dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">player</td><td>Player whose optimal response is to be computed </td></tr>
@@ -991,6 +971,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramname">sol</td><td>The solution vector where the response will be returned </td></tr>
     <tr><td class="paramname">player</td><td>Player whose optimal response is to be computed </td></tr>
     <tr><td class="paramname">x</td><td>A vector of pure strategies (either for all players or all other players) </td></tr>
     <tr><td class="paramname">fullvec</td><td>Is <code>x</code> strategy of all players? </td></tr>
@@ -1470,18 +1451,14 @@ Friends</h2></td></tr>
 <li><a class="el" href="Games_8cpp_source.html">Games.cpp</a></li>
 </ul>
 </div><!-- contents -->
-</div><!-- doc-content -->
 <div class="ttc" id="asrc_2EPEC_8cpp_html_a3c04138a5bfe5d72780bb7e82a18e627"><div class="ttname"><a href="src_2EPEC_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a></div><div class="ttdeci">int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> <a href="src_2EPEC_8cpp_source.html#l00014">src/EPEC.cpp:14</a></div></div>
 <div class="ttc" id="aclassGame_1_1NashGame_html_aa26996eea20f6618e93e531a2be5d1e7"><div class="ttname"><a href="classGame_1_1NashGame.html#aa26996eea20f6618e93e531a2be5d1e7">Game::NashGame::env</a></div><div class="ttdeci">GRBEnv * env</div><div class="ttdef"><b>Definition:</b> <a href="games_8h_source.html#l00213">games.h:213</a></div></div>
 <div class="ttc" id="aclassGame_1_1NashGame_html"><div class="ttname"><a href="classGame_1_1NashGame.html">Game::NashGame</a></div><div class="ttdoc">Class to model Nash-cournot games with each player playing a QP.</div><div class="ttdef"><b>Definition:</b> <a href="games_8h_source.html#l00211">games.h:211</a></div></div>
 <!-- start footer part -->
-<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
-  <ul>
-    <li class="navelem"><a class="el" href="namespaceGame.html">Game</a></li><li class="navelem"><a class="el" href="classGame_1_1NashGame.html">NashGame</a></li>
-    <li class="footer">Generated by
-    <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.16 </li>
-  </ul>
-</div>
+<hr class="footer"/><address class="footer"><small>
+Generated by &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.16
+</small></address>
 </body>
 </html>
