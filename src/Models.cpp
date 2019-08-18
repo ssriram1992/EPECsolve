@@ -11,6 +11,8 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/prettywriter.h>
+#include<boost/program_options.hpp>
+#include<boost/log/trivial.hpp>
 
 
 using namespace rapidjson;
@@ -278,15 +280,13 @@ void Models::EPEC::make_LL_LeadCons(
         LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons) =
                 Params.LeaderParam.price_limit - Params.DemandParam.alpha;
     }
-    if (VERBOSE) {
-        cout << "\n********** Price Limit constraint: " << price_lim_cons;
-        cout << "\n********** Import Limit constraint: " << import_lim_cons;
-        cout << "\n********** Export Limit constraint: " << export_lim_cons;
-        cout << "\n********** Tax Limit constraints: " << activeTaxCaps << "\n\t";
-        for (unsigned int i = 0; i < Params.n_followers; i++) cout << "q_" + to_string(i) << "\t\t";
-        cout << "q_imp\t\tq_exp\t\tp_cap\t\t";
-        for (unsigned int i = 0; i < Params.n_followers; i++) cout << "t_" + to_string(i) << "\t\t";
-    }
+	 BOOST_LOG_TRIVIAL(trace)<< "********** Price Limit constraint: " << price_lim_cons;
+	 BOOST_LOG_TRIVIAL(trace)<< "********** Import Limit constraint: " << import_lim_cons;
+	 BOOST_LOG_TRIVIAL(trace)<< "********** Export Limit constraint: " << export_lim_cons;
+	 BOOST_LOG_TRIVIAL(trace)<< "********** Tax Limit constraints: " << activeTaxCaps << "\n\t";
+	for (unsigned int i = 0; i < Params.n_followers; i++) BOOST_LOG_TRIVIAL(trace) << "q_" + to_string(i) << "\t\t";
+	BOOST_LOG_TRIVIAL(trace) << "q_imp\t\tq_exp\t\tp_cap\t\t";
+	for (unsigned int i = 0; i < Params.n_followers; i++)  BOOST_LOG_TRIVIAL(trace)<< "t_" + to_string(i) << "\t\t";
 }
 
 
@@ -878,10 +878,10 @@ Models::EPEC::make_country_QP()
         }
     }
     this->computeLeaderLocations(true);
-    if (VERBOSE) {
-        for (unsigned int i = 0; i < this->nCountr; ++i)
-            this->country_QP.at(i)->QP_Param::write("dat/debug/countrQP_" + to_string(i), false);
-    }
+    // if (VERBOSE) {
+        // for (unsigned int i = 0; i < this->nCountr; ++i)
+            // this->country_QP.at(i)->QP_Param::write("dat/debug/countrQP_" + to_string(i), false);
+    // }
 }
 
 void
@@ -949,11 +949,11 @@ Models::EPEC::findNashEq() {
 
         this->lcpmodel = lcp->LCPasMIP(false);
         Nvar = nashgame->getNprimals() + nashgame->getNduals() + nashgame->getNshadow() + nashgame->getNleaderVars();
-        if (VERBOSE) {
-            lcpmodel->write("dat/debug/NashLCP.lp");
-            this->nashgame->write("dat/debug/NashGame", false, true);
-            cout << *nashgame;
-        }
+        // if (VERBOSE) {
+            // lcpmodel->write("dat/debug/NashLCP.lp");
+            // this->nashgame->write("dat/debug/NashGame", false, true);
+             BOOST_LOG_TRIVIAL(trace)<< *nashgame;
+        // }
 
         this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
         this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);

@@ -4,7 +4,8 @@
 #include"lcptolp.h"
 #include<gurobi_c++.h>
 #include<armadillo>
-// #define VERBOSE true
+#include<boost/program_options.hpp>
+#include<boost/log/trivial.hpp>
 
 using namespace std;
 using namespace Utils;
@@ -178,9 +179,7 @@ Game::LCP::makeRelaxed()
     try {
         if (this->madeRlxdModel) return;
         GRBVar x[nC], z[nR];
-        if (VERBOSE)
-            cout << "LCP::makeRelaxed() is creating a model with : " << nR << " variables and  " << nC << " constraints"
-                 << endl;
+		 BOOST_LOG_TRIVIAL(trace)<< "LCP::makeRelaxed() is creating a model with : " << nR << " variables and  " << nC << " constraints" ;
         for (unsigned int i = 0; i < nC; i++)
             x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS, "x_" + to_string(i));
         for (unsigned int i = 0; i < nR; i++)
@@ -195,7 +194,7 @@ Game::LCP::makeRelaxed()
         // If @f$Ax \leq b@f$ constraints are there, they should be included too!
         if (this->_A.n_nonzero != 0 && this->_b.n_rows != 0) {
             if (_A.n_cols != nC || _A.n_rows != _b.n_rows) {
-                cout << "(" << _A.n_rows << "," << _A.n_cols << ")\t" << _b.n_rows << " " << nC << endl;
+                BOOST_LOG_TRIVIAL(trace) << "(" << _A.n_rows << "," << _A.n_cols << ")\t" << _b.n_rows << " " << nC ;
                 throw string("A and b are incompatible! Thrown from makeRelaxed()");
             }
             for (unsigned int i = 0; i < _A.n_rows; i++) {
@@ -335,10 +334,10 @@ Game::LCP::LCPasMIP(
             for (unsigned int i = 0; i < nR; i++)
                 v[i] = model->addVar(0, 1, 0, GRB_BINARY, "v_" + to_string(i));
         // Include ALL Complementarity constraints using bigM
-        if (VERBOSE) {
-            if (this->useIndicators) { cout << "Using indicator constraints for complementarities." << endl; }
-            else { cout << "Using bigM for complementarities with M=" << this->bigM << endl; }
-        }
+
+            if (this->useIndicators) { BOOST_LOG_TRIVIAL(trace) << "Using indicator constraints for complementarities." ;}
+            else {  BOOST_LOG_TRIVIAL(trace)<< "Using bigM for complementarities with M=" << this->bigM ;}
+
         GRBLinExpr expr = 0;
         for (auto p:Compl) {
             // z[i] <= Mu constraint
@@ -492,7 +491,7 @@ int Game::ConvexHull(
     // Counting rows completed
     /****************** SLOW LOOP BEWARE *******************/
     for (unsigned int i = 0; i < nPoly; i++) {
-        if (VERBOSE) cout << "Game::ConvexHull: Handling Polyhedron " << i + 1 << " out of " << nPoly << endl;
+         BOOST_LOG_TRIVIAL(trace) << "Game::ConvexHull: Handling Polyhedron " << i + 1 << " out of " << nPoly ;
         // First constraint in (4.31)
         // A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i); // Slowest line. Will arma improve this?
         // First constraint RHS
@@ -722,15 +721,12 @@ Game::LCP::branch(int loc,                    ///< Location (complementarity pai
     // GRBModel *FixEqMdl=nullptr, *FixVarMdl=nullptr;
     vector<short int> *FixEqLeaf, *FixVarLeaf;
 
-    if (VERBOSE) {
-        cout << "\nBranching on Variable: " << loc << " with Fix as ";
-        for (auto t1:*Fixes) cout << t1 << '\t';
-        cout << endl;
-    }
+         BOOST_LOG_TRIVIAL(debug)<< "Branching on Variable: " << loc << " with Fix as ";
+        for (auto t1:*Fixes)  BOOST_LOG_TRIVIAL(debug)<< t1 << '\t';
 
     loc = (loc >= 0) ? loc : (loc == -(int) nR ? 0 : -loc);
     if (loc >= static_cast<signed int>(nR)) {
-        if (VERBOSE) cout << "nR: " << nR << "\tloc: " << loc << "\t Returning..." << endl;
+         BOOST_LOG_TRIVIAL(debug)<< "nR: " << nR << "\tloc: " << loc << "\t Returning..." ;
         return;
     } else {
         GRBVar x, z;
@@ -788,31 +784,21 @@ Game::LCP::branchLoc(unique_ptr<GRBModel> &m, vector<short int> *Fix)
     static int GurCallCt{0};
     m = this->LCPasMIP(*Fix, true);
     GurCallCt++;
-    if (VERBOSE) {
-        cout << "Gurobi call\t" << GurCallCt << "\t";
-        for (auto a:*Fix) cout << a << "\t";
-        cout << endl;
-    }
+         BOOST_LOG_TRIVIAL(debug)<< "Gurobi call\t" << GurCallCt << "\t";
+        for (auto a:*Fix)  BOOST_LOG_TRIVIAL(debug)<< a << "\t";
     int pos;
     pos = (signed int) nR;// Don't branch! You are at the leaf if pos never gets changed!!
     arma::vec z, x;
     if (this->extractSols(m.get(), z, x, true)) // If already infeasible, nothing to branch!
     {
         vector<short int> *v1 = this->solEncode(z, x);
-        if (VERBOSE) {
-            cout << "v1: \t\t\t";
-            for (auto a:*v1) cout << a << '\t';
-            cout << '\n';
-        }
+             BOOST_LOG_TRIVIAL(debug)<< "v1: \t\t\t";
+            for (auto a:*v1)  BOOST_LOG_TRIVIAL(debug)<< a << '\t';
 
         this->AllPolyhedra->push_back(v1);
         this->FixToPolies(v1);
 
-        if (VERBOSE) {
-            cout << "New Polyhedron found" << endl;
-            x.t().print("x");
-            z.t().print("z");
-        }
+		 BOOST_LOG_TRIVIAL(debug)<< "New Polyhedron found" ;
         ////////////////////
         // BRANCHING RULE //
         ////////////////////
@@ -838,7 +824,7 @@ Game::LCP::branchLoc(unique_ptr<GRBModel> &m, vector<short int> *Fix)
         ///////////////////////////
         // END OF BRANCHING RULE //
         ///////////////////////////
-    } else { if (VERBOSE) cout << "Infeasible branch" << endl; }
+    } else {  BOOST_LOG_TRIVIAL(debug)<< "Infeasible branch" ;}
     return pos;
 }
 
@@ -853,11 +839,8 @@ Game::LCP::branchProcLoc(vector<short int> *Fix, vector<short int> *Leaf)
 {
     int pos = (int) nR;
 
-    if (VERBOSE) {
-        cout << "Processed Node \t\t";
-        for (auto a:*Fix) cout << a << "\t";
-        cout << endl;
-    }
+         BOOST_LOG_TRIVIAL(debug)<< "Processed Node \t\t";
+        for (auto a:*Fix) BOOST_LOG_TRIVIAL(debug) << a << "\t";
 
     if (*Fix == *Leaf) return nR;
     if (Fix->size() != Leaf->size()) throw "Error in branchProcLoc";
@@ -1219,7 +1202,7 @@ Game::LCP::save(string filename, bool erase) const {
     Utils::appendSave(this->_A, filename, string("LCP::_A"), false);
     Utils::appendSave(this->_b, filename, string("LCP::_b"), false);
 
-    if (VERBOSE) cout << "Saved LCP to file " << filename << endl;
+     BOOST_LOG_TRIVIAL(trace)<< "Saved LCP to file " << filename ;
 }
 
 

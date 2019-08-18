@@ -1,6 +1,8 @@
 #include"utils.h"
 #include<armadillo>
 #include<fstream>
+#include<boost/program_options.hpp>
+#include<boost/log/trivial.hpp>
 
 using namespace std;
 using namespace arma;

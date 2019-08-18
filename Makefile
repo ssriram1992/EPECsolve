@@ -15,8 +15,8 @@ ARGS=
 BOOST_HOME=/home/sriram/Install/boost_1_70_0
 # BOOST_LIB_D=$(BOOST_HOME)/lib/libboost_
 BOOST_LIB_D=$(BOOST_HOME)/stage/lib/libboost_
-# BOOSTLIB=$(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a $(BOOST_LIB_D)prg_exec_monitor.a -lpthread
-BOOSTLIB=$(BOOST_LIB_D)unit_test_framework.a -lpthread
+# BOOSTLIB=$(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a  -lpthread $(BOOST_LIB_D)prg_exec_monitor.a
+BOOSTLIB=$(BOOST_LIB_D)unit_test_framework.a -lpthread $(BOOST_LIB_D)program_options.a $(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a  -lpthread $(BOOST_LIB_D)prg_exec_monitor.a
 # BOOSTOPT=-I $(BOOST_HOME)/include $(BOOSTLIB) 
 BOOSTOPT=-I $(BOOST_HOME) $(BOOSTLIB) 
 
@@ -43,7 +43,7 @@ GCC=g++
 # GCC=g++-4.8
 #OTHEROPTS= -O2 -std=c++11 -I include/
 OTHEROPTS= -g3 -std=c++11 -I include/
-OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS)
+OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS) $(BOOSTOPT)
 
 runEPEC: compileEPEC
 	$(OUTPUT) $(ARGS)

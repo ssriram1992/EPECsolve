@@ -4,6 +4,8 @@
 #include<armadillo>
 #include<array>
 #include <algorithm>
+#include<boost/program_options.hpp>
+#include<boost/log/trivial.hpp>
 
 using namespace std;
 using namespace Utils;
@@ -357,9 +359,8 @@ Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars, i
  * @warning This implies you might have to rerun NashGame::FormulateLCP again too.
  */
 {
-    if (VERBOSE && (pars || vars))
-        cout
-                << "From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.\n";
+    if ((pars || vars))
+         BOOST_LOG_TRIVIAL(trace)       << "From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.";
 
     // Call the superclass function
     try { MP_Param::addDummy(pars, vars, position); }
@@ -460,7 +461,7 @@ Game::QP_Param::save(string filename, bool erase) const {
     Utils::appendSave(this->C, filename, string("QP_Param::C"), false);
     Utils::appendSave(this->b, filename, string("QP_Param::b"), false);
     Utils::appendSave(this->c, filename, string("QP_Param::c"), false);
-    if (VERBOSE) cout << "Saved QP_Param to file " << filename << endl;
+    BOOST_LOG_TRIVIAL(trace) << "Saved QP_Param to file " << filename ;
 }
 
 long int
@@ -545,7 +546,7 @@ Game::NashGame::save(string filename, bool erase) const {
     Utils::appendSave(this->LeaderConstraints, filename, string("NashGame::LeaderConstraints"), false);
     Utils::appendSave(this->LeaderConsRHS, filename, string("NashGame::LeaderConsRHS"), false);
     Utils::appendSave(this->n_LeadVar, filename, string("NashGame::n_LeadVar"), false);
-    if (VERBOSE) cout << "Saved NashGame to file " << filename << endl;
+	BOOST_LOG_TRIVIAL(trace)<< "Saved NashGame to file " << filename ;
 }
 
 long int

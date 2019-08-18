@@ -5,6 +5,7 @@
 #include"models.h"
 #include<gurobi_c++.h>
 #include<boost/program_options.hpp>
+#include<boost/log/trivial.hpp>
 
 using namespace std;
 using namespace boost::program_options;
@@ -15,6 +16,14 @@ int main(int argc, char **argv)
     string resFile,instanceFile="",logFile;
     int writeLevel,nThreads;
     double timeLimit;
+	BOOST_LOG_TRIVIAL(trace)<<"Trace severity";
+	BOOST_LOG_TRIVIAL(trace) << "A trace severity message";
+    BOOST_LOG_TRIVIAL(debug) << "A debug severity message";
+    BOOST_LOG_TRIVIAL(info) << "An informational severity message";
+    BOOST_LOG_TRIVIAL(warning) << "A warning severity message";
+    BOOST_LOG_TRIVIAL(error) << "An error severity message";
+    BOOST_LOG_TRIVIAL(fatal) << "A fatal severity message";
+
     po::options_description desc("EPEC: Allowed options");
     desc.add_options()
             ("help,h", "Shows this help message")
