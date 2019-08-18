@@ -906,6 +906,7 @@ Models::EPEC::make_country_QP(const unsigned int i)
  * @todo where is the error?
  */
 {
+	BOOST_LOG_TRIVIAL(info) << "Starting Convex hull computation of the country "<< this->AllLeadPars[i].name<< '\n';
     if (!this->finalized) throw string("Error in Models::EPEC::make_country_QP: Model not finalized");
     if (i >= this->nCountr) throw string("Error in Models::EPEC::make_country_QP: Invalid country number");
     if (!this->country_QP.at(i).get()) {

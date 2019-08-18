@@ -39,8 +39,8 @@ GURLIB= $(GUR)/lib/libgurobi_c++.a $(GUR)/lib/libgurobi81.so -lm
 GUROPT=$(GURINC) $(GURLIB)
 
 # Generic objects not requiring changes
-GCC=g++
-# GCC=g++-4.8
+# GCC=g++
+GCC=g++-4.8
 #OTHEROPTS= -O2 -std=c++11 -I include/
 OTHEROPTS= -g3 -std=c++11 -I include/
 OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS) $(BOOSTOPT)
@@ -90,7 +90,7 @@ docDetailed:
 	doxygen docs/refDetConf
 
 edit: 
-	vim -p src/epecsolve.h src/Games.cpp src/LCPtoLP.cpp  src/Models.cpp src/Utils.cpp
+	vim -p src/epecsolve.h src/Games.cpp src/LCPtoLP.cpp  src/Models.cpp src/Utils.cpp src/EPEC.cpp
 
 tag:
 	ctags src/*.cpp src/*.h
