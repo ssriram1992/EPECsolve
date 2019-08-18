@@ -975,7 +975,7 @@ Game::NashGame::Respond(
 		) const
 /**
  * @brief Given the decision of other players, find the optimal response for player in position @p player
- * @detail 
+ * @details
  * Given the strategy of each player, returns a Gurobi Model that has the optimal strategy of the player at position @p player.
  * @returns A unique_ptr to GRBModel
  *
@@ -1005,7 +1005,7 @@ Game::NashGame::Respond(
 
 double
 Game::NashGame::RespondSol(
-		arma::vec& sol, 
+		arma::vec& sol, 			///< The solution vector where the response will be returned
 		unsigned int player, 		///< Player whose optimal response is to be computed
 		const arma::vec &x, 			///< A vector of pure strategies (either for all players or all other players)
 		bool fullvec 				///< Is @p x strategy of all players?

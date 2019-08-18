@@ -27,6 +27,7 @@ make docDetailed
 - You can alternatively use the [online documentation](https://ssriram1992.github.io/EPECsolve/html/index.html)
 
 # Running
+- Download the [project](https://github.com/ssriram1992/EPECsolve/). If you do not have access, please email [sriram.sankaranarayanan@polymtl.ca](mailto:sriram.sankaranarayanan@polymtl.ca).
 - Open `Makefile`. 
 - Enter the path of your armadillo-installation in the line defining the variable `ARMA`. Typically, the location would be like `/opt/armadillo-code`.
 - Enter the path of your Gurobi-installation in the line defining the variable `GUR`. Typically, the location would be like `/opt/gurobi/gurobi811/<Your OS>`.
