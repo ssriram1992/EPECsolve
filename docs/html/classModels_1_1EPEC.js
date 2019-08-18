@@ -19,6 +19,7 @@ var classModels_1_1EPEC =
     [ "getz", "classModels_1_1EPEC.html#a37439da14e30f88feee407f0669ffde5", null ],
     [ "gur_WriteCountry_conv", "classModels_1_1EPEC.html#a54eedf915987cc66e280be0b58df48cc", null ],
     [ "gur_WriteEpecMip", "classModels_1_1EPEC.html#ab914cc9be4894d0ab20881290d896330", null ],
+    [ "isSolved", "classModels_1_1EPEC.html#a3d711b2a443ef9401c8b76217bf5d982", null ],
     [ "make_country_QP", "classModels_1_1EPEC.html#a04159a7a1026f0771ee921f4481b3250", null ],
     [ "make_country_QP", "classModels_1_1EPEC.html#aa8bef40141d868801c8c3b0a4d28fa6f", null ],
     [ "make_LL_LeadCons", "classModels_1_1EPEC.html#ac0317095ef32ba34772c9e73f26dc0ad", null ],
@@ -64,5 +65,6 @@ var classModels_1_1EPEC =
     [ "sol_x", "classModels_1_1EPEC.html#a6e16419eb2ecfbc354a0d7ce14244d54", null ],
     [ "sol_z", "classModels_1_1EPEC.html#acd05f6fac6d91faf1382c0912ae079da", null ],
     [ "Stats", "classModels_1_1EPEC.html#a6ee0b1aea6ed95d731c432c327a25f07", null ],
+    [ "timeLimit", "classModels_1_1EPEC.html#a054c534c35b4779703a668a51499d43d", null ],
     [ "TranspCosts", "classModels_1_1EPEC.html#afe2b46d396e7980d8336099d8d916b19", null ]
 ];

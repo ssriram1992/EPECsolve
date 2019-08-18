@@ -14,5 +14,5 @@ var searchData=
   ['solencode',['solEncode',['../classGame_1_1LCP.html#a19650ed8a9ae7e071f9ccdc39c8d8606',1,'Game::LCP::solEncode(GRBModel *model) const'],['../classGame_1_1LCP.html#ab3e60f1a1b2b7fda80f26bf39528f1af',1,'Game::LCP::solEncode(const arma::vec &amp;z, const arma::vec &amp;x) const']]],
   ['solvefixed',['solveFixed',['../classGame_1_1QP__Param.html#a94c1b94ff3a3423dfcec43f2d66e3507',1,'Game::QP_Param']]],
   ['stats',['Stats',['../classModels_1_1EPEC.html#a6ee0b1aea6ed95d731c432c327a25f07',1,'Models::EPEC']]],
-  ['status',['status',['../structModels_1_1EPECStatistics.html#a9ae65929060732ab523cf78690b24e34',1,'Models::EPECStatistics']]]
+  ['status',['status',['../structModels_1_1EPECStatistics.html#a40e9b0323604fb0207c5f37a84c2b7da',1,'Models::EPECStatistics']]]
 ];

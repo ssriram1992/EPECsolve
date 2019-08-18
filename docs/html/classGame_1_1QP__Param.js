@@ -4,6 +4,7 @@ var classGame_1_1QP__Param =
     [ "QP_Param", "classGame_1_1QP__Param.html#a61008ed53ae0d7bf482724c6495931fe", null ],
     [ "QP_Param", "classGame_1_1QP__Param.html#ad02ba73442c9556bae3c184ac3ae7ee8", null ],
     [ "addDummy", "classGame_1_1QP__Param.html#a5313f28073ba60f90ca422e2da6a369a", null ],
+    [ "computeObjective", "classGame_1_1QP__Param.html#aad40a0f721956c78c03be4d39a4b1710", null ],
     [ "dataCheck", "classGame_1_1QP__Param.html#a3d1ee706080d6968674ad8c7a669989b", null ],
     [ "finalize", "classGame_1_1QP__Param.html#ad99f19eae314bd3ca720d75d219167c3", null ],
     [ "getA", "classGame_1_1QP__Param.html#ac838b1f2b2e2a4014ee284c3c0f0ecdf", null ],

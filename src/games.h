@@ -554,7 +554,12 @@ namespace Game {
 		cout<<nashResp1->getVarByName("y_0").get(GRB_DoubleAttr_X)<<endl; // Should print 28.271028
 		cout<<nashResp2->getVarByName("y_0").get(GRB_DoubleAttr_X)<<endl; // Should print 27.803728
  * @endcode
- * One can, thus check that the values match the solution values obtained earlier.
+ * One can, thus check that the values match the solution values obtained earlier. If only does not want the individual GRBModel handles, but just want to confirm either that the problem is solved or to provide a player with profitable deviation, one can just use Game::NashGame::isSolved function as follows.
+ * @code
+		unsigned int temp1 ; arma::vec temp2;
+		cout<<Nash.isSolved(Nashsol, temp1, temp2); // This should be true. 
+ * @endcode
+ * If the Game::NashGame::isSolved function returns false, then @p temp1 and @p temp2 respectively contain the player with profitable deviation, and the more profitable strategy of the player.
  *
  * And note that, just like Game::QP_Param, Game::NashGame can also be saved to and loaded from an external file.
  * @code

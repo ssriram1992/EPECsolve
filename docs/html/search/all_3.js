@@ -6,6 +6,8 @@ var searchData=
   ['compconvsize',['compConvSize',['../namespaceGame.html#ac1aeab68fc2231bdb1ae8e9d57da5095',1,'Game']]],
   ['compl',['Compl',['../classGame_1_1LCP.html#a6dbcd747d3b7a82fcd9079916da001df',1,'Game::LCP']]],
   ['computeleaderlocations',['computeLeaderLocations',['../classModels_1_1EPEC.html#afbff1dd5f2974c35fd56ada5cae96de2',1,'Models::EPEC']]],
+  ['computeobjective',['computeObjective',['../classGame_1_1QP__Param.html#aad40a0f721956c78c03be4d39a4b1710',1,'Game::QP_Param']]],
+  ['computeqpobjvals',['ComputeQPObjvals',['../classGame_1_1NashGame.html#a13f2c54098acc8e38e16ddcd09d3f5e7',1,'Game::NashGame']]],
   ['convexhull',['ConvexHull',['../classGame_1_1LCP.html#a98042d88db2e32a4c1c55bfb3b1b6756',1,'Game::LCP::ConvexHull()'],['../namespaceGame.html#ace813b46bdf72c6c92a3935542d278ef',1,'Game::ConvexHull()']]],
   ['convhulldummy',['ConvHullDummy',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea2afd0bab7c35873bc8dd372c6d255448',1,'Models']]],
   ['costs_5flin',['costs_lin',['../structModels_1_1FollPar.html#aaa36c0543e54c59699f0da4164e65b5b',1,'Models::FollPar']]],
