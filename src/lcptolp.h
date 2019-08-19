@@ -41,6 +41,7 @@ namespace Game {
         // Temporary data
         bool madeRlxdModel{false}; ///< Keep track if LCP::RlxdModel is made
         unsigned int nR, nC;
+        int polyCounter{0};
         int feasiblePolyhedra{-1};
         /// LCP feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra
         vector<vector<short int> *> *AllPolyhedra, *RelAllPol;

@@ -627,7 +627,7 @@ Game::LPSolve(const arma::sp_mat &A, ///< The constraint matrix
             lin += (*j) * x[j.col()];
         a[i] = model.addConstr(lin, GRB_LESS_EQUAL, b.at(i));
     }
-    model.set(GRB_IntParam_OutputFlag, 0);
+    model.set(GRB_IntParam_OutputFlag, VERBOSE);
     model.set(GRB_IntParam_DualReductions, 0);
     model.optimize();
     status = model.get(GRB_IntAttr_Status);
@@ -868,6 +868,7 @@ Game::LCP::FixToPoly(
  *	not meant for high level code. Instead use LCP::FixToPolies.
  */
 {
+    BOOST_LOG_TRIVIAL(trace) << "\tChecking feasability for polyhedron "<< to_string(++this->polyCounter)<< '\n';
     arma::sp_mat *Aii = new arma::sp_mat(nR, nC);
     arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
     for (unsigned int i = 0; i < this->nR; i++) {

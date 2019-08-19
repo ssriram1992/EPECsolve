@@ -284,9 +284,6 @@ void Models::EPEC::make_LL_LeadCons(
 	 BOOST_LOG_TRIVIAL(trace)<< "********** Import Limit constraint: " << import_lim_cons;
 	 BOOST_LOG_TRIVIAL(trace)<< "********** Export Limit constraint: " << export_lim_cons;
 	 BOOST_LOG_TRIVIAL(trace)<< "********** Tax Limit constraints: " << activeTaxCaps << "\n\t";
-	for (unsigned int i = 0; i < Params.n_followers; i++) BOOST_LOG_TRIVIAL(trace) << "q_" + to_string(i) << "\t\t";
-	BOOST_LOG_TRIVIAL(trace) << "q_imp\t\tq_exp\t\tp_cap\t\t";
-	for (unsigned int i = 0; i < Params.n_followers; i++)  BOOST_LOG_TRIVIAL(trace)<< "t_" + to_string(i) << "\t\t";
 }
 
 
