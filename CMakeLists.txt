@@ -1,28 +1,44 @@
-#Gabriele's CMake for Mac OS 10.15-Beta Catalina
-#if (ROSSOBIANCO)
-#   execute_process(COMMAND bash -c "module purge && module load gurobi boost cmake gdb")
-#ENDIF ()
+############################################
+################ CONFIGURATION #############
+#### Here yoy can edit with your paths #####
+############################################
+if (ROSSOBIANCO)
+    set(BOOST_ROOT "/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0")
+ELSE ()
+    set(BOOST_ROOT "/usr/local/boost-1.70.0/")
+ENDIF ()
+set(GUROBI_PATH_LINUX "/home/gurobi/8.1.0/linux64")
+set(GUROBI_PATH_MAC "/Library/gurobi811/mac64/include")
+set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi811\\win64\\include")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+############################################
+
+
+############################################
+################ DO NOT MODIFY #############
+############################################
 cmake_minimum_required(VERSION 3.14)
 project(EPECsolve)
 add_compile_options(-std=c++11)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_SHARED_LINKER_FLAGS "-lgurobi_c++ -lgurobi81 -larmadillo -lblas -llapack -lm -lpthread -lboost_program_options")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_SHARED_LINKER_FLAGS "-lgurobi_c++ -lgurobi81 -lpthread -larmadillo -lblas -llapack -lm")
+
 #From https://github.com/LiangliangNan/PolyFit/blob/master/cmake/FindGUROBI.cmake
 if (NOT GUROBI_FOUND)
     # Hardcoded search paths
     set(SEARCH_PATHS_FOR_HEADERS
         "$ENV{GUROBI_HOME}/include"
-        "/Library/gurobi811/mac64/include"
-        "/home/gurobi/8.1.0/linux64/include"
-        "C:\\dev\\gurobi811\\win64\\include"
+        "${GUROBI_PATH_MAC}/include"
+        "${GUROBI_PATH_LINUX}/include"
+        "${GUROBI_PATH_WINDOWS}/include"
         )
 
     set(SEARCH_PATHS_FOR_LIBRARIES
         "$ENV{GUROBI_HOME}/lib"
-        "/Library/gurobi811/mac64/lib"
-        "/home/gurobi/8.1.0/linux64/lib"
-        "C:\\dev\\gurobi811\\win64\\lib"
+        "${GUROBI_PATH_MAC}/lib"
+        "${GUROBI_PATH_LINUX}/lib"
+        "${GUROBI_PATH_WINDOWS}/lib"
         )
 
     find_path(GUROBI_INCLUDE_DIR gurobi_c++.h
@@ -54,20 +70,16 @@ if (NOT GUROBI_FOUND)
         optimized ${GUROBI_CXX_LIBRARY_RELEASE})
 
 endif ()
-
-# Check that Gurobi was successfully found
 include(FindPackageHandleStandardArgs)
+SET(Boost_USE_STATIC_LIBS ON)
+find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options unit_test_framework log log_setup)
+find_package(Armadillo REQUIRED)
 find_package_handle_standard_args(GUROBI DEFAULT_MSG GUROBI_INCLUDE_DIRS)
 find_package_handle_standard_args(GUROBI DEFAULT_MSG GUROBI_LIBRARIES)
 mark_as_advanced(GUROBI_LIBRARIES GUROBI_INCLUDE_DIRS GUROBI_INCLUDE_DIR)
 include_directories(${GUROBI_INCLUDE_DIR})
-if (ROSSOBIANCO)
-    include_directories("/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0/include")
-    include_directories("/home/draggabr/.local/armadillo-9.500.2/include")
-ELSE ()
-    include_directories("/usr/local/boost-1.70.0/include")
-    include_directories("/usr/local/include")
-ENDIF ()
+include_directories(${BOOST_ROOT}/include)
+include_directories(${ARMADILLO_INCLUDE_DIRS})
 include_directories("src")
 include_directories("include")
 add_executable(EPEC
@@ -102,13 +114,14 @@ add_executable(EPECtest
                src/Models.cpp
                src/models.h
                test/EPEC.cpp)
-
-
-target_link_libraries(EPECInstances ${GUROBI_LIBRARIES})
-if (ROSSOBIANCO)
-    target_link_libraries(EPEC /home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0/lib/libboost_program_options.a ${GUROBI_LIBRARIES})
-    target_link_libraries(EPECtest /home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0/lib/libboost_unit_test_framework.a ${GUROBI_LIBRARIES})
-ELSE ()
-    target_link_libraries(EPEC /usr/local/boost-1.70.0/lib/libboost_program_options.a ${GUROBI_LIBRARIES})
-    target_link_libraries(EPECtest /usr/local/boost-1.70.0/lib/libboost_unit_test_framework.a ${GUROBI_LIBRARIES})
-ENDIF ()
+target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
+target_link_libraries(EPEC Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
+target_link_libraries(EPECtest Boost::program_options Boost:unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
+message("\n\nEPEC Cmake configuration terminated:")
+message("\tWorking directory: ${CMAKE_CURRENT_SOURCE_DIR}")
+message("\tArmadillo (lib): ${ARMADILLO_LIBRARIES}")
+message("\tArmadillo (include): ${ARMADILLO_INCLUDE_DIRS}")
+message("\tGurobi (lib): ${GUROBI_LIBRARIES}")
+message("\tGurobi (include): ${GUROBI_INCLUDE_DIRS}")
+message("\tBoost (include): ${BOOST_ROOT}/include")
+############################################
