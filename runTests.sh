@@ -7,6 +7,6 @@ for ex in $(ls ${dataFolder}/*.json); do
       instanceName=${ex/.json/}
       instanceNumber=${ex//[!0-9]/}
       echo "----------------------Running instance $ex----------------------"
-      ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_${instanceNumber} --timelimit 360
+      ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_${instanceNumber} --timelimit 3600
       printf "\n\n"
 done

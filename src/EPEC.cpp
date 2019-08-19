@@ -6,15 +6,18 @@
 #include<gurobi_c++.h>
 #include<boost/program_options.hpp>
 #include<boost/log/trivial.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/expressions.hpp>
 
 using namespace std;
+namespace logging = boost::log;
 using namespace boost::program_options;
 namespace po = boost::program_options;
 
 int main(int argc, char **argv)
 {
     string resFile,instanceFile="",logFile;
-    int writeLevel,nThreads;
+    int writeLevel,nThreads,verbosity;
     double timeLimit;
 
     po::options_description desc("EPEC: Allowed options");
@@ -25,7 +28,8 @@ int main(int argc, char **argv)
             ("solution,s", po::value<string>(&resFile)->default_value("dat/Solution"), "Sets the output path/filename of the solution file (.json appended automatically)")
             ("log,l", po::value<string>(&logFile)->default_value("dat/Results.csv"), "Sets the output path/filename of the log file")
             ("timelimit,tl", po::value<double>(&timeLimit)->default_value(-1.0), "Sets the timelimit for solving the Nash Equilibrium model")
-            ("writelevel,w", po::value<int>(&writeLevel)->default_value(0), "Sets the writeLevel param. 0: only Json. 1: only human-readable. 2:both")
+            ("writelevel,w", po::value<int>(&writeLevel)->default_value(0), "Sets the writeLevel param. 0: only Json. 1: only human-readable. 2: both")
+            ("message,m", po::value<int>(&verbosity)->default_value(0), "Sets the verbosity level for info and warning messages. 0: warning and critical. 1: info.")
             ("threads,t", po::value<int>(&nThreads)->default_value(1), "Sets the number of Threads for Gurobi")
             ;
 
@@ -42,7 +46,10 @@ int main(int argc, char **argv)
         cout << "-i [--input] option missing"<<endl;
         return EXIT_SUCCESS;
     }
-
+    if (verbosity == 0)
+        logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::info);
+    else
+        logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::info);
 
     // --------------------------------
     // LOADING INSTANCE
