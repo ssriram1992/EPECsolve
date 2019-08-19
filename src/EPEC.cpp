@@ -55,8 +55,16 @@ int main(int argc, char **argv) {
         logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::info);
     else if (verbosity == 1)
         logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::info);
-    else if (verbosity == 2)
+    else if (verbosity == 2) {
         logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::trace);
+        arma::arma_version ver;
+        int major, minor, technical;
+        GRBversion(&major, &minor, &technical);
+        BOOST_LOG_TRIVIAL(trace) << "Dependencies:\n\tARMAdillo: " << ver.as_string();
+        BOOST_LOG_TRIVIAL(trace) << "\tGurobi: " << to_string(major)<<"."<<to_string(minor);
+        BOOST_LOG_TRIVIAL(trace) << "\tBoost: " << to_string(BOOST_VERSION / 100000)<<"."<<to_string(BOOST_VERSION / 100 % 1000);
+    }
+    
 
 
 
@@ -75,9 +83,6 @@ int main(int argc, char **argv) {
     clock_t time_start = clock();
     GRBEnv env = GRBEnv();
     env.set(GRB_IntParam_Threads, nThreads);
-    arma::arma_version ver;
-    std::cout << "ARMA version: " << ver.as_string() << std::endl;
-    BOOST_LOG_TRIVIAL(info) << "version:" << ver.as_string();
     /*char envThreads[(int) ceil((nThreads + 1) / 10)];
     strcpy(envThreads, to_string(nThreads).c_str());
     setenv("OPENBLAS_NUM_THREADS", envThreads, true);
