@@ -280,6 +280,36 @@ void Models::EPEC::make_LL_LeadCons(
         LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons) =
                 Params.LeaderParam.price_limit - Params.DemandParam.alpha;
     }
+    // Non-linear tax
+    for (unsigned int i = 0; i < Params.n_followers; i++) {
+        double t_cap = (Params.FollowerParam.tax_caps.at(i) >= 0 ? Params.FollowerParam.tax_caps.at(i) : 0);
+
+        // -u_i + \bar{q}_it_i + \bar{t}_iq_i \le \bar{t}_i \bar{q}_i
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +1,
+                    Loc.at(Models::LeaderVars::TaxU)+i)=-1;
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +1,
+                    Loc.at(Models::LeaderVars::Tax)+i)=Params.FollowerParam.capacities.at(i);
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +1,
+                    Loc.at(Models::LeaderVars::FollowerStart)+i)=t_cap;
+        LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +1) =
+                t_cap*Params.FollowerParam.capacities.at(i);
+
+        // -u_i + \bar{q}_it_i  \le 0
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +2,
+                    Loc.at(Models::LeaderVars::TaxU)+i)=-1;
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +2,
+                    Loc.at(Models::LeaderVars::Tax)+i)=Params.FollowerParam.capacities.at(i);
+        LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +2) =
+                0;
+
+        // -u_i + \bar{t}_iq_i  \le 0
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +3,
+                    Loc.at(Models::LeaderVars::TaxU)+i)=-1;
+        LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +3,
+                    Loc.at(Models::LeaderVars::FollowerStart)+i)=t_cap;
+        LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons + export_lim_cons + i*3 +3) =
+                0;
+    }
 	 BOOST_LOG_TRIVIAL(trace)<< "********** Price Limit constraint: " << price_lim_cons;
 	 BOOST_LOG_TRIVIAL(trace)<< "********** Import Limit constraint: " << import_lim_cons;
 	 BOOST_LOG_TRIVIAL(trace)<< "********** Export Limit constraint: " << export_lim_cons;
@@ -329,8 +359,8 @@ Models::EPEC::addCountry(
     catch (exception &e) { cerr << "Exception: Error in Models::EPEC::addCountry: " << e.what() << '\n'; }
     if (!noError) return *this;
 
-    const unsigned int LeadVars = 2 + 2 * Params.n_followers +
-                                  addnlLeadVars;// two for quantity imported and exported, n for imposed cap and last n for tax
+    const unsigned int LeadVars = 2 + 3 * Params.n_followers +
+                                  addnlLeadVars;// two for quantity imported and exported, n for imposed cap, n for taxes and n for bilinear taxes.
 
     LeadLocs Loc;
     Models::init(Loc);
@@ -341,6 +371,7 @@ Models::EPEC::addCountry(
     Models::increaseVal(Loc, LeaderVars::NetExport, 1);
     Models::increaseVal(Loc, LeaderVars::Caps, Params.n_followers);
     Models::increaseVal(Loc, LeaderVars::Tax, Params.n_followers);
+    Models::increaseVal(Loc, LeaderVars::TaxU, Params.n_followers);
 
 
     // Loc[Models::LeaderVars::AddnVar] = 1;
@@ -358,6 +389,7 @@ Models::EPEC::addCountry(
                           export_lim_cons +                // Export limit constraint
                           price_lim_cons +                    // Price limit constraint
                           activeTaxCaps +                // Tax limit constraints
+                          Params.n_followers*3 +         // Non-linear tax
                           1,                                // Export - import <= Domestic production
                           Loc[Models::LeaderVars::End]
     );
@@ -365,6 +397,7 @@ Models::EPEC::addCountry(
                       export_lim_cons +
                       price_lim_cons +
                       activeTaxCaps +
+                      Params.n_followers*3 +
                       1, arma::fill::zeros);
 
     vector<shared_ptr<Game::QP_Param>> Players{};
@@ -803,11 +836,21 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
          count < Params.n_followers;
          j++, count++)
         QP_obj.c.at(j) = Params.FollowerParam.emission_costs.at(count);
+
+
+    // non-linear tax
+    for (unsigned int j = Loc.at(Models::LeaderVars::TaxU), count = 0;
+         count < Params.n_followers;
+         j++, count++)
+        QP_obj.c.at(j) =1;
+
+
     if (this->nCountr > 1) {
         // export revenue term
         QP_obj.C(Loc.at(Models::LeaderVars::NetExport),
                 // this->getPosition(i, Models::LeaderVars::End) - nThisCountryvars) = -1;
                  this->getPosition(this->nCountr - 1, Models::LeaderVars::End) - nThisCountryvars + i) = -1;
+
         // Import cost term.
         unsigned int count{0};
         for (auto val = TrCo.begin_col(i); val != TrCo.end_col(i); ++val, ++count) {
@@ -843,7 +886,7 @@ Models::EPEC::Respond(const unsigned int i, const arma::vec &x) const {
     return this->country_QP.at(i).get()->solveFixed(x);
 }
 
-bool 
+bool
 Models::EPEC::isSolved(int * countryNumber, arma::vec * ProfDevn) const
 /**
  * @todo Implementation to be done.

@@ -94,6 +94,7 @@ namespace Models {
         CountryImport,
         Caps,
         Tax,
+        TaxU,
         DualVar,
         ConvHullDummy,
         End
