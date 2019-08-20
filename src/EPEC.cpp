@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char **argv) {
     string resFile, instanceFile = "", logFile;
-    int writeLevel, nThreads, verbosity;
+    int writeLevel, nThreads, verbosity, taxQ, bigM;
     double timeLimit;
 
     po::options_description desc("EPEC: Allowed options");
@@ -25,6 +25,8 @@ int main(int argc, char **argv) {
             ("version,v", "Shows EPEC version")
             ("input,i", po::value<string>(&instanceFile),
              "Sets the input path/filename of the instance file (.json appended automatically)")
+            ("quadratictax,q", po::value<int>(&taxQ)->default_value(0),
+             "Switch for the quadratic tax term.")
             ("solution,s", po::value<string>(&resFile)->default_value("dat/Solution"),
              "Sets the output path/filename of the solution file (.json appended automatically)")
             ("log,l", po::value<string>(&logFile)->default_value("dat/Results.csv"),
@@ -35,6 +37,8 @@ int main(int argc, char **argv) {
              "Sets the writeLevel param. 0: only Json. 1: only human-readable. 2: both")
             ("message,m", po::value<int>(&verbosity)->default_value(0),
              "Sets the verbosity level for info and warning messages. 0: warning and critical. 1: info. 2: trace")
+            ("bigm,b", po::value<int>(&bigM)->default_value(0),
+             "Replaces indicator constraints with bigM.")
             ("threads,t", po::value<int>(&nThreads)->default_value(1),
              "Sets the number of Threads for Gurobi. (int): number of threads. 0: auto (number of processors)");
 
@@ -61,10 +65,11 @@ int main(int argc, char **argv) {
         int major, minor, technical;
         GRBversion(&major, &minor, &technical);
         BOOST_LOG_TRIVIAL(trace) << "Dependencies:\n\tARMAdillo: " << ver.as_string();
-        BOOST_LOG_TRIVIAL(trace) << "\tGurobi: " << to_string(major)<<"."<<to_string(minor);
-        BOOST_LOG_TRIVIAL(trace) << "\tBoost: " << to_string(BOOST_VERSION / 100000)<<"."<<to_string(BOOST_VERSION / 100 % 1000);
+        BOOST_LOG_TRIVIAL(trace) << "\tGurobi: " << to_string(major) << "." << to_string(minor);
+        BOOST_LOG_TRIVIAL(trace) << "\tBoost: " << to_string(BOOST_VERSION / 100000) << "."
+                                 << to_string(BOOST_VERSION / 100 % 1000);
     }
-    
+
 
 
 
@@ -83,12 +88,19 @@ int main(int argc, char **argv) {
     clock_t time_start = clock();
     GRBEnv env = GRBEnv();
     env.set(GRB_IntParam_Threads, nThreads);
-    /*char envThreads[(int) ceil((nThreads + 1) / 10)];
-    strcpy(envThreads, to_string(nThreads).c_str());
-    setenv("OPENBLAS_NUM_THREADS", envThreads, true);
-     */
+
+    //OPTIONS
+    //------------
     Models::EPEC epec(&env);
+    //Tax switch
+    epec.quadraticTax = taxQ;
+    //Indicator constraints
+    if (bigM == 1)
+        epec.indicators = 0;
+    //timeLimit
     epec.timeLimit = timeLimit;
+    //------------
+
     for (int j = 0; j < Instance.Countries.size(); ++j)
         epec.addCountry(Instance.Countries.at(j));
     epec.addTranspCosts(Instance.TransportationCosts);
@@ -110,7 +122,7 @@ int main(int argc, char **argv) {
     std::ofstream results(logFile, ios::app);
     if (!existCheck.good()) {
         results
-                << "Instance;Countries;Followers;Status;numFeasiblePolyhedra;numVar;numConstraints;numNonZero;CPUTime (ms)\n";
+                << "Instance;Countries;Followers;Status;numFeasiblePolyhedra;numVar;numConstraints;numNonZero;CPUTime (ms);Threads;Indicators;quadraticTax\n";
     }
     existCheck.close();
     stringstream PolyT;
@@ -120,8 +132,8 @@ int main(int argc, char **argv) {
     for (auto &Countrie : Instance.Countries)
         results << " " << to_string(Countrie.n_followers);
     results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];" << to_string(stat.numVar) << ";"
-            << to_string(stat.numConstraints)
-            << ";" << to_string(stat.numNonZero) << ";" << to_string(CPUTime) << "\n";
+            << to_string(stat.numConstraints) << ";" << to_string(stat.numNonZero) << ";" << to_string(CPUTime) << ";"
+            << to_string(nThreads) << ";" << to_string(epec.indicators) << ";" << to_string(taxQ) << "\n";
     results.close();
 
     return EXIT_SUCCESS;

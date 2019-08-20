@@ -117,6 +117,9 @@ Models::operator<<(ostream &ost, const Models::LeaderVars l) {
         case Models::LeaderVars::Tax:
             ost << "Models::LeaderVars::Tax";
             break;
+        case Models::LeaderVars::TaxQuad:
+            ost << "Models::LeaderVars::TaxQuad";
+            break;
         case Models::LeaderVars::DualVar:
             ost << "Models::LeaderVars::DualVar";
             break;
@@ -361,7 +364,7 @@ Models::EPEC::addCountry(
     catch (exception &e) { cerr << "Exception: Error in Models::EPEC::addCountry: " << e.what() << '\n'; }
     if (!noError) return *this;
 
-    const unsigned int LeadVars = 2 + 3 * Params.n_followers +
+    const unsigned int LeadVars = 2 + (2 + this->quadraticTax) * Params.n_followers +
                                   addnlLeadVars;// two for quantity imported and exported, n for imposed cap, n for taxes and n for bilinear taxes.
 
     LeadLocs Loc;
@@ -842,11 +845,12 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
 
 
     // non-linear tax
-    for (unsigned int j = Loc.at(Models::LeaderVars::TaxQuad), count = 0;
-         count < Params.n_followers;
-         j++, count++)
-        QP_obj.c.at(j) = 1;
-
+    if (this->quadraticTax) {
+        for (unsigned int j = Loc.at(Models::LeaderVars::TaxQuad), count = 0;
+             count < Params.n_followers;
+             j++, count++)
+            QP_obj.c.at(j) = 1;
+    }
 
     if (this->nCountr > 1) {
         // export revenue term
@@ -1150,6 +1154,10 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x, const a
         writer.Uint(this->getPosition(i, Models::LeaderVars::Caps));
         writer.Key("Tax");
         writer.Uint(this->getPosition(i, Models::LeaderVars::Tax));
+        if (this->quadraticTax) {
+            writer.Key("QuadraticTax");
+            writer.Uint(this->getPosition(i, Models::LeaderVars::TaxQuad));
+        }
         writer.Key("DualVar");
         writer.Uint(this->getPosition(i, Models::LeaderVars::DualVar));
         writer.Key("ConvHullDummy");
@@ -1440,10 +1448,12 @@ Models::EPEC::WriteFollower(const unsigned int i,
 
     // Country Variables
     const LeadAllPar &Params = this->AllLeadPars.at(i);
-    unsigned int foll_prod, foll_tax, foll_lim;
+    unsigned int foll_prod, foll_tax, foll_lim, foll_taxQ;
     foll_prod = this->getPosition(i, Models::LeaderVars::FollowerStart);
     foll_tax = this->getPosition(i, Models::LeaderVars::Tax);
     foll_lim = this->getPosition(i, Models::LeaderVars::Caps);
+    if (this->quadraticTax) {}
+    foll_taxQ = this->getPosition(i, Models::LeaderVars::TaxQuad);
 
     string name;
     try { name = Params.name + " --- " + Params.FollowerParam.names.at(j); }
@@ -1453,6 +1463,9 @@ Models::EPEC::WriteFollower(const unsigned int i,
 
     const double q = x.at(foll_prod + j);
     const double tax = x.at(foll_tax + j);
+    double taxQ = 0;
+    if (this->quadraticTax)
+        taxQ = x.at(foll_taxQ + j) / q;
     const double lim = x.at(foll_lim + j);
     const double lin = Params.FollowerParam.costs_lin.at(j);
     const double quad = Params.FollowerParam.costs_quad.at(j);
@@ -1464,6 +1477,8 @@ Models::EPEC::WriteFollower(const unsigned int i,
     file << Models::prn::label << "Limit on production" << ":" << Models::prn::val << lim << "\n";
     //file << "x(): " << foll_lim + j << '\n';
     file << Models::prn::label << "Tax imposed" << ":" << Models::prn::val << tax << "\n";
+    if (this->quadraticTax)
+        file << Models::prn::label << "Tax imposed (Q)" << ":" << Models::prn::val << taxQ << "\n";
     // file << Models::prn::label << "Tax cap" << ":" << Params.FollowerParam.tax_caps.at(j) << tax << "\n";
     //file << "x(): " << foll_tax + j << '\n';
     file << Models::prn::label << "  -Production cost function" << ":" << "\t C(q) = (" << lin << " + " << tax
