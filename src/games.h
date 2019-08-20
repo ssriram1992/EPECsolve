@@ -174,7 +174,7 @@ namespace Game {
 
         std::unique_ptr<GRBModel> solveFixed(arma::vec x);
 
-		double computeObjective(const arma::vec &y, const arma::vec &x, bool checkFeas=true, double tol=1e-6) const;
+        double computeObjective(const arma::vec &y, const arma::vec &x, bool checkFeas = true, double tol = 1e-6) const;
 
         inline bool is_Playable(const QP_Param &P) const
         /// Checks if the current object can play a game with another Game::QP_Param object @p P.
@@ -239,7 +239,8 @@ namespace Game {
         NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
                  arma::vec MCRHS, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {}, arma::vec LeadRHS = {});
 
-        NashGame(GRBEnv* e, unsigned int Nplayers, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {}, arma::vec LeadRHS = {})
+        NashGame(GRBEnv *e, unsigned int Nplayers, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {},
+                 arma::vec LeadRHS = {})
                 : env{e}, LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar} {
             Players.resize(this->Nplayers);
             primal_position.resize(this->Nplayers);
@@ -297,20 +298,22 @@ namespace Game {
                     -this->MCRHS);
         }
 
-		// Check solution and correctness
-		unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec &x, bool fullvec = true) const;
-		double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, bool fullvec = true) const;
-		arma::vec ComputeQPObjvals(const arma::vec &x, bool checkFeas=false) const;
+        // Check solution and correctness
+        unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec &x, bool fullvec = true) const;
 
-		bool isSolved(const arma::vec & sol, unsigned int &violPlayer, arma::vec &violSol, double tol=1e-6) const;
+        double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, bool fullvec = true) const;
 
-		//  Modify NashGame members
-		
+        arma::vec ComputeQPObjvals(const arma::vec &x, bool checkFeas = false) const;
+
+        bool isSolved(const arma::vec &sol, unsigned int &violPlayer, arma::vec &violSol, double tol = 1e-6) const;
+
+        //  Modify NashGame members
+
         NashGame &addDummy(unsigned int par = 0, int position = -1);
 
         NashGame &addLeadCons(const arma::vec &a, double b);
 
-		// Read/Write Nashgame functions
+        // Read/Write Nashgame functions
 
         void write(string filename, bool append = true, bool KKT = false) const;
 
@@ -442,7 +445,7 @@ namespace Game {
  *
  * Now that you are aware of most of the functionalities of Game::QP_Param, let us switch to the next tutorial on @link NashGame_Example NashGame and LCP @endlink.
  *
- */ 
+ */
 
 
 

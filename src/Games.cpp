@@ -360,7 +360,8 @@ Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars, i
  */
 {
     if ((pars || vars))
-         BOOST_LOG_TRIVIAL(trace)       << "From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.";
+        BOOST_LOG_TRIVIAL(trace)
+            << "From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.";
 
     // Call the superclass function
     try { MP_Param::addDummy(pars, vars, position); }
@@ -451,21 +452,19 @@ Game::QP_Param::set(const QP_objective &obj, const QP_constraints &cons) {
     return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
 }
 
-double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x, bool checkFeas, double tol) const
-{
-	if(y.n_rows != this->getNy()) throw string("Error in QP_Param::computeObjective: Invalid size of y");
-	if(x.n_rows != this->getNx()) throw string("Error in QP_Param::computeObjective: Invalid size of x");
-	if(checkFeas)
-	{
-		arma::vec slack = A*x + B*y - b;
-		if(slack.n_rows)// if infeasible
-			if (slack.max() >= tol) 
-				return -GRB_INFINITY;
-		if ( y.min() <= -tol) // if infeasible
-			return -GRB_INFINITY;
-	}
-	arma::vec obj = 0.5* y.t()*Q*y + (C*x).t()*y + c.t()*y;
-	return obj(0);
+double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x, bool checkFeas, double tol) const {
+    if (y.n_rows != this->getNy()) throw string("Error in QP_Param::computeObjective: Invalid size of y");
+    if (x.n_rows != this->getNx()) throw string("Error in QP_Param::computeObjective: Invalid size of x");
+    if (checkFeas) {
+        arma::vec slack = A * x + B * y - b;
+        if (slack.n_rows)// if infeasible
+            if (slack.max() >= tol)
+                return -GRB_INFINITY;
+        if (y.min() <= -tol) // if infeasible
+            return -GRB_INFINITY;
+    }
+    arma::vec obj = 0.5 * y.t() * Q * y + (C * x).t() * y + c.t() * y;
+    return obj(0);
 }
 
 void
@@ -477,27 +476,27 @@ Game::QP_Param::save(string filename, bool erase) const {
     Utils::appendSave(this->C, filename, string("QP_Param::C"), false);
     Utils::appendSave(this->b, filename, string("QP_Param::b"), false);
     Utils::appendSave(this->c, filename, string("QP_Param::c"), false);
-    BOOST_LOG_TRIVIAL(trace) << "Saved QP_Param to file " << filename ;
+    BOOST_LOG_TRIVIAL(trace) << "Saved QP_Param to file " << filename;
 }
 
 long int
 Game::QP_Param::load(string filename, long int pos) {
-	/**
-	 * @brief Loads the @p QP_Param object stored in a file.  Before calling this function, use the constructor QP_Param::QP_Param(GRBEnv *env) to initialize.
-	 * @details Loads the @p QP_Param object stored in a file.  Before calling this function, use the constructor QP_Param::QP_Param(GRBEnv *env) to initialize.
-	 * Example usage:
-	 * @code{.cpp}
-	 * int main()
-	 * {
-	 * 		GRBEnv env;
-	 * 		Game::QP_Param q1(&env);
-	 * 		q1.load("./dat/q1data.dat");
-	 * 		std::cout<<q1<<'\n';
-	 * 		return 0;
-	 * }
-	 * @endcode
-	 *
-	 */
+    /**
+     * @brief Loads the @p QP_Param object stored in a file.  Before calling this function, use the constructor QP_Param::QP_Param(GRBEnv *env) to initialize.
+     * @details Loads the @p QP_Param object stored in a file.  Before calling this function, use the constructor QP_Param::QP_Param(GRBEnv *env) to initialize.
+     * Example usage:
+     * @code{.cpp}
+     * int main()
+     * {
+     * 		GRBEnv env;
+     * 		Game::QP_Param q1(&env);
+     * 		q1.load("./dat/q1data.dat");
+     * 		std::cout<<q1<<'\n';
+     * 		return 0;
+     * }
+     * @endcode
+     *
+     */
     arma::sp_mat Q, A, B, C;
     arma::vec c, b;
     string headercheck;
@@ -515,8 +514,10 @@ Game::QP_Param::load(string filename, long int pos) {
 }
 
 
-Game::NashGame::NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar,
-                         arma::sp_mat LeadA, arma::vec LeadRHS) : env{e}, LeaderConstraints{LeadA}, LeaderConsRHS{LeadRHS}
+Game::NashGame::NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC, arma::vec MCRHS,
+                         unsigned int n_LeadVar,
+                         arma::sp_mat LeadA, arma::vec LeadRHS) : env{e}, LeaderConstraints{LeadA},
+                                                                  LeaderConsRHS{LeadRHS}
 /**
  * @brief
  * Construct a NashGame by giving a vector of pointers to
@@ -562,27 +563,27 @@ Game::NashGame::save(string filename, bool erase) const {
     Utils::appendSave(this->LeaderConstraints, filename, string("NashGame::LeaderConstraints"), false);
     Utils::appendSave(this->LeaderConsRHS, filename, string("NashGame::LeaderConsRHS"), false);
     Utils::appendSave(this->n_LeadVar, filename, string("NashGame::n_LeadVar"), false);
-	BOOST_LOG_TRIVIAL(trace)<< "Saved NashGame to file " << filename ;
+    BOOST_LOG_TRIVIAL(trace) << "Saved NashGame to file " << filename;
 }
 
 long int
 Game::NashGame::load(string filename, long int pos) {
-	/**
-	 * @brief Loads the @p NashGame object stored in a file.  Before calling this function, use the constructor NashGame::NashGame(GRBEnv *env) to initialize.
-	 * @details Loads the @p NashGame object stored in a file.  Before calling this function, use the constructor NashGame::NashGame(GRBEnv *env) to initialize.
-	 * Example usage:
-	 * @code{.cpp}
-	 * int main()
-	 * {
-	 * 		GRBEnv env;
-	 * 		Game::NashGame N(&env);
-	 * 		N.load("./dat/Ndata.dat");
-	 * 		std::cout<<N<<'\n';
-	 * 		return 0;
-	 * }
-	 * @endcode
-	 *
-	 */
+    /**
+     * @brief Loads the @p NashGame object stored in a file.  Before calling this function, use the constructor NashGame::NashGame(GRBEnv *env) to initialize.
+     * @details Loads the @p NashGame object stored in a file.  Before calling this function, use the constructor NashGame::NashGame(GRBEnv *env) to initialize.
+     * Example usage:
+     * @code{.cpp}
+     * int main()
+     * {
+     * 		GRBEnv env;
+     * 		Game::NashGame N(&env);
+     * 		N.load("./dat/Ndata.dat");
+     * 		std::cout<<N<<'\n';
+     * 		return 0;
+     * }
+     * @endcode
+     *
+     */
     if (!this->env)
         throw string(
                 "Error in NashGame::load: To load NashGame from file, it has to be constructed using NashGame(GRBEnv*) constructor");
@@ -967,12 +968,12 @@ void Game::NashGame::write(string filename, bool append, bool KKT) const {
     file.close();
 }
 
-unique_ptr<GRBModel> 
+unique_ptr<GRBModel>
 Game::NashGame::Respond(
-		unsigned int player, 		///< Player whose optimal response is to be computed
-		const arma::vec &x, 			///< A vector of pure strategies (either for all players or all other players)
-		bool fullvec 				///< Is @p x strategy of all players?
-		) const
+        unsigned int player,        ///< Player whose optimal response is to be computed
+        const arma::vec &x,            ///< A vector of pure strategies (either for all players or all other players)
+        bool fullvec                ///< Is @p x strategy of all players?
+) const
 /**
  * @brief Given the decision of other players, find the optimal response for player in position @p player
  * @detail 
@@ -980,86 +981,81 @@ Game::NashGame::Respond(
  * @returns A unique_ptr to GRBModel
  *
  */
-{ 
-	arma::vec solOther;
-	unsigned int nVar{this->getNprimals()+this->getNshadow() + this->getNleaderVars()};
-	unsigned int nStart, nEnd;
-	nStart = this->primal_position.at(player); // Start of the player-th player's primals
-	nEnd = this->primal_position.at(player+1); // Start of the player+1-th player's primals or LeaderVrs if player is the last player.
-	if(fullvec)
-	{ 
-		solOther.zeros(nVar - nEnd + nStart);
-		if(nStart > 0)
-			solOther.subvec(0, nStart-1) = x.subvec(0, nStart-1);
-		if(nEnd < x.n_rows)
-			solOther.subvec(nStart, nVar + nStart - nEnd-1) = x.subvec(nEnd, nVar-1); // Discard any dual variables in x
-	}
-	else
-	{
-		solOther.zeros(nVar + nEnd - nStart);
-		solOther = x.subvec(0, nVar + nEnd - nStart - 1); // Discard any dual variables in x
-	}
+{
+    arma::vec solOther;
+    unsigned int nVar{this->getNprimals() + this->getNshadow() + this->getNleaderVars()};
+    unsigned int nStart, nEnd;
+    nStart = this->primal_position.at(player); // Start of the player-th player's primals
+    nEnd = this->primal_position.at(
+            player + 1); // Start of the player+1-th player's primals or LeaderVrs if player is the last player.
+    if (fullvec) {
+        solOther.zeros(nVar - nEnd + nStart);
+        if (nStart > 0)
+            solOther.subvec(0, nStart - 1) = x.subvec(0, nStart - 1);
+        if (nEnd < x.n_rows)
+            solOther.subvec(nStart, nVar + nStart - nEnd - 1) = x.subvec(nEnd,
+                                                                         nVar - 1); // Discard any dual variables in x
+    } else {
+        solOther.zeros(nVar + nEnd - nStart);
+        solOther = x.subvec(0, nVar + nEnd - nStart - 1); // Discard any dual variables in x
+    }
 
-	return this->Players.at(player)->solveFixed(solOther);
+    return this->Players.at(player)->solveFixed(solOther);
 }
 
 double
 Game::NashGame::RespondSol(
-		arma::vec& sol, 
-		unsigned int player, 		///< Player whose optimal response is to be computed
-		const arma::vec &x, 			///< A vector of pure strategies (either for all players or all other players)
-		bool fullvec 				///< Is @p x strategy of all players?
-		) const
-{
-	auto model = this->Respond(player, x, fullvec);
-	unsigned int Nx = this->primal_position.at(player+1) - this->primal_position.at(player);
-	sol.zeros(Nx);
-	for (unsigned int i=0; i< Nx; ++i)
-		sol.at(i) = model->getVarByName("y_"+to_string(i)).get(GRB_DoubleAttr_X);
+        arma::vec &sol,
+        unsigned int player,        ///< Player whose optimal response is to be computed
+        const arma::vec &x,            ///< A vector of pure strategies (either for all players or all other players)
+        bool fullvec                ///< Is @p x strategy of all players?
+) const {
+    auto model = this->Respond(player, x, fullvec);
+    unsigned int Nx = this->primal_position.at(player + 1) - this->primal_position.at(player);
+    sol.zeros(Nx);
+    for (unsigned int i = 0; i < Nx; ++i)
+        sol.at(i) = model->getVarByName("y_" + to_string(i)).get(GRB_DoubleAttr_X);
 
-	return model->get(GRB_DoubleAttr_ObjVal);
+    return model->get(GRB_DoubleAttr_ObjVal);
 }
 
 
-arma::vec 
-Game::NashGame::ComputeQPObjvals(const arma::vec &x, bool checkFeas) const
-{
-	arma::vec vals; vals.zeros(this->Nplayers);
-	for (unsigned int i=0;i<this->Nplayers;++i)
-	{
-		unsigned int nVar{this->getNprimals()+this->getNshadow() + this->getNleaderVars()};
-		unsigned int nStart, nEnd;
-		nStart = this->primal_position.at(i); 
-		nEnd = this->primal_position.at(i+1);
+arma::vec
+Game::NashGame::ComputeQPObjvals(const arma::vec &x, bool checkFeas) const {
+    arma::vec vals;
+    vals.zeros(this->Nplayers);
+    for (unsigned int i = 0; i < this->Nplayers; ++i) {
+        unsigned int nVar{this->getNprimals() + this->getNshadow() + this->getNleaderVars()};
+        unsigned int nStart, nEnd;
+        nStart = this->primal_position.at(i);
+        nEnd = this->primal_position.at(i + 1);
 
-		arma::vec x_i, x_minus_i;
+        arma::vec x_i, x_minus_i;
 
-		x_minus_i.zeros(nVar - nEnd + nStart);
-		if(nStart > 0)
-			x_minus_i.subvec(0, nStart-1) = x.subvec(0, nStart-1);
-		if(nEnd < x.n_rows)
-			x_minus_i.subvec(nStart, nVar + nStart - nEnd-1) = x.subvec(nEnd, nVar-1); // Discard any dual variables in x
+        x_minus_i.zeros(nVar - nEnd + nStart);
+        if (nStart > 0)
+            x_minus_i.subvec(0, nStart - 1) = x.subvec(0, nStart - 1);
+        if (nEnd < x.n_rows)
+            x_minus_i.subvec(nStart, nVar + nStart - nEnd - 1) = x.subvec(nEnd,
+                                                                          nVar - 1); // Discard any dual variables in x
 
-		x_i = x.subvec(nStart, nEnd-1);
+        x_i = x.subvec(nStart, nEnd - 1);
 
-		vals.at(i) = this->Players.at(i)->computeObjective(x_i, x_minus_i, checkFeas); 
-	}
+        vals.at(i) = this->Players.at(i)->computeObjective(x_i, x_minus_i, checkFeas);
+    }
 
-	return vals;
+    return vals;
 }
 
-bool 
-Game::NashGame::isSolved(const arma::vec& sol, unsigned int &violPlayer, arma::vec &violSol, double tol) const
-{
-	arma::vec objvals = this->ComputeQPObjvals(sol, true);
-	for (unsigned int i=0;i<this->Nplayers;++i)
-	{
-		double val = this->RespondSol(violSol, i, sol, true);
-		if(abs(val-objvals.at(i)) > tol)
-		{
-			violPlayer = i; 
-			return false;
-		}
-	}
-	return true;
+bool
+Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer, arma::vec &violSol, double tol) const {
+    arma::vec objvals = this->ComputeQPObjvals(sol, true);
+    for (unsigned int i = 0; i < this->Nplayers; ++i) {
+        double val = this->RespondSol(violSol, i, sol, true);
+        if (abs(val - objvals.at(i)) > tol) {
+            violPlayer = i;
+            return false;
+        }
+    }
+    return true;
 }
