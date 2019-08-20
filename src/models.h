@@ -94,7 +94,7 @@ namespace Models {
         CountryImport,
         Caps,
         Tax,
-        TaxU,
+        TaxQuad,
         DualVar,
         ConvHullDummy,
         End
@@ -134,7 +134,7 @@ namespace Models {
         vector<unsigned int> nImportMarkets = {};    ///< Number of countries from which the i-th country imports
         vector<LeadLocs> Locations = {};            ///< Location of variables for each country
         vector<unsigned int> LeaderLocations = {};    ///< Location of each leader
-        EPECStatistics Stats = {};					///< Store run time information
+        EPECStatistics Stats = {};                    ///< Store run time information
 
         unique_ptr<Game::NashGame> nashgame;
         unique_ptr<Game::LCP> lcp;
@@ -198,6 +198,7 @@ namespace Models {
         const unsigned int &nVarEPEC{nVarinEPEC}; ///< Constant attribute for number of variables in the EPEC
         bool indicators = {
                 true}; ///< Controls the flag useIndicators in LCPtoLP class. If true, indicators constraints replace bigM ones.
+        bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax is added to each leader objective
 
         double timeLimit = {-1}; ///< Controls the timeLimit (s) for findNashEq
 
@@ -231,14 +232,14 @@ namespace Models {
 
         EPEC &unlock();
 
-		// Solving and checking solutions 
+        // Solving and checking solutions
         void findNashEq();
 
         unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
 
         unique_ptr<GRBModel> Respond(const string name, const arma::vec &x) const;
 
-		bool isSolved(int * countryNumber, arma::vec * ProfDevn) const;
+        bool isSolved(int *countryNumber, arma::vec *ProfDevn) const;
 
         // Data access methods
         Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
