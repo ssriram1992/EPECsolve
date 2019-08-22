@@ -12,8 +12,8 @@ ELSE ()
     set(ARMA_LIB "/usr/local/lib/libarmadillo.dylib")
 ENDIF ()
 set(GUROBI_PATH_LINUX "/home/gurobi/8.1.0/linux64")
-set(GUROBI_PATH_MAC "/Library/gurobi811/mac64/include")
-set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi811\\win64\\include")
+set(GUROBI_PATH_MAC "/Library/gurobi811/mac64")
+set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi811\\win64")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 

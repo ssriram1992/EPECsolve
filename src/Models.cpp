@@ -284,7 +284,7 @@ void Models::EPEC::make_LL_LeadCons(
                 Params.LeaderParam.price_limit - Params.DemandParam.alpha;
     }
     // Non-linear tax
-    if (this->quadraticTax) {
+    if (Params.LeaderParam.tax_revenue) {
         for (unsigned int i = 0; i < Params.n_followers; i++) {
             double t_cap = (Params.FollowerParam.tax_caps.at(i) >= 0 ? Params.FollowerParam.tax_caps.at(i) : 0);
 
@@ -364,7 +364,7 @@ Models::EPEC::addCountry(
     catch (exception &e) { cerr << "Exception: Error in Models::EPEC::addCountry: " << e.what() << '\n'; }
     if (!noError) return *this;
 
-    const unsigned int LeadVars = 2 + (2 + this->quadraticTax) * Params.n_followers +
+    const unsigned int LeadVars = 2 + (2 + Params.LeaderParam.tax_revenue) * Params.n_followers +
                                   addnlLeadVars;// two for quantity imported and exported, n for imposed cap, n for taxes and n for bilinear taxes.
 
     LeadLocs Loc;
@@ -376,9 +376,10 @@ Models::EPEC::addCountry(
     Models::increaseVal(Loc, LeaderVars::NetExport, 1);
     Models::increaseVal(Loc, LeaderVars::Caps, Params.n_followers);
     Models::increaseVal(Loc, LeaderVars::Tax, Params.n_followers);
-    if (this->quadraticTax)
+    if (Params.LeaderParam.tax_revenue) {
+        BOOST_LOG_TRIVIAL(info) << "Country " << Params.name << ' has tax revenue in the objective.\n';
         Models::increaseVal(Loc, LeaderVars::TaxQuad, Params.n_followers);
-
+    }
 
     // Loc[Models::LeaderVars::AddnVar] = 1;
 
@@ -395,7 +396,7 @@ Models::EPEC::addCountry(
                           export_lim_cons +                // Export limit constraint
                           price_lim_cons +                    // Price limit constraint
                           activeTaxCaps +                // Tax limit constraints
-                          Params.n_followers * 3 * this->quadraticTax +         // Non-linear tax
+                          Params.n_followers * 3 * Params.LeaderParam.tax_revenue +         // Non-linear tax
                           1,                                // Export - import <= Domestic production
                           Loc[Models::LeaderVars::End]
     );
@@ -403,7 +404,7 @@ Models::EPEC::addCountry(
                       export_lim_cons +
                       price_lim_cons +
                       activeTaxCaps +
-                      Params.n_followers * 3 * this->quadraticTax +
+                      Params.n_followers * 3 * Params.LeaderParam.tax_revenue +
                       1, arma::fill::zeros);
 
     vector<shared_ptr<Game::QP_Param>> Players{};
@@ -845,7 +846,7 @@ Models::EPEC::make_obj_leader(const unsigned int i, ///< The location of the cou
 
 
     // non-linear tax
-    if (this->quadraticTax) {
+    if (this->AllLeadPars.at(i).LeaderParam.tax_revenue) {
         for (unsigned int j = Loc.at(Models::LeaderVars::TaxQuad), count = 0;
              count < Params.n_followers;
              j++, count++)
@@ -1154,7 +1155,7 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x, const a
         writer.Uint(this->getPosition(i, Models::LeaderVars::Caps));
         writer.Key("Tax");
         writer.Uint(this->getPosition(i, Models::LeaderVars::Tax));
-        if (this->quadraticTax) {
+        if (this->AllLeadPars.at(i).LeaderParam.tax_revenue) {
             writer.Key("QuadraticTax");
             writer.Uint(this->getPosition(i, Models::LeaderVars::TaxQuad));
         }
@@ -1254,6 +1255,8 @@ Models::EPECInstance::save(string filename) {
         writer.Double(this->Countries.at(i).LeaderParam.export_limit);
         writer.Key("PriceLimit");
         writer.Double(this->Countries.at(i).LeaderParam.price_limit);
+        writer.Key("TaxRevenue");
+        writer.Int(this->Countries.at(i).LeaderParam.tax_revenue);
         writer.EndObject();
 
         writer.Key("Followers");
@@ -1360,12 +1363,16 @@ Models::EPECInstance::load(string filename) {
                 for (SizeType i = 0; i < c["TransportationCosts"].GetArray().Size(); i++) {
                     TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
                 }
+                bool tax_revenue = false;
+                if (d.HasMember("TaxRevenue")) {
+                    tax_revenue = c["LeaderParam"].GetObject()["TaxRevenue"].GetInt();
+                }
                 LAP.push_back(Models::LeadAllPar(FP.capacities.size(), c["Name"].GetString(), FP,
                                                  {c["DemandParam"].GetObject()["Alpha"].GetDouble(),
                                                   c["DemandParam"].GetObject()["Beta"].GetDouble()},
                                                  {c["LeaderParam"].GetObject()["ImportLimit"].GetDouble(),
                                                   c["LeaderParam"].GetObject()["ExportLimit"].GetDouble(),
-                                                  c["LeaderParam"].GetObject()["PriceLimit"].GetDouble()}
+                                                  c["LeaderParam"].GetObject()["PriceLimit"].GetDouble(), tax_revenue}
                 ));
             }
             ifs.close();
@@ -1452,8 +1459,8 @@ Models::EPEC::WriteFollower(const unsigned int i,
     foll_prod = this->getPosition(i, Models::LeaderVars::FollowerStart);
     foll_tax = this->getPosition(i, Models::LeaderVars::Tax);
     foll_lim = this->getPosition(i, Models::LeaderVars::Caps);
-    if (this->quadraticTax) {}
-    foll_taxQ = this->getPosition(i, Models::LeaderVars::TaxQuad);
+    if (this->AllLeadPars.at(i).LeaderParam.tax_revenue)
+        foll_taxQ = this->getPosition(i, Models::LeaderVars::TaxQuad);
 
     string name;
     try { name = Params.name + " --- " + Params.FollowerParam.names.at(j); }
@@ -1464,7 +1471,7 @@ Models::EPEC::WriteFollower(const unsigned int i,
     const double q = x.at(foll_prod + j);
     const double tax = x.at(foll_tax + j);
     double taxQ = 0;
-    if (this->quadraticTax)
+    if (this->AllLeadPars.at(i).LeaderParam.tax_revenue)
         taxQ = x.at(foll_taxQ + j) / q;
     const double lim = x.at(foll_lim + j);
     const double lin = Params.FollowerParam.costs_lin.at(j);
@@ -1477,7 +1484,7 @@ Models::EPEC::WriteFollower(const unsigned int i,
     file << Models::prn::label << "Limit on production" << ":" << Models::prn::val << lim << "\n";
     //file << "x(): " << foll_lim + j << '\n';
     file << Models::prn::label << "Tax imposed" << ":" << Models::prn::val << tax << "\n";
-    if (this->quadraticTax)
+    if (this->AllLeadPars.at(i).LeaderParam.tax_revenue)
         file << Models::prn::label << "Tax imposed (Q)" << ":" << Models::prn::val << taxQ << "\n";
     // file << Models::prn::label << "Tax cap" << ":" << Params.FollowerParam.tax_caps.at(j) << tax << "\n";
     //file << "x(): " << foll_tax + j << '\n';

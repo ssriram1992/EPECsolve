@@ -40,8 +40,9 @@ namespace Models {
         double import_limit = -1;    ///< Maximum net import in the country. If no limit, set the value as -1;
         double export_limit = -1;    ///< Maximum net export in the country. If no limit, set the value as -1;
         double price_limit = -1;    ///< Government does not want the price to exceed this limit
-        LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1)
-                : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit} {}
+        bool tax_revenue = false; ///< Dictates whether the leader objective will include tax revenues
+        LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1, bool tax_revenue=false)
+                : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit}, tax_revenue{tax_revenue} {}
     };
 
 /// @brief Stores the parameters of a country model

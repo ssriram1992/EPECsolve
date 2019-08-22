@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char **argv) {
     string resFile, instanceFile = "", logFile;
-    int writeLevel, nThreads, verbosity, taxQ, bigM;
+    int writeLevel, nThreads, verbosity, bigM;
     double timeLimit;
 
     po::options_description desc("EPEC: Allowed options");
@@ -25,8 +25,6 @@ int main(int argc, char **argv) {
             ("version,v", "Shows EPEC version")
             ("input,i", po::value<string>(&instanceFile),
              "Sets the input path/filename of the instance file (.json appended automatically)")
-            ("quadratictax,q", po::value<int>(&taxQ)->default_value(0),
-             "Switch for the quadratic tax term.")
             ("solution,s", po::value<string>(&resFile)->default_value("dat/Solution"),
              "Sets the output path/filename of the solution file (.json appended automatically)")
             ("log,l", po::value<string>(&logFile)->default_value("dat/Results.csv"),
@@ -92,8 +90,6 @@ int main(int argc, char **argv) {
     //OPTIONS
     //------------
     Models::EPEC epec(&env);
-    //Tax switch
-    epec.quadraticTax = taxQ;
     //Indicator constraints
     if (bigM == 1)
         epec.indicators = 0;
@@ -133,7 +129,7 @@ int main(int argc, char **argv) {
         results << " " << to_string(Countrie.n_followers);
     results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];" << to_string(stat.numVar) << ";"
             << to_string(stat.numConstraints) << ";" << to_string(stat.numNonZero) << ";" << to_string(CPUTime) << ";"
-            << to_string(nThreads) << ";" << to_string(epec.indicators) << ";" << to_string(taxQ) << "\n";
+            << to_string(nThreads) << ";" << to_string(epec.indicators) << "\n";
     results.close();
 
     return EXIT_SUCCESS;
