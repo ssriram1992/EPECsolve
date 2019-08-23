@@ -359,9 +359,9 @@ Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars, i
  * @warning This implies you might have to rerun NashGame::FormulateLCP again too.
  */
 {
-    if ((pars || vars))
-        BOOST_LOG_TRIVIAL(trace)
-            << "From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.";
+    // if ((pars || vars))
+        // BOOST_LOG_TRIVIAL(trace)
+            // << "From Game::QP_Param::addDummyVars:\t You might have to rerun Games::QP_Param::KKT since you have now changed the number of variables in the NashGame.";
 
     // Call the superclass function
     try { MP_Param::addDummy(pars, vars, position); }

@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
     epec.timeLimit = timeLimit;
     //------------
 
-    for (int j = 0; j < Instance.Countries.size(); ++j)
+    for (unsigned int j = 0; j < Instance.Countries.size(); ++j)
         epec.addCountry(Instance.Countries.at(j));
     epec.addTranspCosts(Instance.TransportationCosts);
     epec.finalize();

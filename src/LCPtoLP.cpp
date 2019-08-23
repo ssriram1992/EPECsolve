@@ -869,7 +869,7 @@ Game::LCP::FixToPoly(
  *	not meant for high level code. Instead use LCP::FixToPolies.
  */
 {
-    BOOST_LOG_TRIVIAL(trace) << "\tChecking feasability for polyhedron " << to_string(++this->polyCounter) << '\n';
+    BOOST_LOG_TRIVIAL(trace) << "\tChecking feasibility for polyhedron " << to_string(++this->polyCounter);
     arma::sp_mat *Aii = new arma::sp_mat(nR, nC);
     arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
     for (unsigned int i = 0; i < this->nR; i++) {

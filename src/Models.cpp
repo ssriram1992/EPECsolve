@@ -377,7 +377,7 @@ Models::EPEC::addCountry(
     Models::increaseVal(Loc, LeaderVars::Caps, Params.n_followers);
     Models::increaseVal(Loc, LeaderVars::Tax, Params.n_followers);
     if (Params.LeaderParam.tax_revenue) {
-        BOOST_LOG_TRIVIAL(info) << "Country " << Params.name << ' has tax revenue in the objective.\n';
+        BOOST_LOG_TRIVIAL(info) << "Country " << Params.name << " has tax revenue in the objective.";
         Models::increaseVal(Loc, LeaderVars::TaxQuad, Params.n_followers);
     }
 
@@ -1364,7 +1364,7 @@ Models::EPECInstance::load(string filename) {
                     TrCo.at(j, i) = c["TransportationCosts"].GetArray()[i].GetDouble();
                 }
                 bool tax_revenue = false;
-                if (d.HasMember("TaxRevenue")) {
+                if (c["LeaderParam"].HasMember("TaxRevenue")) {
                     tax_revenue = c["LeaderParam"].GetObject()["TaxRevenue"].GetInt();
                 }
                 LAP.push_back(Models::LeadAllPar(FP.capacities.size(), c["Name"].GetString(), FP,
@@ -1380,7 +1380,7 @@ Models::EPECInstance::load(string filename) {
             this->TransportationCosts = TrCo;
         }
         catch (exception &e) {
-            cerr << "Exception in Models::load : cannot read instance file." << '\n';
+            cerr << "Exception in Models::load : cannot read instance file." <<e.what() << '\n';
             throw;
         }
         catch (...) {
