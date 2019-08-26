@@ -1404,7 +1404,7 @@ void Models::EPECInstance::save(string filename) {
     writer.Key("PriceLimit");
     writer.Double(this->Countries.at(i).LeaderParam.price_limit);
     writer.Key("TaxRevenue");
-    writer.Int(this->Countries.at(i).LeaderParam.tax_revenue);
+    writer.Bool(this->Countries.at(i).LeaderParam.tax_revenue);
     writer.EndObject();
 
     writer.Key("Followers");
@@ -1512,7 +1512,7 @@ void Models::EPECInstance::load(string filename) {
         }
         bool tax_revenue = false;
         if (c["LeaderParam"].HasMember("TaxRevenue")) {
-          tax_revenue = c["LeaderParam"].GetObject()["TaxRevenue"].GetInt();
+          tax_revenue = c["LeaderParam"].GetObject()["TaxRevenue"].GetBool();
         }
         LAP.push_back(Models::LeadAllPar(
             FP.capacities.size(), c["Name"].GetString(), FP,
@@ -1614,7 +1614,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
   foll_prod = this->getPosition(i, Models::LeaderVars::FollowerStart);
   foll_tax = this->getPosition(i, Models::LeaderVars::Tax);
   foll_lim = this->getPosition(i, Models::LeaderVars::Caps);
-  if (this->AllLeadPars.at(i).LeaderParam.tax_revenue)
+  if (Params.LeaderParam.tax_revenue)
     foll_taxQ = this->getPosition(i, Models::LeaderVars::TaxQuad);
 
   string name;
@@ -1630,8 +1630,8 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
   const double q = x.at(foll_prod + j);
   const double tax = x.at(foll_tax + j);
   double taxQ = 0;
-  if (this->AllLeadPars.at(i).LeaderParam.tax_revenue)
-    taxQ = x.at(foll_taxQ + j) / q;
+  if (Params.LeaderParam.tax_revenue)
+    taxQ = q>0 ? x.at(foll_taxQ + j) / q : x.at(foll_taxQ + j);
   const double lim = x.at(foll_lim + j);
   const double lin = Params.FollowerParam.costs_lin.at(j);
   const double quad = Params.FollowerParam.costs_quad.at(j);
@@ -1647,7 +1647,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
   // file << "x(): " << foll_lim + j << '\n';
   file << Models::prn::label << "Tax imposed"
        << ":" << Models::prn::val << tax << "\n";
-  if (this->AllLeadPars.at(i).LeaderParam.tax_revenue)
+  if (Params.LeaderParam.tax_revenue)
     file << Models::prn::label << "Tax imposed (Q)"
          << ":" << Models::prn::val << taxQ << "\n";
   // file << Models::prn::label << "Tax cap" << ":" <<
