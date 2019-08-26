@@ -972,7 +972,7 @@ void Models::EPEC::make_obj_leader(
     QP_obj.c.at(j) = Params.FollowerParam.emission_costs.at(count);
 
   // non-linear tax
-  if (this->AllLeadPars.at(i).LeaderParam.tax_revenue) {
+  if (Params.LeaderParam.tax_revenue) {
     for (unsigned int j = Loc.at(Models::LeaderVars::TaxQuad), count = 0;
          count < Params.n_followers; j++, count++)
       QP_obj.c.at(j) = 1;
