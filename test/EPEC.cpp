@@ -181,19 +181,18 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_MESSAGE(abs(q1.getc().at(Ny)) < 1e-4, "c check after addDummy(0, 1, 1)");
 
 
+        BOOST_TEST_MESSAGE("QP_Param test for file save");
+        q1.save("test/q1.dat", true);
+        q2.save("test/q2.dat", true);
+        BOOST_TEST_MESSAGE("Saved QP_Param objects");
+        QP_Param q1loader(&env);
+        q1loader.load("test/q1.dat", 0);
+        QP_Param q2loader(&env);
+        q2loader.load("test/q2.dat", 0);
 
-		BOOST_TEST_MESSAGE("QP_Param test for file save");
-		q1.save("test/q1.dat", true);
-		q2.save("test/q2.dat", true);
-		BOOST_TEST_MESSAGE("Saved QP_Param objects");
-		QP_Param q1loader(&env);
-		q1loader.load("test/q1.dat", 0);
-		QP_Param q2loader(&env);
-		q2loader.load("test/q2.dat", 0);
+        BOOST_CHECK_MESSAGE(q1loader == q1, "Save/load test 1 works well");
+        BOOST_CHECK_MESSAGE(q2loader == q2, "Save/load test 2 works well");
 
-		BOOST_CHECK_MESSAGE(q1loader==q1, "Save/load test 1 works well");
-		BOOST_CHECK_MESSAGE(q2loader==q2, "Save/load test 2 works well");
-				
     }
 
 
@@ -201,7 +200,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_TEST_MESSAGE("\n\n");
         BOOST_TEST_MESSAGE("Testing Game::NashGame");
 
-        GRBEnv env  = GRBEnv();
+        GRBEnv env = GRBEnv();
 
         /** First test is to create a duopoly **/
         /* PLAYER 1:
@@ -260,72 +259,75 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X), 28.271028, 0.001);
         BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X), 27.803728, 0.001);
 
-		BOOST_TEST_MESSAGE("NashGame load/save test");
-		BOOST_CHECK_NO_THROW(Nash.save("test/Nash.dat"));
+        BOOST_TEST_MESSAGE("NashGame load/save test");
+        BOOST_CHECK_NO_THROW(Nash.save("test/Nash.dat"));
 
-		NashGame N2(&env);
-		BOOST_CHECK_NO_THROW(N2.load("test/Nash.dat"));
-		BOOST_CHECK_NO_THROW(N2.save("test/Nash2.dat"));
+        NashGame N2(&env);
+        BOOST_CHECK_NO_THROW(N2.load("test/Nash.dat"));
+        BOOST_CHECK_NO_THROW(N2.save("test/Nash2.dat"));
 
-		BOOST_TEST_MESSAGE("LCP load/save test");
-		BOOST_CHECK_NO_THROW(lcp.save("test/lcp.dat"));
+        BOOST_TEST_MESSAGE("LCP load/save test");
+        BOOST_CHECK_NO_THROW(lcp.save("test/lcp.dat"));
 
-		LCP lcp2(&env);
-		lcp2.load("test/lcp.dat");
-		BOOST_CHECK_NO_THROW(lcp2.load("test/lcp.dat"));
-		BOOST_CHECK_NO_THROW(lcp2.save("test/lcp2.dat"));
+        LCP lcp2(&env);
+        lcp2.load("test/lcp.dat");
+        BOOST_CHECK_NO_THROW(lcp2.load("test/lcp.dat"));
+        BOOST_CHECK_NO_THROW(lcp2.save("test/lcp2.dat"));
 
 
-		arma::vec Nashsol(2);
-		Nashsol(0) = 28.271028; 
-		Nashsol(1) = 27.803738;
+        arma::vec Nashsol(2);
+        Nashsol(0) = 28.271028;
+        Nashsol(1) = 27.803738;
 
-		auto nashResp1 = Nash.Respond(0, Nashsol);
-		auto nashResp2 = Nash.Respond(1, Nashsol);
+        auto nashResp1 = Nash.Respond(0, Nashsol);
+        auto nashResp2 = Nash.Respond(1, Nashsol);
 
-		BOOST_CHECK_CLOSE(nashResp1->getVarByName("y_0").get(GRB_DoubleAttr_X), Nashsol(0), 0.0001);
-		BOOST_CHECK_CLOSE(nashResp2->getVarByName("y_0").get(GRB_DoubleAttr_X), Nashsol(1), 0.0001);
-	
-		unsigned int temp1 ; arma::vec temp2;
-		BOOST_CHECK_MESSAGE(Nash.isSolved(Nashsol, temp1, temp2), "Checking that the Nashgame is solved correctly using isSolved()");
+        BOOST_CHECK_CLOSE(nashResp1->getVarByName("y_0").get(GRB_DoubleAttr_X), Nashsol(0), 0.0001);
+        BOOST_CHECK_CLOSE(nashResp2->getVarByName("y_0").get(GRB_DoubleAttr_X), Nashsol(1), 0.0001);
+
+        unsigned int temp1;
+        arma::vec temp2;
+        BOOST_CHECK_MESSAGE(Nash.isSolved(Nashsol, temp1, temp2),
+                            "Checking that the Nashgame is solved correctly using isSolved()");
 
     }
 
-	BOOST_AUTO_TEST_CASE(LCP_test){
-			// For the problem in LCP tutorial.
-		arma::sp_mat M(4, 5); // We have four complementarity eqns and 5 variables.
-		arma::vec q(4);
-		M.zeros(); 
-		// First eqn
-		M(0, 3) = 1;
-		q(0) = -1;
-		// Second eqn
-		M(1, 2) = 2;
-		M(1, 4)  = 1;
-		q(1) = 0;
-		// Third eqn
-		M(2, 0) = -1;
-		M(2, 1) = 1;
-		q(2) = 10;
-		// Fourth eqn
-		M(3, 1) = 1 ;
-		M(3, 2) = -1;
-		q(3) = 5;
-		// Other common constraints
-		arma::sp_mat A(2, 5); arma::vec b;
-		A.zeros(); 
-		// x_2 <= 2 constraint
-		A(0, 1) = 1;
-		b(0) = 2;
-		// x_1 + x_2 + x_3 <= 12 constraint
-		A(1, 0) = 1;
-		A(1, 1) = 1;
-		A(1, 2) = 1;
-		b(1) = 12;
-		// Creating the LCP object
-		GRBEnv env;
-		LCP lcp = LCP(&env, M, q, 1, 1, A, b);
-	}
+    BOOST_AUTO_TEST_CASE(LCP_test) {
+        // For the problem in LCP tutorial.
+        arma::sp_mat M(4, 5); // We have four complementarity eqns and 5 variables.
+        arma::vec q(4);
+        M.zeros();
+        // First eqn
+        M(0, 3) = 1;
+        q(0) = -1;
+        // Second eqn
+        M(1, 2) = 2;
+        M(1, 4) = 1;
+        q(1) = 0;
+        // Third eqn
+        M(2, 0) = -1;
+        M(2, 1) = 1;
+        q(2) = 10;
+        // Fourth eqn
+        M(3, 1) = 1;
+        M(3, 2) = -1;
+        q(3) = 5;
+        // Other common constraints
+        arma::sp_mat A(2, 5);
+        arma::vec b;
+        A.zeros();
+        // x_2 <= 2 constraint
+        A(0, 1) = 1;
+        b(0) = 2;
+        // x_1 + x_2 + x_3 <= 12 constraint
+        A(1, 0) = 1;
+        A(1, 1) = 1;
+        A(1, 2) = 1;
+        b(1) = 12;
+        // Creating the LCP object
+        GRBEnv env;
+        LCP lcp = LCP(&env, M, q, 1, 1, A, b);
+    }
 
     BOOST_AUTO_TEST_CASE(ConvexHull_test) {
 
@@ -442,7 +444,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         FP.emission_costs = {6};
         FP.tax_caps = {250};
         FP.names = {"Blu"};
-        Models::LeadAllPar Country(1, "One", FP, {300, 0.05}, {-1, -1, -1});
+        Models::LeadAllPar Country(1, "One", FP, {300, 0.05}, {-1, -1, -1, false});
         BOOST_TEST_MESSAGE("MaxTax:250 with alpha=300 and beta=0.05");
         BOOST_TEST_MESSAGE("Expected: q=66.666;t=250");
         GRBEnv env = GRBEnv();
@@ -506,7 +508,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         FP.emission_costs = {6};
         FP.tax_caps = {-1};
         FP.names = {"Blu"};
-        Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1});
+        Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1, false});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -545,7 +547,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         FP.emission_costs = {6};
         FP.tax_caps = {20};
         FP.names = {"Blu"};
-        Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1});
+        Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, -1, false});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -589,7 +591,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         TrCo(0, 0) = 0;
 
         Models::EPEC epec(&env);
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 299});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 299, false});
         BOOST_TEST_MESSAGE("PriceLimit:299 with alpha=300 and beta=0.05");
         BOOST_TEST_MESSAGE("PriceLimit coincides with domestic demand price");
         BOOST_TEST_MESSAGE("Expected: q=20;p=299");
@@ -624,7 +626,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 85});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 85, false});
 
         BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:85 with alpha=300 and beta=0.05");
         BOOST_TEST_MESSAGE("Expected: exception in findNashEq (infeasability PriceLimit<295)");
@@ -638,7 +640,8 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_THROW(epec.findNashEq(), string);
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
+        BOOST_CHECK_MESSAGE(epec.getStatistics().status== false,"checking status");
     }
 
     BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
@@ -657,7 +660,7 @@ BOOST_AUTO_TEST_SUITE(Models_Bilevel__Test)
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 295});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 295, false});
 
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:290 with alpha=300 and beta=0.05");
@@ -700,7 +703,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP.emission_costs = {6, 10};
         FP.tax_caps = {100, 100};
         FP.names = {"Rosso", "Bianco"};
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 300});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05}, {-1, -1, 300, false});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -749,7 +752,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP.emission_costs = {6, 2};
         FP.tax_caps = {100, 100};
         FP.names = {"Rosso", "Bianco"};
-        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.5}, {-1, -1, 300});
+        Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.5}, {-1, -1, 300, false});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(1, 1);
         TrCo(0, 0) = 0;
@@ -796,7 +799,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP5.emission_costs = {2, 4, 9, 10, 15};
         FP5.tax_caps = {25, 25, 25, 25, 25};
         FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
-        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, -1});
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, -1, false});
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry");
         BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -843,7 +846,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP5.emission_costs = {2, 4, 9, 10, 15};
         FP5.tax_caps = {100, 100, 100, 100, 100};
         FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
-        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, -1});
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, -1, false});
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry");
         BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -885,7 +888,7 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         FP5.emission_costs = {2, 4, 9, 10, 15};
         FP5.tax_caps = {25, 25, 25, 25, 25};
         FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
-        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, 385});
+        Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05}, {-1, -1, 385, false});
         Models::EPEC epec(&env);
         BOOST_TEST_MESSAGE("testing Models::addCountry");
         BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -896,7 +899,8 @@ BOOST_AUTO_TEST_SUITE(Models_C1Fn__Tests)
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
-        BOOST_CHECK_THROW(epec.findNashEq(), string);
+        BOOST_CHECK_NO_THROW(epec.findNashEq());
+        BOOST_CHECK_MESSAGE(epec.getStatistics().status== false,"checking status");
     }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -920,8 +924,8 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP.emission_costs = {290};
         FP.tax_caps = {100};
         FP.names = {"Rosso"};
-        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
-        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5}, {-1, -1, 285});
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295, false});
+        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5}, {-1, -1, 285, false});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
         TrCo.zeros(2, 2);
@@ -989,7 +993,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP1.emission_costs = {6, 10};
         FP1.tax_caps = {100, 100};
         FP1.names = {"OneGas", "OneCoal"};
-        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {0, 0, 230});
+        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {0, 0, 230, false});
 
 
         FP2.capacities = {100, 80};
@@ -998,7 +1002,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP2.emission_costs = {6, 1};
         FP2.tax_caps = {100, 100};
         FP2.names = {"TwoGas", "TwoSolar"};
-        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {0, 0, 240});
+        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {0, 0, 240, false});
 
 
         GRBEnv env = GRBEnv();
@@ -1020,7 +1024,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq());
-        BOOST_CHECK_NO_THROW(epec.writeSolution(0,"Solution"));
+        BOOST_CHECK_NO_THROW(epec.writeSolution(0, "Solution"));
         cout
                 << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
         for (unsigned int i = 0; i < epec.nCountries; i++) {
@@ -1083,7 +1087,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP1.emission_costs = {6, 10};
         FP1.tax_caps = {100, 100};
         FP1.names = {"OneGas", "OneCoal"};
-        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {100, 100, 230});
+        Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5}, {100, 100, 230, false});
 
 
         FP2.capacities = {100, 80};
@@ -1092,7 +1096,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP2.emission_costs = {6, 1};
         FP2.tax_caps = {100, 100};
         FP2.names = {"TwoGas", "TwoSolar"};
-        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {100, 100, 240});
+        Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5}, {100, 100, 240, false});
 
 
         GRBEnv env = GRBEnv();
@@ -1143,9 +1147,9 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP.emission_costs = {15};
         FP.tax_caps = {100};
         FP.names = {"Rosso"};
-        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
-        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285});
-        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 315});
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295, false});
+        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285, false});
+        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 315, false});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(3, 3);
         TrCo.zeros(3, 3);
@@ -1202,9 +1206,9 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP.emission_costs = {275, 100};
         FP.tax_caps = {100, 100};
         FP.names = {"Rosso", "Bianco"};
-        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
-        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285});
-        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 295});
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295, false});
+        Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285, false});
+        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 295, false});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(3, 3);
         TrCo.zeros(3, 3);
@@ -1271,9 +1275,9 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         FP.emission_costs = {275, 100};
         FP.tax_caps = {100, 100};
         FP.names = {"Rosso", "Bianco"};
-        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295});
+        Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7}, {-1, -1, 295, false});
         // Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5}, {-1, -1, 285});
-        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 295});
+        Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5}, {-1, -1, 295, false});
         GRBEnv env = GRBEnv();
         arma::sp_mat TrCo(2, 2);
         TrCo.zeros(2, 2);
@@ -1300,8 +1304,8 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq());
-		epec.writeSolution(2, "epec");
-		/*
+        epec.writeSolution(2, "epec");
+        /*
         double margCountryOne =
                 FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
                 FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
@@ -1326,7 +1330,8 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 100, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0), 100, 0.01);
 
-		*/ 
+        */
     }
+
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -120,7 +120,7 @@ add_executable(EPECtest
                test/EPEC.cpp)
 target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPEC Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECtest Boost::program_options Boost:unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+target_link_libraries(EPECtest Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 message("\n\nEPEC Cmake configuration terminated:")
 message("\tWorking directory: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("\tArmadillo (lib): ${ARMA_PATH}/include")
