@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         q(3) = 5;
         // Other common constraints
         arma::sp_mat A(2, 5);
-        arma::vec b;
+        arma::vec b(2);
         A.zeros();
         // x_2 <= 2 constraint
         A(0, 1) = 1;
