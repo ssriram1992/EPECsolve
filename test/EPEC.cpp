@@ -1233,6 +1233,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_CHECK_NO_THROW(epec.finalize());
         BOOST_TEST_MESSAGE("testing Models::make_country_QP");
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
+		/* Too slow tests
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq());
         epec.writeSolution(2, "dat/Solutionasd");
@@ -1251,8 +1252,7 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
-
-
+		*/ 
     }
 
     BOOST_AUTO_TEST_CASE(C2F2_test2) {
