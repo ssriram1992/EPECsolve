@@ -80,6 +80,20 @@ $(OBJ)/Utils.o: $(SRC)/epecsolve.h $(SRC)/utils.h $(SRC)/Utils.cpp
 
 $(OBJ)/makeTests.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/makeTests.cpp
 	$(GCC) -c $(SRC)/makeTests.cpp $(OPTS) -o $(OBJ)/makeTests.o
+
+EPECtest: $(EPEC_HOME)/test/EPEC
+	@echo "Starting the tests..."
+	@$(EPEC_HOME)/test/EPEC -l success $(ARGS)
+	@echo "Tests completed"
+
+$(EPEC_HOME)/test/EPEC.o: $(EPEC_HOME)/test/EPEC.cpp
+	@echo "Compiling the tests..."
+	$(GCC) -c $(EPEC_HOME)/test/EPEC.cpp $(OPTS) $(BOOSTOPT) -o $(EPEC_HOME)/test/EPEC.o
+
+
+$(EPEC_HOME)/test/EPEC: $(FILEEPEC) $(EPEC_HOME)/test/EPEC.o
+	$(GCC) $(FILEEPEC) $(EPEC_HOME)/test/EPEC.o  $(BOOSTOPT) $(BOOSTLIB) $(OPTS) $(LINKOPTS) -o $(EPEC_HOME)/test/EPEC
+
 clean:
 	rm -rf $(OUTPUT) $(EPEC_HOME)/test/EPEC
 	rm -rf $(OBJ)/*.o
@@ -97,16 +111,7 @@ tag:
 	ctags src/*.cpp src/*.h
 	@echo "All tags done. Use Ctrl+] to follow a tag in vim and Ctrl+O to go back"
 
-EPECtest: $(EPEC_HOME)/test/EPEC
-	@echo "Starting the tests..."
-	@$(EPEC_HOME)/test/EPEC -l success $(ARGS)
-	@echo "Tests completed"
-
-$(EPEC_HOME)/test/EPEC.o: $(EPEC_HOME)/test/EPEC.cpp
-	@echo "Compiling the tests..."
-	$(GCC) -c $(EPEC_HOME)/test/EPEC.cpp $(OPTS) $(BOOSTOPT) -o $(EPEC_HOME)/test/EPEC.o
-
-
-$(EPEC_HOME)/test/EPEC: $(FILEEPEC) $(EPEC_HOME)/test/EPEC.o
-	$(GCC) $(FILEEPEC) $(EPEC_HOME)/test/EPEC.o  $(BOOSTOPT) $(BOOSTLIB) $(OPTS) $(LINKOPTS) -o $(EPEC_HOME)/test/EPEC
-
+install:
+	mkdir -p dat
+	mkdir -p bin
+	mkdir -p obj
