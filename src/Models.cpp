@@ -554,6 +554,11 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
                        // each lower level QP and provide the sum. Indeed, this
                        // is the number of dual variables for the lower level.
   this->Locations.push_back(Loc);
+
+  this->EPEC::LocStarts.push_back(&Loc[LeaderVars::FollowerStart]);
+  this->EPEC::LocConvHulls.push_back(&Loc[LeaderVars::ConvHullDummy]);
+  this->EPEC::LocEnds.push_back(&Loc[LeaderVars::End]);
+
   this->LeadConses.push_back(N->RewriteLeadCons());
   this->AllLeadPars.push_back(Params);
   this->nCountr++;
@@ -599,7 +604,7 @@ Models::EPEC &Models::EPEC::addTranspCosts(
   return *this;
 }
 
-const Models::EPEC &Models::EPEC::finalize()
+void Models::EPEC::finalize()
 /**
  * @brief Finalizes the creation of a Models::EPEC object.
  * @details Performs a bunch of job after all data for a Models::EPEC object are
@@ -608,7 +613,7 @@ const Models::EPEC &Models::EPEC::finalize()
  * where each Leader's variable start in the variable list. Calls
  * Models::EPEC::computeLeaderLocations -	Adds the required dummy
  * variables to each leader's problem so that a game among the leaders can be
- * defined. Calls Models::EPEC::add_Dummy_Lead
+ * defined. Calls Game::EPEC::add_Dummy_Lead
  * 	-	Makes the market clearing constraint in each country. Calls
  * Models::EPEC::make_MC_leader -	Creates the QP objective corresponding
  * to each leader's objective. Calls Models::EPEC::make_obj_leader
@@ -630,7 +635,8 @@ const Models::EPEC &Models::EPEC::finalize()
      */
     this->computeLeaderLocations(true);
 
-    this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
+    // this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountr); // We don't
+    // have MC_QP
     this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
     this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
     for (unsigned int i = 0; i < this->nCountr;
@@ -658,17 +664,17 @@ const Models::EPEC &Models::EPEC::finalize()
     throw;
   }
   this->finalized = true;
-  return *this;
+  // return *this;
 }
 
 void Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 /**
  * @brief Adds leaders' trade balance constraints for import-exports
  * @details Does the following job:
- * 	-	Counts the number of import markets for the country @p i to store
- * in Models::EPEC::nImportMarkets -	Adds the trade balance constraint. Total
- * quantity imported by country @p i = Sum of Total quantity exported by each
- * country to country i. -	Updates the LeadLocs in
+ * 	-	Counts the number of import markets for the country @p i to
+ * store in Models::EPEC::nImportMarkets -	Adds the trade balance
+ * constraint. Total quantity imported by country @p i = Sum of Total quantity
+ * exported by each country to country i. -	Updates the LeadLocs in
  * Models::EPEC::Locations.at(i)
  */
 {
@@ -861,14 +867,11 @@ bool Models::EPEC::dataCheck(
   return true;
 }
 
-void Models::EPEC::add_Dummy_Lead(const unsigned int i) {
-  if (!this->dataCheck())
-    throw string(
-        "Error in Models::EPEC::add_Dummy_All_Lead: dataCheck() failed!");
+void Game::EPEC::add_Dummy_Lead(const unsigned int i) {
 
   const unsigned int nEPECvars = this->nVarinEPEC;
-  const unsigned int nThisCountryvars =
-      this->Locations.at(i).at(Models::LeaderVars::End);
+  const unsigned int nThisCountryvars = *this->LocEnds.at(i);
+  // this->Locations.at(i).at(Models::LeaderVars::End);
 
   try {
     this->countries_LL.at(i).get()->addDummy(nEPECvars - nThisCountryvars);
@@ -1004,11 +1007,11 @@ void Models::EPEC::make_obj_leader(
 
 unique_ptr<GRBModel> Models::EPEC::Respond(const string name,
                                            const arma::vec &x) const {
-  return this->Respond(this->name2nos.at(name), x);
+  return this->Game::EPEC::Respond(this->name2nos.at(name), x);
 }
 
-unique_ptr<GRBModel> Models::EPEC::Respond(const unsigned int i,
-                                           const arma::vec &x) const {
+unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
+                                         const arma::vec &x) const {
   if (!this->finalized)
     throw string("Error in Models::EPEC::Respond: Model not finalized");
 
@@ -1016,8 +1019,8 @@ unique_ptr<GRBModel> Models::EPEC::Respond(const unsigned int i,
     throw string("Error in Models::EPEC::Respond: Invalid country number");
 
   const unsigned int nEPECvars = this->nVarinEPEC;
-  const unsigned int nThisCountryvars =
-      this->Locations.at(i).at(Models::LeaderVars::End);
+  const unsigned int nThisCountryvars = *this->LocEnds.at(i);
+  // this->Locations.at(i).at(Models::LeaderVars::End);
 
   if (x.n_rows != nEPECvars - nThisCountryvars)
     throw string("Error in Models::EPEC::Respond: Invalid parametrization");
@@ -1025,7 +1028,8 @@ unique_ptr<GRBModel> Models::EPEC::Respond(const unsigned int i,
   return this->country_QP.at(i).get()->solveFixed(x);
 }
 
-bool Models::EPEC::isSolved(int *countryNumber, arma::vec *ProfDevn) const
+bool Game::EPEC::isSolved(unsigned int *countryNumber,
+                          arma::vec *ProfDevn) const
 /**
  * @todo Implementation to be done.
  */
@@ -1063,7 +1067,8 @@ void Models::EPEC::make_country_QP()
           this->country_QP.at(j)->addDummy(convHullVarCount, 0,
                                            this->country_QP.at(j)->getNx() -
                                                this->nCountr);
-        // this->MC_QP.at(j)->addDummy(convHullVarCount, 0);
+        // this->MC_QP.at(j)->addDummy(convHullVarCount, 0); // We don't have
+        // MC_QP
       }
     }
   }
@@ -1631,7 +1636,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
   const double tax = x.at(foll_tax + j);
   double taxQ = 0;
   if (Params.LeaderParam.tax_revenue)
-    taxQ = q>0 ? x.at(foll_taxQ + j) / q : x.at(foll_taxQ + j);
+    taxQ = q > 0 ? x.at(foll_taxQ + j) / q : x.at(foll_taxQ + j);
   const double lim = x.at(foll_lim + j);
   const double lin = Params.FollowerParam.costs_lin.at(j);
   const double quad = Params.FollowerParam.costs_quad.at(j);
