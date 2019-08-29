@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
   // --------------------------------
   // WRITING STATISTICS AND SOLUTION
   // --------------------------------
-  Models::EPECStatistics stat = epec.getStatistics();
+  Game::EPECStatistics stat = epec.getStatistics();
   if (stat.status == 1)
     epec.writeSolution(writeLevel, resFile);
   ifstream existCheck(logFile);

@@ -604,7 +604,79 @@ Models::EPEC &Models::EPEC::addTranspCosts(
   return *this;
 }
 
-void Models::EPEC::finalize()
+void Models::EPEC::prefinalize() {
+  try {
+    /*
+     * Below for loop adds space for each country's quantity imported from
+     * variable
+     */
+    this->nImportMarkets = vector<unsigned int>(this->nCountr);
+    for (unsigned int i = 0; i < this->nCountr; i++)
+      this->add_Leaders_tradebalance_constraints(i);
+  } catch (const char *e) {
+    cerr << e << '\n';
+    throw;
+  } catch (string e) {
+    cerr << "String in Models::EPEC::prefinalize : " << e << '\n';
+    throw;
+  } catch (GRBException &e) {
+    cerr << "GRBException in Models::EPEC::prefinalize : " << e.getErrorCode()
+         << ": " << e.getMessage() << '\n';
+    throw;
+  } catch (exception &e) {
+    cerr << "Exception in Models::EPEC::prefinalize : " << e.what() << '\n';
+    throw;
+  }
+}
+
+void Game::EPEC::finalize()
+/**
+ * @brief Finalizes the creation of a Game::EPEC object.
+ * @details Performs a bunch of job after all data for a Game::EPEC object are
+ * given, namely.
+ * Models::EPEC::computeLeaderLocations -	Adds the required dummy
+ * variables to each leader's problem so that a game among the leaders can be
+ * defined. Calls Game::EPEC::add_Dummy_Lead
+ * 	-	Makes the market clearing constraint in each country. Calls
+ */
+{
+  if (this->finalized)
+    cerr << "Warning in Game::EPEC::finalize: Model already finalized\n";
+
+  this->prefinalize();
+
+  try {
+    this->computeLeaderLocations(this->n_MCVar);
+    // Initialize leader objective and country_QP
+    this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
+    this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
+    for (unsigned int i = 0; i < this->nCountr; i++) {
+      this->add_Dummy_Lead(i);
+      this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
+      this->make_obj_leader(i, *this->LeadObjec.at(i).get());
+    }
+
+  } catch (const char *e) {
+    cerr << e << '\n';
+    throw;
+  } catch (string e) {
+    cerr << "String in Game::EPEC::finalize : " << e << '\n';
+    throw;
+  } catch (GRBException &e) {
+    cerr << "GRBException in Game::EPEC::finalize : " << e.getErrorCode()
+         << ": " << e.getMessage() << '\n';
+    throw;
+  } catch (exception &e) {
+    cerr << "Exception in Game::EPEC::finalize : " << e.what() << '\n';
+    throw;
+  }
+
+  this->finalized = true;
+
+  this->postfinalize();
+}
+
+// void Models::EPEC::finalize()
 /**
  * @brief Finalizes the creation of a Models::EPEC object.
  * @details Performs a bunch of job after all data for a Models::EPEC object are
@@ -618,21 +690,18 @@ void Models::EPEC::finalize()
  * Models::EPEC::make_MC_leader -	Creates the QP objective corresponding
  * to each leader's objective. Calls Models::EPEC::make_obj_leader
  */
+/*
 {
   if (this->finalized)
     cerr << "Warning in Models::EPEC::finalize: Model already finalized\n";
   try {
-    /*
-     * Below for loop adds space for each country's quantity imported from
-     * variable
-     */
+     // * Below for loop adds space for each country's quantity imported from
+     // * variable
     this->nImportMarkets = vector<unsigned int>(this->nCountr);
     for (unsigned int i = 0; i < this->nCountr; i++)
       this->add_Leaders_tradebalance_constraints(i);
 
-    /*
-     * Now we keep track of where each country's variables start
-     */
+     // * Now we keep track of where each country's variables start
     this->computeLeaderLocations(true);
 
     // this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountr); // We don't
@@ -642,7 +711,6 @@ void Models::EPEC::finalize()
     for (unsigned int i = 0; i < this->nCountr;
          i++) // To add the corresponding Market Clearing constraint
     {
-      Game::QP_objective QP_obj;
       this->add_Dummy_Lead(i);
       // this->make_MC_leader(i); // Useless at the moment. Might as well
       // comment this!
@@ -666,6 +734,7 @@ void Models::EPEC::finalize()
   this->finalized = true;
   // return *this;
 }
+*/
 
 void Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 /**
@@ -892,13 +961,23 @@ void Game::EPEC::add_Dummy_Lead(const unsigned int i) {
   }
 }
 
-void Models::EPEC::computeLeaderLocations(const bool addSpaceForMC) {
+void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
   this->LeaderLocations = vector<unsigned int>(this->nCountr);
   this->LeaderLocations.at(0) = 0;
   for (unsigned int i = 1; i < this->nCountr; i++)
     this->LeaderLocations.at(i) =
-        this->getPosition(i - 1, Models::LeaderVars::End) +
-        (addSpaceForMC ? 0 : 0);
+        this->LeaderLocations.at(i - 1) + *this->LocEnds.at(i);
+
+  this->nVarinEPEC =
+      this->LeaderLocations.back() + *this->LocEnds.back() + addSpaceForMC;
+}
+
+void Models::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
+  this->LeaderLocations = vector<unsigned int>(this->nCountr);
+  this->LeaderLocations.at(0) = 0;
+  for (unsigned int i = 1; i < this->nCountr; i++)
+    this->LeaderLocations.at(i) =
+        this->getPosition(i - 1, Models::LeaderVars::End);
 
   this->nVarinEPEC =
       this->getPosition(this->nCountr - 1, Models::LeaderVars::End) +
@@ -1050,7 +1129,7 @@ void Models::EPEC::make_country_QP()
   static bool already_ran{false};
   if (!already_ran)
     for (unsigned int i = 0; i < this->nCountr; ++i)
-      this->make_country_QP(i);
+      this->Game::EPEC::make_country_QP(i);
 
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     LeadLocs &Loc = this->Locations.at(i);
@@ -1067,20 +1146,13 @@ void Models::EPEC::make_country_QP()
           this->country_QP.at(j)->addDummy(convHullVarCount, 0,
                                            this->country_QP.at(j)->getNx() -
                                                this->nCountr);
-        // this->MC_QP.at(j)->addDummy(convHullVarCount, 0); // We don't have
-        // MC_QP
       }
     }
   }
   this->computeLeaderLocations(true);
-  // if (VERBOSE) {
-  // for (unsigned int i = 0; i < this->nCountr; ++i)
-  // this->country_QP.at(i)->QP_Param::write("dat/debug/countrQP_" +
-  // to_string(i), false);
-  // }
 }
 
-void Models::EPEC::make_country_QP(const unsigned int i)
+void Game::EPEC::make_country_QP(const unsigned int i)
 /**
  * @brief Makes the Game::QP_Param corresponding to the @p i-th country.
  * @details
@@ -1094,8 +1166,9 @@ void Models::EPEC::make_country_QP(const unsigned int i)
  * @todo where is the error?
  */
 {
-  BOOST_LOG_TRIVIAL(info) << "Starting Convex hull computation of the country "
-                          << this->AllLeadPars[i].name << '\n';
+  // BOOST_LOG_TRIVIAL(info) << "Starting Convex hull computation of the country
+  // "
+  // << this->AllLeadPars[i].name << '\n';
   if (!this->finalized)
     throw string("Error in Models::EPEC::make_country_QP: Model not finalized");
   if (i >= this->nCountr)
