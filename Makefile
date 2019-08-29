@@ -98,6 +98,13 @@ clean:
 	rm -rf $(OUTPUT) $(EPEC_HOME)/test/EPEC
 	rm -rf $(OBJ)/*.o
 
+instance:
+	$(OUTPUT) -i dat/Instance -m 2 -w 2
+
+format:
+	clang-format-8 -style=file -i src/*.cpp
+	clang-format-8 -style=file -i src/*.h
+
 docSimple:
 	doxygen docs/refConf
 

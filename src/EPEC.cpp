@@ -68,12 +68,12 @@ int main(int argc, char **argv) {
     arma::arma_version ver;
     int major, minor, technical;
     GRBversion(&major, &minor, &technical);
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(info)
         << "Dependencies:\n\tARMAdillo: " << ver.as_string();
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(info)
         << "\tGurobi: " << to_string(major) << "." << to_string(minor);
-    BOOST_LOG_TRIVIAL(trace) << "\tBoost: " << to_string(BOOST_VERSION / 100000)
-                             << "." << to_string(BOOST_VERSION / 100 % 1000);
+    BOOST_LOG_TRIVIAL(info) << "\tBoost: " << to_string(BOOST_VERSION / 100000)
+                            << "." << to_string(BOOST_VERSION / 100 % 1000);
   }
 
   // --------------------------------
