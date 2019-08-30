@@ -5,7 +5,7 @@ var searchData=
   ['caps',['Caps',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea55dd587cdc4a278be6a5c37f9e539de1',1,'Models']]],
   ['compconvsize',['compConvSize',['../namespaceGame.html#ac1aeab68fc2231bdb1ae8e9d57da5095',1,'Game']]],
   ['compl',['Compl',['../classGame_1_1LCP.html#a6dbcd747d3b7a82fcd9079916da001df',1,'Game::LCP']]],
-  ['computeleaderlocations',['computeLeaderLocations',['../classModels_1_1EPEC.html#afbff1dd5f2974c35fd56ada5cae96de2',1,'Models::EPEC']]],
+  ['computeleaderlocations',['computeLeaderLocations',['../classGame_1_1EPEC.html#abea81f56f1228e47a0043a7bcb167e1c',1,'Game::EPEC::computeLeaderLocations()'],['../classModels_1_1EPEC.html#afc89a6813fb2cf6436b6a1e5511628ae',1,'Models::EPEC::computeLeaderLocations()']]],
   ['computeobjective',['computeObjective',['../classGame_1_1QP__Param.html#aad40a0f721956c78c03be4d39a4b1710',1,'Game::QP_Param']]],
   ['computeqpobjvals',['ComputeQPObjvals',['../classGame_1_1NashGame.html#a13f2c54098acc8e38e16ddcd09d3f5e7',1,'Game::NashGame']]],
   ['convexhull',['ConvexHull',['../classGame_1_1LCP.html#a98042d88db2e32a4c1c55bfb3b1b6756',1,'Game::LCP::ConvexHull()'],['../namespaceGame.html#ace813b46bdf72c6c92a3935542d278ef',1,'Game::ConvexHull()']]],
@@ -13,7 +13,7 @@ var searchData=
   ['costs_5flin',['costs_lin',['../structModels_1_1FollPar.html#aaa36c0543e54c59699f0da4164e65b5b',1,'Models::FollPar']]],
   ['costs_5fquad',['costs_quad',['../structModels_1_1FollPar.html#a55746125a9d34c969a27fe0c577a8fb2',1,'Models::FollPar']]],
   ['countries',['Countries',['../structModels_1_1EPECInstance.html#a33b4b7a619654eb3ef7636443ec867bb',1,'Models::EPECInstance']]],
-  ['countries_5fll',['countries_LL',['../classModels_1_1EPEC.html#a82eab96ef7e7c45219555958d67e29a1',1,'Models::EPEC']]],
-  ['country_5fqp',['country_QP',['../classModels_1_1EPEC.html#aaf4329d9fc37b38c59b4f2f459daac2c',1,'Models::EPEC']]],
+  ['countries_5fll',['countries_LL',['../classGame_1_1EPEC.html#a4d8745504818d288a37c2708095ec07a',1,'Game::EPEC']]],
+  ['country_5fqp',['country_QP',['../classGame_1_1EPEC.html#ad4e3bb55356147e59dc71d6bd4bf4b5d',1,'Game::EPEC']]],
   ['countryimport',['CountryImport',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eabaf050cedcda40eabc94d4a7bd5116cb',1,'Models']]]
 ];

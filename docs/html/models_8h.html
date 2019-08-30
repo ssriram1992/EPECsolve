@@ -77,10 +77,10 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="epecsolve_8h_source.html">epecsolve.h</a>&quot;</code><br />
+<code>#include &lt;armadillo&gt;</code><br />
+<code>#include &lt;gurobi_c++.h&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
 <code>#include &lt;memory&gt;</code><br />
-<code>#include &lt;gurobi_c++.h&gt;</code><br />
-<code>#include &lt;armadillo&gt;</code><br />
 </div>
 <p><a href="models_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -100,9 +100,6 @@ Data Structures</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1EPECInstance.html">Models::EPECInstance</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a single Instance.  <a href="structModels_1_1EPECInstance.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1EPECStatistics.html">Models::EPECStatistics</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores statistics for a (solved) <a class="el" href="classModels_1_1EPEC.html">EPEC</a> instance.  <a href="structModels_1_1EPECStatistics.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html">Models::EPEC</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,10 +132,11 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea55dd587cdc4a278be6a5c37f9e539de1">Models::LeaderVars::Caps</a>, 
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea4b78ac8eb158840e9638a3aeb26c4a9d">Models::LeaderVars::Tax</a>, 
+<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea24a98047b142b17863fc0bbdde6c6321">Models::LeaderVars::TaxQuad</a>, 
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea17d72d09ea044ac3506cece93e19f6b8">Models::LeaderVars::DualVar</a>, 
-<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea2afd0bab7c35873bc8dd372c6d255448">Models::LeaderVars::ConvHullDummy</a>, 
 <br />
-&#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea87557f11575c0ad78e4e28abedc13b6e">Models::LeaderVars::End</a>
+&#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea2afd0bab7c35873bc8dd372c6d255448">Models::LeaderVars::ConvHullDummy</a>, 
+<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76ea87557f11575c0ad78e4e28abedc13b6e">Models::LeaderVars::End</a>
 <br />
  }</td></tr>
 <tr class="separator:a64b758b38a6e4004b84630ec087bf76e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -201,7 +199,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01023">1023</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01025">1025</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -221,7 +219,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01043">1043</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01044">1044</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>

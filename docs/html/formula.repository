@@ -71,3 +71,5 @@
 \form#70:$t \in [0, 1]$
 \form#71:$q_1=28.271028$
 \form#72:$q_2=27.803728$
+\form#73:$ < Ax\le b$
+\form#74:\begin{eqnarray} t_i^{I} &\leq& \bar{t_i^{I}}\\ q^{import} - q^{export} &\leq& \bar{q^{import}}\\ q^{export} - q^{import} &\leq& \bar{q^{export}}\\ \alpha - \beta\left(q^{import} - q^{export} + \sum_i q_i \right) &\leq& *\bar{\pi}\\ q^{export} &\leq& \sum_i q_i +q^{import} \end{eqnarray}
