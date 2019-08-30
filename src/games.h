@@ -375,6 +375,102 @@ ostream &operator<<(ostream &ost, const perps &C);
 void print(const perps &C);
 }; // namespace Game
 
+// The EPEC stuff
+namespace Game {
+/// @brief Stores statistics for a (solved) EPEC instance
+struct EPECStatistics {
+  int status = {0}; ///< status: 1: nashEq found. 0:no nashEq found. 2:timeLimit
+  int numVar = {-1};         ///< Number of variables in findNashEq model
+  int numConstraints = {-1}; ///< Number of constraints in findNashEq model
+  int numNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
+                         ///< matrix of findNashEq model
+  vector<int> feasiblePolyhedra =
+      {}; ///< Vector containing the number of non-void polyhedra, indexed by
+          ///< leader (country)
+  double wallClockTime = {-1.0};
+};
+
+class EPEC {
+protected: // Datafields
+  vector<shared_ptr<Game::NashGame>> countries_LL{};
+
+  vector<arma::sp_mat> LeadConses{}; ///< Stores each leader's constraint LHS
+  vector<arma::vec> LeadRHSes{};     ///< Stores each leader's constraint RHS
+
+  vector<shared_ptr<Game::QP_Param>>
+      country_QP{}; ///< The QP corresponding to each player
+  vector<shared_ptr<Game::QP_objective>>
+      LeadObjec{}; ///< Objective of each leader
+
+  unique_ptr<Game::NashGame> nashgame; ///< The EPEC nash game
+  unique_ptr<Game::LCP> lcp;           ///< The EPEC nash game written as an LCP
+  unique_ptr<GRBModel>
+      lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
+
+  vector<unsigned int> LeaderLocations{}; ///< Location of each leader
+  vector<const unsigned int *> LocStarts{};
+  vector<const unsigned int *> LocEnds{};
+  vector<const unsigned int *> LocConvHulls{};
+  unsigned int n_MCVar{0};
+
+  GRBEnv *env;
+  bool finalized{false}, nashEq{false};
+
+  unsigned int nCountr{0};
+  unsigned int nVarinEPEC{0};
+
+  EPECStatistics Stats{}; ///< Store run time information
+
+public:                  // Datafields
+  bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
+                         ///< Uses @p bigM if @p false.
+  double timeLimit{
+      -1}; ///< Controls the timelimit for solve in Game::EPEC::findNashEq
+
+  arma::vec sol_x, sol_z; ///< Solution
+
+protected: // functions
+  // Must NOT be reimplemented by inheritors
+  virtual void add_Dummy_Lead(const unsigned int i) final;
+  virtual void make_country_QP(const unsigned int i) final;
+
+  // virtual function to be implemented by the inheritor.
+  virtual void make_obj_leader(const unsigned int i,
+                               Game::QP_objective &QP_obj) = 0;
+  //
+  // virtual function to be optionally implemented by the inheritor.
+  virtual void prefinalize(){};
+  virtual void postfinalize(){};
+  virtual void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
+  virtual void make_MC_cons(arma::sp_mat &MC, arma::vec &RHS) const {};
+
+public: // functions
+  EPEC() = delete;
+  EPEC(GRBEnv *env) : env{env}, timeLimit{-1} {};
+  EPEC(EPEC &) = delete;
+  ~EPEC() {}
+
+  EPEC &set_n_MCV(unsigned int n) {
+    this->n_MCVar = n;
+    return *this;
+  }
+
+  virtual void make_country_QP() = 0;
+  virtual void finalize() final;
+  virtual void findNashEq() final;
+
+  unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
+  bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn) const;
+
+  virtual const arma::vec getx() const final { return this->sol_x; }
+  virtual const arma::vec getz() const final { return this->sol_z; }
+  ///@brief Get the EPECStatistics object for the current instance
+  virtual const EPECStatistics getStatistics() const final {
+    return this->Stats;
+  }
+};
+}; // namespace Game
+
 #endif
 
 /* Example for QP_Param */

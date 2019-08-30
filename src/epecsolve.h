@@ -35,6 +35,8 @@ class QP_Param;
 class NashGame;
 
 class LCP;
+
+class EPEC;
 }; // namespace Game
 namespace Models {
 class EPEC;
@@ -42,7 +44,6 @@ class EPEC;
 
 #include "games.h"
 #include "lcptolp.h"
-#include "models.h"
 #include "utils.h"
 
 #endif

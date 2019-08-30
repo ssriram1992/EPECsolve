@@ -630,56 +630,6 @@ void Models::EPEC::prefinalize() {
   }
 }
 
-void Game::EPEC::finalize()
-/**
- * @brief Finalizes the creation of a Game::EPEC object.
- * @details Performs a bunch of job after all data for a Game::EPEC object are
- * given, namely.
- * Models::EPEC::computeLeaderLocations -	Adds the required dummy
- * variables to each leader's problem so that a game among the leaders can be
- * defined. Calls Game::EPEC::add_Dummy_Lead
- * 	-	Makes the market clearing constraint in each country. Calls
- */
-{
-  if (this->finalized)
-    cerr << "Warning in Game::EPEC::finalize: Model already finalized\n";
-
-  /// Game::EPEC::prefinalize() can be overridden, and that code will run before calling Game::EPEC::finalize()
-  this->prefinalize();
-
-  try {
-    this->computeLeaderLocations(this->n_MCVar);
-    // Initialize leader objective and country_QP
-    this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
-    this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
-    for (unsigned int i = 0; i < this->nCountr; i++) {
-      this->add_Dummy_Lead(i);
-      this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
-      this->make_obj_leader(i, *this->LeadObjec.at(i).get());
-    }
-
-  } catch (const char *e) {
-    cerr << e << '\n';
-    throw;
-  } catch (string e) {
-    cerr << "String in Game::EPEC::finalize : " << e << '\n';
-    throw;
-  } catch (GRBException &e) {
-    cerr << "GRBException in Game::EPEC::finalize : " << e.getErrorCode()
-         << ": " << e.getMessage() << '\n';
-    throw;
-  } catch (exception &e) {
-    cerr << "Exception in Game::EPEC::finalize : " << e.what() << '\n';
-    throw;
-  }
-
-  this->finalized = true;
-
-  /// Game::EPEC::postfinalize() can be overridden, and that code will run after calling Game::EPEC::finalize()
-  this->postfinalize();
-}
-
-
 void Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 /**
  * @brief Adds leaders' trade balance constraints for import-exports
@@ -880,42 +830,6 @@ bool Models::EPEC::dataCheck(
   return true;
 }
 
-void Game::EPEC::add_Dummy_Lead(const unsigned int i) {
-
-  const unsigned int nEPECvars = this->nVarinEPEC;
-  const unsigned int nThisCountryvars = *this->LocEnds.at(i);
-  // this->Locations.at(i).at(Models::LeaderVars::End);
-
-  try {
-    this->countries_LL.at(i).get()->addDummy(nEPECvars - nThisCountryvars);
-  } catch (const char *e) {
-    cerr << e << '\n';
-    throw;
-  } catch (string e) {
-    cerr << "String in Models::EPEC::add_Dummy_All_Lead : " << e << '\n';
-    throw;
-  } catch (GRBException &e) {
-    cerr << "GRBException in Models::EPEC::add_Dummy_All_Lead : "
-         << e.getErrorCode() << ": " << e.getMessage() << '\n';
-    throw;
-  } catch (exception &e) {
-    cerr << "Exception in Models::EPEC::add_Dummy_All_Lead : " << e.what()
-         << '\n';
-    throw;
-  }
-}
-
-void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
-  this->LeaderLocations = vector<unsigned int>(this->nCountr);
-  this->LeaderLocations.at(0) = 0;
-  for (unsigned int i = 1; i < this->nCountr; i++)
-    this->LeaderLocations.at(i) =
-        this->LeaderLocations.at(i - 1) + *this->LocEnds.at(i);
-
-  this->nVarinEPEC =
-      this->LeaderLocations.back() + *this->LocEnds.back() + addSpaceForMC;
-}
-
 void Models::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
   this->LeaderLocations = vector<unsigned int>(this->nCountr);
   this->LeaderLocations.at(0) = 0;
@@ -1034,34 +948,6 @@ unique_ptr<GRBModel> Models::EPEC::Respond(const string name,
   return this->Game::EPEC::Respond(this->name2nos.at(name), x);
 }
 
-unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
-                                         const arma::vec &x) const {
-  if (!this->finalized)
-    throw string("Error in Models::EPEC::Respond: Model not finalized");
-
-  if (i >= this->nCountr)
-    throw string("Error in Models::EPEC::Respond: Invalid country number");
-
-  const unsigned int nEPECvars = this->nVarinEPEC;
-  const unsigned int nThisCountryvars = *this->LocEnds.at(i);
-  // this->Locations.at(i).at(Models::LeaderVars::End);
-
-  if (x.n_rows != nEPECvars - nThisCountryvars)
-    throw string("Error in Models::EPEC::Respond: Invalid parametrization");
-
-  return this->country_QP.at(i).get()->solveFixed(x);
-}
-
-bool Game::EPEC::isSolved(unsigned int *countryNumber,
-                          arma::vec *ProfDevn) const
-/**
- * @todo Implementation to be done.
- */
-{
-  BOOST_LOG_TRIVIAL(fatal) << "NOT YET IMPLEMENTED";
-  return false;
-}
-
 void Models::EPEC::make_country_QP()
 /**
  * @brief Makes the Game::QP_Param for all the countries
@@ -1097,39 +983,6 @@ void Models::EPEC::make_country_QP()
   this->computeLeaderLocations(true);
 }
 
-void Game::EPEC::make_country_QP(const unsigned int i)
-/**
- * @brief Makes the Game::QP_Param corresponding to the @p i-th country.
- * @details
- *  - First gets the Game::LCP object from @p countries_LL and makes a QP with
- * this LCP as the lower level
- *  - This is achieved by calling LCP::makeQP and using the objective value
- * object in @p LeadObjec
- *  - Finally the locations are updated owing to the complete convex hull
- * calculated during the call to LCP::makeQP
- * @note Overloaded as EPEC::make_country_QP()
- * @todo where is the error?
- */
-{
-  // BOOST_LOG_TRIVIAL(info) << "Starting Convex hull computation of the country
-  // "
-  // << this->AllLeadPars[i].name << '\n';
-  if (!this->finalized)
-    throw string("Error in Models::EPEC::make_country_QP: Model not finalized");
-  if (i >= this->nCountr)
-    throw string(
-        "Error in Models::EPEC::make_country_QP: Invalid country number");
-  if (!this->country_QP.at(i).get()) {
-    Game::LCP Player_i_LCP =
-        Game::LCP(this->env, *this->countries_LL.at(i).get());
-    this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
-    Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(),
-                        *this->country_QP.at(i).get());
-    this->Stats.feasiblePolyhedra.push_back(
-        Player_i_LCP.getFeasiblePolyhedra());
-  }
-}
-
 void Models::increaseVal(LeadLocs &L, const LeaderVars start,
                          const unsigned int val, const bool startnext)
 /**
@@ -1140,7 +993,8 @@ void Models::increaseVal(LeadLocs &L, const LeaderVars start,
   for (LeaderVars l = start_rl; l != Models::LeaderVars::End; l = l + 1)
     L[l] += val;
   L[Models::LeaderVars::End] += val;
-  // BOOST_LOG_TRIVIAL(error)<<"End location changed to: "<<L[Models::LeaderVars::End];
+  // BOOST_LOG_TRIVIAL(error)<<"End location changed to:
+  // "<<L[Models::LeaderVars::End];
 }
 
 void Models::init(LeadLocs &L) {
@@ -1152,80 +1006,6 @@ void Models::init(LeadLocs &L) {
 
 Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
   return static_cast<LeaderVars>(static_cast<int>(a) + b);
-}
-
-void Game::EPEC::findNashEq() {
-  if (this->country_QP.front() != nullptr) {
-
-    int Nvar =
-        this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
-    arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
-    arma::vec MCRHS, dumb;
-    MCRHS.zeros(0);
-    dumb.zeros(0);
-    this->make_MC_cons(MC, MCRHS);
-    this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
-        this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
-    lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
-    // Using indicator constraints
-    lcp->useIndicators = this->indicators;
-
-    this->lcpmodel = lcp->LCPasMIP(false);
-    Nvar = nashgame->getNprimals() + nashgame->getNduals() +
-           nashgame->getNshadow() + nashgame->getNleaderVars();
-    // if (VERBOSE) {
-    // lcpmodel->write("dat/debug/NashLCP.lp");
-    // this->nashgame->write("dat/debug/NashGame", false, true);
-    BOOST_LOG_TRIVIAL(trace) << *nashgame;
-    // }
-
-    this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
-    this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
-    this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
-    if (this->timeLimit > 0)
-	{
-	  BOOST_LOG_TRIVIAL(warning)<<"Time limit set: "<<this->Game::EPEC::timeLimit;
-      this->lcpmodel->set(GRB_DoubleParam_TimeLimit, this->timeLimit);
-	}
-    lcpmodel->optimize();
-    this->Stats.wallClockTime = lcpmodel->get(GRB_DoubleAttr_Runtime);
-    this->sol_x.zeros(Nvar);
-    this->sol_z.zeros(Nvar);
-    unsigned int temp;
-    int status = lcpmodel->get(GRB_IntAttr_Status);
-    if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
-        status == GRB_SOLUTION_LIMIT) {
-      try {
-        for (unsigned int i = 0; i < (unsigned int)Nvar; i++) {
-          this->sol_x(i) =
-              lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
-          this->sol_z(i) =
-              lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
-          temp = i;
-        }
-
-      } catch (GRBException &e) {
-        cerr << "GRBException in Game::EPEC::findNashEq : "
-             << e.getErrorCode() << ": " << e.getMessage() << " " << temp
-             << '\n';
-      }
-      this->Stats.status = 1;
-    } else {
-      if (status == GRB_TIME_LIMIT) {
-        this->Stats.status = 2;
-        cerr << "Game::EPEC::findNashEq: no nash equilibrium found "
-                "(timeLimit)."
-             << '\n';
-      } else
-        cerr << "Game::EPEC::findNashEq: no nash equilibrium found." << '\n';
-    }
-
-  } else {
-    cerr << "Exception in Game::EPEC::findNashEq : no country QP has been "
-            "made."
-         << '\n';
-    throw;
-  }
 }
 
 void Models::EPEC::gur_WriteCountry_conv(const unsigned int i,
