@@ -52,15 +52,15 @@ runEPEC: compileEPEC
 valgrind: compileEPEC
 	valgrind --leak-check=full --show-leak-kinds=all  -v ./$(OUTPUT) $(ARGS)
 
-compileEPEC: EPEC
+compileEPEC: $(OUTPUT)
 
 makeInstances:  $(FILEEPEC) $(OBJ)/makeTests.o 
-	@echo making the test instances...
+	@echo making the test cases...
 	$(GCC) $(FILEEPEC) $(OBJ)/makeTests.o  $(OPTS) $(LINKOPTS) -o bin/genTestInstances
 	./bin/genTestInstances
 
-EPEC: $(FILEEPEC) $(OBJ)/EPEC.o 
-	@echo Compiling...
+$(OUTPUT): $(FILEEPEC) $(OBJ)/EPEC.o 
+	@echo Linking...
 	$(GCC) $(FILEEPEC) $(OBJ)/EPEC.o  $(OPTS) $(LINKOPTS) -o $(OUTPUT) 
 
 $(OBJ)/LCPtoLP.o: $(SRC)/epecsolve.h $(SRC)/lcptolp.h $(SRC)/LCPtoLP.cpp 
@@ -99,7 +99,7 @@ clean:
 	rm -rf $(OBJ)/*.o
 
 instance:
-	$(OUTPUT) -i dat/Instance -m 2 -w 2
+	$(OUTPUT) -i dat/Instance -m 1 -w 2
 
 format:
 	clang-format-8 -style=file -i src/*.cpp

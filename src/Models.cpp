@@ -562,6 +562,7 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   this->LeadConses.push_back(N->RewriteLeadCons());
   this->AllLeadPars.push_back(Params);
   this->nCountr++;
+  this->Game::EPEC::n_MCVar++;
   return *this;
 }
 
@@ -643,6 +644,7 @@ void Game::EPEC::finalize()
   if (this->finalized)
     cerr << "Warning in Game::EPEC::finalize: Model already finalized\n";
 
+  /// Game::EPEC::prefinalize() can be overridden, and that code will run before calling Game::EPEC::finalize()
   this->prefinalize();
 
   try {
@@ -673,68 +675,10 @@ void Game::EPEC::finalize()
 
   this->finalized = true;
 
+  /// Game::EPEC::postfinalize() can be overridden, and that code will run after calling Game::EPEC::finalize()
   this->postfinalize();
 }
 
-// void Models::EPEC::finalize()
-/**
- * @brief Finalizes the creation of a Models::EPEC object.
- * @details Performs a bunch of job after all data for a Models::EPEC object are
- * given, namely. -	Adds the tradebalance constraints for leaders. Calls
- * Models::EPEC::add_Leaders_tradebalance_constraints -	Computes the location of
- * where each Leader's variable start in the variable list. Calls
- * Models::EPEC::computeLeaderLocations -	Adds the required dummy
- * variables to each leader's problem so that a game among the leaders can be
- * defined. Calls Game::EPEC::add_Dummy_Lead
- * 	-	Makes the market clearing constraint in each country. Calls
- * Models::EPEC::make_MC_leader -	Creates the QP objective corresponding
- * to each leader's objective. Calls Models::EPEC::make_obj_leader
- */
-/*
-{
-  if (this->finalized)
-    cerr << "Warning in Models::EPEC::finalize: Model already finalized\n";
-  try {
-     // * Below for loop adds space for each country's quantity imported from
-     // * variable
-    this->nImportMarkets = vector<unsigned int>(this->nCountr);
-    for (unsigned int i = 0; i < this->nCountr; i++)
-      this->add_Leaders_tradebalance_constraints(i);
-
-     // * Now we keep track of where each country's variables start
-    this->computeLeaderLocations(true);
-
-    // this->MC_QP = vector<shared_ptr<Game::QP_Param>>(nCountr); // We don't
-    // have MC_QP
-    this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
-    this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
-    for (unsigned int i = 0; i < this->nCountr;
-         i++) // To add the corresponding Market Clearing constraint
-    {
-      this->add_Dummy_Lead(i);
-      // this->make_MC_leader(i); // Useless at the moment. Might as well
-      // comment this!
-      this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
-      this->make_obj_leader(i, *this->LeadObjec.at(i).get());
-    }
-  } catch (const char *e) {
-    cerr << e << '\n';
-    throw;
-  } catch (string e) {
-    cerr << "String in Models::EPEC::finalize : " << e << '\n';
-    throw;
-  } catch (GRBException &e) {
-    cerr << "GRBException in Models::EPEC::finalize : " << e.getErrorCode()
-         << ": " << e.getMessage() << '\n';
-    throw;
-  } catch (exception &e) {
-    cerr << "Exception in Models::EPEC::finalize : " << e.what() << '\n';
-    throw;
-  }
-  this->finalized = true;
-  // return *this;
-}
-*/
 
 void Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
 /**
@@ -1062,6 +1006,7 @@ void Models::EPEC::make_obj_leader(
 
   if (this->nCountr > 1) {
     // export revenue term
+
     QP_obj.C(Loc.at(Models::LeaderVars::NetExport),
              // this->getPosition(i, Models::LeaderVars::End) -
              // nThisCountryvars) = -1;
@@ -1195,6 +1140,7 @@ void Models::increaseVal(LeadLocs &L, const LeaderVars start,
   for (LeaderVars l = start_rl; l != Models::LeaderVars::End; l = l + 1)
     L[l] += val;
   L[Models::LeaderVars::End] += val;
+  // BOOST_LOG_TRIVIAL(error)<<"End location changed to: "<<L[Models::LeaderVars::End];
 }
 
 void Models::init(LeadLocs &L) {
@@ -1208,7 +1154,7 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
   return static_cast<LeaderVars>(static_cast<int>(a) + b);
 }
 
-void Models::EPEC::findNashEq() {
+void Game::EPEC::findNashEq() {
   if (this->country_QP.front() != nullptr) {
 
     int Nvar =
@@ -1237,7 +1183,10 @@ void Models::EPEC::findNashEq() {
     this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
     this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
     if (this->timeLimit > 0)
+	{
+	  BOOST_LOG_TRIVIAL(warning)<<"Time limit set: "<<this->Game::EPEC::timeLimit;
       this->lcpmodel->set(GRB_DoubleParam_TimeLimit, this->timeLimit);
+	}
     lcpmodel->optimize();
     this->Stats.wallClockTime = lcpmodel->get(GRB_DoubleAttr_Runtime);
     this->sol_x.zeros(Nvar);
@@ -1256,7 +1205,7 @@ void Models::EPEC::findNashEq() {
         }
 
       } catch (GRBException &e) {
-        cerr << "GRBException in Models::EPEC::findNashEq : "
+        cerr << "GRBException in Game::EPEC::findNashEq : "
              << e.getErrorCode() << ": " << e.getMessage() << " " << temp
              << '\n';
       }
@@ -1264,15 +1213,15 @@ void Models::EPEC::findNashEq() {
     } else {
       if (status == GRB_TIME_LIMIT) {
         this->Stats.status = 2;
-        cerr << "Models::EPEC::findNashEq: no nash equilibrium found "
+        cerr << "Game::EPEC::findNashEq: no nash equilibrium found "
                 "(timeLimit)."
              << '\n';
       } else
-        cerr << "Models::EPEC::findNashEq: no nash equilibrium found." << '\n';
+        cerr << "Game::EPEC::findNashEq: no nash equilibrium found." << '\n';
     }
 
   } else {
-    cerr << "Exception in Models::EPEC::findNashEq : no country QP has been "
+    cerr << "Exception in Game::EPEC::findNashEq : no country QP has been "
             "made."
          << '\n';
     throw;

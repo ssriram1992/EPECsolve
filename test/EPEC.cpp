@@ -1,4 +1,7 @@
 #include<exception>
+#include <boost/log/core.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/trivial.hpp>
 #include<iomanip>
 #include<chrono>
 #include"../src/models.h"
@@ -18,6 +21,11 @@
 
 using namespace std;
 using namespace arma;
+
+BOOST_AUTO_TEST_CASE(LoggingOff)
+{  
+    boost::log::core::get()->set_filter(boost::log::trivial::severity > boost::log::trivial::info);
+}
 
 BOOST_AUTO_TEST_SUITE(Core__Tests)
 

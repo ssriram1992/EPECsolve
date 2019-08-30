@@ -23,10 +23,10 @@ struct EPECStatistics {
 
 class EPEC {
 protected: // Datafields
-  vector<shared_ptr<Game::NashGame>> countries_LL = {};
+  vector<shared_ptr<Game::NashGame>> countries_LL{};
 
-  vector<arma::sp_mat> LeadConses = {}; ///< Stores each leader's constraint LHS
-  vector<arma::vec> LeadRHSes = {};     ///< Stores each leader's constraint RHS
+  vector<arma::sp_mat> LeadConses{}; ///< Stores each leader's constraint LHS
+  vector<arma::vec> LeadRHSes{};     ///< Stores each leader's constraint RHS
 
   vector<shared_ptr<Game::QP_Param>>
       country_QP{}; ///< The QP corresponding to each player
@@ -38,25 +38,24 @@ protected: // Datafields
   unique_ptr<GRBModel>
       lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
 
-  vector<unsigned int> LeaderLocations = {}; ///< Location of each leader
-  vector<const unsigned int *> LocStarts = {};
-  vector<const unsigned int *> LocEnds = {};
-  vector<const unsigned int *> LocConvHulls = {};
-  unsigned int n_MCVar;
+  vector<unsigned int> LeaderLocations{}; ///< Location of each leader
+  vector<const unsigned int *> LocStarts{};
+  vector<const unsigned int *> LocEnds{};
+  vector<const unsigned int *> LocConvHulls{};
+  unsigned int n_MCVar{0};
 
   GRBEnv *env;
   bool finalized{false}, nashEq{false};
 
-  unsigned int nCountr = 0;
-  unsigned int nVarinEPEC = 0;
+  unsigned int nCountr{0};
+  unsigned int nVarinEPEC{0};
 
-  EPECStatistics Stats = {}; ///< Store run time information
+  EPECStatistics Stats{}; ///< Store run time information
 
 public:                  // Datafields
   bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
                          ///< Uses @p bigM if @p false.
-  double
-      timeLimit; ///< Controls the timelimit for solve in Game::EPEC::findNahEq
+  double timeLimit{-1}; ///< Controls the timelimit for solve in Game::EPEC::findNashEq
 
   arma::vec sol_x, sol_z; ///< Solution
 
@@ -73,10 +72,11 @@ protected: // functions
   virtual void prefinalize(){};
   virtual void postfinalize(){};
   virtual void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
+  virtual void make_MC_cons(arma::sp_mat &MC, arma::vec &RHS) const {};
 
 public: // functions
   EPEC() = delete;
-  EPEC(GRBEnv *env) : env{env} {}
+  EPEC(GRBEnv *env) : env{env}, timeLimit{-1} {};
   EPEC(EPEC &) = delete;
   ~EPEC() {}
 
@@ -87,7 +87,7 @@ public: // functions
 
   virtual void make_country_QP() = 0;
   virtual void finalize() final;
-  virtual void findNashEq() = 0;
+  virtual void findNashEq() final;
 
   unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn) const;
@@ -235,7 +235,7 @@ public:
   void prefinalize() override;
   void postfinalize() override {};
   // void finalize() override;
-  void findNashEq() override;
+  // void findNashEq() override;
   void make_country_QP() override;
 
   // Rest
@@ -284,7 +284,7 @@ private:
 
   void make_MC_leader(const unsigned int i);
 
-  void make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const;
+  void make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const override;
 
   void WriteCountry(const unsigned int i, const string filename,
                     const arma::vec x, const bool append = true) const;
@@ -303,7 +303,7 @@ public: // Attributes
   bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax
                                ///< is added to each leader objective
 
-  double timeLimit = {-1}; ///< Controls the timeLimit (s) for findNashEq
+  // double timeLimit = {-1}; ///< Controls the timeLimit (s) for findNashEq
 
   EPEC() = delete;
 
