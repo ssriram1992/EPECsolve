@@ -1,2 +1,2 @@
-/home/sriram/Dropbox/code/EPEC/code/src/games.h:345: warning: The following parameters of Game::NashGame::RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, bool fullvec=true) const are not documented:
+/home/sriram/Dropbox/code/EPEC/code/src/games.h:344: warning: The following parameters of Game::NashGame::RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, bool fullvec=true) const are not documented:
   parameter 'sol'
