@@ -226,8 +226,8 @@ public:
  * @f}
  * These are the types of problems that are handled by the class Game::LCP but
  we use a different notation. Instead of using @p y to refer to the variables
- that don't have matching complementary equations, we call @i all the variables
- as @p x and we keep track of the position of variables which are not
+ that don't have matching complementary equations, we call <i>all</i> the
+ variables as @p x and we keep track of the position of variables which are not
  complementary to any equation.
  *
  * <b>Points to note: </b>
@@ -283,7 +283,7 @@ public:
  *
  * Now, since the variable with no complementarity pair is @f$x_2@f$ which is in
  position @p 1 (counting from 0) of the vector @p x, the arguments @p LeadStart
- and @LeadEnd in the constructor, Game::LCP::LCP are @p 1 as below.
+ and @p LeadEnd in the constructor, Game::LCP::LCP are @p 1 as below.
  * @code
                 GRBEnv env;
                 LCP lcp = LCP(&env, M, q, 1, 1, A, b);

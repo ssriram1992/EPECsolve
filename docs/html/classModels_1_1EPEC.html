@@ -92,8 +92,10 @@ Inheritance diagram for Models::EPEC:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a928a609004b9034c2117fb920c081b72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a928a609004b9034c2117fb920c081b72">prefinalize</a> () override</td></tr>
+<tr class="memdesc:a928a609004b9034c2117fb920c081b72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty function - optionally reimplementable in derived class.  <a href="#a928a609004b9034c2117fb920c081b72">More...</a><br /></td></tr>
 <tr class="separator:a928a609004b9034c2117fb920c081b72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a880b1d378f0973274b88969912ef6f68"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a880b1d378f0973274b88969912ef6f68">postfinalize</a> () override</td></tr>
+<tr class="memdesc:a880b1d378f0973274b88969912ef6f68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty function - optionally reimplementable in derived class.  <a href="#a880b1d378f0973274b88969912ef6f68">More...</a><br /></td></tr>
 <tr class="separator:a880b1d378f0973274b88969912ef6f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff5d65a8b55e5ac491fdb951a4859a59"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#aff5d65a8b55e5ac491fdb951a4859a59">make_country_QP</a> () override</td></tr>
 <tr class="memdesc:aff5d65a8b55e5ac491fdb951a4859a59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> for all the countries.  <a href="#aff5d65a8b55e5ac491fdb951a4859a59">More...</a><br /></td></tr>
@@ -143,8 +145,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a32f76f4e828f8f7ffa6d76f889b60bc5"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structModels_1_1EPECInstance.html">EPECInstance</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModels_1_1EPEC.html#a32f76f4e828f8f7ffa6d76f889b60bc5">getInstance</a> () const</td></tr>
 <tr class="memdesc:a32f76f4e828f8f7ffa6d76f889b60bc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current <a class="el" href="structModels_1_1EPECInstance.html" title="Stores a single Instance.">EPECInstance</a> loaded.  <a href="#a32f76f4e828f8f7ffa6d76f889b60bc5">More...</a><br /></td></tr>
 <tr class="separator:a32f76f4e828f8f7ffa6d76f889b60bc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3eb84bef6b8cef499f2cfe1f178b5ba8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModels_1_1EPEC.html">EPEC</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a3eb84bef6b8cef499f2cfe1f178b5ba8">set_n_MCV</a> (unsigned int n)</td></tr>
-<tr class="separator:a3eb84bef6b8cef499f2cfe1f178b5ba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77a6ccc56c53fe827520f312a6b6e0e9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9">finalize</a> () final</td></tr>
 <tr class="memdesc:a77a6ccc56c53fe827520f312a6b6e0e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalizes the creation of a <a class="el" href="classGame_1_1EPEC.html">Game::EPEC</a> object.  <a href="#a77a6ccc56c53fe827520f312a6b6e0e9">More...</a><br /></td></tr>
 <tr class="separator:a77a6ccc56c53fe827520f312a6b6e0e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,18 +177,11 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a5616d84f5febbe4e8b89e47e62baf9c1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a5616d84f5febbe4e8b89e47e62baf9c1">timeLimit</a></td></tr>
 <tr class="memdesc:a5616d84f5febbe4e8b89e47e62baf9c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Controls the timelimit for solve in <a class="el" href="classGame_1_1EPEC.html#a3e9dfef88ec6d1dec992632d4f7d68f5">Game::EPEC::findNashEq</a>.  <a href="#a5616d84f5febbe4e8b89e47e62baf9c1">More...</a><br /></td></tr>
 <tr class="separator:a5616d84f5febbe4e8b89e47e62baf9c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#afbee4cd7f8c737d79d00c71b0dded3b5">sol_x</a></td></tr>
-<tr class="separator:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e77a13dc08a016c2e8232d1f910034b"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a1e77a13dc08a016c2e8232d1f910034b">sol_z</a></td></tr>
-<tr class="memdesc:a1e77a13dc08a016c2e8232d1f910034b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solution.  <a href="#a1e77a13dc08a016c2e8232d1f910034b">More...</a><br /></td></tr>
-<tr class="separator:a1e77a13dc08a016c2e8232d1f910034b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a7746f76d4ea0a8ef9f2e96259812a471"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a7746f76d4ea0a8ef9f2e96259812a471">add_Dummy_Lead</a> (const unsigned int i) final</td></tr>
-<tr class="separator:a7746f76d4ea0a8ef9f2e96259812a471"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61ab661541f695eef569605f4071af80"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a61ab661541f695eef569605f4071af80">make_country_QP</a> (const unsigned int i) final</td></tr>
-<tr class="memdesc:a61ab661541f695eef569605f4071af80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> corresponding to the <code>i-th</code> country.  <a href="#a61ab661541f695eef569605f4071af80">More...</a><br /></td></tr>
+<tr class="memdesc:a61ab661541f695eef569605f4071af80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Can be instantiated by a derived class only!  <a href="#a61ab661541f695eef569605f4071af80">More...</a><br /></td></tr>
 <tr class="separator:a61ab661541f695eef569605f4071af80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
@@ -240,6 +233,12 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a827a90f6d6c14f8e6d61694f9a63f450"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structGame_1_1EPECStatistics.html">EPECStatistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a827a90f6d6c14f8e6d61694f9a63f450">Stats</a> {}</td></tr>
 <tr class="memdesc:a827a90f6d6c14f8e6d61694f9a63f450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store run time information.  <a href="#a827a90f6d6c14f8e6d61694f9a63f450">More...</a><br /></td></tr>
 <tr class="separator:a827a90f6d6c14f8e6d61694f9a63f450"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e77a13dc08a016c2e8232d1f910034b"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a1e77a13dc08a016c2e8232d1f910034b">sol_z</a></td></tr>
+<tr class="memdesc:a1e77a13dc08a016c2e8232d1f910034b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solution equation values.  <a href="#a1e77a13dc08a016c2e8232d1f910034b">More...</a><br /></td></tr>
+<tr class="separator:a1e77a13dc08a016c2e8232d1f910034b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#afbee4cd7f8c737d79d00c71b0dded3b5">sol_x</a></td></tr>
+<tr class="memdesc:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solution variable values.  <a href="#afbee4cd7f8c737d79d00c71b0dded3b5">More...</a><br /></td></tr>
+<tr class="separator:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -359,34 +358,6 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7746f76d4ea0a8ef9f2e96259812a471"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7746f76d4ea0a8ef9f2e96259812a471">&#9670;&nbsp;</a></span>add_Dummy_Lead()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Game::EPEC::add_Dummy_Lead </td>
-          <td>(</td>
-          <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>i</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">protected</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01199">1199</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a926d12ae3829db9068a6ce813fbbdfce"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a926d12ae3829db9068a6ce813fbbdfce">&#9670;&nbsp;</a></span>add_Leaders_tradebalance_constraints()</h2>
 
@@ -416,7 +387,7 @@ Private Attributes</h2></td></tr>
 <li>Counts the number of import markets for the country <code>i</code> to store in <a class="el" href="classModels_1_1EPEC.html#a9ab0c5070d9674c16e9b80e469eac6af" title="Number of countries from which the i-th country imports.">Models::EPEC::nImportMarkets</a> - Adds the trade balance constraint. Total quantity imported by country <code>i</code> = Sum of Total quantity exported by each country to country i. - Updates the LeadLocs in Models::EPEC::Locations.at(i) </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00633">633</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00640">640</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -531,7 +502,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classGame_1_1EPEC.html#abea81f56f1228e47a0043a7bcb167e1c">Game::EPEC</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00833">833</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00840">840</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -626,7 +597,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00786">786</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00793">793</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -654,13 +625,13 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Finalizes the creation of a <a class="el" href="classGame_1_1EPEC.html">Game::EPEC</a> object. </p>
-<p>Performs a bunch of job after all data for a <a class="el" href="classGame_1_1EPEC.html">Game::EPEC</a> object are given, namely. <a class="el" href="classModels_1_1EPEC.html#afc89a6813fb2cf6436b6a1e5511628ae">Models::EPEC::computeLeaderLocations</a> - Adds the required dummy variables to each leader's problem so that a game among the leaders can be defined. Calls <a class="el" href="classGame_1_1EPEC.html#a7746f76d4ea0a8ef9f2e96259812a471">Game::EPEC::add_Dummy_Lead</a></p><ul>
+<p>Performs a bunch of job after all data for a <a class="el" href="classGame_1_1EPEC.html">Game::EPEC</a> object are given, namely. <a class="el" href="classModels_1_1EPEC.html#afc89a6813fb2cf6436b6a1e5511628ae">Models::EPEC::computeLeaderLocations</a> - Adds the required dummy variables to each leader's problem so that a game among the leaders can be defined. Calls <a class="el" href="classGame_1_1EPEC.html#a7746f76d4ea0a8ef9f2e96259812a471" title="Add Dummy variables for the leaders.">Game::EPEC::add_Dummy_Lead</a></p><ul>
 <li>Makes the market clearing constraint in each country. Calls </li>
 </ul>
-<p><a class="el" href="classGame_1_1EPEC.html#a0087fe84ec0cffa43a83ae1cf0720cee">Game::EPEC::prefinalize()</a> can be overridden, and that code will run before calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a></p>
-<p><a class="el" href="classGame_1_1EPEC.html#ab04366ed9765c7fa5f97ea10606f3eee">Game::EPEC::postfinalize()</a> can be overridden, and that code will run after calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a></p>
+<p><a class="el" href="classGame_1_1EPEC.html#a1650a665591d7a7e982dbb11ef0e897a" title="Empty function - optionally reimplementable in derived class.">Game::EPEC::prefinalize()</a> can be overridden, and that code will run before calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a></p>
+<p><a class="el" href="classGame_1_1EPEC.html#aa17713c9c874ea96c8e939ae2dc58120" title="Empty function - optionally reimplementable in derived class.">Game::EPEC::postfinalize()</a> can be overridden, and that code will run after calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a></p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01148">1148</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01186">1186</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -687,7 +658,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01296">1296</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01335">1335</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -709,7 +680,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns a non-owning pointer to the <code>i</code> -th country's lower level NashGame. </p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00867">867</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00874">874</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -770,7 +741,7 @@ Private Attributes</h2></td></tr>
 
 <p>Gets position of a variable in a country given the country name and the variable. </p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00857">857</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00864">864</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -802,7 +773,7 @@ Private Attributes</h2></td></tr>
 
 <p>Gets position of a variable in a country. </p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00845">845</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00852">852</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -831,7 +802,7 @@ Private Attributes</h2></td></tr>
 
 <p>Get the EPECStatistics object for the current instance. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00468">468</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00473">473</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -858,7 +829,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00465">465</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00470">470</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -885,7 +856,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00466">466</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00471">471</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -915,7 +886,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01011">1011</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01018">1018</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -945,7 +916,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01018">1018</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01025">1025</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -984,7 +955,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>Implementation to be done. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01253">1253</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01293">1293</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1012,11 +983,11 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Makes the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> for all the countries. </p>
-<p>Calls are made to <a class="el" href="classGame_1_1EPEC.html#a61ab661541f695eef569605f4071af80" title="Makes the Game::QP_Param corresponding to the i-th country.">Models::EPEC::make_country_QP(const unsigned int i)</a> for each valid <code>i</code> </p><dl class="section note"><dt>Note</dt><dd>Overloaded as <a class="el" href="classGame_1_1EPEC.html#a61ab661541f695eef569605f4071af80" title="Makes the Game::QP_Param corresponding to the i-th country.">EPEC::make_country_QP(unsigned int)</a> </dd></dl>
+<p>Calls are made to <a class="el" href="classGame_1_1EPEC.html#a61ab661541f695eef569605f4071af80" title="Can be instantiated by a derived class only!">Models::EPEC::make_country_QP(const unsigned int i)</a> for each valid <code>i</code> </p><dl class="section note"><dt>Note</dt><dd>Overloaded as <a class="el" href="classGame_1_1EPEC.html#a61ab661541f695eef569605f4071af80" title="Can be instantiated by a derived class only!">EPEC::make_country_QP(unsigned int)</a> </dd></dl>
 
 <p>Implements <a class="el" href="classGame_1_1EPEC.html#a569a086536147a74f74712e1be859ff4">Game::EPEC</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00951">951</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00958">958</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1044,16 +1015,16 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Makes the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> corresponding to the <code>i-th</code> country. </p>
+<p>Can be instantiated by a derived class only! </p>
+<p>Makes the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> corresponding to the <code>i-th</code> country.</p>
 <ul>
-<li>First gets the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">Game::LCP</a> object from <code>countries_LL</code> and makes a QP with this LCP as the lower level</li>
-<li>This is achieved by calling LCP::makeQP and using the objective value object in <code>LeadObjec</code> </li>
+<li>First gets the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">Game::LCP</a> object from <code><a class="el" href="classGame_1_1EPEC.html#a4d8745504818d288a37c2708095ec07a">Game::EPEC::countries_LL</a></code> and makes a <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> with this LCP as the lower level</li>
+<li>This is achieved by calling LCP::makeQP and using the objective value object in <code><a class="el" href="classGame_1_1EPEC.html#a7221407745036f00b3efed1ccbf43f0f" title="Objective of each leader.">Game::EPEC::LeadObjec</a></code> </li>
 <li>Finally the locations are updated owing to the complete convex hull calculated during the call to LCP::makeQP <dl class="section note"><dt>Note</dt><dd>Overloaded as <a class="el" href="classModels_1_1EPEC.html#aff5d65a8b55e5ac491fdb951a4859a59" title="Makes the Game::QP_Param for all the countries.">EPEC::make_country_QP()</a> </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>where is the error? </dd></dl>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01263">1263</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01303">1303</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1252,7 +1223,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classGame_1_1EPEC.html#ac436c2d4d60fdbe5e8d219aaa0989991">Game::EPEC</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00685">685</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00692">692</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1283,7 +1254,7 @@ Private Attributes</h2></td></tr>
 <p>Makes the market clearing constraint for country <code>i</code>. </p>
 <p>Writes the market clearing constraint as a <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> and stores it in <a class="el" href="classModels_1_1EPEC.html#a11b212ad1bc65ad020fb8601e302c931">Models::EPEC::MC_QP</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00723">723</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00730">730</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1331,7 +1302,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classGame_1_1EPEC.html#a50bab61e0943dc5cc730ae660bba2605">Game::EPEC</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00889">889</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00896">896</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1416,7 +1387,10 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented from <a class="el" href="classGame_1_1EPEC.html#ab04366ed9765c7fa5f97ea10606f3eee">Game::EPEC</a>.</p>
+<p>Empty function - optionally reimplementable in derived class. </p>
+<p>This function can be optionally implemented by the derived class. Code in this class will be run <em>after</em> calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a>. </p>
+
+<p>Reimplemented from <a class="el" href="classGame_1_1EPEC.html#aa17713c9c874ea96c8e939ae2dc58120">Game::EPEC</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00142">142</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
 
@@ -1445,7 +1419,14 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented from <a class="el" href="classGame_1_1EPEC.html#a0087fe84ec0cffa43a83ae1cf0720cee">Game::EPEC</a>.</p>
+<p>Empty function - optionally reimplementable in derived class. </p>
+<p>This function can be optionally implemented by the derived class. Code in this class will be run <em>before</em> calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a>. </p>
+<p>Does the following:</p><ol type="1">
+<li>Adds the trade balance constraint for all leaders. i.e., total import must equal sum of import from each country</li>
+<li>Stores the number of import markets for each country in <a class="el" href="classModels_1_1EPEC.html#a9ab0c5070d9674c16e9b80e469eac6af" title="Number of countries from which the i-th country imports.">Models::EPEC::nImportMarkets</a></li>
+</ol>
+
+<p>Reimplemented from <a class="el" href="classGame_1_1EPEC.html#a1650a665591d7a7e982dbb11ef0e897a">Game::EPEC</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00608">608</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
@@ -1477,7 +1458,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00946">946</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00953">953</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1515,35 +1496,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01235">1235</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a3eb84bef6b8cef499f2cfe1f178b5ba8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3eb84bef6b8cef499f2cfe1f178b5ba8">&#9670;&nbsp;</a></span>set_n_MCV()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classModels_1_1EPEC.html">EPEC</a>&amp; Game::EPEC::set_n_MCV </td>
-          <td>(</td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>n</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00453">453</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01275">1275</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1563,7 +1516,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01510">1510</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01517">1517</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1583,7 +1536,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01479">1479</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01486">1486</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1606,7 +1559,7 @@ Private Attributes</h2></td></tr>
 <p>A finalized model cannot be edited unless it is unlocked first. </p>
 <p><a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">EPEC::finalize()</a> performs "finalizing" acts on an object. </p><dl class="section warning"><dt>Warning</dt><dd>Exclusively for debugging purposes for developers. Don't call this function, unless you know what you are doing. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00876">876</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00883">883</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1636,7 +1589,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01062">1062</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01069">1069</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1672,7 +1625,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01049">1049</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01056">1056</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1722,7 +1675,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01350">1350</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01357">1357</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1772,7 +1725,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01412">1412</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01419">1419</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1803,7 +1756,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Writes the computed Nash Equilibrium in the <a class="el" href="classModels_1_1EPEC.html">EPEC</a> instance <code>writeLevel</code> is an integer representing the write configuration. 0: only Json solution; 1: only human readable solution; 2:both</p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01145">1145</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01152">1152</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -1840,7 +1793,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Writes the computed Nash Equilibrium in the standard JSON solution file <code>filename</code> dictates the name of the .JSON solution file</p>
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01075">1075</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01082">1082</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
@@ -2505,12 +2458,14 @@ Private Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00430">430</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p>Solution variable values. </p>
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00424">424</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -2529,14 +2484,14 @@ Private Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Solution. </p>
+<p>Solution equation values. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00430">430</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00424">424</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -2588,7 +2543,7 @@ Private Attributes</h2></td></tr>
 <b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">      -1}</div></div><!-- fragment -->
 <p>Controls the timelimit for solve in <a class="el" href="classGame_1_1EPEC.html#a3e9dfef88ec6d1dec992632d4f7d68f5">Game::EPEC::findNashEq</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00427">427</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00430">430</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>

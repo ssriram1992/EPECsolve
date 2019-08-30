@@ -120,7 +120,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9822cf86f807f3bac5286b9e015dc759"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a9822cf86f807f3bac5286b9e015dc759">getMCLeadRHS</a> () const</td></tr>
 <tr class="separator:a9822cf86f807f3bac5286b9e015dc759"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f8b9352623a4c15d8186382027461b9"><td class="memItemLeft" align="right" valign="top">unique_ptr&lt; GRBModel &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a3f8b9352623a4c15d8186382027461b9">Respond</a> (unsigned int player, const arma::vec &amp;x, bool fullvec=true) const</td></tr>
-<tr class="memdesc:a3f8b9352623a4c15d8186382027461b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the decision of other players, find the optimal response for player in position <code>player</code> @detail Given the strategy of each player, returns a Gurobi Model that has the optimal strategy of the player at position <code>player</code>.  <a href="#a3f8b9352623a4c15d8186382027461b9">More...</a><br /></td></tr>
+<tr class="memdesc:a3f8b9352623a4c15d8186382027461b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given the decision of other players, find the optimal response for player in position <code>player</code>.  <a href="#a3f8b9352623a4c15d8186382027461b9">More...</a><br /></td></tr>
 <tr class="separator:a3f8b9352623a4c15d8186382027461b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96b5e4e9d919d672cdce22be5a7b50fd"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1NashGame.html#a96b5e4e9d919d672cdce22be5a7b50fd">RespondSol</a> (arma::vec &amp;sol, unsigned int player, const arma::vec &amp;x, bool fullvec=true) const</td></tr>
 <tr class="separator:a96b5e4e9d919d672cdce22be5a7b50fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -401,7 +401,7 @@ Friends</h2></td></tr>
 <p>Add dummy variables in a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a> object. </p>
 <p>Add extra variables at the end of the problem. These are just zero columns that don't feature in the problem anywhere. They are of importance only where the <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a> gets converted into an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> and gets parametrized. Typically, they appear in the upper level objective in such a case. </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00922">922</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00921">921</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +434,7 @@ Friends</h2></td></tr>
 <p>Adds Leader constraint to a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">NashGame</a> object. </p>
 <p>In case common constraint to all followers is to be added (like a leader constraint in an MPEC), this function can be used. It adds a single constraint <img class="formulaInl" alt="$ a^Tx \leq b$" src="form_10.png"/> </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00960">960</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00959">959</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -463,8 +463,10 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Computes players' objective</p>
+<p>Computes the objective value of <em> each </em> player in the <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP.">Game::NashGame</a> object. </p><dl class="section return"><dt>Returns</dt><dd>An arma::vec with the objective values.</dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01103">1103</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01108">1108</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -518,8 +520,7 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Formulates the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> corresponding to the Nash game. </p><dl class="section warning"><dt>Warning</dt><dd>Does not return the leader constraints. Use <a class="el" href="classGame_1_1NashGame.html#a64070d10ab0de6d4369934c8f8d04c20" title="Rewrites leader constraint adjusting for dual variables. Rewrites leader constraints given earlier wi...">NashGame::RewriteLeadCons()</a> to handle them</dd></dl>
-<p>Computes the KKT conditions for each Player, calling <a class="el" href="classGame_1_1QP__Param.html#aa9042eb407e5768c793f17e490e8a5bd" title="Compute the KKT conditions for the given QP.">QP_Param::KKT</a>. Arranges them systematically to return M, q as an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> <img class="formulaInl" alt="$0\leq q \perp Mx+q \geq 0 $" src="form_9.png"/>. </p><pre class="fragment">  The way the variables of the players get distributed is shown in the
-</pre><p> image below </p><div class="image">
+<p>Computes the KKT conditions for each Player, calling <a class="el" href="classGame_1_1QP__Param.html#aa9042eb407e5768c793f17e490e8a5bd" title="Compute the KKT conditions for the given QP.">QP_Param::KKT</a>. Arranges them systematically to return M, q as an <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> <img class="formulaInl" alt="$0\leq q \perp Mx+q \geq 0 $" src="form_9.png"/>. The way the variables of the players get distributed is shown in the image below </p><div class="image">
 <img src="FormulateLCP.png" alt=""/>
 </div>
  <dl class="params"><dt>Parameters</dt><dd>
@@ -849,8 +850,18 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Checks if the Nash game is solved.</p>
+<p>Checks if the Nash game is solved, if not provides a proof of deviation </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sol</td><td>- The vector of pure strategies for the Nash <a class="el" href="namespaceGame.html">Game</a> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">violPlayer</td><td>- Index of the player with profitable deviation </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">violSol</td><td>- The pure strategy for that player - which gives a profitable deviation </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tol</td><td>- If the additional profit is smaller than this, then it is not considered a profitable deviation.</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01133">1133</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01144">1144</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -917,18 +928,18 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Given the decision of other players, find the optimal response for player in position <code>player</code> @detail Given the strategy of each player, returns a Gurobi Model that has the optimal strategy of the player at position <code>player</code>. </p>
-<dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel </dd></dl>
+<p>Given the decision of other players, find the optimal response for player in position <code>player</code>. </p>
+<p>Given the strategy of each player, returns a Gurobi Model that has the optimal strategy of the player at position <code>player</code>. </p><dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">player</td><td>Player whose optimal response is to be computed </td></tr>
     <tr><td class="paramname">x</td><td>A vector of pure strategies (either for all players or all other players) </td></tr>
-    <tr><td class="paramname">fullvec</td><td>Is <code>x</code> strategy of all players? </td></tr>
+    <tr><td class="paramname">fullvec</td><td>Is <code>x</code> strategy of all players? (including player <code>player</code>) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01044">1044</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01043">1043</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -969,16 +980,18 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Returns the optimal objective value that is obtainable for the player <code>player</code> given the decision <code>x</code> of all other players.</p>
+<p>Calls <a class="el" href="classGame_1_1NashGame.html#a3f8b9352623a4c15d8186382027461b9" title="Given the decision of other players, find the optimal response for player in position player.">Game::NashGame::Respond</a> and obtains the unique_ptr to GRBModel of best response by player <code>player</code>. Then solves the model and returns the appropriate objective value. </p><dl class="section return"><dt>Returns</dt><dd>The optimal objective value for the player <code>player</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">player</td><td>Player whose optimal response is to be computed </td></tr>
     <tr><td class="paramname">x</td><td>A vector of pure strategies (either for all players or all other players) </td></tr>
-    <tr><td class="paramname">fullvec</td><td>Is <code>x</code> strategy of all players? </td></tr>
+    <tr><td class="paramname">fullvec</td><td>Is <code>x</code> strategy of all players? (including player <code>player</code>) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01086">1086</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01085">1085</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1000,7 +1013,7 @@ Friends</h2></td></tr>
 <p>Rewrites leader constraint adjusting for dual variables. Rewrites leader constraints given earlier with added empty columns and spaces corresponding to Market clearing duals and other equation duals. </p>
 <p>This becomes important if the Lower level complementarity problem is passed to <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> with upper level constraints. </p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00871">871</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00870">870</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -1096,7 +1109,7 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00983">983</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00982">982</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>

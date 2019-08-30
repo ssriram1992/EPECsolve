@@ -606,6 +606,13 @@ Models::EPEC &Models::EPEC::addTranspCosts(
 }
 
 void Models::EPEC::prefinalize() {
+  /**
+   * Does the following:
+   * 	1. Adds the trade balance constraint for all leaders. i.e., total import
+   * must equal sum of import from each country
+   * 	2. Stores the number of import markets for each country in
+   * Models::EPEC::nImportMarkets
+   */
   try {
     /*
      * Below for loop adds space for each country's quantity imported from

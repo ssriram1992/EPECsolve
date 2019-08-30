@@ -70,7 +70,8 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Data Fields</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a>  </div>
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Game::EPEC Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
@@ -90,15 +91,14 @@ Inheritance diagram for Game::EPEC:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a1b8553cd89efb9951f7cec24b8c09b5f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a1b8553cd89efb9951f7cec24b8c09b5f">EPEC</a> ()=delete</td></tr>
+<tr class="memdesc:a1b8553cd89efb9951f7cec24b8c09b5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">No default constructor.  <a href="#a1b8553cd89efb9951f7cec24b8c09b5f">More...</a><br /></td></tr>
 <tr class="separator:a1b8553cd89efb9951f7cec24b8c09b5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2323518f6af325c254eaad444cea1317"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a2323518f6af325c254eaad444cea1317">EPEC</a> (GRBEnv *<a class="el" href="classGame_1_1EPEC.html#a5c9d2ad673948e23b72af16174335386">env</a>)</td></tr>
-<tr class="separator:a2323518f6af325c254eaad444cea1317"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae88d958afd4f98f1bb7638759ff1c753"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#ae88d958afd4f98f1bb7638759ff1c753">EPEC</a> (<a class="el" href="classGame_1_1EPEC.html">EPEC</a> &amp;)=delete</td></tr>
+<tr class="memdesc:ae88d958afd4f98f1bb7638759ff1c753"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abstract class - no copy constructor.  <a href="#ae88d958afd4f98f1bb7638759ff1c753">More...</a><br /></td></tr>
 <tr class="separator:ae88d958afd4f98f1bb7638759ff1c753"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaeeabf0a830dbedb2630aa0faac2acb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#aaaeeabf0a830dbedb2630aa0faac2acb">~EPEC</a> ()</td></tr>
+<tr class="memdesc:aaaeeabf0a830dbedb2630aa0faac2acb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor to free data.  <a href="#aaaeeabf0a830dbedb2630aa0faac2acb">More...</a><br /></td></tr>
 <tr class="separator:aaaeeabf0a830dbedb2630aa0faac2acb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3eb84bef6b8cef499f2cfe1f178b5ba8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1EPEC.html">EPEC</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a3eb84bef6b8cef499f2cfe1f178b5ba8">set_n_MCV</a> (unsigned int n)</td></tr>
-<tr class="separator:a3eb84bef6b8cef499f2cfe1f178b5ba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a569a086536147a74f74712e1be859ff4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a569a086536147a74f74712e1be859ff4">make_country_QP</a> ()=0</td></tr>
 <tr class="separator:a569a086536147a74f74712e1be859ff4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77a6ccc56c53fe827520f312a6b6e0e9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9">finalize</a> () final</td></tr>
@@ -125,25 +125,22 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a5616d84f5febbe4e8b89e47e62baf9c1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a5616d84f5febbe4e8b89e47e62baf9c1">timeLimit</a></td></tr>
 <tr class="memdesc:a5616d84f5febbe4e8b89e47e62baf9c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Controls the timelimit for solve in <a class="el" href="classGame_1_1EPEC.html#a3e9dfef88ec6d1dec992632d4f7d68f5">Game::EPEC::findNashEq</a>.  <a href="#a5616d84f5febbe4e8b89e47e62baf9c1">More...</a><br /></td></tr>
 <tr class="separator:a5616d84f5febbe4e8b89e47e62baf9c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#afbee4cd7f8c737d79d00c71b0dded3b5">sol_x</a></td></tr>
-<tr class="separator:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e77a13dc08a016c2e8232d1f910034b"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a1e77a13dc08a016c2e8232d1f910034b">sol_z</a></td></tr>
-<tr class="memdesc:a1e77a13dc08a016c2e8232d1f910034b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solution.  <a href="#a1e77a13dc08a016c2e8232d1f910034b">More...</a><br /></td></tr>
-<tr class="separator:a1e77a13dc08a016c2e8232d1f910034b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a7746f76d4ea0a8ef9f2e96259812a471"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a7746f76d4ea0a8ef9f2e96259812a471">add_Dummy_Lead</a> (const unsigned int i) final</td></tr>
-<tr class="separator:a7746f76d4ea0a8ef9f2e96259812a471"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2323518f6af325c254eaad444cea1317"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a2323518f6af325c254eaad444cea1317">EPEC</a> (GRBEnv *<a class="el" href="classGame_1_1EPEC.html#a5c9d2ad673948e23b72af16174335386">env</a>)</td></tr>
+<tr class="separator:a2323518f6af325c254eaad444cea1317"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61ab661541f695eef569605f4071af80"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a61ab661541f695eef569605f4071af80">make_country_QP</a> (const unsigned int i) final</td></tr>
-<tr class="memdesc:a61ab661541f695eef569605f4071af80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> corresponding to the <code>i-th</code> country.  <a href="#a61ab661541f695eef569605f4071af80">More...</a><br /></td></tr>
+<tr class="memdesc:a61ab661541f695eef569605f4071af80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Can be instantiated by a derived class only!  <a href="#a61ab661541f695eef569605f4071af80">More...</a><br /></td></tr>
 <tr class="separator:a61ab661541f695eef569605f4071af80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50bab61e0943dc5cc730ae660bba2605"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a50bab61e0943dc5cc730ae660bba2605">make_obj_leader</a> (const unsigned int i, <a class="el" href="structGame_1_1QP__objective.html">Game::QP_objective</a> &amp;QP_obj)=0</td></tr>
 <tr class="separator:a50bab61e0943dc5cc730ae660bba2605"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0087fe84ec0cffa43a83ae1cf0720cee"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a0087fe84ec0cffa43a83ae1cf0720cee">prefinalize</a> ()</td></tr>
-<tr class="separator:a0087fe84ec0cffa43a83ae1cf0720cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab04366ed9765c7fa5f97ea10606f3eee"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#ab04366ed9765c7fa5f97ea10606f3eee">postfinalize</a> ()</td></tr>
-<tr class="separator:ab04366ed9765c7fa5f97ea10606f3eee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1650a665591d7a7e982dbb11ef0e897a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a1650a665591d7a7e982dbb11ef0e897a">prefinalize</a> ()</td></tr>
+<tr class="memdesc:a1650a665591d7a7e982dbb11ef0e897a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty function - optionally reimplementable in derived class.  <a href="#a1650a665591d7a7e982dbb11ef0e897a">More...</a><br /></td></tr>
+<tr class="separator:a1650a665591d7a7e982dbb11ef0e897a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa17713c9c874ea96c8e939ae2dc58120"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#aa17713c9c874ea96c8e939ae2dc58120">postfinalize</a> ()</td></tr>
+<tr class="memdesc:aa17713c9c874ea96c8e939ae2dc58120"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty function - optionally reimplementable in derived class.  <a href="#aa17713c9c874ea96c8e939ae2dc58120">More...</a><br /></td></tr>
+<tr class="separator:aa17713c9c874ea96c8e939ae2dc58120"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abea81f56f1228e47a0043a7bcb167e1c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#abea81f56f1228e47a0043a7bcb167e1c">computeLeaderLocations</a> (const unsigned int addSpaceForMC=0)</td></tr>
 <tr class="separator:abea81f56f1228e47a0043a7bcb167e1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac436c2d4d60fdbe5e8d219aaa0989991"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#ac436c2d4d60fdbe5e8d219aaa0989991">make_MC_cons</a> (arma::sp_mat &amp;MC, arma::vec &amp;RHS) const</td></tr>
@@ -198,13 +195,53 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a827a90f6d6c14f8e6d61694f9a63f450"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structGame_1_1EPECStatistics.html">EPECStatistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a827a90f6d6c14f8e6d61694f9a63f450">Stats</a> {}</td></tr>
 <tr class="memdesc:a827a90f6d6c14f8e6d61694f9a63f450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store run time information.  <a href="#a827a90f6d6c14f8e6d61694f9a63f450">More...</a><br /></td></tr>
 <tr class="separator:a827a90f6d6c14f8e6d61694f9a63f450"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e77a13dc08a016c2e8232d1f910034b"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a1e77a13dc08a016c2e8232d1f910034b">sol_z</a></td></tr>
+<tr class="memdesc:a1e77a13dc08a016c2e8232d1f910034b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solution equation values.  <a href="#a1e77a13dc08a016c2e8232d1f910034b">More...</a><br /></td></tr>
+<tr class="separator:a1e77a13dc08a016c2e8232d1f910034b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="memItemLeft" align="right" valign="top">arma::vec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#afbee4cd7f8c737d79d00c71b0dded3b5">sol_x</a></td></tr>
+<tr class="memdesc:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solution variable values.  <a href="#afbee4cd7f8c737d79d00c71b0dded3b5">More...</a><br /></td></tr>
+<tr class="separator:afbee4cd7f8c737d79d00c71b0dded3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a7746f76d4ea0a8ef9f2e96259812a471"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1EPEC.html#a7746f76d4ea0a8ef9f2e96259812a471">add_Dummy_Lead</a> (const unsigned int i) final</td></tr>
+<tr class="memdesc:a7746f76d4ea0a8ef9f2e96259812a471"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add Dummy variables for the leaders.  <a href="#a7746f76d4ea0a8ef9f2e96259812a471">More...</a><br /></td></tr>
+<tr class="separator:a7746f76d4ea0a8ef9f2e96259812a471"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00393">393</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a2323518f6af325c254eaad444cea1317"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2323518f6af325c254eaad444cea1317">&#9670;&nbsp;</a></span>EPEC() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Game::EPEC::EPEC </td>
+          <td>(</td>
+          <td class="paramtype">GRBEnv *&#160;</td>
+          <td class="paramname"><em>env</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00438">438</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+
+</div>
+</div>
 <a id="a1b8553cd89efb9951f7cec24b8c09b5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b8553cd89efb9951f7cec24b8c09b5f">&#9670;&nbsp;</a></span>EPEC() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b8553cd89efb9951f7cec24b8c09b5f">&#9670;&nbsp;</a></span>EPEC() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -226,33 +263,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a2323518f6af325c254eaad444cea1317"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2323518f6af325c254eaad444cea1317">&#9670;&nbsp;</a></span>EPEC() <span class="overload">[2/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Game::EPEC::EPEC </td>
-          <td>(</td>
-          <td class="paramtype">GRBEnv *&#160;</td>
-          <td class="paramname"><em>env</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00449">449</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p>No default constructor. </p>
 
 </div>
 </div>
@@ -280,6 +291,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Abstract class - no copy constructor. </p>
+
 </div>
 </div>
 <a id="aaaeeabf0a830dbedb2630aa0faac2acb"></a>
@@ -305,7 +318,9 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00451">451</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p>Destructor to free data. </p>
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00461">461</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -329,12 +344,21 @@ Protected Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">private</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01199">1199</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p>Add Dummy variables for the leaders. </p>
+<p>Adds dummy variables to the leader of an <a class="el" href="classGame_1_1EPEC.html">EPEC</a> - useful after computing the convex hull.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>Number of dummy variables to add. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01237">1237</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +388,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classModels_1_1EPEC.html#afc89a6813fb2cf6436b6a1e5511628ae">Models::EPEC</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01224">1224</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01264">1264</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -392,13 +416,13 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Finalizes the creation of a <a class="el" href="classGame_1_1EPEC.html">Game::EPEC</a> object. </p>
-<p>Performs a bunch of job after all data for a <a class="el" href="classGame_1_1EPEC.html">Game::EPEC</a> object are given, namely. <a class="el" href="classModels_1_1EPEC.html#afc89a6813fb2cf6436b6a1e5511628ae">Models::EPEC::computeLeaderLocations</a> - Adds the required dummy variables to each leader's problem so that a game among the leaders can be defined. Calls <a class="el" href="classGame_1_1EPEC.html#a7746f76d4ea0a8ef9f2e96259812a471">Game::EPEC::add_Dummy_Lead</a></p><ul>
+<p>Performs a bunch of job after all data for a <a class="el" href="classGame_1_1EPEC.html">Game::EPEC</a> object are given, namely. <a class="el" href="classModels_1_1EPEC.html#afc89a6813fb2cf6436b6a1e5511628ae">Models::EPEC::computeLeaderLocations</a> - Adds the required dummy variables to each leader's problem so that a game among the leaders can be defined. Calls <a class="el" href="classGame_1_1EPEC.html#a7746f76d4ea0a8ef9f2e96259812a471" title="Add Dummy variables for the leaders.">Game::EPEC::add_Dummy_Lead</a></p><ul>
 <li>Makes the market clearing constraint in each country. Calls </li>
 </ul>
-<p><a class="el" href="classGame_1_1EPEC.html#a0087fe84ec0cffa43a83ae1cf0720cee">Game::EPEC::prefinalize()</a> can be overridden, and that code will run before calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a></p>
-<p><a class="el" href="classGame_1_1EPEC.html#ab04366ed9765c7fa5f97ea10606f3eee">Game::EPEC::postfinalize()</a> can be overridden, and that code will run after calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a></p>
+<p><a class="el" href="classGame_1_1EPEC.html#a1650a665591d7a7e982dbb11ef0e897a" title="Empty function - optionally reimplementable in derived class.">Game::EPEC::prefinalize()</a> can be overridden, and that code will run before calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a></p>
+<p><a class="el" href="classGame_1_1EPEC.html#aa17713c9c874ea96c8e939ae2dc58120" title="Empty function - optionally reimplementable in derived class.">Game::EPEC::postfinalize()</a> can be overridden, and that code will run after calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a></p>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01148">1148</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01186">1186</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -425,7 +449,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01296">1296</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01335">1335</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -454,7 +478,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Get the <a class="el" href="structGame_1_1EPECStatistics.html" title="Stores statistics for a (solved) EPEC instance.">EPECStatistics</a> object for the current instance. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00468">468</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00473">473</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -481,7 +505,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00465">465</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00470">470</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -508,7 +532,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00466">466</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00471">471</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -539,7 +563,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>Implementation to be done. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01253">1253</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01293">1293</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -594,16 +618,16 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Makes the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> corresponding to the <code>i-th</code> country. </p>
+<p>Can be instantiated by a derived class only! </p>
+<p>Makes the <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> corresponding to the <code>i-th</code> country.</p>
 <ul>
-<li>First gets the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">Game::LCP</a> object from <code>countries_LL</code> and makes a QP with this <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> as the lower level</li>
-<li>This is achieved by calling <a class="el" href="classGame_1_1LCP.html#adc8c8100b88e028500647be036550bfb">LCP::makeQP</a> and using the objective value object in <code>LeadObjec</code> </li>
+<li>First gets the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">Game::LCP</a> object from <code><a class="el" href="classGame_1_1EPEC.html#a4d8745504818d288a37c2708095ec07a">Game::EPEC::countries_LL</a></code> and makes a <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP)">Game::QP_Param</a> with this <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">LCP</a> as the lower level</li>
+<li>This is achieved by calling <a class="el" href="classGame_1_1LCP.html#adc8c8100b88e028500647be036550bfb">LCP::makeQP</a> and using the objective value object in <code><a class="el" href="classGame_1_1EPEC.html#a7221407745036f00b3efed1ccbf43f0f" title="Objective of each leader.">Game::EPEC::LeadObjec</a></code> </li>
 <li>Finally the locations are updated owing to the complete convex hull calculated during the call to <a class="el" href="classGame_1_1LCP.html#adc8c8100b88e028500647be036550bfb">LCP::makeQP</a> <dl class="section note"><dt>Note</dt><dd>Overloaded as <a class="el" href="classGame_1_1EPEC.html#a569a086536147a74f74712e1be859ff4">EPEC::make_country_QP()</a> </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>where is the error? </dd></dl>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01263">1263</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01303">1303</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -643,7 +667,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classModels_1_1EPEC.html#a1c3ddc8dd702e628129fafd148edbbe4">Models::EPEC</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00445">445</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00453">453</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -685,8 +709,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab04366ed9765c7fa5f97ea10606f3eee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab04366ed9765c7fa5f97ea10606f3eee">&#9670;&nbsp;</a></span>postfinalize()</h2>
+<a id="aa17713c9c874ea96c8e939ae2dc58120"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa17713c9c874ea96c8e939ae2dc58120">&#9670;&nbsp;</a></span>postfinalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -695,7 +719,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void Game::EPEC::postfinalize </td>
+          <td class="memname">void Game::EPEC::postfinalize </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -703,19 +727,22 @@ Protected Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Empty function - optionally reimplementable in derived class. </p>
+<p>This function can be optionally implemented by the derived class. Code in this class will be run <em>after</em> calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a>. </p>
 
 <p>Reimplemented in <a class="el" href="classModels_1_1EPEC.html#a880b1d378f0973274b88969912ef6f68">Models::EPEC</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00443">443</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01177">1177</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a0087fe84ec0cffa43a83ae1cf0720cee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0087fe84ec0cffa43a83ae1cf0720cee">&#9670;&nbsp;</a></span>prefinalize()</h2>
+<a id="a1650a665591d7a7e982dbb11ef0e897a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1650a665591d7a7e982dbb11ef0e897a">&#9670;&nbsp;</a></span>prefinalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -724,7 +751,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void Game::EPEC::prefinalize </td>
+          <td class="memname">void Game::EPEC::prefinalize </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -732,14 +759,17 @@ Protected Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>Empty function - optionally reimplementable in derived class. </p>
+<p>This function can be optionally implemented by the derived class. Code in this class will be run <em>before</em> calling <a class="el" href="classGame_1_1EPEC.html#a77a6ccc56c53fe827520f312a6b6e0e9" title="Finalizes the creation of a Game::EPEC object.">Game::EPEC::finalize()</a>. </p>
+
 <p>Reimplemented in <a class="el" href="classModels_1_1EPEC.html#a928a609004b9034c2117fb920c081b72">Models::EPEC</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00442">442</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01168">1168</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -769,35 +799,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01235">1235</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a3eb84bef6b8cef499f2cfe1f178b5ba8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3eb84bef6b8cef499f2cfe1f178b5ba8">&#9670;&nbsp;</a></span>set_n_MCV()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classGame_1_1EPEC.html">EPEC</a>&amp; Game::EPEC::set_n_MCV </td>
-          <td>(</td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>n</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00453">453</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l01275">1275</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
 
 </div>
 </div>
@@ -913,7 +915,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Controls the flag <code>useIndicators</code> in <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems.">Game::LCP</a>. Uses <code>bigM</code> if <code>false</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00425">425</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00428">428</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1272,14 +1274,24 @@ Protected Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">arma::vec Game::EPEC::sol_x</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00430">430</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p>Solution variable values. </p>
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00424">424</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1288,16 +1300,24 @@ Protected Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">arma::vec Game::EPEC::sol_z</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Solution. </p>
+<p>Solution equation values. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00430">430</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00424">424</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1341,7 +1361,7 @@ Protected Attributes</h2></td></tr>
 <b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">      -1}</div></div><!-- fragment -->
 <p>Controls the timelimit for solve in <a class="el" href="classGame_1_1EPEC.html#a3e9dfef88ec6d1dec992632d4f7d68f5">Game::EPEC::findNashEq</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00427">427</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00430">430</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>

@@ -421,39 +421,44 @@ protected: // Datafields
 
   EPECStatistics Stats{}; ///< Store run time information
 
+  arma::vec sol_z, ///< Solution equation values
+      sol_x;       ///< Solution variable values
+
 public:                  // Datafields
   bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
                          ///< Uses @p bigM if @p false.
   double timeLimit{
       -1}; ///< Controls the timelimit for solve in Game::EPEC::findNashEq
 
-  arma::vec sol_x, sol_z; ///< Solution
+private:
+  virtual void add_Dummy_Lead(
+      const unsigned int i) final; ///< Add Dummy variables for the leaders
 
 protected: // functions
+  EPEC(GRBEnv *env)
+      : env{env}, timeLimit{
+                      -1} {}; ///< Can be instantiated by a derived class only!
+
   // Must NOT be reimplemented by inheritors
-  virtual void add_Dummy_Lead(const unsigned int i) final;
   virtual void make_country_QP(const unsigned int i) final;
 
   // virtual function to be implemented by the inheritor.
   virtual void make_obj_leader(const unsigned int i,
                                Game::QP_objective &QP_obj) = 0;
-  //
+
   // virtual function to be optionally implemented by the inheritor.
-  virtual void prefinalize(){};
-  virtual void postfinalize(){};
+  virtual void prefinalize();
+  virtual void postfinalize();
   virtual void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
-  virtual void make_MC_cons(arma::sp_mat &MC, arma::vec &RHS) const {};
+  virtual void make_MC_cons(arma::sp_mat &MC, arma::vec &RHS) const {
+    MC.zeros();
+    RHS.zeros();
+  };
 
-public: // functions
-  EPEC() = delete;
-  EPEC(GRBEnv *env) : env{env}, timeLimit{-1} {};
-  EPEC(EPEC &) = delete;
-  ~EPEC() {}
-
-  EPEC &set_n_MCV(unsigned int n) {
-    this->n_MCVar = n;
-    return *this;
-  }
+public:                  // functions
+  EPEC() = delete;       ///< No default constructor
+  EPEC(EPEC &) = delete; ///< Abstract class - no copy constructor
+  ~EPEC() {}             ///< Destructor to free data
 
   virtual void make_country_QP() = 0;
   virtual void finalize() final;

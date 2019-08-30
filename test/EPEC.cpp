@@ -471,7 +471,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_NO_THROW(epec2.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec2.findNashEq());
-        BOOST_TEST_MESSAGE("Testing results (with indicators)");
+		BOOST_TEST_MESSAGE("Testing results (with indicators)");
         double q1 = epec2.getx().at(epec2.getPosition(0, Models::LeaderVars::FollowerStart) + 0), t1 = epec2.getx().at(
                 epec2.getPosition(0, Models::LeaderVars::Tax) + 0);
         BOOST_CHECK_CLOSE(t1, 250, 0.001);

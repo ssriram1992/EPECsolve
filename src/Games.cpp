@@ -723,7 +723,6 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
    * Computes the KKT conditions for each Player, calling QP_Param::KKT.
    Arranges them systematically to return M, q
    * as an LCP @f$0\leq q \perp Mx+q \geq 0 @f$.
-   *
            The way the variables of the players get distributed is shown in the
    image below
            @image html FormulateLCP.png
@@ -1045,12 +1044,13 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
     unsigned int player, ///< Player whose optimal response is to be computed
     const arma::vec &x, ///< A vector of pure strategies (either for all players
                         ///< or all other players)
-    bool fullvec        ///< Is @p x strategy of all players?
+    bool fullvec ///< Is @p x strategy of all players? (including player @p
+                 ///< player)
     ) const
 /**
  * @brief Given the decision of other players, find the optimal response for
  * player in position @p player
- * @detail
+ * @details
  * Given the strategy of each player, returns a Gurobi Model that has the
  * optimal strategy of the player at position @p player.
  * @returns A unique_ptr to GRBModel
@@ -1088,8 +1088,18 @@ double Game::NashGame::RespondSol(
     unsigned int player, ///< Player whose optimal response is to be computed
     const arma::vec &x, ///< A vector of pure strategies (either for all players
                         ///< or all other players)
-    bool fullvec        ///< Is @p x strategy of all players?
+    bool fullvec ///< Is @p x strategy of all players? (including player @p
+                 ///< player)
     ) const {
+  /**
+   * @brief Returns the optimal objective value that is obtainable for the
+   * player @p player given the decision @p x of all other players.
+   * @details
+   * Calls Game::NashGame::Respond and obtains the unique_ptr to GRBModel of
+   * best response by player @p player. Then solves the model and returns the
+   * appropriate objective value.
+   * @returns The optimal objective value for the player @p player.
+   */
   auto model = this->Respond(player, x, fullvec);
   unsigned int Nx =
       this->primal_position.at(player + 1) - this->primal_position.at(player);
@@ -1102,6 +1112,13 @@ double Game::NashGame::RespondSol(
 
 arma::vec Game::NashGame::ComputeQPObjvals(const arma::vec &x,
                                            bool checkFeas) const {
+  /**
+   * @brief Computes players' objective
+   * @details
+   * Computes the objective value of <i> each </i> player in the Game::NashGame
+   * object.
+   * @returns An arma::vec with the objective values.
+   */
   arma::vec vals;
   vals.zeros(this->Nplayers);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
@@ -1132,6 +1149,17 @@ arma::vec Game::NashGame::ComputeQPObjvals(const arma::vec &x,
 
 bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
                               arma::vec &violSol, double tol) const {
+  /**
+   * @brief Checks if the Nash game is solved.
+   * @details
+   * Checks if the Nash game is solved, if not provides a proof of deviation
+   * @param[in] sol - The vector of pure strategies for the Nash Game
+   * @param[out] violPlayer - Index of the player with profitable deviation
+   * @param[out] violSol - The pure strategy for that player - which gives a
+   * profitable deviation
+   * @param[in] tol - If the additional profit is smaller than this, then it is
+   * not considered a profitable deviation.
+   */
   arma::vec objvals = this->ComputeQPObjvals(sol, true);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
     double val = this->RespondSol(violSol, i, sol, true);
@@ -1144,6 +1172,24 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
 }
 
 // EPEC stuff
+
+void Game::EPEC::prefinalize()
+/**
+  @brief Empty function - optionally reimplementable in derived class
+@details This function can be optionally implemented by
+ the derived class. Code in this class will be run <i>before</i>
+ calling Game::EPEC::finalize().
+*/
+{}
+
+void Game::EPEC::postfinalize()
+/**
+  @brief Empty function - optionally reimplementable in derived class
+@details This function can be optionally implemented by
+ the derived class. Code in this class will be run <i>after</i>
+ calling Game::EPEC::finalize().
+*/
+{}
 
 void Game::EPEC::finalize()
 /**
@@ -1196,8 +1242,11 @@ void Game::EPEC::finalize()
   this->postfinalize();
 }
 
-void Game::EPEC::add_Dummy_Lead(const unsigned int i) {
-
+void Game::EPEC::add_Dummy_Lead(
+    const unsigned int i ///< Number of dummy variables to add.
+) {
+  /// Adds dummy variables to the leader of an EPEC - useful after computing the
+  /// convex hull.
   const unsigned int nEPECvars = this->nVarinEPEC;
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
   // this->Locations.at(i).at(Models::LeaderVars::End);
@@ -1264,14 +1313,13 @@ void Game::EPEC::make_country_QP(const unsigned int i)
 /**
  * @brief Makes the Game::QP_Param corresponding to the @p i-th country.
  * @details
- *  - First gets the Game::LCP object from @p countries_LL and makes a QP with
- * this LCP as the lower level
+ *  - First gets the Game::LCP object from @p Game::EPEC::countries_LL and makes
+ * a Game::QP_Param with this LCP as the lower level
  *  - This is achieved by calling LCP::makeQP and using the objective value
- * object in @p LeadObjec
+ * object in @p Game::EPEC::LeadObjec
  *  - Finally the locations are updated owing to the complete convex hull
  * calculated during the call to LCP::makeQP
  * @note Overloaded as EPEC::make_country_QP()
- * @todo where is the error?
  */
 {
   // BOOST_LOG_TRIVIAL(info) << "Starting Convex hull computation of the country
