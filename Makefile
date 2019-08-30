@@ -16,9 +16,9 @@ BOOST_HOME=/home/sriram/Install/boost_1_70_0
 # BOOST_LIB_D=$(BOOST_HOME)/lib/libboost_
 BOOST_LIB_D=$(BOOST_HOME)/stage/lib/libboost_
 # BOOSTLIB=$(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a  -lpthread $(BOOST_LIB_D)prg_exec_monitor.a
-BOOSTLIB=$(BOOST_LIB_D)unit_test_framework.a -lpthread $(BOOST_LIB_D)program_options.a $(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a  -lpthread $(BOOST_LIB_D)prg_exec_monitor.a
+BOOSTLIB=$(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)program_options.a  $(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a  -lpthread $(BOOST_LIB_D)prg_exec_monitor.a
 # BOOSTOPT=-I $(BOOST_HOME)/include $(BOOSTLIB) 
-BOOSTOPT=-I $(BOOST_HOME) $(BOOSTLIB) 
+BOOSTOPT=-I $(BOOST_HOME) 
 
 # Armadillo stuff
 ARMA=/opt/armadillo-code
@@ -26,7 +26,7 @@ ARMA=/opt/armadillo-code
 ARMAINC=
 # ARMALIB=-lblas -llapack
 ARMALIB=-larmadillo
-ARMAOPT=$(ARMAINC) $(ARMALIB)
+ARMAOPT=$(ARMAINC) 
 
 # Gurobi stuff
 GUR=/opt/gurobi811/linux64
@@ -36,14 +36,15 @@ GURINC=-I $(GUR)/include
 # GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi80 -lm 
 GURLIB= $(GUR)/lib/libgurobi_c++.a $(GUR)/lib/libgurobi81.so -lm  
 # GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi81 -lm 
-GUROPT=$(GURINC) $(GURLIB)
+GUROPT=$(GURINC)
 
 # Generic objects not requiring changes
 # GCC=g++
 GCC=g++-4.8
 #OTHEROPTS= -O2 -std=c++11 -I include/
-OTHEROPTS= -g3 -std=c++11 -I include/
-OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS) $(BOOSTOPT)
+OTHEROPTS= -O3 -std=c++11 -I include/
+OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS) $(BOOSTOPT) 
+LINKOPTS=$(GURLIB) $(ARMALIB) $(BOOSTLIB)
 
 runEPEC: compileEPEC
 	$(OUTPUT) $(ARGS)
@@ -51,16 +52,16 @@ runEPEC: compileEPEC
 valgrind: compileEPEC
 	valgrind --leak-check=full --show-leak-kinds=all  -v ./$(OUTPUT) $(ARGS)
 
-compileEPEC: EPEC
+compileEPEC: $(OUTPUT)
 
 makeInstances:  $(FILEEPEC) $(OBJ)/makeTests.o 
-	@echo making the test instances...
-	$(GCC) $(FILEEPEC) $(OBJ)/makeTests.o  $(OPTS) -o bin/genTestInstances
+	@echo making the test cases...
+	$(GCC) $(FILEEPEC) $(OBJ)/makeTests.o  $(OPTS) $(LINKOPTS) -o bin/genTestInstances
 	./bin/genTestInstances
 
-EPEC: $(FILEEPEC) $(OBJ)/EPEC.o 
-	@echo Compiling...
-	$(GCC) $(FILEEPEC) $(OBJ)/EPEC.o  $(OPTS) -o $(OUTPUT) 
+$(OUTPUT): $(FILEEPEC) $(OBJ)/EPEC.o 
+	@echo Linking...
+	$(GCC) $(FILEEPEC) $(OBJ)/EPEC.o  $(OPTS) $(LINKOPTS) -o $(OUTPUT) 
 
 $(OBJ)/LCPtoLP.o: $(SRC)/epecsolve.h $(SRC)/lcptolp.h $(SRC)/LCPtoLP.cpp 
 	$(GCC) -c $(SRC)/LCPtoLP.cpp $(OPTS) -o $(OBJ)/LCPtoLP.o
@@ -79,9 +80,30 @@ $(OBJ)/Utils.o: $(SRC)/epecsolve.h $(SRC)/utils.h $(SRC)/Utils.cpp
 
 $(OBJ)/makeTests.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/makeTests.cpp
 	$(GCC) -c $(SRC)/makeTests.cpp $(OPTS) -o $(OBJ)/makeTests.o
+
+EPECtest: $(EPEC_HOME)/test/EPEC
+	@echo "Starting the tests..."
+	@$(EPEC_HOME)/test/EPEC -l success $(ARGS)
+	@echo "Tests completed"
+
+$(EPEC_HOME)/test/EPEC.o: $(EPEC_HOME)/test/EPEC.cpp
+	@echo "Compiling the tests..."
+	$(GCC) -c $(EPEC_HOME)/test/EPEC.cpp $(OPTS) $(BOOSTOPT) -o $(EPEC_HOME)/test/EPEC.o
+
+
+$(EPEC_HOME)/test/EPEC: $(FILEEPEC) $(EPEC_HOME)/test/EPEC.o
+	$(GCC) $(FILEEPEC) $(EPEC_HOME)/test/EPEC.o  $(BOOSTOPT) $(BOOSTLIB) $(OPTS) $(LINKOPTS) -o $(EPEC_HOME)/test/EPEC
+
 clean:
 	rm -rf $(OUTPUT) $(EPEC_HOME)/test/EPEC
 	rm -rf $(OBJ)/*.o
+
+instance:
+	$(OUTPUT) -i dat/Instance -m 1 -w 2
+
+format:
+	clang-format-8 -style=file -i src/*.cpp
+	clang-format-8 -style=file -i src/*.h
 
 docSimple:
 	doxygen docs/refConf
@@ -96,16 +118,7 @@ tag:
 	ctags src/*.cpp src/*.h
 	@echo "All tags done. Use Ctrl+] to follow a tag in vim and Ctrl+O to go back"
 
-EPECtest: $(EPEC_HOME)/test/EPEC
-	@echo "Starting the tests..."
-	@$(EPEC_HOME)/test/EPEC -l success $(ARGS)
-	@echo "Tests completed"
-
-$(EPEC_HOME)/test/EPEC.o: $(EPEC_HOME)/test/EPEC.cpp
-	@echo "Compiling the tests..."
-	$(GCC) -c $(EPEC_HOME)/test/EPEC.cpp $(OPTS) $(BOOSTOPT)  -o $(EPEC_HOME)/test/EPEC.o
-
-
-$(EPEC_HOME)/test/EPEC: $(FILEEPEC) $(EPEC_HOME)/test/EPEC.o
-	$(GCC) $(FILEEPEC) $(EPEC_HOME)/test/EPEC.o  $(BOOSTOPT) $(OPTS) -o $(EPEC_HOME)/test/EPEC
-
+install:
+	mkdir -p dat
+	mkdir -p bin
+	mkdir -p obj
