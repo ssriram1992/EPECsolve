@@ -69,10 +69,12 @@ $(function() {
 <div class="textblock"><p><a href="https://www.gnu.org/licenses/gpl-3.0"><object type="image/svg+xml" data="https://img.shields.io/badge/License-GPLv3-blue.svg" style="pointer-events: none;">License: GPL v3</object></a></p>
 <h1><a class="anchor" id="autotoc_md0"></a>
 EPECcode</h1>
-<p>Code to compute mixed-equilibrium in linear EPECs.</p>
+<p>Code to compute mixed-equilibrium in linear EPECs. Code available on <a href="https://github.com/ssriram1992/EPECsolve/">Github</a>.</p>
 <p><em>Manuscript in preparation. Link will be shared once ready</em></p>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Prerequisites</h1>
+<h2><a class="anchor" id="autotoc_md2"></a>
+Mandatory packages</h2>
 <ul>
 <li><a href="http://arma.sourceforge.net/">Armadillo</a> (Version 9.6 or later)<ul>
 <li>BLAS</li>
@@ -83,27 +85,35 @@ Prerequisites</h1>
 <li><a href="https://www.gurobi.com/registration/download-reg">Gurobi</a> (Version 8.1 or later)</li>
 <li><a href="https://gcc.gnu.org/">gcc/g++</a> (Tested on version 4.8. Must support C++11 and be compatible with your version of Gurobi) <code>sudo apt install gcc</code> will install gcc/g++ on an Ubuntu machine.</li>
 <li><a href="https://www.gnu.org/software/make/">GNU make</a> <code>sudo apt install make</code> will install GNU make on an Ubuntu machine.</li>
-<li><a href="http://rapidjson.org/">Rapid JSON</a> To export results and save example problem instances</li>
+<li><a href="https://www.boost.org/">Boost</a> Required for logging, commandline interface to solve files etc. Can produce a boost-free version if there is significant interest.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md3"></a>
+Recommended but not mandatory for the algorithm. (Some examples might have these dependancies)</h2>
+<ul>
+<li><a href="http://rapidjson.org/">Rapid JSON</a> To export results and save example problem instances.</li>
 <li><a href="http://www.doxygen.nl">DOxygen</a> Only if you need documentation. <code>sudo apt install doxygen</code> will install DOxygen on an Ubuntu machine.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2"></a>
+<h1><a class="anchor" id="autotoc_md4"></a>
 Getting the documentation</h1>
 <p>One can generate two versions of documentation for this project..</p><ul>
 <li>Use the simple version of documentation, if you are only interested in using this as a predefined library which you don't intend to edit. This version of the documentation gives a sufficiently detailed explanation of every class or function you might every have to use. To avail this version, run <div class="fragment"><div class="line">make docSimple</div></div><!-- fragment --></li>
 <li>Use the complete documentation if you are interested in every implementation detail of the code.This gives a complete description of every private member and fields in every class, all of which might be useful if you want to edit the code in here. To avail this version, run <div class="fragment"><div class="line">make docDetailed</div></div><!-- fragment --></li>
 <li>You can alternatively use the <a href="https://ssriram1992.github.io/EPECsolve/html/index.html">online documentation</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3"></a>
-Running</h1>
+<h1><a class="anchor" id="autotoc_md5"></a>
+Compiling</h1>
 <ul>
 <li>Download the <a href="https://github.com/ssriram1992/EPECsolve/">project</a>. If you do not have access, please email <a href="#" onclick="location.href='mai'+'lto:'+'sri'+'ra'+'m.s'+'an'+'kar'+'an'+'ara'+'ya'+'nan'+'@p'+'oly'+'mt'+'l.c'+'a'; return false;">sriram.sankaranarayanan@polymtl.ca</a>.</li>
 <li>Open <code>Makefile</code>.</li>
+<li>Enter the path where you downladed in <code>EPEC_HOME</code>. This folder should contain folders like <code>docs/</code>, <code>src/</code>, <code>test/</code> etc.</li>
+<li>Enter the path to Boost in <code>BOOST_HOME</code>. Ensure that the path to corresponding include files and boost libraries are correct.</li>
 <li>Enter the path of your armadillo-installation in the line defining the variable <code>ARMA</code>. Typically, the location would be like <code>/opt/armadillo-code</code>.</li>
 <li>Enter the path of your Gurobi-installation in the line defining the variable <code>GUR</code>. Typically, the location would be like <code>/opt/gurobi/gurobi811/&lt;Your OS&gt;</code>.</li>
-<li>Run <code>mkdir bin &amp;&amp; mkdir dat</code> to create the folders where the executable file and other temporary files sit.</li>
+<li>Run <code>make install</code> to make the necessary folders to store temporary files, binary files etc.</li>
 <li>Run <code>make compileEPEC</code> to compile.</li>
-<li>Run <code>make</code> to run the code. <br  />
- </li>
+<li>Optionally run <code>make EPECtest</code> to run the set of unit tests. It should all succeed without a problem.</li>
+<li>Run <code>make</code> to create the binary.</li>
+<li>Run <code>./bin/EPEC -h</code> to get a list of command line options with which you can run the executable. </li>
 </ul>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
