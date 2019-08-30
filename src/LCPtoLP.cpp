@@ -53,7 +53,6 @@ void Game::LCP::defConst(GRBEnv *env)
  * @brief Assign default values to LCP attributes
  * @details Internal member that can be called from multiple constructors
  * to assign default values to some attributes of the class.
- * @todo LCP::defConst can be replaced by a private constructor
  */
 {
   AllPolyhedra = new vector<vector<short int> *>{};
@@ -138,8 +137,6 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
   N.FormulateLCP(M, q, Compl);
   // LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getMCLeadRHS());
 
-  // This is a constructor code! Remember to delete
-  /// @todo Delete the below section of code
   this->M = M;
   this->q = q;
   this->_A = N.RewriteLeadCons();

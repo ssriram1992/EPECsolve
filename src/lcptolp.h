@@ -186,10 +186,6 @@ public:
                                ///< stored here
   /**
    * Computes the convex hull of the feasible region of the LCP
-   * @warning To be run only after LCP::BranchAndPrune is run. Otherwise this
-   * can give errors
-   * @todo Formally call LCP::BranchAndPrune or throw an exception if this
-   * method is not already run
    */
   {
     return Game::ConvexHull(this->Ai, this->bi, A, b, this->_A, this->_b);

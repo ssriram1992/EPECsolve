@@ -228,7 +228,6 @@ public: // Constructors
  * etc
  * @warning This has public fields which if accessed and changed can cause
  * undefined behavior!
- * \todo Better implementation which will make the above warning go away!
  */
 class NashGame {
 private:
