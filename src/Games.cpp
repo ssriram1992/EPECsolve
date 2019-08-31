@@ -1251,20 +1251,25 @@ void Game::EPEC::add_Dummy_Lead(
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
   // this->Locations.at(i).at(Models::LeaderVars::End);
 
+  if (nEPECvars < nThisCountryvars)
+    throw string(
+        "String in Game::EPEC::add_Dummy_Lead: Invalid variable counts " +
+        to_string(nEPECvars) + " and " + to_string(nThisCountryvars));
+
   try {
     this->countries_LL.at(i).get()->addDummy(nEPECvars - nThisCountryvars);
   } catch (const char *e) {
     cerr << e << '\n';
     throw;
   } catch (string e) {
-    cerr << "String in Models::EPEC::add_Dummy_All_Lead : " << e << '\n';
+    cerr << "String in Game::EPEC::add_Dummy_All_Lead : " << e << '\n';
     throw;
   } catch (GRBException &e) {
-    cerr << "GRBException in Models::EPEC::add_Dummy_All_Lead : "
+    cerr << "GRBException in Game::EPEC::add_Dummy_All_Lead : "
          << e.getErrorCode() << ": " << e.getMessage() << '\n';
     throw;
   } catch (exception &e) {
-    cerr << "Exception in Models::EPEC::add_Dummy_All_Lead : " << e.what()
+    cerr << "Exception in Game::EPEC::add_Dummy_All_Lead : " << e.what()
          << '\n';
     throw;
   }
@@ -1284,17 +1289,17 @@ void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
 unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
                                          const arma::vec &x) const {
   if (!this->finalized)
-    throw string("Error in Models::EPEC::Respond: Model not finalized");
+    throw string("Error in Game::EPEC::Respond: Model not finalized");
 
   if (i >= this->nCountr)
-    throw string("Error in Models::EPEC::Respond: Invalid country number");
+    throw string("Error in Game::EPEC::Respond: Invalid country number");
 
   const unsigned int nEPECvars = this->nVarinEPEC;
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
   // this->Locations.at(i).at(Models::LeaderVars::End);
 
   if (x.n_rows != nEPECvars - nThisCountryvars)
-    throw string("Error in Models::EPEC::Respond: Invalid parametrization");
+    throw string("Error in Game::EPEC::Respond: Invalid parametrization");
 
   return this->country_QP.at(i).get()->solveFixed(x);
 }
@@ -1326,13 +1331,12 @@ void Game::EPEC::make_country_QP(const unsigned int i)
   // "
   // << this->AllLeadPars[i].name << '\n';
   if (!this->finalized)
-    throw string("Error in Models::EPEC::make_country_QP: Model not finalized");
+    throw string("Error in Game::EPEC::make_country_QP: Model not finalized");
   if (i >= this->nCountr)
     throw string(
-        "Error in Models::EPEC::make_country_QP: Invalid country number");
+        "Error in Game::EPEC::make_country_QP: Invalid country number");
   if (!this->country_QP.at(i).get()) {
-    Game::LCP Player_i_LCP =
-        Game::LCP(this->env, *this->countries_LL.at(i).get());
+    Game::LCP Player_i_LCP(this->env, *this->countries_LL.at(i).get());
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
     Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(),
                         *this->country_QP.at(i).get());
@@ -1413,3 +1417,5 @@ void Game::EPEC::findNashEq() {
     throw;
   }
 }
+
+void Game::EPEC::iterativeNashE() {}

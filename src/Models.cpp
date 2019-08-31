@@ -1484,6 +1484,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
 }
 
 void Models::EPEC::testQP(const unsigned int i) {
+  /// @todo Are we using Models::EPEC::testQP anywhere? If not remove this.
   QP_Param *QP = this->country_QP.at(i).get();
   arma::vec x;
   x.ones(QP->getNx());
@@ -1515,8 +1516,9 @@ void Models::EPEC::testQP(const unsigned int i) {
 }
 
 void Models::EPEC::testLCP(const unsigned int i) {
+  /// @todo Are we using Models::EPEC::testLCP anywhere? If not remove this.
   auto country = this->get_LowerLevelNash(i);
-  LCP CountryLCP = LCP(this->env, *country);
+  LCP CountryLCP(this->env, *country);
   CountryLCP.write("dat/LCP_" + to_string(i));
   cout << "*** COUNTRY TEST***\n";
   auto model = CountryLCP.LCPasMIP(true);

@@ -55,10 +55,9 @@ void Game::LCP::defConst(GRBEnv *env)
  * to assign default values to some attributes of the class.
  */
 {
-  AllPolyhedra = new vector<vector<short int> *>{};
-  RelAllPol = new vector<vector<short int> *>{};
-  Ai = new vector<arma::sp_mat *>{};
-  bi = new vector<arma::vec *>{};
+  AllPolyhedra = {};
+  // Ai = {};
+  // bi = {};
   this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
   this->env = env;
   this->nR = this->M.n_rows;
@@ -161,20 +160,7 @@ Game::LCP::~LCP()
 /** @brief Destructor of LCP */
 /** LCP object owns the pointers to definitions of its polyhedra that it owns
  It has to be deleted and freed. */
-{
-  for (auto p : *(this->AllPolyhedra))
-    delete p;
-  for (auto p : *(this->RelAllPol))
-    delete p;
-  delete this->AllPolyhedra;
-  delete this->RelAllPol;
-  for (auto a : *(this->Ai))
-    delete a;
-  for (auto b : *(this->bi))
-    delete b;
-  delete Ai;
-  delete bi;
-}
+{}
 
 void Game::LCP::makeRelaxed()
 /** @brief Makes a Gurobi object that relaxes complementarity constraints in an
@@ -717,9 +703,9 @@ Game::LPSolve(const arma::sp_mat &A, ///< The constraint matrix
   return sol;
 }
 
-vector<short int> *
-Game::LCP::anyBranch(const vector<vector<short int> *> *vecOfFixes,
-                     vector<short int> *Fix) const
+vector<short int>
+Game::LCP::anyBranch(const vector<vector<short int>> &vecOfFixes,
+                     const vector<short int> Fix) const
 /** @brief Returns the (grand)child if any (grand)child of @p Fix is in @p
    vecOfFixes else returns @c nullptr  */
 /**
@@ -731,10 +717,10 @@ Game::LCP::anyBranch(const vector<vector<short int> *> *vecOfFixes,
  * grandparent is 0
  */
 {
-  for (auto v : *vecOfFixes)
-    if (*Fix < *v || *v == *Fix)
+  for (auto v : vecOfFixes)
+    if (Fix < v || v == Fix)
       return v;
-  return NULL;
+  return {};
 }
 
 bool Game::LCP::extractSols(
@@ -767,29 +753,29 @@ bool Game::LCP::extractSols(
   return true;
 }
 
-vector<short int> *Game::LCP::solEncode(const arma::vec &z, ///< Equation values
-                                        const arma::vec &x  ///< Variable values
-                                        ) const
+vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
+                                       const arma::vec &x  ///< Variable values
+                                       ) const
 /// @brief Given variable values and equation values, encodes it in 0/+1/-1
 /// format and returns it.
 /// @warning Note that the vector returned by this function might have to be
 /// explicitly deleted using the delete operator. For specific uses in
 /// LCP::BranchAndPrune, this delete is handled by the class destructor.
 {
-  vector<signed short int> *solEncoded = new vector<signed short int>(nR, 0);
+  vector<signed short int> solEncoded(nR, 0);
   for (auto p : Compl) {
     unsigned int i, j;
     i = p.first;
     j = p.second;
     if (isZero(z(i)))
-      solEncoded->at(i)++;
+      solEncoded.at(i)++;
     if (isZero(x(j)))
-      solEncoded->at(i)--;
+      solEncoded.at(i)--;
   };
   return solEncoded;
 }
 
-vector<short int> *Game::LCP::solEncode(GRBModel *model) const
+vector<short int> Game::LCP::solEncode(GRBModel *model) const
 /// @brief Given a Gurobi model, extracts variable values and equation values,
 /// encodes it in 0/+1/-1 format and returns it.
 /// @warning Note that the vector returned by this function might have to be
@@ -805,8 +791,8 @@ vector<short int> *Game::LCP::solEncode(GRBModel *model) const
 
 void Game::LCP::branch(
     int loc, ///< Location (complementarity pair) to be branched at.
-    const vector<short int> *Fixes) ///< What are fixed so far.
-
+    const vector<short int> &Fixes ///< What are fixed so far.
+    )
 /** @brief Branches at a location defined by the caller
  * If loc == nR, then stop branching. We either hit infeasibility or a leaf
  * (i.e., all locations are branched) If loc <0, then branch at abs(loc)
@@ -820,11 +806,11 @@ void Game::LCP::branch(
   bool VarFirst = (loc < 0);
   unique_ptr<GRBModel> FixEqMdl, FixVarMdl;
   // GRBModel *FixEqMdl=nullptr, *FixVarMdl=nullptr;
-  vector<short int> *FixEqLeaf, *FixVarLeaf;
+  vector<short int> FixEqLeaf, FixVarLeaf;
 
   BOOST_LOG_TRIVIAL(debug) << "Branching on Variable: " << loc
                            << " with Fix as ";
-  for (auto t1 : *Fixes)
+  for (auto t1 : Fixes)
     BOOST_LOG_TRIVIAL(debug) << t1 << '\t';
 
   loc = (loc >= 0) ? loc : (loc == -(int)nR ? 0 : -loc);
@@ -834,58 +820,55 @@ void Game::LCP::branch(
     return;
   } else {
     GRBVar x, z;
-    vector<short int> *FixesEq = new vector<short int>(*Fixes);
-    vector<short int> *FixesVar = new vector<short int>(*Fixes);
-    if (Fixes->at(loc) != 0)
+    vector<short int> FixesEq = vector<short int>(Fixes);
+    vector<short int> FixesVar = vector<short int>(Fixes);
+    if (Fixes.at(loc) != 0)
       throw string("Error in LCP::branch: Fixing an already fixed variable!");
-    FixesEq->at(loc) = 1;
-    FixesVar->at(loc) = -1;
+    FixesEq.at(loc) = 1;
+    FixesVar.at(loc) = -1;
     if (VarFirst) {
       FixVarLeaf = anyBranch(AllPolyhedra,
                              FixesVar); // Checking if a feasible solution is
                                         // already found along this branch
-      if (!FixVarLeaf)
+      if (FixVarLeaf.size())
         this->branch(branchLoc(FixVarMdl, FixesVar), FixesVar);
       else
         this->branch(branchProcLoc(FixesVar, FixVarLeaf), FixesVar);
 
       FixEqLeaf = anyBranch(AllPolyhedra, FixesEq);
-      if (!FixEqLeaf)
+      if (FixEqLeaf.size())
         this->branch(branchLoc(FixEqMdl, FixesEq), FixesEq);
       else
         this->branch(branchProcLoc(FixesEq, FixEqLeaf), FixesEq);
     } else {
       FixEqLeaf = anyBranch(AllPolyhedra, FixesEq);
-      if (!FixEqLeaf)
+      if (FixEqLeaf.size())
         this->branch(branchLoc(FixEqMdl, FixesEq), FixesEq);
       else
         this->branch(branchProcLoc(FixesEq, FixEqLeaf), FixesEq);
 
       FixVarLeaf = anyBranch(AllPolyhedra, FixesVar);
-      if (!FixVarLeaf)
+      if (FixVarLeaf.size())
         this->branch(branchLoc(FixVarMdl, FixesVar), FixesVar);
       else
         this->branch(branchProcLoc(FixesVar, FixVarLeaf), FixesVar);
     }
-    delete FixesEq;
-    delete FixesVar;
   }
 }
 
-vector<vector<short int> *> *Game::LCP::BranchAndPrune()
+vector<vector<short int>> Game::LCP::BranchAndPrune()
 /**
  * @brief Calls the complete branch and prune for LCP object.
  * @returns LCP::AllPolyhedra
  */
 {
   unique_ptr<GRBModel> m;
-  vector<short int> *Fix = new vector<short int>(nR, 0);
+  vector<short int> Fix = vector<short int>(nR, 0);
   branch(branchLoc(m, Fix), Fix);
-  delete Fix;
   return AllPolyhedra;
 }
 
-int Game::LCP::branchLoc(unique_ptr<GRBModel> &m, vector<short int> *Fix)
+int Game::LCP::branchLoc(unique_ptr<GRBModel> &m, const vector<short int> &Fix)
 /**
  * @brief Defining the branching rule.
  * @details Solves a gurobi model at some point in the branch and prune tree.
@@ -904,10 +887,10 @@ int Game::LCP::branchLoc(unique_ptr<GRBModel> &m, vector<short int> *Fix)
  */
 {
   static int GurCallCt{0};
-  m = this->LCPasMIP(*Fix, true);
+  m = this->LCPasMIP(Fix, true);
   GurCallCt++;
   BOOST_LOG_TRIVIAL(debug) << "Gurobi call\t" << GurCallCt << "\t";
-  for (auto a : *Fix)
+  for (auto a : Fix)
     BOOST_LOG_TRIVIAL(debug) << a << "\t";
   int pos;
   pos = (signed int)
@@ -916,12 +899,12 @@ int Game::LCP::branchLoc(unique_ptr<GRBModel> &m, vector<short int> *Fix)
   if (this->extractSols(m.get(), z, x,
                         true)) // If already infeasible, nothing to branch!
   {
-    vector<short int> *v1 = this->solEncode(z, x);
+    vector<short int> v1 = this->solEncode(z, x);
     BOOST_LOG_TRIVIAL(debug) << "v1: \t\t\t";
-    for (auto a : *v1)
+    for (auto a : v1)
       BOOST_LOG_TRIVIAL(debug) << a << '\t';
 
-    this->AllPolyhedra->push_back(v1);
+    this->AllPolyhedra.push_back(v1);
     this->FixToPolies(v1);
 
     BOOST_LOG_TRIVIAL(debug) << "New Polyhedron found";
@@ -936,13 +919,13 @@ int Game::LCP::branchLoc(unique_ptr<GRBModel> &m, vector<short int> *Fix)
     for (unsigned int i = 0; i < nR; i++) {
       unsigned int varPos = i >= this->LeadStart ? i + nLeader : i;
       if (x(varPos) > maxvalx &&
-          Fix->at(i) == 0) // If already fixed, it makes no sense!
+          Fix.at(i) == 0) // If already fixed, it makes no sense!
       {
         maxvalx = x(varPos);
         maxposx = (i == 0) ? -nR : -i; // Negative of 0 is -nR by convention
       }
       if (z(i) > maxvalz &&
-          Fix->at(i) == 0) // If already fixed, it makes no sense!
+          Fix.at(i) == 0) // If already fixed, it makes no sense!
       {
         maxvalz = z(i);
         maxposz = i;
@@ -958,7 +941,8 @@ int Game::LCP::branchLoc(unique_ptr<GRBModel> &m, vector<short int> *Fix)
   return pos;
 }
 
-int Game::LCP::branchProcLoc(vector<short int> *Fix, vector<short int> *Leaf)
+int Game::LCP::branchProcLoc(const vector<short int> &Fix,
+                             const vector<short int> &Leaf) const
 /**
  * @brief Branching choice, if we are at a processed node
  * @details When at processed node, we know that the node definitely has a
@@ -970,16 +954,16 @@ int Game::LCP::branchProcLoc(vector<short int> *Fix, vector<short int> *Leaf)
   int pos = (int)nR;
 
   BOOST_LOG_TRIVIAL(debug) << "Processed Node \t\t";
-  for (auto a : *Fix)
+  for (auto a : Fix)
     BOOST_LOG_TRIVIAL(debug) << a << "\t";
 
-  if (*Fix == *Leaf)
+  if (Fix == Leaf)
     return nR;
-  if (Fix->size() != Leaf->size())
+  if (Fix.size() != Leaf.size())
     throw "Error in branchProcLoc";
-  for (unsigned int i = 0; i < Fix->size(); i++) {
-    int l = Leaf->at(i);
-    if (Fix->at(i) == 0)
+  for (unsigned int i = 0; i < Fix.size(); i++) {
+    int l = Leaf.at(i);
+    if (Fix.at(i) == 0)
       return (l == 0 ? -i : i * l);
   }
   return pos;
@@ -987,17 +971,16 @@ int Game::LCP::branchProcLoc(vector<short int> *Fix, vector<short int> *Leaf)
 
 Game::LCP &Game::LCP::FixToPoly(
     const vector<short int>
-        *Fix,       ///< A vector of +1 and -1 referring to which equations and
+        Fix,        ///< A vector of +1 and -1 referring to which equations and
                     ///< variables are taking 0 value.
     bool checkFeas, ///< The polyhedron is added after ensuring feasibility, if
                     ///< this is true
     bool custom,    ///< Should the polyhedra be pushed into a custom vector of
                     ///< polyhedra as opposed to LCP::Ai and LCP::bi
-    vector<arma::sp_mat *>
-        *custAi, ///< If custom polyhedra vector is used, pointer to vector of
-                 ///< LHS constraint matrix
-    vector<arma::vec *> *custbi /// If custom polyhedra vector is used, pointer
-                                /// to vector of RHS of constraints
+    spmat_Vec *custAi, ///< If custom polyhedra vector is used, pointer to
+                       ///< vector of LHS constraint matrix
+    vec_Vec *custbi    /// If custom polyhedra vector is used, pointer
+                       /// to vector of RHS of constraints
     )
 /** @brief Computes the equation of the feasibility polyhedron corresponding to
  *the given @p Fix
@@ -1014,13 +997,15 @@ Game::LCP &Game::LCP::FixToPoly(
 {
   BOOST_LOG_TRIVIAL(trace) << "\tChecking feasibility for polyhedron "
                            << to_string(++this->polyCounter);
-  arma::sp_mat *Aii = new arma::sp_mat(nR, nC);
-  arma::vec *bii = new arma::vec(nR, arma::fill::zeros);
+  unique_ptr<arma::sp_mat> Aii =
+      unique_ptr<arma::sp_mat>(new arma::sp_mat(nR, nC));
+  unique_ptr<arma::vec> bii =
+      unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
   for (unsigned int i = 0; i < this->nR; i++) {
-    if (Fix->at(i) == 0)
+    if (Fix.at(i) == 0)
       throw string(
           "Error in Game::LCP::FixToPoly. 0s not allowed in argument vector");
-    if (Fix->at(i) == 1) // Equation to be fixed top zero
+    if (Fix.at(i) == 1) // Equation to be fixed top zero
     {
       for (auto j = this->M.begin_row(i); j != this->M.end_row(i); ++j)
         if (!this->isZero((*j)))
@@ -1040,24 +1025,22 @@ Game::LCP &Game::LCP::FixToPoly(
     unsigned int count{0};
     try {
       makeRelaxed();
-      GRBModel *model = new GRBModel(this->RlxdModel);
-      for (auto i : *Fix) {
+      GRBModel model (this->RlxdModel);
+      for (auto i : Fix) {
         if (i > 0)
-          model->getVarByName("z_" + to_string(count))
+          model.getVarByName("z_" + to_string(count))
               .set(GRB_DoubleAttr_UB, 0);
         if (i < 0)
-          model
-              ->getVarByName("x_" + to_string(count >= this->LeadStart
+          model.getVarByName("x_" + to_string(count >= this->LeadStart
                                                   ? count + nLeader
                                                   : count))
               .set(GRB_DoubleAttr_UB, 0);
         count++;
       }
-      model->set(GRB_IntParam_OutputFlag, VERBOSE);
-      model->optimize();
-      if (model->get(GRB_IntAttr_Status) == GRB_OPTIMAL)
+      model.set(GRB_IntParam_OutputFlag, VERBOSE);
+      model.optimize();
+      if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL)
         add = true;
-      delete model;
     } catch (const char *e) {
       cerr << "Error in Game::LCP::FixToPoly: " << e << '\n';
       throw;
@@ -1074,25 +1057,26 @@ Game::LCP &Game::LCP::FixToPoly(
     }
   }
   if (add) {
-    custom ? (custAi->push_back(Aii)) : (this->Ai->push_back(Aii));
-    custom ? custbi->push_back(bii) : this->bi->push_back(bii);
+    custom ? (custAi->push_back(std::move(Aii)))
+           : (this->Ai->push_back(std::move(Aii)));
+    custom ? custbi->push_back(std::move(bii))
+           : this->bi->push_back(std::move(bii));
   }
   return *this;
 }
 
 Game::LCP &Game::LCP::FixToPolies(
     const vector<short int>
-        *Fix, ///< A vector of +1, 0 and -1 referring to which equations and
-              ///< variables are taking 0 value.
+        Fix, ///< A vector of +1, 0 and -1 referring to which equations and
+             ///< variables are taking 0 value.
     bool checkFeas, ///< The polyhedron is added after ensuring feasibility, if
                     ///< this is true
     bool custom,    ///< Should the polyhedra be pushed into a custom vector of
                     ///< polyhedra as opposed to LCP::Ai and LCP::bi
-    vector<arma::sp_mat *>
-        *custAi, ///< If custom polyhedra vector is used, pointer to vector of
-                 ///< LHS constraint matrix
-    vector<arma::vec *> *custbi /// If custom polyhedra vector is used, pointer
-                                /// to vector of RHS of constraints
+    spmat_Vec *custAi, ///< If custom polyhedra vector is used, pointer to
+                       ///< vector of LHS constraint matrix
+    vec_Vec *custbi    /// If custom polyhedra vector is used, pointer
+                       /// to vector of RHS of constraints
     )
 /** @brief Computes the equation of the feasibility polyhedron corresponding to
  *the given @p Fix
@@ -1110,7 +1094,7 @@ Game::LCP &Game::LCP::FixToPolies(
  */
 {
   bool flag = false;
-  vector<short int> MyFix(*Fix);
+  vector<short int> MyFix(Fix);
   /*
   if (VERBOSE) {
       for (const auto v:MyFix) cout << v << " ";
@@ -1119,16 +1103,16 @@ Game::LCP &Game::LCP::FixToPolies(
   */
   unsigned int i;
   for (i = 0; i < this->nR; i++) {
-    if (Fix->at(i) == 0) {
+    if (Fix.at(i) == 0) {
       flag = true;
       break;
     }
   }
   if (flag) {
     MyFix[i] = 1;
-    this->FixToPolies(&MyFix, checkFeas, custom, custAi, custbi);
+    this->FixToPolies(MyFix, checkFeas, custom, custAi, custbi);
     MyFix[i] = -1;
-    this->FixToPolies(&MyFix, checkFeas, custom, custAi, custbi);
+    this->FixToPolies(MyFix, checkFeas, custom, custAi, custbi);
   } else
     this->FixToPoly(Fix, checkFeas, custom, custAi, custbi);
   return *this;
@@ -1144,26 +1128,27 @@ Game::LCP &Game::LCP::EnumerateAll(
  * Th ese are always added to LCP::Ai and LCP::bi
  */
 {
-  delete Ai;
-  delete bi; // Just in case it is polluted with BranchPrune
-  Ai = new vector<arma::sp_mat *>{};
-  bi = new vector<arma::vec *>{};
-  vector<short int> *Fix = new vector<short int>(nR, 0);
+  // delete Ai;
+  // delete bi; // Just in case it is polluted with BranchPrune
+  // Ai = new vector<arma::sp_mat *>{};
+  // bi = new vector<arma::vec *>{};
+  vector<short int> Fix = vector<short int>(nR, 0);
   this->FixToPolies(Fix, solveLP);
   return *this;
 }
 
 Game::LCP &Game::LCP::addPolyhedron(
-    const vector<short int> &Fix, ///< +1/0/-1 Representation of the polyhedra
-                                  ///< which needed to be pushed
-    vector<arma::sp_mat *>
-        &custAi, ///< Vector with LHS of constraint matrix should be pushed.
-    vector<arma::vec *>
-        &custbi,     ///< Vector with RHS of constraints should be pushed.
-    arma::sp_mat *A, ///< Location where convex hull LHS has to be stored
-    arma::vec *b     ///< Location where convex hull RHS has to be stored
+    const vector<short int> &Fix, ///< [in] +1/0/-1 Representation of the
+                                  ///< polyhedra which needed to be pushed
+    vector<unique_ptr<arma::sp_mat>>
+        &custAi, ///< [out] Vector with LHS of constraint matrix should be
+                 ///< pushed.
+    vector<unique_ptr<arma::vec>>
+        &custbi,     ///< [out] Vector with RHS of constraints should be pushed.
+    arma::sp_mat *A, ///< [out] Location where convex hull LHS has to be stored
+    arma::vec *b     ///< [out] Location where convex hull RHS has to be stored
 ) {
-  this->FixToPolies(&Fix, true, true, &custAi, &custbi);
+  this->FixToPolies(Fix, true, true, &custAi, &custbi);
 
   if (custAi.empty()) {
     cerr << "Empty vector of polyhedra given! Problem might be infeasible."
@@ -1176,7 +1161,20 @@ Game::LCP &Game::LCP::addPolyhedron(
     arma::sp_mat A_common;
     A_common = arma::join_cols(this->_A, -this->M);
     arma::vec b_common = arma::join_cols(this->_b, this->q);
-    Game::ConvexHull(&custAi, &custbi, *A, *b, A_common, b_common);
+    const vector<arma::sp_mat *> tempAi =
+        [](vector<unique_ptr<arma::sp_mat>> &uv) {
+          vector<arma::sp_mat *> v{};
+          for (const auto &x : uv)
+            v.push_back(x.get());
+          return v;
+        }(custAi);
+    const vector<arma::vec *> tempbi = [](vector<unique_ptr<arma::vec>> &uv) {
+      vector<arma::vec *> v{};
+      for (const auto &x : uv)
+        v.push_back(x.get());
+      return v;
+    }(custbi);
+    Game::ConvexHull(&tempAi, &tempbi, *A, *b, A_common, b_common);
   }
   return *this;
 }
@@ -1184,9 +1182,9 @@ Game::LCP &Game::LCP::addPolyhedron(
 Game::LCP &Game::LCP::makeQP(
     const vector<short int> &Fix, ///< +1/0/-1 Representation of the polyhedron
                                   ///< which needed to be pushed
-    vector<arma::sp_mat *>
+    vector<unique_ptr<arma::sp_mat>>
         &custAi, ///< Vector with LHS of constraint matrix should be pushed.
-    vector<arma::vec *>
+    vector<unique_ptr<arma::vec>>
         &custbi, ///< Vector with RHS of constraints should be pushed.
     Game::QP_objective
         &QP_obj, ///< The objective function of the QP to be returned. @warning
@@ -1214,8 +1212,8 @@ Game::LCP &Game::LCP::makeQP(
 }
 
 Game::LCP &Game::LCP::makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP) {
-  vector<arma::sp_mat *> custAi{};
-  vector<arma::vec *> custbi{};
+  vector<unique_ptr<arma::sp_mat>> custAi{};
+  vector<unique_ptr<arma::vec>> custbi{};
   vector<short int> Fix =
       vector<short int>(this->getCompl().size(), 0); // Complete enumeration
   return this->makeQP(Fix, custAi, custbi, QP_obj, QP);

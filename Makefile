@@ -42,7 +42,7 @@ GUROPT=$(GURINC)
 # GCC=g++
 GCC=g++-4.8
 #OTHEROPTS= -O2 -std=c++11 -I include/
-OTHEROPTS= -O3 -std=c++11 -I include/ -Wall -Wpedantic #-Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wconversion 
+OTHEROPTS= -O3 -std=c++11 -I include/ #-Wall -Wextra -Wpedantic #-Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wconversion 
 OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS) $(BOOSTOPT) 
 LINKOPTS=$(GURLIB) $(ARMALIB) $(BOOSTLIB)
 

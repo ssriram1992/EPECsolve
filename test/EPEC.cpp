@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_MESSAGE(qq(1) == -95, "checking rhs coefficient in Q-LCP (1)");
 
         BOOST_TEST_MESSAGE("LCP.LCPasMIP test");
-        Game::LCP lcp = Game::LCP(&env, Nash);
+        Game::LCP lcp (&env, Nash);
         unique_ptr<GRBModel> lcpmodel = lcp.LCPasMIP(true);
 
         // int Nvar = Nash.getNprimals() + Nash.getNduals() + Nash.getNshadow() + Nash.getNleaderVars();
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         BOOST_CHECK_NO_THROW(lcp.save("test/lcp.dat"));
 
         LCP lcp2(&env);
-        lcp2.load("test/lcp.dat");
+        // lcp2.load("test/lcp.dat");
         BOOST_CHECK_NO_THROW(lcp2.load("test/lcp.dat"));
         BOOST_CHECK_NO_THROW(lcp2.save("test/lcp2.dat"));
 
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_SUITE(Core__Tests)
         b(1) = 12;
         // Creating the LCP object
         GRBEnv env;
-        LCP lcp = LCP(&env, M, q, 1, 1, A, b);
+        LCP lcp (&env, M, q, 1, 1, A, b);
     }
 
     BOOST_AUTO_TEST_CASE(ConvexHull_test) {

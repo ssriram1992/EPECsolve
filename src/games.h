@@ -462,6 +462,7 @@ public:                  // functions
   virtual void make_country_QP() = 0;
   virtual void finalize() final;
   virtual void findNashEq() final;
+  virtual void iterativeNashE() final;
 
   unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn) const;

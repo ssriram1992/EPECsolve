@@ -1,4 +1,4 @@
-#ifndef LCPTOLP_H
+#pragma once
 #define LCPTOLP_H
 
 #include "epecsolve.h"
@@ -31,7 +31,11 @@ void compConvSize(arma::sp_mat &A, const unsigned int nFinCons,
  * Also provides the convex hull of the feasible space, restricted feasible
  * space etc.
  */
+
 class LCP {
+  using spmat_Vec = std::vector<unique_ptr<arma::sp_mat>>;
+  using vec_Vec = std::vector<unique_ptr<arma::vec>>;
+
 private:
   // Essential data ironment for MIP/LP solves
   GRBEnv *env;    ///< Gurobi env
@@ -49,9 +53,9 @@ private:
   int feasiblePolyhedra{-1};
   /// LCP feasible region is a union of polyhedra. Keeps track which of those
   /// inequalities are fixed to equality to get the individual polyhedra
-  vector<vector<short int> *> *AllPolyhedra, *RelAllPol;
-  vector<arma::sp_mat *> *Ai, *Rel_Ai;
-  vector<arma::vec *> *bi, *Rel_bi;
+  vector<vector<short int>> AllPolyhedra;
+  unique_ptr<spmat_Vec> Ai;
+  unique_ptr<vec_Vec> bi;
   GRBModel RlxdModel; ///< A gurobi model with all complementarity constraints
                       ///< removed.
 
@@ -79,28 +83,29 @@ private:
     return (val > -eps && val < eps);
   }
 
-  inline vector<short int> *solEncode(GRBModel *model) const;
+  inline vector<short int> solEncode(GRBModel *model) const;
 
-  vector<short int> *solEncode(const arma::vec &z, const arma::vec &x) const;
+  vector<short int> solEncode(const arma::vec &z, const arma::vec &x) const;
 
-  void branch(int loc, const vector<short int> *Fixes);
+  void branch(int loc, const vector<short int> &Fixes);
 
-  vector<short int> *anyBranch(const vector<vector<short int> *> *vecOfFixes,
-                               vector<short int> *Fix) const;
+  vector<short int> anyBranch(const vector<vector<short int>> &vecOfFixes,
+                              const vector<short int> Fix) const;
 
-  int branchLoc(unique_ptr<GRBModel> &m, vector<short int> *Fix);
+  int branchLoc(unique_ptr<GRBModel> &m, const vector<short int> &Fix);
 
-  int branchProcLoc(vector<short int> *Fix, vector<short int> *Leaf);
+  int branchProcLoc(const vector<short int> &Fix,
+                    const vector<short int> &Leaf) const;
 
   LCP &EnumerateAll(bool solveLP = false);
 
-  LCP &FixToPoly(const vector<short int> *Fix, bool checkFeas = false,
-                 bool custom = false, vector<arma::sp_mat *> *custAi = {},
-                 vector<arma::vec *> *custbi = {});
+  LCP &FixToPoly(const vector<short int> Fix, bool checkFeas = false,
+                 bool custom = false, spmat_Vec *custAi = {},
+                 vec_Vec *custbi = {});
 
-  LCP &FixToPolies(const vector<short int> *Fix, bool checkFeas = false,
-                   bool custom = false, vector<arma::sp_mat *> *custAi = {},
-                   vector<arma::vec *> *custbi = {});
+  LCP &FixToPolies(const vector<short int> Fix, bool checkFeas = false,
+                   bool custom = false, spmat_Vec *custAi = {},
+                   vec_Vec *custbi = {});
 
 public:
   // Fudgible data
@@ -158,7 +163,7 @@ public:
   bool extractSols(GRBModel *model, arma::vec &z, arma::vec &x,
                    bool extractZ = false) const;
 
-  vector<vector<short int> *> *BranchAndPrune();
+  vector<vector<short int>> BranchAndPrune();
 
   /* Getting single point solutions */
   unique_ptr<GRBModel> LCPasQP(bool solve = false);
@@ -175,10 +180,8 @@ public:
                                   bool solve = false);
 
   /* Convex hull computation */
-  LCP &addPolyhedron(const vector<short int> &Fix,
-                     vector<arma::sp_mat *> &custAi,
-                     vector<arma::vec *> &custbi, arma::sp_mat *A = {},
-                     arma::vec *b = {});
+  LCP &addPolyhedron(const vector<short int> &Fix, spmat_Vec &custAi,
+                     vec_Vec &custbi, arma::sp_mat *A = {}, arma::vec *b = {});
 
   int ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description LHS to
                                   ///< be stored here
@@ -188,11 +191,25 @@ public:
    * Computes the convex hull of the feasible region of the LCP
    */
   {
-    return Game::ConvexHull(this->Ai, this->bi, A, b, this->_A, this->_b);
+    const vector<arma::sp_mat *> tempAi = [](spmat_Vec &uv) {
+      vector<arma::sp_mat *> v{};
+      for (const auto &x : uv)
+        v.push_back(x.get());
+      return v;
+    }(*this->Ai);
+    const vector<arma::vec *> tempbi = [](vec_Vec &uv) {
+      vector<arma::vec *> v{};
+      std::for_each(
+          uv.begin(), uv.end(),
+          [&v](const unique_ptr<arma::vec> &ptr) { v.push_back(ptr.get()); });
+      return v;
+    }(*this->bi);
+    return Game::ConvexHull(&tempAi, &tempbi, A, b, this->_A, this->_b);
   };
 
-  LCP &makeQP(const vector<short int> &Fix, vector<arma::sp_mat *> &custAi,
-              vector<arma::vec *> &custbi, Game::QP_objective &QP_obj,
+  LCP &makeQP(const vector<short int> &Fix,
+              vector<unique_ptr<arma::sp_mat>> &custAi,
+              vector<unique_ptr<arma::vec>> &custbi, Game::QP_objective &QP_obj,
               Game::QP_Param &QP);
 
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
@@ -206,7 +223,6 @@ public:
   long int load(string filename, long int pos = 0);
 };
 } // namespace Game
-#endif
 
 /* Example for LCP  */
 /**
