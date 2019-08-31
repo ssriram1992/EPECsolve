@@ -197,7 +197,7 @@ public:
 
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
 
-  const int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
+  int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 
   void write(string filename, bool append = true) const;
 
@@ -205,7 +205,7 @@ public:
 
   long int load(string filename, long int pos = 0);
 };
-}; // namespace Game
+} // namespace Game
 #endif
 
 /* Example for LCP  */

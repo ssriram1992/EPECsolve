@@ -57,6 +57,6 @@ void appendSave(const unsigned int v, const string out,
 long int appendRead(unsigned int &v, const string in, long int pos,
                     const string header = "");
 
-}; // namespace Utils
+} // namespace Utils
 
 #endif

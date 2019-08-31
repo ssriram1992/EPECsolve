@@ -372,7 +372,7 @@ ostream &operator<<(ostream &os, const QP_Param &Q);
 ostream &operator<<(ostream &ost, const perps &C);
 
 void print(const perps &C);
-}; // namespace Game
+} // namespace Game
 
 // The EPEC stuff
 namespace Game {
@@ -473,7 +473,7 @@ public:                  // functions
     return this->Stats;
   }
 };
-}; // namespace Game
+} // namespace Game
 
 #endif
 

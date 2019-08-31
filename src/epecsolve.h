@@ -37,10 +37,10 @@ class NashGame;
 class LCP;
 
 class EPEC;
-}; // namespace Game
+} // namespace Game
 namespace Models {
 class EPEC;
-};
+}
 
 #include "games.h"
 #include "lcptolp.h"

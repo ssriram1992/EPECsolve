@@ -1,5 +1,7 @@
 Archive.cpp
 bin/
+build/
+CMakeFiles/
 cmake-*
 cmake-build-debug/*
 *.dat

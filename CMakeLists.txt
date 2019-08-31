@@ -23,7 +23,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 ############################################
 ################ DO NOT MODIFY #############
 ############################################
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 project(EPECsolve)
 add_compile_options(-std=c++11)
 set(CMAKE_CXX_STANDARD 14)
@@ -41,6 +41,7 @@ if (NOT GUROBI_FOUND)
 
     set(SEARCH_PATHS_FOR_LIBRARIES
         "$ENV{GUROBI_HOME}/lib"
+		"/opt/gurobi811/linux64/lib"
         "${GUROBI_PATH_MAC}/lib"
         "${GUROBI_PATH_LINUX}/lib"
         "${GUROBI_PATH_WINDOWS}/lib"

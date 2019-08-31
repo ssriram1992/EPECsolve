@@ -268,7 +268,7 @@ public: // Attributes
   }
 };
 
-}; // namespace Models
+} // namespace Models
 
 // Gurobi functions
 string to_string(const GRBVar &var);
@@ -280,7 +280,7 @@ namespace Models {
 enum class prn { label, val };
 
 ostream &operator<<(ostream &ost, Models::prn l);
-}; // namespace Models
+} // namespace Models
 
 #endif
 
