@@ -505,6 +505,9 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
       this->make_LL_QP(Params, follower, Foll.get(), Loc);
       Players.push_back(Foll);
     }
+    // Make Leader Constraints
+    this->make_LL_LeadCons(LeadCons, LeadRHS, Params, Loc, import_lim_cons,
+                           export_lim_cons, price_lim_cons, activeTaxCaps);
   } catch (const char *e) {
     cerr << e << '\n';
     throw;
@@ -514,25 +517,6 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   } catch (GRBException &e) {
     cerr << "GRBException in Models::EPEC::addCountry : " << e.getErrorCode()
          << ": " << e.getMessage() << '\n';
-    throw;
-  } catch (exception &e) {
-    cerr << "Exception in Models::EPEC::addCountry : " << e.what() << '\n';
-    throw;
-  }
-
-  // Make Leader Constraints
-  try {
-    this->make_LL_LeadCons(LeadCons, LeadRHS, Params, Loc, import_lim_cons,
-                           export_lim_cons, price_lim_cons, activeTaxCaps);
-  } catch (const char *e) {
-    cerr << e << '\n';
-    throw;
-  } catch (string e) {
-    cerr << "String: " << e << '\n';
-    throw;
-  } catch (GRBException &e) {
-    cerr << "GRBException: " << e.getErrorCode() << ": " << e.getMessage()
-         << '\n';
     throw;
   } catch (exception &e) {
     cerr << "Exception in Models::EPEC::addCountry : " << e.what() << '\n';

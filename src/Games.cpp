@@ -17,10 +17,6 @@ bool Game::isZero(arma::mat M, double tol) {
 bool Game::isZero(arma::sp_mat M, double tol) {
   return (arma::min(arma::min(abs(M))) <= tol);
 }
-// bool Game::isZero(arma::vec M, double tol)
-// {
-// return(arma::min(abs(M)) <= tol);
-// }
 
 template <class T> ostream &operator<<(ostream &ost, vector<T> v) {
   for (auto elem : v)
@@ -65,7 +61,6 @@ void Game::MP_Param::write(string filename, bool) const {
 }
 
 void Game::QP_Param::write(string filename, bool append) const {
-  // this->MP_Param::write(filename, append);
   ofstream file;
   file.open(filename, append ? ios::app : ios::out);
   file << *this;
@@ -127,7 +122,6 @@ Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars,
     }
     break;
   };
-
   return *this;
 }
 
@@ -191,9 +185,7 @@ Game::MP_Param &Game::MP_Param::set(QP_objective &&obj, QP_constraints &&cons) {
   return this->set(obj.Q, obj.C, cons.A, cons.B, obj.c, cons.b);
 }
 
-bool Game::MP_Param::dataCheck(
-    bool forcesymm ///< Check if MP_Param::Q is symmetric
-    ) const
+bool Game::MP_Param::dataCheck(bool forcesymm) const
 /** @brief Check that the data for the MP_Param class is valid
  * Always works after calls to MP_Param::size()
  * Checks that are done:
@@ -240,7 +232,6 @@ bool Game::MP_Param::dataCheck(const QP_objective &obj,
   unsigned int Ny = obj.Q.n_rows;
   unsigned int Nx = obj.C.n_cols;
   unsigned int Ncons = cons.b.size();
-
   if (checkobj && obj.Q.n_cols != Ny) {
     return false;
   }
@@ -304,20 +295,19 @@ int Game::QP_Param::make_yQy()
   return 0;
 }
 
-unique_ptr<GRBModel>
-Game::QP_Param::solveFixed(arma::vec x ///< Other players' decisions
-                           )
-/**
- * Given a value for the parameters @f$x@f$ in the definition of QP_Param, solve
- * the parameterized quadratic program to  optimality.
- *
- * In terms of game theory, this can be viewed as <i>the best response</i> for a
- * set of decisions by other players.
- *
- */
+unique_ptr<GRBModel> Game::QP_Param::solveFixed(
+    arma::vec x ///< Other players' decisions
+    )           /**
+                 * Given a value for the parameters @f$x@f$ in the definition of QP_Param,
+                 * solve           the parameterized quadratic program to  optimality.
+                 *
+                 * In terms of game theory, this can be viewed as <i>the best response</i>
+                 * for a           set of decisions by other players.
+                 *
+                 */
 {
-  this->make_yQy();
-  /// @throws GRBException if argument vector size is not compatible with the
+  this->make_yQy(); /// @throws GRBException if argument vector size is not
+                    /// compatible with the
   /// Game::QP_Param definition.
   if (x.size() != this->Nx)
     throw "Invalid argument size: " + to_string(x.size()) +
@@ -392,10 +382,8 @@ Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars,
          << '\n';
     throw;
   }
-
   return *this;
 }
-
 unsigned int Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N,
                                  arma::vec &q) const
 /// @brief Compute the KKT conditions for the given QP
@@ -533,7 +521,6 @@ long int Game::QP_Param::load(string filename, long int pos) {
   this->set(Q, C, A, B, c, b);
   return pos;
 }
-
 Game::NashGame::NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players,
                          arma::sp_mat MC, arma::vec MCRHS,
                          unsigned int n_LeadVar, arma::sp_mat LeadA,
@@ -545,8 +532,7 @@ Game::NashGame::NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players,
  * QP_Param, defining each player's game
  * A set of Market clearing constraints and its RHS
  * And if there are leader variables, the number of leader vars.
- */
-/**
+ * @details
  * Have a vector of pointers to Game::QP_Param ready such that
  * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
@@ -569,7 +555,6 @@ Game::NashGame::NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players,
   // Setting the size of class variable vectors
   this->primal_position.resize(this->Nplayers + 1);
   this->dual_position.resize(this->Nplayers + 1);
-
   this->set_positions();
 }
 
@@ -614,16 +599,13 @@ long int Game::NashGame::load(string filename, long int pos) {
   if (!this->env)
     throw string("Error in NashGame::load: To load NashGame from file, it has "
                  "to be constructed using NashGame(GRBEnv*) constructor");
-
   string headercheck;
   pos = Utils::appendRead(headercheck, filename, pos);
   if (headercheck != "NashGame")
     throw string("Error in NashGame::load: In valid header - ") + headercheck;
-
   unsigned int Nplayers;
   pos =
       Utils::appendRead(Nplayers, filename, pos, string("NashGame::Nplayers"));
-
   vector<shared_ptr<QP_Param>> Players;
   Players.resize(Nplayers);
   for (unsigned int i = 0; i < Nplayers; ++i) {
@@ -632,26 +614,20 @@ long int Game::NashGame::load(string filename, long int pos) {
     Players.at(i) = temp;
     pos = Players.at(i)->load(filename, pos);
   }
-
   arma::sp_mat MarketClearing;
   pos = Utils::appendRead(MarketClearing, filename, pos,
                           string("NashGame::MarketClearing"));
-
   arma::vec MCRHS;
   pos = Utils::appendRead(MCRHS, filename, pos, string("NashGame::MCRHS"));
-
   arma::sp_mat LeaderConstraints;
   pos = Utils::appendRead(LeaderConstraints, filename, pos,
                           string("NashGame::LeaderConstraints"));
-
   arma::vec LeaderConsRHS;
   pos = Utils::appendRead(LeaderConsRHS, filename, pos,
                           string("NashGame::LeaderConsRHS"));
-
   unsigned int n_LeadVar;
   pos = Utils::appendRead(n_LeadVar, filename, pos,
                           string("NashGame::n_LeadVar"));
-
   // Setting the class variables
   this->n_LeadVar = n_LeadVar;
   this->Players = Players;
@@ -661,9 +637,7 @@ long int Game::NashGame::load(string filename, long int pos) {
   // Setting the size of class variable vectors
   this->primal_position.resize(this->Nplayers + 1);
   this->dual_position.resize(this->Nplayers + 1);
-
   this->set_positions();
-
   return pos;
 }
 
@@ -698,14 +672,14 @@ void Game::NashGame::set_positions()
   dual_position.at(Nplayers) = (dl_cnt);
 
   /*
-  if (VERBOSE) {
-      cout << "Primals: ";
-      for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i)
-  << " "; cout << "---MC_Dual:" << MC_dual_position << "---Leader: " <<
-  Leader_position << "Duals: "; for (unsigned int i = 0; i < Nplayers + 1; i++)
-  cout << dual_position.at(i) << " "; cout << '\n';
-  }
-  */
+if (VERBOSE) {
+    cout << "Primals: ";
+    for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i)
+<< " "; cout << "---MC_Dual:" << MC_dual_position << "---Leader: " <<
+Leader_position << "Duals: "; for (unsigned int i = 0; i < Nplayers + 1; i++)
+cout << dual_position.at(i) << " "; cout << '\n';
+}
+*/
 }
 
 const Game::NashGame &Game::NashGame::FormulateLCP(
@@ -720,14 +694,14 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
   /// @warning Does not return the leader constraints. Use
   /// NashGame::RewriteLeadCons() to handle them
   /**
-   * Computes the KKT conditions for each Player, calling QP_Param::KKT.
-   Arranges them systematically to return M, q
-   * as an LCP @f$0\leq q \perp Mx+q \geq 0 @f$.
-           The way the variables of the players get distributed is shown in the
-   image below
-           @image html FormulateLCP.png
-           @image latex FormulateLCP.png
-   */
+ * Computes the KKT conditions for each Player, calling QP_Param::KKT.
+ Arranges them systematically to return M, q
+ * as an LCP @f$0\leq q \perp Mx+q \geq 0 @f$.
+         The way the variables of the players get distributed is shown in the
+ image below
+         @image html FormulateLCP.png
+         @image latex FormulateLCP.png
+ */
 
   // To store the individual KKT conditions for each player.
   vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers);
@@ -740,7 +714,6 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
   M.zeros(NvarFollow, NvarLead);
   q.zeros(NvarFollow);
   // Get the KKT conditions for each player
-  //
 
   for (unsigned int i = 0; i < Nplayers; i++) {
     // cout << "-----Player " << i << '\n';
@@ -751,41 +724,19 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     // Adding the primal equations
     // Region 1 in Formulate LCP.ipe
     if (i > 0) { // For the first player, no need to add anything 'before' 0-th
-                 // position
-      // cout << "Region 1" << '\n';
-      // cout << "\tM(" << this->primal_position.at(i) << "," << 0 << "," <<
-      // this->primal_position.at(i + 1) - 1
-      // << "-"
-      // << this->primal_position.at(i) - 1 << ")" << '\n';
-      // cout << "\t(" << 0 << "," << 0 << "-" << Nprim - 1 << "," <<
-      // this->primal_position.at(i) - 1 << ")" << '\n';
+      // position
       M.submat(this->primal_position.at(i), 0,
                this->primal_position.at(i + 1) - 1,
                this->primal_position.at(i) - 1) =
           Ni[i].submat(0, 0, Nprim - 1, this->primal_position.at(i) - 1);
     }
     // Region 2 in Formulate LCP.ipe
-    // cout << "Region 2" << '\n';
-    // cout << "\tM(" << this->primal_position.at(i) << "," <<
-    // this->primal_position.at(i) << "-"
-    // << this->primal_position.at(i + 1) - 1 << "-" <<
-    // this->primal_position.at(i + 1) - 1 << ")" << '\n'; cout << "\t(" << 0 <<
-    // "," << 0 << "-" << Nprim - 1 << "," << Nprim - 1 << ")" << '\n';
     M.submat(this->primal_position.at(i), this->primal_position.at(i),
              this->primal_position.at(i + 1) - 1,
              this->primal_position.at(i + 1) - 1) =
         Mi[i].submat(0, 0, Nprim - 1, Nprim - 1);
     // Region 3 in Formulate LCP.ipe
     if (this->primal_position.at(i + 1) != this->dual_position.at(0)) {
-      // cout << "Region 3" << '\n';
-      // cout << "\tM(" << this->primal_position.at(i) << "," <<
-      // this->primal_position.at(i + 1) << "-"
-      // << this->primal_position.at(i + 1) - 1 << "-" <<
-      // this->dual_position.at(0) - 1 << ")" << '\n'; cout << "\t(" << 0 << ","
-      // << this->primal_position.at(i) << "-" << Nprim - 1 << "," <<
-      // Ni[i].n_cols - 1
-      // << ")"
-      // << '\n';
       M.submat(this->primal_position.at(i), this->primal_position.at(i + 1),
                this->primal_position.at(i + 1) - 1,
                this->dual_position.at(0) - 1) =
@@ -794,13 +745,6 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     }
     // Region 4 in Formulate LCP.ipe
     if (this->dual_position.at(i) != this->dual_position.at(i + 1)) {
-      // cout << "Region 4" << '\n';
-      // cout << "\tM(" << this->primal_position.at(i) << "," <<
-      // this->dual_position.at(i) << "-"
-      // << this->primal_position.at(i + 1) - 1 << "-" <<
-      // this->dual_position.at(i + 1) << ")" << '\n'; cout << "\t(" << 0 << ","
-      // << Nprim - 1 << "-" << Nprim - 1 << "," << Nprim + Ndual - 1 << ")" <<
-      // '\n';
       M.submat(this->primal_position.at(i), this->dual_position.at(i),
                this->primal_position.at(i + 1) - 1,
                this->dual_position.at(i + 1) - 1) =
@@ -816,7 +760,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     // Region 5 in Formulate LCP.ipe
     if (Ndual > 0) {
       if (i > 0) // For the first player, no need to add anything 'before' 0-th
-                 // position
+        // position
         M.submat(this->dual_position.at(i) - n_LeadVar, 0,
                  this->dual_position.at(i + 1) - n_LeadVar - 1,
                  this->primal_position.at(i) - 1) =
@@ -850,7 +794,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     }
   }
   if (this->MCRHS.n_elem >= 1) // It is possible that it is a Cournot game and
-                               // there are no MC conditions!
+  // there are no MC conditions!
   {
     M.submat(this->MC_dual_position, 0, this->Leader_position - 1,
              this->dual_position.at(0) - 1) = this->MarketClearing;
@@ -859,7 +803,6 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
          j++)
       Compl.push_back({j, j});
   }
-
   if (writeToFile) {
     M.save(M_name, arma::coord_ascii);
     q.save(q_name, arma::arma_ascii);
@@ -1042,10 +985,10 @@ void Game::NashGame::write(string filename, bool append, bool KKT) const {
 
 unique_ptr<GRBModel> Game::NashGame::Respond(
     unsigned int player, ///< Player whose optimal response is to be computed
-    const arma::vec &x, ///< A vector of pure strategies (either for all players
-                        ///< or all other players)
+    const arma::vec &x,  ///< A vector of pure strategies (either for all
+    ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
-                 ///< player)
+    ///< player)
     ) const
 /**
  * @brief Given the decision of other players, find the optimal response for
@@ -1086,10 +1029,10 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
 double Game::NashGame::RespondSol(
     arma::vec &sol,
     unsigned int player, ///< Player whose optimal response is to be computed
-    const arma::vec &x, ///< A vector of pure strategies (either for all players
-                        ///< or all other players)
+    const arma::vec &x,  ///< A vector of pure strategies (either for all
+    ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
-                 ///< player)
+    ///< player)
     ) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
@@ -1347,7 +1290,6 @@ void Game::EPEC::make_country_QP(const unsigned int i)
 
 void Game::EPEC::findNashEq() {
   if (this->country_QP.front() != nullptr) {
-
     int Nvar =
         this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
     arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
