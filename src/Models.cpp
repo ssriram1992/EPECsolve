@@ -557,7 +557,7 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
 
   this->EPEC::LocStarts.push_back(&Loc[LeaderVars::FollowerStart]);
   this->EPEC::LocConvHulls.push_back(&Loc[LeaderVars::ConvHullDummy]);
-  this->EPEC::LocEnds.push_back(&Loc[LeaderVars::End]);
+  this->EPEC::LocEnds.push_back(&this->Locations.back().at(LeaderVars::End));
 
   this->LeadConses.push_back(N->RewriteLeadCons());
   this->AllLeadPars.push_back(Params);

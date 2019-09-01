@@ -1025,15 +1025,15 @@ Game::LCP &Game::LCP::FixToPoly(
     unsigned int count{0};
     try {
       makeRelaxed();
-      GRBModel model (this->RlxdModel);
+      GRBModel model(this->RlxdModel);
       for (auto i : Fix) {
         if (i > 0)
-          model.getVarByName("z_" + to_string(count))
-              .set(GRB_DoubleAttr_UB, 0);
+          model.getVarByName("z_" + to_string(count)).set(GRB_DoubleAttr_UB, 0);
         if (i < 0)
-          model.getVarByName("x_" + to_string(count >= this->LeadStart
-                                                  ? count + nLeader
-                                                  : count))
+          model
+              .getVarByName("x_" + to_string(count >= this->LeadStart
+                                                 ? count + nLeader
+                                                 : count))
               .set(GRB_DoubleAttr_UB, 0);
         count++;
       }
