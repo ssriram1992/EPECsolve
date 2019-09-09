@@ -431,15 +431,14 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
 }
 
 bool Game::LCP::errorCheck(
-    bool throwErr ///< If this is true, function throws an error, else, it just
-                  ///< returns false
+    bool throwErr ///< If this is true, function throws an
+                  ///< error, else, it just returns false
     ) const
 /**
  * Checks if the `M` and `q` given to create the LCP object are of
  * compatible size, given the number of leader variables
  */
 {
-
   const unsigned int nR = M.n_rows;
   const unsigned int nC = M.n_cols;
   if (throwErr) {
@@ -463,8 +462,8 @@ int Game::ConvexHull(
         *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
              ///< hull is to be found
     const vector<arma::vec *>
-        *bi, ///< Inequality constraints RHS that define polyhedra whose convex
-             ///< hull is to be found
+        *bi,         ///< Inequality constraints RHS that define
+                     ///< polyhedra whose convex hull is to be found
     arma::sp_mat &A, ///< Pointer to store the output of the convex hull LHS
     arma::vec &b,    ///< Pointer to store the output of the convex hull RHS
     const arma::sp_mat
@@ -574,10 +573,10 @@ void Game::compConvSize(
     const unsigned int nFinVar,  ///< Number of columns in the final matrix A
     const vector<arma::sp_mat *>
         *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
-             ///< hull is to be found
+    ///< hull is to be found
     const vector<arma::vec *>
-        *bi, ///< Inequality constraints RHS that define polyhedra whose convex
-             ///< hull is to be found
+        *bi, ///< Inequality constraints RHS that define
+             ///< polyhedra whose convex hull is to be found
     const arma::sp_mat
         &Acom,            ///< LHS of the common constraints for all polyhedra
     const arma::vec &bcom ///< RHS of the common constraints for all polyhedra
@@ -725,10 +724,10 @@ Game::LCP::anyBranch(const vector<vector<short int>> &vecOfFixes,
 
 bool Game::LCP::extractSols(
     GRBModel *model, ///< The Gurobi Model that was solved (perhaps using
-                     ///< Game::LCP::LCPasMIP)
-    arma::vec &z,    ///< Output variable - where the equation values are stored
-    arma::vec &x,    ///< Output variable - where the variable values are stored
-    bool extractZ    ///< z values are filled only if this is true
+    ///< Game::LCP::LCPasMIP)
+    arma::vec &z, ///< Output variable - where the equation values are stored
+    arma::vec &x, ///< Output variable - where the variable values are stored
+    bool extractZ ///< z values are filled only if this is true
     ) const
 /** @brief Extracts variable and equation values from a solved Gurobi model for
    LCP */
@@ -971,8 +970,8 @@ int Game::LCP::branchProcLoc(const vector<short int> &Fix,
 
 Game::LCP &Game::LCP::FixToPoly(
     const vector<short int>
-        Fix,        ///< A vector of +1 and -1 referring to which equations and
-                    ///< variables are taking 0 value.
+        Fix,        ///< A vector of +1 and -1 referring to which
+                    ///< equations and variables are taking 0 value.
     bool checkFeas, ///< The polyhedron is added after ensuring feasibility, if
                     ///< this is true
     bool custom,    ///< Should the polyhedra be pushed into a custom vector of
@@ -1013,7 +1012,7 @@ Game::LCP &Game::LCP::FixToPoly(
               (*j); // Only mess with non-zero elements of a sparse matrix!
       bii->at(i) = -this->q(i);
     } else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be
-           // added
+    // added
     {
       unsigned int varpos = (i >= this->LeadStart) ? i + this->nLeader : i;
       Aii->at(i, varpos) = 1;
@@ -1067,8 +1066,8 @@ Game::LCP &Game::LCP::FixToPoly(
 
 Game::LCP &Game::LCP::FixToPolies(
     const vector<short int>
-        Fix, ///< A vector of +1, 0 and -1 referring to which equations and
-             ///< variables are taking 0 value.
+        Fix,        ///< A vector of +1, 0 and -1 referring to which
+                    ///< equations and variables are taking 0 value.
     bool checkFeas, ///< The polyhedron is added after ensuring feasibility, if
                     ///< this is true
     bool custom,    ///< Should the polyhedra be pushed into a custom vector of
@@ -1096,11 +1095,11 @@ Game::LCP &Game::LCP::FixToPolies(
   bool flag = false;
   vector<short int> MyFix(Fix);
   /*
-  if (VERBOSE) {
-      for (const auto v:MyFix) cout << v << " ";
-      cout << '\n';
-  }
-  */
+if (VERBOSE) {
+    for (const auto v:MyFix) cout << v << " ";
+    cout << '\n';
+}
+*/
   unsigned int i;
   for (i = 0; i < this->nR; i++) {
     if (Fix.at(i) == 0) {

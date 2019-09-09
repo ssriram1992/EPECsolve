@@ -698,14 +698,14 @@ void Game::NashGame::set_positions()
   dual_position.at(Nplayers) = (dl_cnt);
 
   /*
-  if (VERBOSE) {
-      cout << "Primals: ";
-      for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i)
-  << " "; cout << "---MC_Dual:" << MC_dual_position << "---Leader: " <<
-  Leader_position << "Duals: "; for (unsigned int i = 0; i < Nplayers + 1; i++)
-  cout << dual_position.at(i) << " "; cout << '\n';
-  }
-  */
+if (VERBOSE) {
+    cout << "Primals: ";
+    for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i)
+<< " "; cout << "---MC_Dual:" << MC_dual_position << "---Leader: " <<
+Leader_position << "Duals: "; for (unsigned int i = 0; i < Nplayers + 1; i++)
+cout << dual_position.at(i) << " "; cout << '\n';
+}
+*/
 }
 
 const Game::NashGame &Game::NashGame::FormulateLCP(
@@ -720,14 +720,14 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
   /// @warning Does not return the leader constraints. Use
   /// NashGame::RewriteLeadCons() to handle them
   /**
-   * Computes the KKT conditions for each Player, calling QP_Param::KKT.
-   Arranges them systematically to return M, q
-   * as an LCP @f$0\leq q \perp Mx+q \geq 0 @f$.
-           The way the variables of the players get distributed is shown in the
-   image below
-           @image html FormulateLCP.png
-           @image latex FormulateLCP.png
-   */
+ * Computes the KKT conditions for each Player, calling QP_Param::KKT.
+ Arranges them systematically to return M, q
+ * as an LCP @f$0\leq q \perp Mx+q \geq 0 @f$.
+         The way the variables of the players get distributed is shown in the
+ image below
+         @image html FormulateLCP.png
+         @image latex FormulateLCP.png
+ */
 
   // To store the individual KKT conditions for each player.
   vector<arma::sp_mat> Mi(Nplayers), Ni(Nplayers);
@@ -751,7 +751,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     // Adding the primal equations
     // Region 1 in Formulate LCP.ipe
     if (i > 0) { // For the first player, no need to add anything 'before' 0-th
-                 // position
+      // position
       // cout << "Region 1" << '\n';
       // cout << "\tM(" << this->primal_position.at(i) << "," << 0 << "," <<
       // this->primal_position.at(i + 1) - 1
@@ -816,7 +816,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     // Region 5 in Formulate LCP.ipe
     if (Ndual > 0) {
       if (i > 0) // For the first player, no need to add anything 'before' 0-th
-                 // position
+        // position
         M.submat(this->dual_position.at(i) - n_LeadVar, 0,
                  this->dual_position.at(i + 1) - n_LeadVar - 1,
                  this->primal_position.at(i) - 1) =
@@ -850,7 +850,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     }
   }
   if (this->MCRHS.n_elem >= 1) // It is possible that it is a Cournot game and
-                               // there are no MC conditions!
+  // there are no MC conditions!
   {
     M.submat(this->MC_dual_position, 0, this->Leader_position - 1,
              this->dual_position.at(0) - 1) = this->MarketClearing;
@@ -1042,10 +1042,10 @@ void Game::NashGame::write(string filename, bool append, bool KKT) const {
 
 unique_ptr<GRBModel> Game::NashGame::Respond(
     unsigned int player, ///< Player whose optimal response is to be computed
-    const arma::vec &x, ///< A vector of pure strategies (either for all players
-                        ///< or all other players)
+    const arma::vec &x,  ///< A vector of pure strategies (either for all
+    ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
-                 ///< player)
+    ///< player)
     ) const
 /**
  * @brief Given the decision of other players, find the optimal response for
@@ -1086,10 +1086,10 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
 double Game::NashGame::RespondSol(
     arma::vec &sol,
     unsigned int player, ///< Player whose optimal response is to be computed
-    const arma::vec &x, ///< A vector of pure strategies (either for all players
-                        ///< or all other players)
+    const arma::vec &x,  ///< A vector of pure strategies (either for all
+    ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
-                 ///< player)
+    ///< player)
     ) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
@@ -1276,12 +1276,15 @@ void Game::EPEC::add_Dummy_Lead(
 }
 
 void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
+  /** @todo Make Models::EPEC::make_country_QP() into
+   * Game::EPEC::make_country_QP() and make this function private
+   */
   this->LeaderLocations = vector<unsigned int>(this->nCountr);
   this->LeaderLocations.at(0) = 0;
-  for (unsigned int i = 1; i < this->nCountr; i++)
+  for (unsigned int i = 1; i < this->nCountr; i++) {
     this->LeaderLocations.at(i) =
-        this->LeaderLocations.at(i - 1) + *this->LocEnds.at(i);
-
+        this->LeaderLocations.at(i - 1) + *this->LocEnds.at(i - 1);
+  }
   this->nVarinEPEC =
       this->LeaderLocations.back() + *this->LocEnds.back() + addSpaceForMC;
 }
@@ -1296,7 +1299,6 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
 
   const unsigned int nEPECvars = this->nVarinEPEC;
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
-  // this->Locations.at(i).at(Models::LeaderVars::End);
 
   if (x.n_rows != nEPECvars - nThisCountryvars)
     throw string("Error in Game::EPEC::Respond: Invalid parametrization");
@@ -1314,7 +1316,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber,
   return false;
 }
 
-void Game::EPEC::make_country_QP(const unsigned int i)
+void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
 /**
  * @brief Makes the Game::QP_Param corresponding to the @p i-th country.
  * @details
@@ -1324,7 +1326,7 @@ void Game::EPEC::make_country_QP(const unsigned int i)
  * object in @p Game::EPEC::LeadObjec
  *  - Finally the locations are updated owing to the complete convex hull
  * calculated during the call to LCP::makeQP
- * @note Overloaded as EPEC::make_country_QP()
+ * @note Overloaded as Models::EPEC::make_country_QP()
  */
 {
   // BOOST_LOG_TRIVIAL(info) << "Starting Convex hull computation of the country
@@ -1345,9 +1347,20 @@ void Game::EPEC::make_country_QP(const unsigned int i)
   }
 }
 
+void Game::EPEC::iterativeNash() {
+  int Nvar =
+      this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
+  arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
+  arma::vec MCRHS, dumb;
+  MCRHS.zeros(0);
+  dumb.zeros(0);
+  this->make_MC_cons(MC, MCRHS);
+  this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
+      this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
+}
+
 void Game::EPEC::findNashEq() {
   if (this->country_QP.front() != nullptr) {
-
     int Nvar =
         this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
     arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
@@ -1403,19 +1416,15 @@ void Game::EPEC::findNashEq() {
     } else {
       if (status == GRB_TIME_LIMIT) {
         this->Stats.status = 2;
-        cerr << "Game::EPEC::findNashEq: no nash equilibrium found "
-                "(timeLimit)."
+        cerr << "Game::EPEC::findNashEq: no nash equilibrium found (timeLimit)."
              << '\n';
       } else
         cerr << "Game::EPEC::findNashEq: no nash equilibrium found." << '\n';
     }
 
   } else {
-    cerr << "Exception in Game::EPEC::findNashEq : no country QP has been "
-            "made."
+    cerr << "Exception in Game::EPEC::findNashEq : no country QP has been made."
          << '\n';
     throw;
   }
 }
-
-void Game::EPEC::iterativeNashE() {}

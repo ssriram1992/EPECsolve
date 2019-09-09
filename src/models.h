@@ -134,8 +134,8 @@ class EPEC : public Game::EPEC {
 private:
   void make_obj_leader(const unsigned int i,
                        Game::QP_objective &QP_obj) override;
-  virtual void
-  computeLeaderLocations(const unsigned int addSpaceForMC = 0) override;
+  // virtual void computeLeaderLocations(const unsigned int addSpaceForMC = 0)
+  // override;
 
 public:
   void prefinalize() override;
