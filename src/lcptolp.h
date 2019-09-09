@@ -1,5 +1,4 @@
 #pragma once
-#define LCPTOLP_H
 
 #include "epecsolve.h"
 #include <armadillo>

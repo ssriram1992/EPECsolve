@@ -1,5 +1,4 @@
-#ifndef EPECSOLVE_H
-#define EPECSOLVE_H
+#pragma once
 
 #define VERBOSE false
 #define EPECVERSION 0.1
@@ -33,5 +32,3 @@ class EPEC;
 #include "games.h"
 #include "lcptolp.h"
 #include "utils.h"
-
-#endif

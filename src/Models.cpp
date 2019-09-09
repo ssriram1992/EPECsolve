@@ -251,14 +251,14 @@ void Models::EPEC::make_LL_LeadCons(
     const LeadAllPar &Params,           ///< All country specific parameters
     const Models::LeadLocs &Loc,        ///< Location of variables
     const unsigned int import_lim_cons, ///< Does a constraint on import limit
-                                        ///< exist or no limit?
+    ///< exist or no limit?
     const unsigned int export_lim_cons, ///< Does a constraint on export limit
-                                        ///< exist or no limit?
-    const unsigned int
-        price_lim_cons, ///< Does a constraint on price limit exist or no limit?
+    ///< exist or no limit?
+    const unsigned int price_lim_cons, ///< Does a constraint on price limit
+    ///< exist or no limit?
     const unsigned int
         activeTaxCaps ///< Number of active Tax Caps constraints. If strictly
-                      ///< positive, tax cap constraint(s) will be enforced
+    ///< positive, tax cap constraint(s) will be enforced
     ) const noexcept
 /**
  * Makes the leader level constraints for a country.
@@ -730,8 +730,8 @@ void Models::EPEC::make_MC_leader(const unsigned int i)
     C.at(0, this->getPosition(i, Models::LeaderVars::NetExport)) = 1;
 
     for (auto val = TrCo.begin_row(i); val != TrCo.end_row(i); ++val) {
-      const unsigned int j = val.col(); // This is the country which the country
-                                        // "i" is importing from
+      const unsigned int j = val.col(); // This is the country which the
+                                        // country "i" is importing from
       unsigned int count{0};
 
       for (auto val2 = TrCo.begin_col(j); val2 != TrCo.end_col(j); ++val2)
@@ -777,20 +777,20 @@ void Models::EPEC::make_MC_leader(const unsigned int i)
 bool Models::EPEC::dataCheck(
     const bool
         chkAllLeadPars, ///< Checks if Models::EPEC::AllLeadPars has size @p n
-    const bool
-        chkcountries_LL, ///< Checks if Models::EPEC::countries_LL has size @p n
+    const bool chkcountries_LL, ///< Checks if Models::EPEC::countries_LL has
+    ///< size @p n
     const bool chkMC_QP, ///< Checks if Models::EPEC::MC_QP has size @p n
     const bool
         chkLeadConses, ///< Checks if Models::EPEC::LeadConses has size @p n
     const bool
         chkLeadRHSes, ///< Checks if Models::EPEC::LeadRHSes has size @p n
     const bool chknImportMarkets, ///< Checks if Models::EPEC::nImportMarkets
-                                  ///< has size @p n
+    ///< has size @p n
     const bool
         chkLocations, ///< Checks if Models::EPEC::Locations has size @p n
     const bool
         chkLeaderLocations, ///< Checks if Models::EPEC::LeaderLocations has
-                            ///< size @p n and Models::EPEC::nVarinEPEC is set
+    ///< size @p n and Models::EPEC::nVarinEPEC is set
     const bool chkLeadObjec ///< Checks if Models::EPEC::LeadObjec has size @p n
     ) const
 /**
@@ -819,18 +819,6 @@ bool Models::EPEC::dataCheck(
   if (!chkLeadObjec && LeadObjec.size() != this->nCountr)
     return false;
   return true;
-}
-
-void Models::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
-  this->LeaderLocations = vector<unsigned int>(this->nCountr);
-  this->LeaderLocations.at(0) = 0;
-  for (unsigned int i = 1; i < this->nCountr; i++)
-    this->LeaderLocations.at(i) =
-        this->getPosition(i - 1, Models::LeaderVars::End);
-
-  this->nVarinEPEC =
-      this->getPosition(this->nCountr - 1, Models::LeaderVars::End) +
-      (addSpaceForMC ? this->nCountr : 0);
 }
 
 unsigned int Models::EPEC::getPosition(const unsigned int countryCount,
@@ -957,7 +945,7 @@ void Models::EPEC::make_country_QP()
     LeadLocs &Loc = this->Locations.at(i);
     // Adjusting "stuff" because we now have new convHull variables
     unsigned int convHullVarCount =
-        this->LeadObjec.at(i)->Q.n_rows - Loc[Models::LeaderVars::End];
+        this->LeadObjec.at(i)->Q.n_rows - *this->LocEnds.at(i);
     // Location details
     Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy,
                         convHullVarCount);
@@ -971,7 +959,7 @@ void Models::EPEC::make_country_QP()
       }
     }
   }
-  this->computeLeaderLocations(true);
+  this->computeLeaderLocations(this->nCountr);
 }
 
 void Models::increaseVal(LeadLocs &L, const LeaderVars start,
@@ -1001,14 +989,12 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
 
 void Models::EPEC::gur_WriteCountry_conv(const unsigned int i,
                                          string filename) const {
-
   if (!lcp)
     throw;
 }
 
 void Models::EPEC::gur_WriteEpecMip(const unsigned int i,
                                     string filename) const {
-
   if (!lcp)
     throw;
 }
@@ -1267,7 +1253,6 @@ void Models::EPECInstance::load(string filename) {
    */
   ifstream ifs(filename + ".json");
   if (ifs.good()) {
-
     IStreamWrapper isw(ifs);
     Document d;
     try {

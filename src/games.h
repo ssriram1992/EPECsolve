@@ -1,5 +1,4 @@
-#ifndef GAMES_H
-#define GAMES_H
+#pragma once
 
 // #include"epecsolve.h"
 #include "lcptolp.h"
@@ -439,7 +438,8 @@ protected: // functions
                       -1} {}; ///< Can be instantiated by a derived class only!
 
   // Must NOT be reimplemented by inheritors
-  virtual void make_country_QP(const unsigned int i) final;
+  virtual void make_country_QP(const unsigned int i,
+                               const int algorithm = 0) final;
 
   // virtual function to be implemented by the inheritor.
   virtual void make_obj_leader(const unsigned int i,
@@ -448,7 +448,8 @@ protected: // functions
   // virtual function to be optionally implemented by the inheritor.
   virtual void prefinalize();
   virtual void postfinalize();
-  virtual void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
+  virtual void
+  computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
   virtual void make_MC_cons(arma::sp_mat &MC, arma::vec &RHS) const {
     MC.zeros();
     RHS.zeros();
@@ -462,7 +463,8 @@ public:                  // functions
   virtual void make_country_QP() = 0;
   virtual void finalize() final;
   virtual void findNashEq() final;
-  virtual void iterativeNashE() final;
+
+  virtual void iterativeNash() final;
 
   unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn) const;
@@ -476,7 +478,6 @@ public:                  // functions
 };
 } // namespace Game
 
-#endif
 
 /* Example for QP_Param */
 /**

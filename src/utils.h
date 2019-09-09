@@ -1,5 +1,4 @@
-#ifndef UTILS_H
-#define UTILS_H
+#pragma once
 
 #include "epecsolve.h"
 #include <armadillo>
@@ -58,5 +57,3 @@ long int appendRead(unsigned int &v, const string in, long int pos,
                     const string header = "");
 
 } // namespace Utils
-
-#endif

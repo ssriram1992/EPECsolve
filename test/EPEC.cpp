@@ -22,10 +22,6 @@
 using namespace std;
 using namespace arma;
 
-BOOST_AUTO_TEST_CASE(LoggingOff)
-{  
-    boost::log::core::get()->set_filter(boost::log::trivial::severity > boost::log::trivial::info);
-}
 
 BOOST_AUTO_TEST_SUITE(Core__Tests)
 
@@ -915,6 +911,10 @@ BOOST_AUTO_TEST_SUITE_END()
 
 
 BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
+BOOST_AUTO_TEST_CASE(LoggingOff)
+{  
+    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::warning);
+}
 
     /* This test suite perform  unit tests for generalized EPEC problem with multiple countries and followers
      */
@@ -1033,19 +1033,6 @@ BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq());
         BOOST_CHECK_NO_THROW(epec.writeSolution(0, "Solution"));
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
-        for (unsigned int i = 0; i < epec.nCountries; i++) {
-            cout << "********** Country number " << i + 1 << "\t\t" << "**********\n";
-            for (int j = 0; j < 9; j++) {
-                auto v = static_cast<Models::LeaderVars>(j);
-                cout << Models::prn::label << std::setfill('.') << v << Models::prn::val << std::setfill('.')
-                     << epec.getPosition(i, v) << endl;
-            }
-            cout << endl;
-        }
-        cout
-                << "--------------------------------------------------Printing Locations--------------------------------------------------\n";
         BOOST_TEST_MESSAGE("checking production");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0), 100, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 40, 0.01);

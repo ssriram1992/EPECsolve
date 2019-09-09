@@ -122,11 +122,11 @@ Models::LeadAllPar makeLeader(bool cc, bool gg, bool ss, int cC = 5, int gC = 5,
     else
       total_cap += v;
   /*
-  price_limit = (a - b*total_cap)/price_lim;
+price_limit = (a - b*total_cap)/price_lim;
 
-  price_limit = price_limit > a*1.05? a * price_lim:price_limit;
-  price_limit = (price_limit < 0)? a*price_lim:price_limit;
-  */
+price_limit = price_limit > a*1.05? a * price_lim:price_limit;
+price_limit = (price_limit < 0)? a*price_lim:price_limit;
+*/
   price_limit = price_lim * a;
 
   Models::LeadAllPar Country(F.capacities.size(),

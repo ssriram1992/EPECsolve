@@ -1219,12 +1219,15 @@ void Game::EPEC::add_Dummy_Lead(
 }
 
 void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
+  /** @todo Make Models::EPEC::make_country_QP() into
+   * Game::EPEC::make_country_QP() and make this function private
+   */
   this->LeaderLocations = vector<unsigned int>(this->nCountr);
   this->LeaderLocations.at(0) = 0;
-  for (unsigned int i = 1; i < this->nCountr; i++)
+  for (unsigned int i = 1; i < this->nCountr; i++) {
     this->LeaderLocations.at(i) =
-        this->LeaderLocations.at(i - 1) + *this->LocEnds.at(i);
-
+        this->LeaderLocations.at(i - 1) + *this->LocEnds.at(i - 1);
+  }
   this->nVarinEPEC =
       this->LeaderLocations.back() + *this->LocEnds.back() + addSpaceForMC;
 }
@@ -1239,7 +1242,6 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
 
   const unsigned int nEPECvars = this->nVarinEPEC;
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
-  // this->Locations.at(i).at(Models::LeaderVars::End);
 
   if (x.n_rows != nEPECvars - nThisCountryvars)
     throw string("Error in Game::EPEC::Respond: Invalid parametrization");
@@ -1257,7 +1259,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber,
   return false;
 }
 
-void Game::EPEC::make_country_QP(const unsigned int i)
+void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
 /**
  * @brief Makes the Game::QP_Param corresponding to the @p i-th country.
  * @details
@@ -1267,7 +1269,7 @@ void Game::EPEC::make_country_QP(const unsigned int i)
  * object in @p Game::EPEC::LeadObjec
  *  - Finally the locations are updated owing to the complete convex hull
  * calculated during the call to LCP::makeQP
- * @note Overloaded as EPEC::make_country_QP()
+ * @note Overloaded as Models::EPEC::make_country_QP()
  */
 {
   // BOOST_LOG_TRIVIAL(info) << "Starting Convex hull computation of the country
@@ -1286,6 +1288,18 @@ void Game::EPEC::make_country_QP(const unsigned int i)
     this->Stats.feasiblePolyhedra.push_back(
         Player_i_LCP.getFeasiblePolyhedra());
   }
+}
+
+void Game::EPEC::iterativeNash() {
+  int Nvar =
+      this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
+  arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
+  arma::vec MCRHS, dumb;
+  MCRHS.zeros(0);
+  dumb.zeros(0);
+  this->make_MC_cons(MC, MCRHS);
+  this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
+      this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
 }
 
 void Game::EPEC::findNashEq() {
@@ -1345,19 +1359,15 @@ void Game::EPEC::findNashEq() {
     } else {
       if (status == GRB_TIME_LIMIT) {
         this->Stats.status = 2;
-        cerr << "Game::EPEC::findNashEq: no nash equilibrium found "
-                "(timeLimit)."
+        cerr << "Game::EPEC::findNashEq: no nash equilibrium found (timeLimit)."
              << '\n';
       } else
         cerr << "Game::EPEC::findNashEq: no nash equilibrium found." << '\n';
     }
 
   } else {
-    cerr << "Exception in Game::EPEC::findNashEq : no country QP has been "
-            "made."
+    cerr << "Exception in Game::EPEC::findNashEq : no country QP has been made."
          << '\n';
     throw;
   }
 }
-
-void Game::EPEC::iterativeNashE() {}
