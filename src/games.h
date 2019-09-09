@@ -1,5 +1,4 @@
-#ifndef GAMES_H
-#define GAMES_H
+#pragma once
 
 // #include"epecsolve.h"
 #include "lcptolp.h"
@@ -479,7 +478,6 @@ public:                  // functions
 };
 } // namespace Game
 
-#endif
 
 /* Example for QP_Param */
 /**

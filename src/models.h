@@ -1,5 +1,4 @@
-#ifndef MODELS_H
-#define MODELS_H
+#pragma once
 
 #include "epecsolve.h"
 #include <armadillo>
@@ -281,7 +280,5 @@ enum class prn { label, val };
 
 ostream &operator<<(ostream &ost, Models::prn l);
 } // namespace Models
-
-#endif
 
 /* Examples */
