@@ -106,7 +106,7 @@ long int Utils::appendRead(
     sp_mat &matrix,  ///< Read and store the solution in this matrix.
     const string in, ///< File to read from (could be file very many data is
                      ///< appended one below another)
-    long int pos, ///< Position in the long file where reading should start
+    long int pos,    ///< Position in the long file where reading should start
     const string header ///< Any header to check data sanctity
     )
 /**

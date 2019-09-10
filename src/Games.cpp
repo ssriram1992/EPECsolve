@@ -1157,6 +1157,7 @@ void Game::EPEC::finalize()
     // Initialize leader objective and country_QP
     this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
     this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
+    this->countries_LCP = vector<unique_ptr<Game::LCP>>(nCountr);
     for (unsigned int i = 0; i < this->nCountr; i++) {
       this->add_Dummy_Lead(i);
       this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
@@ -1281,12 +1282,14 @@ void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
     throw string(
         "Error in Game::EPEC::make_country_QP: Invalid country number");
   if (!this->country_QP.at(i).get()) {
-    Game::LCP Player_i_LCP(this->env, *this->countries_LL.at(i).get());
+    if (!this->countries_LCP.at(i))
+      this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
+          new LCP(this->env, *this->countries_LL.at(i).get()));
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
-    Player_i_LCP.makeQP(*this->LeadObjec.at(i).get(),
-                        *this->country_QP.at(i).get());
+    this->countries_LCP.at(i)->makeQP(*this->LeadObjec.at(i).get(),
+                                      *this->country_QP.at(i).get());
     this->Stats.feasiblePolyhedra.push_back(
-        Player_i_LCP.getFeasiblePolyhedra());
+        this->countries_LCP.at(i)->getFeasiblePolyhedra());
   }
 }
 
@@ -1310,23 +1313,38 @@ void Game::EPEC::make_country_QP()
     unsigned int convHullVarCount =
         this->LeadObjec.at(i)->Q.n_rows - *this->LocEnds.at(i);
     // Location details
-		this->convexHullVarAddn.at(i) += convHullVarCount;
+    this->convexHullVarAddn.at(i) += convHullVarCount;
     // All other players' QP
     if (this->nCountr > 1) {
       for (unsigned int j = 0; j < this->nCountr; j++) {
         if (i != j)
-          this->country_QP.at(j)->addDummy(convHullVarCount, 0,
-                                           this->country_QP.at(j)->getNx() -
-                                               this->nCountr);
+          this->country_QP.at(j)->addDummy(
+              convHullVarCount, 0,
+              this->country_QP.at(j)->getNx() -
+                  this->n_MCVar); // The position to add parameters is towards
+                                  // the end of all parameters, giving space
+                                  // only for the n_MCVar number of market
+                                  // clearing variables
       }
     }
   }
-	this->updateLocs();
+  already_ran = true;
+  this->updateLocs();
+  this->computeLeaderLocations(this->nCountr);
 }
 
-
-
 void Game::EPEC::iterativeNash() {
+
+  for (unsigned int i = 0; i < this->nCountr; ++i) // For each country
+  {
+    if (!this->countries_LCP.at(
+            i)) // If the LCP object for the country is not already there
+    {
+      this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>( // Then make it
+          new LCP(this->env, *this->countries_LL.at(i).get()));
+    } // Now this LCP object has to be outer/inner approximated
+  }
+
   int Nvar =
       this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
   arma::sp_mat MC(0, Nvar), dumA(0, Nvar);

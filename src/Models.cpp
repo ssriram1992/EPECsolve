@@ -541,8 +541,8 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
 
   this->EPEC::LocStarts.push_back(&Loc[LeaderVars::FollowerStart]);
   this->EPEC::LocConvHulls.push_back(&Loc[LeaderVars::ConvHullDummy]);
-  this->EPEC::LocEnds.push_back(&this->Locations.back().at(LeaderVars::End)); 
-	this->EPEC::convexHullVarAddn.push_back(0);
+  this->EPEC::LocEnds.push_back(&this->Locations.back().at(LeaderVars::End));
+  this->EPEC::convexHullVarAddn.push_back(0);
 
   this->LeadConses.push_back(N->RewriteLeadCons());
   this->AllLeadPars.push_back(Params);
@@ -928,19 +928,17 @@ unique_ptr<GRBModel> Models::EPEC::Respond(const string name,
   return this->Game::EPEC::Respond(this->name2nos.at(name), x);
 }
 
-
 void Models::EPEC::updateLocs()
 /**
- * This function is called after 
+ * This function is called after make_country_QP()
  */
 {
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     LeadLocs &Loc = this->Locations.at(i);
-		Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy,
+    Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy,
                         this->convexHullVarAddn.at(i));
-}
-  this->computeLeaderLocations(this->nCountr);
-
+    this->convexHullVarAddn.at(i) = 0;
+  }
 }
 
 void Models::increaseVal(LeadLocs &L, const LeaderVars start,

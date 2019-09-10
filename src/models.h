@@ -131,9 +131,8 @@ LeaderVars operator+(Models::LeaderVars a, int b);
 class EPEC : public Game::EPEC {
   // Mandatory virtuals
 private:
-  void make_obj_leader(const unsigned int i,
-                       Game::QP_objective &QP_obj) final;
-	virtual void updateLocs() override;
+  void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj) final;
+  virtual void updateLocs() override;
   virtual void prefinalize() override;
   virtual void postfinalize() override{};
   // override;

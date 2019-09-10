@@ -391,6 +391,7 @@ struct EPECStatistics {
 class EPEC {
 protected: // Datafields
   vector<shared_ptr<Game::NashGame>> countries_LL{};
+  vector<unique_ptr<Game::LCP>> countries_LCP{};
 
   vector<arma::sp_mat> LeadConses{}; ///< Stores each leader's constraint LHS
   vector<arma::vec> LeadRHSes{};     ///< Stores each leader's constraint RHS
@@ -409,7 +410,7 @@ protected: // Datafields
   vector<const unsigned int *> LocStarts{};
   vector<const unsigned int *> LocEnds{};
   vector<const unsigned int *> LocConvHulls{};
-	vector<unsigned int> convexHullVarAddn {};
+  vector<unsigned int> convexHullVarAddn{};
   unsigned int n_MCVar{0};
 
   GRBEnv *env;
@@ -449,7 +450,9 @@ protected: // functions
   // virtual function to be optionally implemented by the inheritor.
   virtual void prefinalize();
   virtual void postfinalize();
-	virtual void updateLocs() = 0;
+  virtual void
+  updateLocs() = 0; // If any location tracking system is implemented, that can
+                    // be called from in here.
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
   virtual void make_MC_cons(arma::sp_mat &MC, arma::vec &RHS) const {
@@ -479,7 +482,6 @@ public:                  // functions
   }
 };
 } // namespace Game
-
 
 /* Example for QP_Param */
 /**
