@@ -409,6 +409,7 @@ protected: // Datafields
   vector<const unsigned int *> LocStarts{};
   vector<const unsigned int *> LocEnds{};
   vector<const unsigned int *> LocConvHulls{};
+	vector<unsigned int> convexHullVarAddn {};
   unsigned int n_MCVar{0};
 
   GRBEnv *env;
@@ -448,6 +449,7 @@ protected: // functions
   // virtual function to be optionally implemented by the inheritor.
   virtual void prefinalize();
   virtual void postfinalize();
+	virtual void updateLocs() = 0;
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
   virtual void make_MC_cons(arma::sp_mat &MC, arma::vec &RHS) const {
@@ -460,7 +462,7 @@ public:                  // functions
   EPEC(EPEC &) = delete; ///< Abstract class - no copy constructor
   ~EPEC() {}             ///< Destructor to free data
 
-  virtual void make_country_QP() = 0;
+  virtual void make_country_QP() final;
   virtual void finalize() final;
   virtual void findNashEq() final;
 

@@ -22,6 +22,10 @@
 using namespace std;
 using namespace arma;
 
+BOOST_AUTO_TEST_CASE(LoggingOff)
+{  
+    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::warning);
+}
 
 BOOST_AUTO_TEST_SUITE(Core__Tests)
 
@@ -1292,33 +1296,23 @@ BOOST_AUTO_TEST_CASE(LoggingOff)
         BOOST_CHECK_NO_THROW(epec.make_country_QP());
         BOOST_TEST_MESSAGE("testing Models::findNashEq");
         BOOST_CHECK_NO_THROW(epec.findNashEq());
-        epec.writeSolution(2, "epec");
-        /*
+        // epec.writeSolution(2, "epec");
         double margCountryOne =
                 FP.costs_quad[0] * epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
                 FP.costs_lin[0] + epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
         double margCountryTwo =
                 FP.costs_quad[0] * epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
                 FP.costs_lin[0] + epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
-        double margCountryThree =
-                FP.costs_quad[0] * epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 0) +
-                FP.costs_lin[0] + epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0);
-        BOOST_CHECK_MESSAGE(margCountryTwo > margCountryOne && margCountryTwo < margCountryThree,
-                            "checking marginal costs");
         BOOST_TEST_MESSAGE("checking production on Bianco-followers");
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
         BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) + 1), 30, 0.01);
         BOOST_TEST_MESSAGE("checking tax on Bianco-followers");
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 10, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 1), 0, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 43, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 14, 0.01);
         BOOST_TEST_MESSAGE("checking tax on Rosso-followers");
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 100, 0.01);
-        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0), 100, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 95, 0.01);
+        BOOST_CHECK_CLOSE(epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 49.2857, 0.01);
 
-        */
     }
 
 BOOST_AUTO_TEST_SUITE_END()

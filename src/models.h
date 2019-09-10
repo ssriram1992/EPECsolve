@@ -132,17 +132,13 @@ class EPEC : public Game::EPEC {
   // Mandatory virtuals
 private:
   void make_obj_leader(const unsigned int i,
-                       Game::QP_objective &QP_obj) override;
-  // virtual void computeLeaderLocations(const unsigned int addSpaceForMC = 0)
+                       Game::QP_objective &QP_obj) final;
+	virtual void updateLocs() override;
+  virtual void prefinalize() override;
+  virtual void postfinalize() override{};
   // override;
 
 public:
-  void prefinalize() override;
-  void postfinalize() override{};
-  // void finalize() override;
-  // void findNashEq() override;
-  void make_country_QP() override;
-
   // Rest
 private:
   vector<LeadAllPar> AllLeadPars =

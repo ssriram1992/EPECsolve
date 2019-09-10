@@ -1290,6 +1290,42 @@ void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
   }
 }
 
+void Game::EPEC::make_country_QP()
+/**
+ * @brief Makes the Game::QP_Param for all the countries
+ * @details
+ * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for
+ * each valid @p i
+ * @note Overloaded as EPEC::make_country_QP(unsigned int)
+ */
+{
+  static bool already_ran{false};
+  if (!already_ran)
+    for (unsigned int i = 0; i < this->nCountr; ++i)
+      this->Game::EPEC::make_country_QP(i);
+
+  for (unsigned int i = 0; i < this->nCountr; ++i) {
+    // LeadLocs &Loc = this->Locations.at(i);
+    // Adjusting "stuff" because we now have new convHull variables
+    unsigned int convHullVarCount =
+        this->LeadObjec.at(i)->Q.n_rows - *this->LocEnds.at(i);
+    // Location details
+		this->convexHullVarAddn.at(i) += convHullVarCount;
+    // All other players' QP
+    if (this->nCountr > 1) {
+      for (unsigned int j = 0; j < this->nCountr; j++) {
+        if (i != j)
+          this->country_QP.at(j)->addDummy(convHullVarCount, 0,
+                                           this->country_QP.at(j)->getNx() -
+                                               this->nCountr);
+      }
+    }
+  }
+	this->updateLocs();
+}
+
+
+
 void Game::EPEC::iterativeNash() {
   int Nvar =
       this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
