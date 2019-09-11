@@ -475,6 +475,7 @@ public:                  // functions
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn) const;
 
   virtual const arma::vec getx() const final { return this->sol_x; }
+  void reset() { this->sol_x.ones(); }
   virtual const arma::vec getz() const final { return this->sol_z; }
   ///@brief Get the EPECStatistics object for the current instance
   virtual const EPECStatistics getStatistics() const final {

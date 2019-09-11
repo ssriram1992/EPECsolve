@@ -670,16 +670,6 @@ void Game::NashGame::set_positions()
   }
   // Pushing back the end of dual position
   dual_position.at(Nplayers) = (dl_cnt);
-
-  /*
-if (VERBOSE) {
-    cout << "Primals: ";
-    for (unsigned int i = 0; i < Nplayers; i++) cout << primal_position.at(i)
-<< " "; cout << "---MC_Dual:" << MC_dual_position << "---Leader: " <<
-Leader_position << "Duals: "; for (unsigned int i = 0; i < Nplayers + 1; i++)
-cout << dual_position.at(i) << " "; cout << '\n';
-}
-*/
 }
 
 const Game::NashGame &Game::NashGame::FormulateLCP(
@@ -716,7 +706,6 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
   // Get the KKT conditions for each player
 
   for (unsigned int i = 0; i < Nplayers; i++) {
-    // cout << "-----Player " << i << '\n';
     this->Players[i]->KKT(Mi[i], Ni[i], qi[i]);
     unsigned int Nprim, Ndual;
     Nprim = this->Players[i]->getNy();
@@ -1256,8 +1245,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber,
  * @todo Implementation to be done.
  */
 {
-  BOOST_LOG_TRIVIAL(fatal) << "NOT YET IMPLEMENTED";
-  return false;
+  return this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
 }
 
 void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
@@ -1282,9 +1270,10 @@ void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
     throw string(
         "Error in Game::EPEC::make_country_QP: Invalid country number");
   if (!this->country_QP.at(i).get()) {
-    if (!this->countries_LCP.at(i))
+    if (!this->countries_LCP.at(i)) {
       this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
           new LCP(this->env, *this->countries_LL.at(i).get()));
+    }
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec.at(i).get(),
                                       *this->country_QP.at(i).get());
@@ -1303,9 +1292,9 @@ void Game::EPEC::make_country_QP()
  */
 {
   static bool already_ran{false};
-  if (!already_ran)
-    for (unsigned int i = 0; i < this->nCountr; ++i)
-      this->Game::EPEC::make_country_QP(i);
+  for (unsigned int i = 0; i < this->nCountr; ++i) {
+    this->Game::EPEC::make_country_QP(i);
+  }
 
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     // LeadLocs &Loc = this->Locations.at(i);
@@ -1328,7 +1317,6 @@ void Game::EPEC::make_country_QP()
       }
     }
   }
-  already_ran = true;
   this->updateLocs();
   this->computeLeaderLocations(this->nCountr);
 }

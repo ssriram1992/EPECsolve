@@ -56,8 +56,8 @@ void Game::LCP::defConst(GRBEnv *env)
  */
 {
   AllPolyhedra = {};
-  // Ai = {};
-  // bi = {};
+  this->Ai = unique_ptr<spmat_Vec>(new spmat_Vec());
+  this->bi = unique_ptr<vec_Vec>(new vec_Vec());
   this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
   this->env = env;
   this->nR = this->M.n_rows;
@@ -457,7 +457,7 @@ void Game::LCP::print(string end) {
        << end;
 }
 
-int Game::ConvexHull(
+unsigned int Game::ConvexHull(
     const vector<arma::sp_mat *>
         *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
              ///< hull is to be found
@@ -564,7 +564,7 @@ int Game::ConvexHull(
   // Third Constraint RHS
   b.at(FirstCons + nC * 2) = 1;
   b.at(FirstCons + nC * 2 + 1) = -1;
-  return 0;
+  return nPoly;
 }
 
 void Game::compConvSize(
@@ -996,6 +996,7 @@ Game::LCP &Game::LCP::FixToPoly(
 {
   BOOST_LOG_TRIVIAL(trace) << "\tChecking feasibility for polyhedron "
                            << to_string(++this->polyCounter);
+
   unique_ptr<arma::sp_mat> Aii =
       unique_ptr<arma::sp_mat>(new arma::sp_mat(nR, nC));
   unique_ptr<arma::vec> bii =
@@ -1092,14 +1093,9 @@ Game::LCP &Game::LCP::FixToPolies(
  *high-level usage.
  */
 {
-  bool flag = false;
+  bool flag = false; // flag that there may be multiple polyhedra, i.e. 0 in
+                     // some Fix entry
   vector<short int> MyFix(Fix);
-  /*
-if (VERBOSE) {
-    for (const auto v:MyFix) cout << v << " ";
-    cout << '\n';
-}
-*/
   unsigned int i;
   for (i = 0; i < this->nR; i++) {
     if (Fix.at(i) == 0) {
@@ -1127,54 +1123,10 @@ Game::LCP &Game::LCP::EnumerateAll(
  * Th ese are always added to LCP::Ai and LCP::bi
  */
 {
-  // delete Ai;
-  // delete bi; // Just in case it is polluted with BranchPrune
-  // Ai = new vector<arma::sp_mat *>{};
-  // bi = new vector<arma::vec *>{};
   vector<short int> Fix = vector<short int>(nR, 0);
+  this->Ai->clear();
+  this->bi->clear();
   this->FixToPolies(Fix, solveLP);
-  return *this;
-}
-
-Game::LCP &Game::LCP::addPolyhedron(
-    const vector<short int> &Fix, ///< [in] +1/0/-1 Representation of the
-                                  ///< polyhedra which needed to be pushed
-    vector<unique_ptr<arma::sp_mat>>
-        &custAi, ///< [out] Vector with LHS of constraint matrix should be
-                 ///< pushed.
-    vector<unique_ptr<arma::vec>>
-        &custbi,     ///< [out] Vector with RHS of constraints should be pushed.
-    arma::sp_mat *A, ///< [out] Location where convex hull LHS has to be stored
-    arma::vec *b     ///< [out] Location where convex hull RHS has to be stored
-) {
-  this->FixToPolies(Fix, true, true, &custAi, &custbi);
-
-  if (custAi.empty()) {
-    cerr << "Empty vector of polyhedra given! Problem might be infeasible."
-         << '\n';
-    // 0 <= -1 for infeasability
-    *A = arma::sp_mat(1, this->M.n_cols);
-    *b = arma::vec(1);
-    b->at(0) = -1;
-  } else {
-    arma::sp_mat A_common;
-    A_common = arma::join_cols(this->_A, -this->M);
-    arma::vec b_common = arma::join_cols(this->_b, this->q);
-    const vector<arma::sp_mat *> tempAi =
-        [](vector<unique_ptr<arma::sp_mat>> &uv) {
-          vector<arma::sp_mat *> v{};
-          for (const auto &x : uv)
-            v.push_back(x.get());
-          return v;
-        }(custAi);
-    const vector<arma::vec *> tempbi = [](vector<unique_ptr<arma::vec>> &uv) {
-      vector<arma::vec *> v{};
-      for (const auto &x : uv)
-        v.push_back(x.get());
-      return v;
-    }(custbi);
-    Game::ConvexHull(&tempAi, &tempbi, *A, *b, A_common, b_common);
-  }
   return *this;
 }
 
@@ -1195,7 +1147,8 @@ Game::LCP &Game::LCP::makeQP(
   const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
 
   Game::QP_constraints QP_cons;
-  this->addPolyhedron(Fix, custAi, custbi, &QP_cons.B, &QP_cons.b);
+  this->EnumerateAll(true);
+  this->feasiblePolyhedra = this->ConvexHull(QP_cons.B, QP_cons.b);
   // Updated size after convex hull has been computed.
   const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
   const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};
@@ -1204,7 +1157,6 @@ Game::LCP &Game::LCP::makeQP(
   QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
   QP_obj.C = resize_patch(QP_obj.C, Ny, Nx_old);
   QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
-  this->feasiblePolyhedra = custAi.size();
   // Setting the QP_Param object
   QP.set(QP_obj, QP_cons);
   return *this;

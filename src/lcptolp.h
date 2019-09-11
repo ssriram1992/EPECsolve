@@ -13,9 +13,10 @@ namespace Game {
 arma::vec LPSolve(const arma::sp_mat &A, const arma::vec &b, const arma::vec &c,
                   int &status, bool Positivity = false);
 
-int ConvexHull(const vector<arma::sp_mat *> *Ai, const vector<arma::vec *> *bi,
-               arma::sp_mat &A, arma::vec &b, const arma::sp_mat Acom = {},
-               const arma::vec bcom = {});
+unsigned int ConvexHull(const vector<arma::sp_mat *> *Ai,
+                        const vector<arma::vec *> *bi, arma::sp_mat &A,
+                        arma::vec &b, const arma::sp_mat Acom = {},
+                        const arma::vec bcom = {});
 
 void compConvSize(arma::sp_mat &A, const unsigned int nFinCons,
                   const unsigned int nFinVar, const vector<arma::sp_mat *> *Ai,
@@ -179,9 +180,6 @@ public:
                                   bool solve = false);
 
   /* Convex hull computation */
-  LCP &addPolyhedron(const vector<short int> &Fix, spmat_Vec &custAi,
-                     vec_Vec &custbi, arma::sp_mat *A = {}, arma::vec *b = {});
-
   int ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description LHS to
                                   ///< be stored here
                  arma::vec &b) ///< Convex hull inequality description RHS to be
