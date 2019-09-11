@@ -994,6 +994,18 @@ Game::LCP &Game::LCP::FixToPoly(
  *level code. Instead use LCP::FixToPolies.
  */
 {
+  if (!custom) {
+    bool flag{false};
+    for (const auto &ff : AllPolyhedra) {
+      if (ff == Fix) {
+        flag = true;
+        break;
+      }
+    }
+    if (flag)
+      return *this;
+  }
+
   BOOST_LOG_TRIVIAL(trace) << "\tChecking feasibility for polyhedron "
                            << to_string(++this->polyCounter);
 
@@ -1002,9 +1014,10 @@ Game::LCP &Game::LCP::FixToPoly(
   unique_ptr<arma::vec> bii =
       unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
   for (unsigned int i = 0; i < this->nR; i++) {
-    if (Fix.at(i) == 0)
+    if (Fix.at(i) == 0) {
       throw string(
           "Error in Game::LCP::FixToPoly. 0s not allowed in argument vector");
+    }
     if (Fix.at(i) == 1) // Equation to be fixed top zero
     {
       for (auto j = this->M.begin_row(i); j != this->M.end_row(i); ++j)
@@ -1057,10 +1070,14 @@ Game::LCP &Game::LCP::FixToPoly(
     }
   }
   if (add) {
-    custom ? (custAi->push_back(std::move(Aii)))
-           : (this->Ai->push_back(std::move(Aii)));
-    custom ? custbi->push_back(std::move(bii))
-           : this->bi->push_back(std::move(bii));
+    if (custom) {
+      custAi->push_back(std::move(Aii));
+      custbi->push_back(std::move(bii));
+    } else {
+      AllPolyhedra.push_back(Fix);
+      this->Ai->push_back(std::move(Aii));
+      this->bi->push_back(std::move(bii));
+    }
   }
   return *this;
 }
@@ -1131,23 +1148,20 @@ Game::LCP &Game::LCP::EnumerateAll(
 }
 
 Game::LCP &Game::LCP::makeQP(
-    const vector<short int> &Fix, ///< +1/0/-1 Representation of the polyhedron
-                                  ///< which needed to be pushed
-    vector<unique_ptr<arma::sp_mat>>
-        &custAi, ///< Vector with LHS of constraint matrix should be pushed.
-    vector<unique_ptr<arma::vec>>
-        &custbi, ///< Vector with RHS of constraints should be pushed.
     Game::QP_objective
         &QP_obj, ///< The objective function of the QP to be returned. @warning
                  ///< Size of this parameter might change!
-    Game::QP_Param &QP ///< The output parameter where the final Game::QP_Param
-                       ///< object is stored
+    Game::QP_Param &QP, ///< The output parameter where the final Game::QP_Param
+                        ///< object is stored
+    bool fullEnumerate
+
 ) {
   // Original sizes
   const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
 
   Game::QP_constraints QP_cons;
-  this->EnumerateAll(true);
+  if (fullEnumerate)
+    this->EnumerateAll(true);
   this->feasiblePolyhedra = this->ConvexHull(QP_cons.B, QP_cons.b);
   // Updated size after convex hull has been computed.
   const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
@@ -1160,14 +1174,6 @@ Game::LCP &Game::LCP::makeQP(
   // Setting the QP_Param object
   QP.set(QP_obj, QP_cons);
   return *this;
-}
-
-Game::LCP &Game::LCP::makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP) {
-  vector<unique_ptr<arma::sp_mat>> custAi{};
-  vector<unique_ptr<arma::vec>> custbi{};
-  vector<short int> Fix =
-      vector<short int>(this->getCompl().size(), 0); // Complete enumeration
-  return this->makeQP(Fix, custAi, custbi, QP_obj, QP);
 }
 
 unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)

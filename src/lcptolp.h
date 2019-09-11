@@ -204,12 +204,8 @@ public:
     return Game::ConvexHull(&tempAi, &tempbi, A, b, this->_A, this->_b);
   };
 
-  LCP &makeQP(const vector<short int> &Fix,
-              vector<unique_ptr<arma::sp_mat>> &custAi,
-              vector<unique_ptr<arma::vec>> &custbi, Game::QP_objective &QP_obj,
-              Game::QP_Param &QP);
-
-  LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
+  LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP,
+              bool enumerate = true);
 
   int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 

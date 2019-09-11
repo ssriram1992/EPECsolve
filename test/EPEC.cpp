@@ -1467,7 +1467,7 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  // /* Too slow tests
+  /* Too slow tests
   BOOST_TEST_MESSAGE("testing Models::make_country_QP");
   BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
@@ -1512,7 +1512,7 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
   epec.reset();
   BOOST_REQUIRE_MESSAGE(!epec.isSolved(&n_c, &devn),
                         "Checking if the EPEC is not spuriously soved");
-  // */
+  */
 }
 
 BOOST_AUTO_TEST_CASE(C2F2_test2) {
