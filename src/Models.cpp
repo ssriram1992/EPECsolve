@@ -540,7 +540,6 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   this->Locations.push_back(Loc);
 
   this->EPEC::LocStarts.push_back(&Loc[LeaderVars::FollowerStart]);
-  this->EPEC::LocConvHulls.push_back(&Loc[LeaderVars::ConvHullDummy]);
   this->EPEC::LocEnds.push_back(&this->Locations.back().at(LeaderVars::End));
   this->EPEC::convexHullVarAddn.push_back(0);
 

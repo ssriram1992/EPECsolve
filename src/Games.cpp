@@ -1147,10 +1147,14 @@ void Game::EPEC::finalize()
     this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
     this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
     this->countries_LCP = vector<unique_ptr<Game::LCP>>(nCountr);
+    this->SizesWithoutHull = vector<unsigned int>(nCountr, 0);
     for (unsigned int i = 0; i < this->nCountr; i++) {
       this->add_Dummy_Lead(i);
       this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
       this->make_obj_leader(i, *this->LeadObjec.at(i).get());
+      this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
+          new LCP(this->env, *this->countries_LL.at(i).get()));
+      this->SizesWithoutHull.at(i) = *this->LocEnds.at(i);
     }
 
   } catch (const char *e) {
@@ -1176,7 +1180,7 @@ void Game::EPEC::finalize()
 }
 
 void Game::EPEC::add_Dummy_Lead(
-    const unsigned int i ///< Number of dummy variables to add.
+    const unsigned int i ///< The leader to whom dummy variables should be added
 ) {
   /// Adds dummy variables to the leader of an EPEC - useful after computing the
   /// convex hull.
@@ -1270,10 +1274,6 @@ void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
     throw string(
         "Error in Game::EPEC::make_country_QP: Invalid country number");
   if (!this->country_QP.at(i).get()) {
-    if (!this->countries_LCP.at(i)) {
-      this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
-          new LCP(this->env, *this->countries_LL.at(i).get()));
-    }
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec.at(i).get(),
                                       *this->country_QP.at(i).get());

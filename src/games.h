@@ -389,6 +389,9 @@ struct EPECStatistics {
 };
 
 class EPEC {
+private:
+  vector<unsigned int> SizesWithoutHull{};
+
 protected: // Datafields
   vector<shared_ptr<Game::NashGame>> countries_LL{};
   vector<unique_ptr<Game::LCP>> countries_LCP{};
@@ -409,7 +412,6 @@ protected: // Datafields
   vector<unsigned int> LeaderLocations{}; ///< Location of each leader
   vector<const unsigned int *> LocStarts{};
   vector<const unsigned int *> LocEnds{};
-  vector<const unsigned int *> LocConvHulls{};
   vector<unsigned int> convexHullVarAddn{};
   unsigned int n_MCVar{0};
 
