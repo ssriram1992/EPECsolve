@@ -201,7 +201,10 @@ public:
           [&v](const unique_ptr<arma::vec> &ptr) { v.push_back(ptr.get()); });
       return v;
     }(*this->bi);
-    return Game::ConvexHull(&tempAi, &tempbi, A, b, this->_A, this->_b);
+      arma::sp_mat A_common;
+      A_common = arma::join_cols(this->_A, -this->M);
+      arma::vec b_common = arma::join_cols(this->_b, this->q);
+    return Game::ConvexHull(&tempAi, &tempbi, A, b, A_common, b_common);
   };
 
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP,
