@@ -52,12 +52,15 @@ struct LeadPar {
                             ///< set the value as -1;
   double price_limit =
       -1; ///< Government does not want the price to exceed this limit
+
+  unsigned int tax_type =
+          0;  ///< 0 For standard, 1 for constant tax, 2 for carbon tax
   bool tax_revenue = false; ///< Dictates whether the leader objective will
                             ///< include tax revenues
   LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
-          bool tax_revenue = false)
+          bool tax_revenue = false, unsigned int tax_type = 0)
       : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit},
-        tax_revenue{tax_revenue} {}
+        tax_revenue{tax_revenue}, tax_type{tax_type} {}
 };
 
 /// @brief Stores the parameters of a country model
@@ -152,6 +155,7 @@ private:
   vector<LeadLocs> Locations = {}; ///< Location of variables for each country
 
   map<string, unsigned int> name2nos = {};
+  unsigned int taxVars = {0};
 
   bool dataCheck(const bool chkAllLeadPars = true,
                  const bool chkcountriesLL = true, const bool chkMC_QP = true,
