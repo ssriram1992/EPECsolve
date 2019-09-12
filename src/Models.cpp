@@ -184,8 +184,6 @@ bool Models::EPEC::ParamValid(
   // Country should have a name!
   if (Params.name == "")
     throw "Error in EPEC::ParamValid(). Country name empty";
-  if (Params.LeaderParam.tax_type>2 || Params.LeaderParam.tax_type < 0)
-      throw "Error in EPEC::ParamValid(). Tax Type should be in {0,1,2}";
   // Country should have a unique name
   for (const auto &p : this->AllLeadPars)
     if (Params.name.compare(p.name) == 0) // i.e., if the strings are same
@@ -234,11 +232,11 @@ void Models::EPEC::make_LL_QP(
   Ctemp(0, Params.n_followers) = -Params.DemandParam.beta; // For q_exp
 
   //Scroll in Ctemp basing on the taxation paradigm
-  if (Params.LeaderParam.tax_type==0)
+  if (Params.LeaderParam.tax_type==Models::TaxType::StandardTax)
       Ctemp(0, (Params.n_followers - 1) + 2 + Params.n_followers + follower) = 1; // q_{-i}, then import, export, then tilde q_i, then i-th tax
-   else if (Params.LeaderParam.tax_type==1)
+   else if (Params.LeaderParam.tax_type==Models::TaxType::SingleTax)
       Ctemp(0, (Params.n_followers - 1) + 2 + Params.n_followers + 0) = 1; // q_{-i}, then import, export, then tilde q_i, then only tax var
-  else if (Params.LeaderParam.tax_type==2)
+  else if (Params.LeaderParam.tax_type==Models::TaxType::CarbonTax)
       Ctemp(0, (Params.n_followers - 1) + 2 + Params.n_followers + 0) = Params.FollowerParam.emission_costs.at(follower); // q_{-i}, then import, export, then tilde q_i, then only tax var
 
 
@@ -351,10 +349,10 @@ void Models::EPEC::make_LL_LeadCons(
       // If taxation paradigm is not standard (0), then just one tax variable is used.
       unsigned int standardTax = 1;
       unsigned int carbonTax = 0;
-      if (Params.LeaderParam.tax_type!=0){
+      if (Params.LeaderParam.tax_type!=Models::TaxType::StandardTax){
           standardTax = 0;
           //If carbon tax, we should modify McCornick inequalities
-          if (Params.LeaderParam.tax_type==2)
+          if (Params.LeaderParam.tax_type==Models::TaxType::CarbonTax)
               carbonTax = 1;
 
       }
@@ -473,17 +471,17 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
     return *this;
 
   //Basing on the taxation paradigm, allocate the right number of taxVars in the class
-  if (Params.LeaderParam.tax_type == 0) {
+  if (Params.LeaderParam.tax_type == Models::TaxType::StandardTax) {
       BOOST_LOG_TRIVIAL(info)
               << "Country " << Params.name << " has a standard tax paradigm.";
       this->taxVars = Params.n_followers;
   }
   else {
-      if (Params.LeaderParam.tax_type == 1) {
+      if (Params.LeaderParam.tax_type == Models::TaxType::SingleTax) {
           BOOST_LOG_TRIVIAL(info)
-                  << "Country " << Params.name << " has a constant tax paradigm.";
+                  << "Country " << Params.name << " has a single tax paradigm.";
       }
-      else if (Params.LeaderParam.tax_type == 2){
+      else if (Params.LeaderParam.tax_type == Models::TaxType::CarbonTax){
           BOOST_LOG_TRIVIAL(info)
                   << "Country " << Params.name << " has a carbon tax paradigm.";
       }
@@ -520,14 +518,14 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   if (Params.LeaderParam.price_limit >= 0)
     price_lim_cons = 1;
   unsigned int activeTaxCaps = 0;
-  if (Params.LeaderParam.tax_type == 0) {
+  if (Params.LeaderParam.tax_type == Models::TaxType::StandardTax) {
       // Since we have a standard taxation paradigm, we have to consider all different tax caps
       activeTaxCaps = count_if(Params.FollowerParam.tax_caps.begin(),
                                             Params.FollowerParam.tax_caps.end(),
                                             [](double i) { return i >= 0; });
   }
   else {
-      // There is no standard taxation paradigm (so we have carbon or constant). Hence we want to consider just one caps, arbitrary the first
+      // There is no standard taxation paradigm (so we have carbon or single). Hence we want to consider just one caps, arbitrary the first
       activeTaxCaps = count_if(Params.FollowerParam.tax_caps.begin(),
                                             Params.FollowerParam.tax_caps.end(),
                                             [](double i) { return i >= 0; });
@@ -1224,7 +1222,16 @@ void Models::EPECInstance::save(string filename) {
     writer.Key("TaxRevenue");
     writer.Bool(this->Countries.at(i).LeaderParam.tax_revenue);
     writer.Key("TaxationType");
-    writer.Bool(this->Countries.at(i).LeaderParam.tax_type);
+    switch (this->Countries.at(i).LeaderParam.tax_type) {
+        case Models::TaxType::StandardTax:
+            writer.Int(0);
+            break;
+        case Models::TaxType::SingleTax:
+            writer.Int(1);
+            break;
+        default:
+            writer.Int(2);
+    }
     writer.EndObject();
 
     writer.Key("Followers");
@@ -1333,7 +1340,7 @@ void Models::EPECInstance::load(string filename) {
         if (c["LeaderParam"].HasMember("TaxRevenue")) {
           tax_revenue = c["LeaderParam"].GetObject()["TaxRevenue"].GetBool();
         }
-        unsigned int tax_type = 1;
+        unsigned int tax_type = 0;
         if (c["LeaderParam"].HasMember("TaxationType")) {
             tax_type = c["LeaderParam"].GetObject()["TaxationType"].GetInt();
         }
@@ -1450,7 +1457,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
   file << "\n"
        << name << "\n\n"; //<<" named "<<Params.FollowerParam.names.at(j)<<"\n";
   double tax =-1;
-  if (Params.LeaderParam.tax_type==0)
+  if (Params.LeaderParam.tax_type==Models::TaxType::StandardTax)
       tax = x.at(foll_tax + j);
   else
       tax = x.at(foll_tax );
