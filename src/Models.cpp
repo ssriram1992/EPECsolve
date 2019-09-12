@@ -345,7 +345,7 @@ void Models::EPEC::make_LL_LeadCons(
                export_lim_cons) =
         Params.LeaderParam.price_limit - Params.DemandParam.alpha;
   }
-  // Non-linear tax
+  // revenue tax
   if (Params.LeaderParam.tax_revenue) {
 
       // If taxation paradigm is not standard (0), then just one tax variable is used.
@@ -546,7 +546,7 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
           export_lim_cons + // Export limit constraint
           price_lim_cons +  // Price limit constraint
           activeTaxCaps +   // Tax limit constraints
-          Params.n_followers * 3 * Params.LeaderParam.tax_revenue + // Non-linear tax
+          Params.n_followers * 3 * Params.LeaderParam.tax_revenue + // revenue tax
           1, // Export - import <= Domestic production
       Loc[Models::LeaderVars::End]);
   arma::vec LeadRHS(
@@ -947,7 +947,7 @@ void Models::EPEC::make_obj_leader(
        count < Params.n_followers; j++, count++)
     QP_obj.c.at(j) = Params.FollowerParam.emission_costs.at(count);
 
-  // non-linear tax
+  // revenue tax
   if (Params.LeaderParam.tax_revenue) {
           for (unsigned int j = Loc.at(Models::LeaderVars::TaxQuad), count = 0; count < this->taxVars; j++, count++)
               QP_obj.c.at(j) = 1;
@@ -1333,7 +1333,7 @@ void Models::EPECInstance::load(string filename) {
         if (c["LeaderParam"].HasMember("TaxRevenue")) {
           tax_revenue = c["LeaderParam"].GetObject()["TaxRevenue"].GetBool();
         }
-        unsigned int tax_type = 0;
+        unsigned int tax_type = 1;
         if (c["LeaderParam"].HasMember("TaxationType")) {
             tax_type = c["LeaderParam"].GetObject()["TaxationType"].GetInt();
         }
@@ -1449,9 +1449,12 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
 
   file << "\n"
        << name << "\n\n"; //<<" named "<<Params.FollowerParam.names.at(j)<<"\n";
-
+  double tax =-1;
+  if (Params.LeaderParam.tax_type==0)
+      tax = x.at(foll_tax + j);
+  else
+      tax = x.at(foll_tax );
   const double q = x.at(foll_prod + j);
-  const double tax = x.at(foll_tax + j);
   double taxQ = 0;
   if (Params.LeaderParam.tax_revenue)
     taxQ = q > 0 ? x.at(foll_taxQ + j) / q : x.at(foll_taxQ + j);
