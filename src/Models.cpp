@@ -1539,7 +1539,6 @@ void Models::EPEC::testLCP(const unsigned int i) {
   auto country = this->get_LowerLevelNash(i);
   LCP CountryLCP(this->env, *country);
   CountryLCP.write("dat/LCP_" + to_string(i));
-  cout << "*** COUNTRY TEST***\n";
   auto model = CountryLCP.LCPasMIP(true);
   model->write("dat/CountryLCP_" + to_string(i) + ".lp");
   model->write("dat/CountryLCP_" + to_string(i) + ".sol");

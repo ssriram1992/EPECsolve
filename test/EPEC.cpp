@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE(ConvexHull_test) {
   GRBLinExpr obj = 0;
   obj += x[0] + x[1];
   model.setObjective(obj, GRB_MAXIMIZE);
-  model.set(GRB_IntParam_OutputFlag, 1);
+  model.set(GRB_IntParam_OutputFlag, 0);
   model.set(GRB_IntParam_DualReductions, 0);
   model.write("dat/ConvexHullTest.lp");
   model.optimize();
@@ -512,9 +512,9 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_CHECK_CLOSE(
       epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) +
                       0),
-      250, 0.001);
+      66.6666, 0.001);
   BOOST_CHECK_CLOSE(
-      epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), 66.6666,
+      epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), 250,
       0.001);
 }
 
@@ -1078,7 +1078,6 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
       epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
   BOOST_CHECK_MESSAGE(margCountryTwo < margCountryOne,
                       "checking marginal costs");
-  cout << margCountryOne << " " << margCountryTwo << '\n';
   BOOST_CHECK_MESSAGE(
       epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
                      0) >
