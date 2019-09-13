@@ -302,8 +302,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
  * Uses the big M method to solve the complementarity problem. The variables and
  * eqns to be set to equality can be given in Fixes in 0/+1/-1 notation
  * @note Returned model is \e always a restriction. For <tt>Fixes =
- * {0,...,0}</tt>, the returned model would solve the exact LCP (up to bigM
- * caused restriction).
+ * {0,...,0}</tt>, the returned model would solve the exact LCP.
  * @throws string if <tt> Fixes.size()!= </tt> number of equations (for
  * complementarity).
  * @warning Note that the model returned by this function has to be explicitly
@@ -333,8 +332,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
  * Uses the big M method to solve the complementarity problem. The variables and
  * eqns to be set to equality can be given in FixVar and FixEq.
  * @note Returned model is \e always a restriction. For <tt>FixEq = FixVar =
- * {}</tt>, the returned model would solve the exact LCP (up to bigM caused
- * restriction).
+ * {}</tt>, the returned model would solve the exact LCP.
  * @warning Note that the model returned by this function has to be explicitly
  * deleted using the delete operator.
  * @returns unique pointer to a GRBModel
@@ -1252,10 +1250,10 @@ unique_ptr<GRBModel>
 Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
                       const arma::vec &x_minus_i, bool solve)
 /**
- * @brief Helps solving an LCP as an MIP using bigM constraints.
+ * @brief Helps solving an LCP as an MIP.
  * @returns A unique_ptr to GRBModel that has the equivalent MIP
  * @details The MIP problem that is returned by this function is equivalent to
- * the LCP problem provided the value of bigM is large enough. The function
+ * the LCP problem. The function
  * differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader
  * objective, and returns an object with this objective.
  * @note The leader's objective has to be linear here. For quadratic objectives,
@@ -1292,7 +1290,7 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
                       const arma::vec &c, const arma::vec &x_minus_i,
                       bool solve)
 /**
- * @brief Helps solving an LCP as an MIQP using bigM constraints.
+ * @brief Helps solving an LCP as an MIQPs.
  * @returns A unique_ptr to GRBModel that has the equivalent MIQP
  * @details The MIQP problem that is returned by this function is equivalent to
  * the LCP problem provided the value of bigM is large enough. The function

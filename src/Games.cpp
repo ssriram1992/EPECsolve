@@ -353,6 +353,7 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed(
   return model;
 }
 
+
 Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars,
                                          int position)
 /**
@@ -1243,7 +1244,8 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
   if (x.n_rows != nEPECvars - nThisCountryvars)
     throw string("Error in Game::EPEC::Respond: Invalid parametrization");
 
-  return this->country_QP.at(i).get()->solveFixed(x);
+  //return this->country_QP.at(i).get()->solveFixed(x);
+  return this->countries_LCP.at(i).get()->MPECasMILP(this->country_QP.at(i).get()->getC(),this->country_QP.at(i).get()->getc(),x,true);
 }
 
 bool Game::EPEC::isSolved(unsigned int *countryNumber,
