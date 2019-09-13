@@ -1145,13 +1145,16 @@ void Game::EPEC::finalize()
     this->computeLeaderLocations(this->n_MCVar);
     // Initialize leader objective and country_QP
     this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
+    this->LeadObjec_ConvexHull = vector<shared_ptr<Game::QP_objective>>(nCountr);
     this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
     this->countries_LCP = vector<unique_ptr<Game::LCP>>(nCountr);
     this->SizesWithoutHull = vector<unsigned int>(nCountr, 0);
     for (unsigned int i = 0; i < this->nCountr; i++) {
       this->add_Dummy_Lead(i);
       this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
+      this->LeadObjec_ConvexHull.at(i) = std::make_shared<Game::QP_objective>();
       this->make_obj_leader(i, *this->LeadObjec.at(i).get());
+      this->make_obj_leader(i, *this->LeadObjec_ConvexHull.at(i).get());
       this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
           new LCP(this->env, *this->countries_LL.at(i).get()));
       this->SizesWithoutHull.at(i) = *this->LocEnds.at(i);
@@ -1275,7 +1278,7 @@ void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
         "Error in Game::EPEC::make_country_QP: Invalid country number");
   if (!this->country_QP.at(i).get()) {
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
-    this->countries_LCP.at(i)->makeQP(*this->LeadObjec.at(i).get(),
+    this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get());
     this->Stats.feasiblePolyhedra.push_back(
         this->countries_LCP.at(i)->getFeasiblePolyhedra());
@@ -1300,7 +1303,7 @@ void Game::EPEC::make_country_QP()
     // LeadLocs &Loc = this->Locations.at(i);
     // Adjusting "stuff" because we now have new convHull variables
     unsigned int convHullVarCount =
-        this->LeadObjec.at(i)->Q.n_rows - *this->LocEnds.at(i);
+        this->LeadObjec_ConvexHull.at(i)->Q.n_rows - *this->LocEnds.at(i);
     // Location details
     this->convexHullVarAddn.at(i) += convHullVarCount;
     // All other players' QP

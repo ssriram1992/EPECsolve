@@ -403,6 +403,8 @@ protected: // Datafields
       country_QP{}; ///< The QP corresponding to each player
   vector<shared_ptr<Game::QP_objective>>
       LeadObjec{}; ///< Objective of each leader
+    vector<shared_ptr<Game::QP_objective>>
+            LeadObjec_ConvexHull{}; ///< Objective of each leader, given the convex hull computation
 
   unique_ptr<Game::NashGame> nashgame; ///< The EPEC nash game
   unique_ptr<Game::LCP> lcp;           ///< The EPEC nash game written as an LCP
