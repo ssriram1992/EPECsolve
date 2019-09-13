@@ -512,9 +512,9 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_CHECK_CLOSE(
       epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) +
                       0),
-      q1, 0.001);
+      250, 0.001);
   BOOST_CHECK_CLOSE(
-      epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), t1,
+      epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), 66.6666,
       0.001);
 }
 
