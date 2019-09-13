@@ -440,7 +440,8 @@ private:
    virtual void make_country_QP(const unsigned int i,
                                  const int algorithm = 0) final;
    virtual void make_country_QP() final;
-
+   virtual void
+    computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
 protected: // functions
   EPEC(GRBEnv *env)
       : env{env}, timeLimit{
@@ -457,8 +458,6 @@ protected: // functions
   virtual void
   updateLocs() = 0; // If any location tracking system is implemented, that can
                     // be called from in here.
-  virtual void
-  computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
   virtual void make_MC_cons(arma::sp_mat &MC, arma::vec &RHS) const {
     MC.zeros();
     RHS.zeros();

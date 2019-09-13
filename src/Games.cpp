@@ -1217,9 +1217,6 @@ void Game::EPEC::add_Dummy_Lead(
 }
 
 void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
-  /** @todo Make Models::EPEC::make_country_QP() into
-   * Game::EPEC::make_country_QP() and make this function private
-   */
   this->LeaderLocations = vector<unsigned int>(this->nCountr);
   this->LeaderLocations.at(0) = 0;
   for (unsigned int i = 1; i < this->nCountr; i++) {
