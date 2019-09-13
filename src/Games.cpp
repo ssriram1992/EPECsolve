@@ -1245,7 +1245,7 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
     throw string("Error in Game::EPEC::Respond: Invalid parametrization");
 
   //return this->country_QP.at(i).get()->solveFixed(x);
-  return this->countries_LCP.at(i).get()->MPECasMILP(this->country_QP.at(i).get()->getC(),this->country_QP.at(i).get()->getc(),x,true);
+  return this->countries_LCP.at(i).get()->MPECasMILP(this->LeadObjec.at(i).get()->C,this->LeadObjec.at(i).get()->c,x,true);
 }
 
 bool Game::EPEC::isSolved(unsigned int *countryNumber,
