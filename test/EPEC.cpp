@@ -487,8 +487,6 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec2.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec2.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec2.findNashEq());
   BOOST_TEST_MESSAGE("Testing results (with indicators)");
@@ -508,8 +506,6 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_CHECK_NO_THROW(epec3.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec3.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec3.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec3.findNashEq());
   BOOST_TEST_MESSAGE("Testing results (with bigM)");
@@ -560,8 +556,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
@@ -606,8 +600,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
@@ -651,8 +643,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_CHECK_NO_THROW(epec.testLCP(0));
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
@@ -694,8 +684,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap2_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.getStatistics().status == false, "checking status");
@@ -732,8 +720,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
@@ -785,8 +771,6 @@ BOOST_AUTO_TEST_CASE(C1F1_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margRosso =
@@ -853,8 +837,6 @@ BOOST_AUTO_TEST_CASE(C1F1_Capacities_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production levels");
@@ -899,8 +881,6 @@ BOOST_AUTO_TEST_CASE(C1F5_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking taxation");
@@ -966,8 +946,6 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCap_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking taxation");
@@ -1031,8 +1009,6 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.getStatistics().status == false, "checking status");
@@ -1086,8 +1062,6 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margCountryOne =
@@ -1180,8 +1154,6 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_NO_THROW(epec.writeSolution(0, "Solution"));
@@ -1287,8 +1259,6 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production");
@@ -1379,8 +1349,6 @@ BOOST_AUTO_TEST_CASE(C3F1_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margCountryOne =
@@ -1468,8 +1436,6 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   /* Too slow tests
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   epec.writeSolution(2, "dat/Solutionasd");
@@ -1558,8 +1524,6 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   // epec.writeSolution(2, "epec");

@@ -1345,7 +1345,8 @@ void Game::EPEC::iterativeNash() {
 }
 
 void Game::EPEC::findNashEq() {
-  if (this->country_QP.front() != nullptr) {
+    this->make_country_QP();
+    if (this->country_QP.front() != nullptr) {
     int Nvar =
         this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
     arma::sp_mat MC(0, Nvar), dumA(0, Nvar);

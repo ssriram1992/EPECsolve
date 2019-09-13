@@ -435,15 +435,15 @@ public:                  // Datafields
 private:
   virtual void add_Dummy_Lead(
       const unsigned int i) final; ///< Add Dummy variables for the leaders
+   virtual void make_country_QP(const unsigned int i,
+                                 const int algorithm = 0) final;
+   virtual void make_country_QP() final;
 
 protected: // functions
   EPEC(GRBEnv *env)
       : env{env}, timeLimit{
                       -1} {}; ///< Can be instantiated by a derived class only!
 
-  // Must NOT be reimplemented by inheritors
-  virtual void make_country_QP(const unsigned int i,
-                               const int algorithm = 0) final;
 
   // virtual function to be implemented by the inheritor.
   virtual void make_obj_leader(const unsigned int i,
@@ -467,7 +467,6 @@ public:                  // functions
   EPEC(EPEC &) = delete; ///< Abstract class - no copy constructor
   ~EPEC() {}             ///< Destructor to free data
 
-  virtual void make_country_QP() final;
   virtual void finalize() final;
   virtual void findNashEq() final;
 
