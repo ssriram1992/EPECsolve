@@ -1007,8 +1007,8 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
           x.subvec(nEnd,
                    nVar - 1); // Discard any dual variables in x
   } else {
-    solOther.zeros(nVar + nEnd - nStart);
-    solOther = x.subvec(0, nVar + nEnd - nStart -
+    solOther.zeros(nVar - nEnd + nStart);
+    solOther = x.subvec(0, nVar - nEnd + nStart -
                                1); // Discard any dual variables in x
   }
 
@@ -1016,7 +1016,7 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
 }
 
 double Game::NashGame::RespondSol(
-    arma::vec &sol,
+    arma::vec &sol,			///< [out] Optimal response 
     unsigned int player, ///< Player whose optimal response is to be computed
     const arma::vec &x,  ///< A vector of pure strategies (either for all
     ///< players or all other players)

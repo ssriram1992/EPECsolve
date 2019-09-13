@@ -1144,18 +1144,18 @@ Game::LCP &Game::LCP::EnumerateAll(
   this->Ai->clear();
   this->bi->clear();
   this->FixToPolies(Fix, solveLP);
-    if (this->Ai->empty()) {
-        BOOST_LOG_TRIVIAL(warning)
+  if (this->Ai->empty()) {
+    BOOST_LOG_TRIVIAL(warning)
         << "Empty vector of polyhedra given! Problem might be infeasible."
-             << '\n';
-        // 0 <= -1 for infeasability
-        unique_ptr<arma::sp_mat> A(new arma::sp_mat(1, this->M.n_cols));
-        unique_ptr<arma::vec> b(new  arma::vec(1));
-        b->at(0) = -1;
-        this->Ai->push_back(std::move(A));
-        this->bi->push_back(std::move(b));
-    }
-    return *this;
+        << '\n';
+    // 0 <= -1 for infeasability
+    unique_ptr<arma::sp_mat> A(new arma::sp_mat(1, this->M.n_cols));
+    unique_ptr<arma::vec> b(new arma::vec(1));
+    b->at(0) = -1;
+    this->Ai->push_back(std::move(A));
+    this->bi->push_back(std::move(b));
+  }
+  return *this;
 }
 
 Game::LCP &Game::LCP::makeQP(
