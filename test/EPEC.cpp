@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   FP.emission_costs = {6};
   FP.tax_caps = {250};
   FP.names = {"Blu"};
-  Models::LeadAllPar Country(1, "One", FP, {300, 0.05}, {-1, -1, -1, false});
+  Models::LeadAllPar Country(1, "One", FP, {300, 0.05}, {-1, -1, -1, false, 0});
   BOOST_TEST_MESSAGE("MaxTax:250 with alpha=300 and beta=0.05");
   BOOST_TEST_MESSAGE("Expected: q=66.666;t=250");
   GRBEnv env = GRBEnv();
@@ -487,8 +487,6 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec2.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec2.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec2.findNashEq());
   BOOST_TEST_MESSAGE("Testing results (with indicators)");
@@ -508,17 +506,15 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_CHECK_NO_THROW(epec3.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec3.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec3.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec3.findNashEq());
   BOOST_TEST_MESSAGE("Testing results (with bigM)");
   BOOST_CHECK_CLOSE(
       epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::FollowerStart) +
                       0),
-      q1, 0.001);
+      250, 0.001);
   BOOST_CHECK_CLOSE(
-      epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), t1,
+      epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), 66.6666,
       0.001);
 }
 
@@ -544,7 +540,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
   FP.tax_caps = {-1};
   FP.names = {"Blu"};
   Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05},
-                              {-1, -1, -1, false});
+                              {-1, -1, -1, false, 0});
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
@@ -560,8 +556,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
@@ -590,7 +584,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
   FP.tax_caps = {20};
   FP.names = {"Blu"};
   Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05},
-                              {-1, -1, -1, false});
+                              {-1, -1, -1, false, 0});
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
@@ -606,8 +600,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
@@ -641,7 +633,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
 
   Models::EPEC epec(&env);
   Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05},
-                             {-1, -1, 299, false});
+                             {-1, -1, 299, false, 0});
   BOOST_TEST_MESSAGE("PriceLimit:299 with alpha=300 and beta=0.05");
   BOOST_TEST_MESSAGE("PriceLimit coincides with domestic demand price");
   BOOST_TEST_MESSAGE("Expected: q=20;p=299");
@@ -651,8 +643,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_CHECK_NO_THROW(epec.testLCP(0));
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
@@ -682,7 +672,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap2_test) {
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
   Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05},
-                             {-1, -1, 85, false});
+                             {-1, -1, 85, false, 0});
 
   BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:85 with alpha=300 and beta=0.05");
   BOOST_TEST_MESSAGE(
@@ -694,8 +684,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap2_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.getStatistics().status == false, "checking status");
@@ -720,7 +708,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
   Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05},
-                             {-1, -1, 295, false});
+                             {-1, -1, 295, false, 0});
 
   Models::EPEC epec(&env);
   BOOST_TEST_MESSAGE("MaxTax:20, PriceLimit:290 with alpha=300 and beta=0.05");
@@ -732,8 +720,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
@@ -770,7 +756,7 @@ BOOST_AUTO_TEST_CASE(C1F1_test) {
   FP.tax_caps = {100, 100};
   FP.names = {"Rosso", "Bianco"};
   Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05},
-                             {-1, -1, 300, false});
+                             {-1, -1, 300, false, 0});
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
@@ -785,8 +771,6 @@ BOOST_AUTO_TEST_CASE(C1F1_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margRosso =
@@ -836,7 +820,7 @@ BOOST_AUTO_TEST_CASE(C1F1_Capacities_test) {
   FP.tax_caps = {100, 100};
   FP.names = {"Rosso", "Bianco"};
   Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.5},
-                             {-1, -1, 300, false});
+                             {-1, -1, 300, false, 0});
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
@@ -853,8 +837,6 @@ BOOST_AUTO_TEST_CASE(C1F1_Capacities_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production levels");
@@ -891,7 +873,7 @@ BOOST_AUTO_TEST_CASE(C1F5_test) {
   FP5.tax_caps = {25, 25, 25, 25, 25};
   FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
   Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05},
-                              {-1, -1, -1, false});
+                              {-1, -1, -1, false, 0});
   Models::EPEC epec(&env);
   BOOST_TEST_MESSAGE("testing Models::addCountry");
   BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -899,8 +881,6 @@ BOOST_AUTO_TEST_CASE(C1F5_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking taxation");
@@ -958,7 +938,7 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCap_test) {
   FP5.tax_caps = {100, 100, 100, 100, 100};
   FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
   Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05},
-                              {-1, -1, -1, false});
+                              {-1, -1, -1, false, 0});
   Models::EPEC epec(&env);
   BOOST_TEST_MESSAGE("testing Models::addCountry");
   BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -966,8 +946,6 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCap_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking taxation");
@@ -1023,7 +1001,7 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
   FP5.tax_caps = {25, 25, 25, 25, 25};
   FP5.names = {"Rosso", "Bianco", "Blu", "Viola", "Verde"};
   Models::LeadAllPar Country5(FP5.capacities.size(), "One", FP5, {400, 0.05},
-                              {-1, -1, 385, false});
+                              {-1, -1, 385, false, 0});
   Models::EPEC epec(&env);
   BOOST_TEST_MESSAGE("testing Models::addCountry");
   BOOST_CHECK_NO_THROW(epec.addCountry(Country5));
@@ -1031,8 +1009,6 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.getStatistics().status == false, "checking status");
@@ -1065,9 +1041,9 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
   FP.tax_caps = {100};
   FP.names = {"Rosso"};
   Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7},
-                              {-1, -1, 295, false});
+                              {-1, -1, 295, false, 0});
   Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5},
-                              {-1, -1, 285, false});
+                              {-1, -1, 285, false, 0});
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(2, 2);
   TrCo.zeros(2, 2);
@@ -1086,8 +1062,6 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margCountryOne =
@@ -1154,7 +1128,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
   FP1.tax_caps = {100, 100};
   FP1.names = {"OneGas", "OneCoal"};
   Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5},
-                         {0, 0, 230, false});
+                         {0, 0, 230, false, 0});
 
   FP2.capacities = {100, 80};
   FP2.costs_lin = {130, 140};
@@ -1163,7 +1137,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
   FP2.tax_caps = {100, 100};
   FP2.names = {"TwoGas", "TwoSolar"};
   Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5},
-                         {0, 0, 240, false});
+                         {0, 0, 240, false, 0});
 
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(2, 2);
@@ -1180,8 +1154,6 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_NO_THROW(epec.writeSolution(0, "Solution"));
@@ -1261,7 +1233,7 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
   FP1.tax_caps = {100, 100};
   FP1.names = {"OneGas", "OneCoal"};
   Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5},
-                         {100, 100, 230, false});
+                         {100, 100, 230, false, 0});
 
   FP2.capacities = {100, 80};
   FP2.costs_lin = {130, 140};
@@ -1270,7 +1242,7 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
   FP2.tax_caps = {100, 100};
   FP2.names = {"TwoGas", "TwoSolar"};
   Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5},
-                         {100, 100, 240, false});
+                         {100, 100, 240, false, 0});
 
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(2, 2);
@@ -1287,8 +1259,6 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production");
@@ -1351,11 +1321,11 @@ BOOST_AUTO_TEST_CASE(C3F1_test) {
   FP.tax_caps = {100};
   FP.names = {"Rosso"};
   Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7},
-                              {-1, -1, 295, false});
+                              {-1, -1, 295, false, 0});
   Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5},
-                              {-1, -1, 285, false});
+                              {-1, -1, 285, false, 0});
   Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5},
-                              {-1, -1, 315, false});
+                              {-1, -1, 315, false, 0});
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(3, 3);
   TrCo.zeros(3, 3);
@@ -1379,8 +1349,6 @@ BOOST_AUTO_TEST_CASE(C3F1_test) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margCountryOne =
@@ -1439,11 +1407,11 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
   FP.tax_caps = {100, 100};
   FP.names = {"Rosso", "Bianco"};
   Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7},
-                              {-1, -1, 295, false});
+                              {-1, -1, 295, false, 0});
   Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5},
-                              {-1, -1, 285, false});
+                              {-1, -1, 285, false, 0});
   Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5},
-                              {-1, -1, 295, false});
+                              {-1, -1, 295, false, 0});
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(3, 3);
   TrCo.zeros(3, 3);
@@ -1468,8 +1436,6 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   /* Too slow tests
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   epec.writeSolution(2, "dat/Solutionasd");
@@ -1530,11 +1496,11 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
   FP.tax_caps = {100, 100};
   FP.names = {"Rosso", "Bianco"};
   Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7},
-                              {-1, -1, 295, false});
+                              {-1, -1, 295, false, 0});
   // Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5},
   // {-1, -1, 285});
   Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5},
-                              {-1, -1, 295, false});
+                              {-1, -1, 295, false, 0});
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(2, 2);
   TrCo.zeros(2, 2);
@@ -1558,8 +1524,6 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
   BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::make_country_QP");
-  BOOST_CHECK_NO_THROW(epec.make_country_QP());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   // epec.writeSolution(2, "epec");
