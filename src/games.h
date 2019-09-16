@@ -10,6 +10,18 @@
 using namespace std;
 using namespace Game;
 
+template <class T> ostream &operator<<(ostream &ost, vector<T> v) {
+  for (auto elem : v)
+    ost << elem << " ";
+  ost << '\n';
+  return ost;
+}
+
+template <class T, class S> ostream &operator<<(ostream &ost, pair<T, S> p) {
+  ost << "<" << p.first << ", " << p.second << ">";
+  return ost;
+}
+
 namespace Game {
 bool isZero(arma::mat M, double tol = 1e-6);
 

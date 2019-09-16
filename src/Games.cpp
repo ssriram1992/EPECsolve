@@ -18,18 +18,6 @@ bool Game::isZero(arma::sp_mat M, double tol) {
   return (arma::min(arma::min(abs(M))) <= tol);
 }
 
-template <class T> ostream &operator<<(ostream &ost, vector<T> v) {
-  for (auto elem : v)
-    ost << elem << " ";
-  ost << '\n';
-  return ost;
-}
-
-template <class T, class S> ostream &operator<<(ostream &ost, pair<T, S> p) {
-  ost << "<" << p.first << ", " << p.second << ">";
-  return ost;
-}
-
 void Game::print(const perps &C) {
   for (auto p : C)
     cout << "<" << p.first << ", " << p.second << ">"
