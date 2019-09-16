@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     epec.addCountry(Instance.Countries.at(j));
   epec.addTranspCosts(Instance.TransportationCosts);
   epec.finalize();
-  epec.make_country_QP();
+  // epec.make_country_QP();
   try {
     epec.findNashEq();
   } catch (...) {

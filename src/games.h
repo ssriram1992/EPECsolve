@@ -403,8 +403,9 @@ protected: // Datafields
       country_QP{}; ///< The QP corresponding to each player
   vector<shared_ptr<Game::QP_objective>>
       LeadObjec{}; ///< Objective of each leader
-    vector<shared_ptr<Game::QP_objective>>
-            LeadObjec_ConvexHull{}; ///< Objective of each leader, given the convex hull computation
+  vector<shared_ptr<Game::QP_objective>>
+      LeadObjec_ConvexHull{}; ///< Objective of each leader, given the convex
+                              ///< hull computation
 
   unique_ptr<Game::NashGame> nashgame; ///< The EPEC nash game
   unique_ptr<Game::LCP> lcp;           ///< The EPEC nash game written as an LCP
@@ -437,16 +438,16 @@ public:                  // Datafields
 private:
   virtual void add_Dummy_Lead(
       const unsigned int i) final; ///< Add Dummy variables for the leaders
-   virtual void make_country_QP(const unsigned int i,
-                                 const int algorithm = 0) final;
-   virtual void make_country_QP() final;
-   virtual void
-    computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
+  virtual void make_country_QP(const unsigned int i,
+                               const int algorithm = 0) final;
+  virtual void make_country_QP() final;
+  virtual void
+  computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
+
 protected: // functions
   EPEC(GRBEnv *env)
       : env{env}, timeLimit{
                       -1} {}; ///< Can be instantiated by a derived class only!
-
 
   // virtual function to be implemented by the inheritor.
   virtual void make_obj_leader(const unsigned int i,

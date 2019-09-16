@@ -12,12 +12,7 @@ typedef struct DemPar DemPar;
 typedef struct LeadPar LeadPar;
 typedef struct LeadAllPar LeadAllPar;
 
-enum class TaxType {
-        StandardTax,
-        SingleTax,
-        CarbonTax
-};
-
+enum class TaxType { StandardTax, SingleTax, CarbonTax };
 
 /// @brief Stores the parameters of the follower in a country model
 struct FollPar {
@@ -61,19 +56,27 @@ struct LeadPar {
       -1; ///< Government does not want the price to exceed this limit
 
   Models::TaxType tax_type =
-          Models::TaxType::StandardTax;  ///< 0 For standard, 1 for constant tax, 2 for carbon tax
+      Models::TaxType::StandardTax; ///< 0 For standard, 1 for constant tax, 2
+                                    ///< for carbon tax
   bool tax_revenue = false; ///< Dictates whether the leader objective will
                             ///< include tax revenues
   LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
           bool tax_revenue = false, unsigned int tax_type_ = 0)
       : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit},
         tax_revenue{tax_revenue} {
-      switch (tax_type_){
-          case 0: tax_type = Models::TaxType::StandardTax;break;
-          case 1: tax_type = Models::TaxType::SingleTax;break;
-          case 2: tax_type = Models::TaxType::CarbonTax;break;
-          default: tax_type = Models::TaxType::StandardTax;
-      }
+    switch (tax_type_) {
+    case 0:
+      tax_type = Models::TaxType::StandardTax;
+      break;
+    case 1:
+      tax_type = Models::TaxType::SingleTax;
+      break;
+    case 2:
+      tax_type = Models::TaxType::CarbonTax;
+      break;
+    default:
+      tax_type = Models::TaxType::StandardTax;
+    }
   }
 };
 

@@ -1526,18 +1526,18 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   // epec.writeSolution(2, "epec");
-  double margCountryOne =
-      FP.costs_quad[0] *
-          epec.getx().at(
-              epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-  double margCountryTwo =
-      FP.costs_quad[0] *
-          epec.getx().at(
-              epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+  // double margCountryOne =
+      // FP.costs_quad[0] *
+          // epec.getx().at(
+              // epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+      // FP.costs_lin[0] +
+      // epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+  // double margCountryTwo =
+      // FP.costs_quad[0] *
+          // epec.getx().at(
+              // epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+      // FP.costs_lin[0] +
+      // epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
   BOOST_TEST_MESSAGE("checking production on Bianco-followers");
   BOOST_CHECK_CLOSE(
       epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +

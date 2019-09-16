@@ -353,7 +353,6 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed(
   return model;
 }
 
-
 Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars,
                                          int position)
 /**
@@ -1017,7 +1016,7 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
 }
 
 double Game::NashGame::RespondSol(
-    arma::vec &sol,			///< [out] Optimal response 
+    arma::vec &sol,      ///< [out] Optimal response
     unsigned int player, ///< Player whose optimal response is to be computed
     const arma::vec &x,  ///< A vector of pure strategies (either for all
     ///< players or all other players)
@@ -1146,7 +1145,8 @@ void Game::EPEC::finalize()
     this->computeLeaderLocations(this->n_MCVar);
     // Initialize leader objective and country_QP
     this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
-    this->LeadObjec_ConvexHull = vector<shared_ptr<Game::QP_objective>>(nCountr);
+    this->LeadObjec_ConvexHull =
+        vector<shared_ptr<Game::QP_objective>>(nCountr);
     this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
     this->countries_LCP = vector<unique_ptr<Game::LCP>>(nCountr);
     this->SizesWithoutHull = vector<unsigned int>(nCountr, 0);
@@ -1241,8 +1241,9 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
   if (x.n_rows != nEPECvars - nThisCountryvars)
     throw string("Error in Game::EPEC::Respond: Invalid parametrization");
 
-  //return this->country_QP.at(i).get()->solveFixed(x);
-  return this->countries_LCP.at(i).get()->MPECasMILP(this->LeadObjec.at(i).get()->C,this->LeadObjec.at(i).get()->c,x,true);
+  // return this->country_QP.at(i).get()->solveFixed(x);
+  return this->countries_LCP.at(i).get()->MPECasMILP(
+      this->LeadObjec.at(i).get()->C, this->LeadObjec.at(i).get()->c, x, true);
 }
 
 bool Game::EPEC::isSolved(unsigned int *countryNumber,
@@ -1293,7 +1294,6 @@ void Game::EPEC::make_country_QP()
  * @note Overloaded as EPEC::make_country_QP(unsigned int)
  */
 {
-  static bool already_ran{false};
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     this->Game::EPEC::make_country_QP(i);
   }
@@ -1327,12 +1327,16 @@ void Game::EPEC::iterativeNash() {
 
   for (unsigned int i = 0; i < this->nCountr; ++i) // For each country
   {
-    if (!this->countries_LCP.at(
+    if (this->countries_LCP.at(
             i)) // If the LCP object for the country is not already there
     {
       this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>( // Then make it
           new LCP(this->env, *this->countries_LL.at(i).get()));
     } // Now this LCP object has to be outer/inner approximated
+    else
+      throw string("Exception in Game::EPEC::iterativeNash: countries_LCP not "
+                   "initialized for i = " +
+                   to_string(i) + ". ");
   }
 
   int Nvar =
@@ -1347,8 +1351,8 @@ void Game::EPEC::iterativeNash() {
 }
 
 void Game::EPEC::findNashEq() {
-    this->make_country_QP();
-    if (this->country_QP.front() != nullptr) {
+  this->make_country_QP();
+  if (this->country_QP.front() != nullptr) {
     int Nvar =
         this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
     arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
