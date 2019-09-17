@@ -475,7 +475,9 @@ public:                  // functions
   virtual void iterativeNash() final;
 
   unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
-  bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn) const;
+  double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
+                      bool fullvec = true) const;
+  bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn, double tol = 1e-6) const;
 
   virtual const arma::vec getx() const final { return this->sol_x; }
   void reset() { this->sol_x.ones(); }

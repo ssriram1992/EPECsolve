@@ -1260,14 +1260,15 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
  * refer LCP::MPECasMIQP
  */
 {
-  unique_ptr<GRBModel> model = this->LCPasMIP(false);
-  arma::vec Cx(this->nC, arma::fill::zeros);
+  unique_ptr<GRBModel> model = this->LCPasMIP(true);
+  model->write("dat/pre_LCP.lp");
+  if (C.n_cols != x_minus_i.n_rows)
+      throw string("Bad size of x_minus_i");
+  if (c.n_rows != C.n_rows)
+      throw string("Bad size of c");
+    arma::vec Cx(c.n_rows, arma::fill::zeros);
   try {
     Cx = C * x_minus_i;
-    if (Cx.n_rows != this->nC)
-      throw string("Bad size of C");
-    if (c.n_rows != this->nC)
-      throw string("Bad size of c");
   } catch (exception &e) {
     cerr << "Exception in Game::LCP::MPECasMIQP: " << e.what() << '\n';
     throw;
@@ -1277,11 +1278,13 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   }
   arma::vec obj = c + Cx;
   GRBLinExpr expr{0};
-  for (unsigned int i = 0; i < this->nC; i++)
+  for (unsigned int i = 0; i < obj.n_rows; i++)
     expr += obj.at(i) * model->getVarByName("x_" + to_string(i));
   model->setObjective(expr, GRB_MINIMIZE);
+  model->set(GRB_IntParam_OutputFlag,VERBOSE);
   if (solve)
     model->optimize();
+  model->write("dat/post_LCP.lp");
   return model;
 }
 

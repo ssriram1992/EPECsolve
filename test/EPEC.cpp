@@ -1084,7 +1084,7 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
           epec.getx().at(
               epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
       "checking production");
-
+  epec.writeSolution(2,"Solution");
   BOOST_REQUIRE_MESSAGE(epec.isSolved(&n_c, &devn),
                         "Checking if the EPEC is soved");
   epec.reset();
