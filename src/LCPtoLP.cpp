@@ -1284,7 +1284,6 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   model->set(GRB_IntParam_OutputFlag,VERBOSE);
   if (solve)
     model->optimize();
-  model->write("dat/post_LCP.lp");
   return model;
 }
 

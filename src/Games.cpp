@@ -460,6 +460,7 @@ double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
       return -GRB_INFINITY;
   }
   arma::vec obj = 0.5 * y.t() * Q * y + (C * x).t() * y + c.t() * y;
+  arma::vec temp = (C * x) + c;
   return obj(0);
 }
 
@@ -1237,16 +1238,11 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
             current = *this->LocEnds.at(j) - this->convexHullVarAddn.at(j);
             solOther.subvec(count, count + current - 1) = x.subvec(*this->LocEnds.at(j),
                                                                    *this->LocEnds.at(j) + current - 1);
-            //MC var
-            solOther.at(solOther.n_rows - this->n_MCVar +index) = x.at(x.n_rows - this->n_MCVar +j);
             count += current;
-            ++index;
         }
+        //We need to keep track of MC_vars also for this country
+        solOther.at(solOther.n_rows - this->n_MCVar +j) = x.at(this->nVarinEPEC - this->n_MCVar +j);
     }
-    solOther.impl_print("solOther");
-    cout << this->LeadObjec.at(i).get()->C.n_rows << "x" << this->LeadObjec.at(i).get()->C.n_cols
-         << endl;
-    cout << solOther.n_rows << "x" << solOther.n_cols << endl;
 
 
     return this->countries_LCP.at(i).get()->MPECasMILP(
