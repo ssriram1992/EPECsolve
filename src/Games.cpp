@@ -283,7 +283,7 @@ int Game::QP_Param::make_yQy()
   return 0;
 }
 
-unique_ptr<GRBModel> Game::QP_Param:: solveFixed(
+unique_ptr<GRBModel> Game::QP_Param::solveFixed(
     arma::vec x ///< Other players' decisions
     )           /**
                  * Given a value for the parameters @f$x@f$ in the definition of QP_Param,
@@ -1218,80 +1218,82 @@ void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
 
 unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
                                          const arma::vec &x) const {
-    if (!this->finalized)
-        throw string("Error in Game::EPEC::Respond: Model not finalized");
+  if (!this->finalized)
+    throw string("Error in Game::EPEC::Respond: Model not finalized");
 
-    if (i >= this->nCountr)
-        throw string("Error in Game::EPEC::Respond: Invalid country number");
+  if (i >= this->nCountr)
+    throw string("Error in Game::EPEC::Respond: Invalid country number");
 
-    const unsigned int nEPECvars = this->nVarinEPEC;
-    const unsigned int nThisCountryvars = *this->LocEnds.at(i);
-    const unsigned int nThisCountryHullVars = this->convexHullVarAddn.at(i);
-    const unsigned int nConvexHullVars = std::accumulate(this->convexHullVarAddn.rbegin(),
-                                                         this->convexHullVarAddn.rend(), 0);
+  const unsigned int nEPECvars = this->nVarinEPEC;
+  const unsigned int nThisCountryvars = *this->LocEnds.at(i);
+  const unsigned int nThisCountryHullVars = this->convexHullVarAddn.at(i);
+  const unsigned int nConvexHullVars = std::accumulate(
+      this->convexHullVarAddn.rbegin(), this->convexHullVarAddn.rend(), 0);
 
-    arma::vec solOther;
-    solOther.zeros(nEPECvars - nThisCountryvars - nConvexHullVars + nThisCountryHullVars);
+  arma::vec solOther;
+  solOther.zeros(nEPECvars - nThisCountryvars - nConvexHullVars +
+                 nThisCountryHullVars);
 
-    for (int j = 0, count = 0, current = 0, index=0; j < this->nCountr; ++j) {
-        if (i != j) {
-            current = *this->LocEnds.at(j) - this->convexHullVarAddn.at(j);
-            solOther.subvec(count, count + current - 1) = x.subvec(*this->LocEnds.at(j),
-                                                                   *this->LocEnds.at(j) + current - 1);
-            count += current;
-        }
-        //We need to keep track of MC_vars also for this country
-        solOther.at(solOther.n_rows - this->n_MCVar +j) = x.at(this->nVarinEPEC - this->n_MCVar +j);
+  for (unsigned int j = 0, count = 0, current = 0; j < this->nCountr; ++j) {
+    if (i != j) {
+      current = *this->LocEnds.at(j) - this->convexHullVarAddn.at(j);
+      solOther.subvec(count, count + current - 1) =
+          x.subvec(*this->LocEnds.at(j), *this->LocEnds.at(j) + current - 1);
+      count += current;
     }
+    // We need to keep track of MC_vars also for this country
+    solOther.at(solOther.n_rows - this->n_MCVar + j) =
+        x.at(this->nVarinEPEC - this->n_MCVar + j);
+  }
 
-
-    return this->countries_LCP.at(i).get()->MPECasMILP(
-            this->LeadObjec.at(i).get()->C, this->LeadObjec.at(i).get()->c, solOther, true);
+  return this->countries_LCP.at(i).get()->MPECasMILP(
+      this->LeadObjec.at(i).get()->C, this->LeadObjec.at(i).get()->c, solOther,
+      true);
 }
 double Game::EPEC::RespondSol(
-        arma::vec &sol,      ///< [out] Optimal response
-        unsigned int player, ///< Player whose optimal response is to be computed
-        const arma::vec &x,  ///< A vector of pure strategies (either for all
-        ///< players or all other players)
-        bool fullvec ///< Is @p x strategy of all players? (including player @p
-        ///< player)
-) const {
-    /**
-     * @brief Returns the optimal objective value that is obtainable for the
-     * player @p player given the decision @p x of all other players.
-     * @details
-     * Calls Game::EPEC::Respond and obtains the unique_ptr to GRBModel of
-     * best response by player @p player. Then solves the model and returns the
-     * appropriate objective value.
-     * @returns The optimal objective value for the player @p player.
-     */
-    auto model = this->Respond(player, x);
-    unsigned int Nx = this->countries_LCP.at(player)->getNcol();
-    sol.zeros(Nx);
-    for (unsigned int i = 0; i < Nx; ++i)
-        sol.at(i) = model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
+    arma::vec &sol,      ///< [out] Optimal response
+    unsigned int player, ///< Player whose optimal response is to be computed
+    const arma::vec &x,  ///< A vector of pure strategies (either for all
+    ///< players or all other players)
+    bool fullvec ///< Is @p x strategy of all players? (including player @p
+                 ///< player)
+    ) const {
+  /**
+   * @brief Returns the optimal objective value that is obtainable for the
+   * player @p player given the decision @p x of all other players.
+   * @details
+   * Calls Game::EPEC::Respond and obtains the unique_ptr to GRBModel of
+   * best response by player @p player. Then solves the model and returns the
+   * appropriate objective value.
+   * @returns The optimal objective value for the player @p player.
+   */
+  auto model = this->Respond(player, x);
+  unsigned int Nx = this->countries_LCP.at(player)->getNcol();
+  sol.zeros(Nx);
+  for (unsigned int i = 0; i < Nx; ++i)
+    sol.at(i) = model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
 
-    return model->get(GRB_DoubleAttr_ObjVal);
+  return model->get(GRB_DoubleAttr_ObjVal);
 }
 
-bool Game::EPEC::isSolved(unsigned int *countryNumber,
-                          arma::vec *ProfDevn, double tol) const
+bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
+                          double tol) const
 /**
  * @todo Implementation to be done.
  */
 {
-    this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
-    if (this->nashEq==false)
-        return false;
-    arma::vec objvals = this->nashgame->ComputeQPObjvals(this->sol_x, true);
-    for (unsigned int i = 0; i < this->nCountr; ++i) {
-        double val = this->RespondSol(*ProfDevn, i, this->sol_x);
-        if (abs(val - objvals.at(i)) > tol) {
-            *countryNumber = i;
-            return false;
-        }
+  this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
+  if (this->nashEq == false)
+    return false;
+  arma::vec objvals = this->nashgame->ComputeQPObjvals(this->sol_x, true);
+  for (unsigned int i = 0; i < this->nCountr; ++i) {
+    double val = this->RespondSol(*ProfDevn, i, this->sol_x);
+    if (abs(val - objvals.at(i)) > tol) {
+      *countryNumber = i;
+      return false;
     }
-    return true;
+  }
+  return true;
 }
 
 void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
@@ -1430,7 +1432,7 @@ void Game::EPEC::findNashEq() {
     int status = lcpmodel->get(GRB_IntAttr_Status);
     if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
         status == GRB_SOLUTION_LIMIT) {
-        this->nashEq = true;
+      this->nashEq = true;
       try {
         for (unsigned int i = 0; i < (unsigned int)Nvar; i++) {
           this->sol_x(i) =

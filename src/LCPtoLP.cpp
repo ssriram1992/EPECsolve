@@ -1263,10 +1263,10 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   unique_ptr<GRBModel> model = this->LCPasMIP(true);
   model->write("dat/pre_LCP.lp");
   if (C.n_cols != x_minus_i.n_rows)
-      throw string("Bad size of x_minus_i");
+    throw string("Bad size of x_minus_i");
   if (c.n_rows != C.n_rows)
-      throw string("Bad size of c");
-    arma::vec Cx(c.n_rows, arma::fill::zeros);
+    throw string("Bad size of c");
+  arma::vec Cx(c.n_rows, arma::fill::zeros);
   try {
     Cx = C * x_minus_i;
   } catch (exception &e) {
@@ -1281,7 +1281,7 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   for (unsigned int i = 0; i < obj.n_rows; i++)
     expr += obj.at(i) * model->getVarByName("x_" + to_string(i));
   model->setObjective(expr, GRB_MINIMIZE);
-  model->set(GRB_IntParam_OutputFlag,VERBOSE);
+  model->set(GRB_IntParam_OutputFlag, VERBOSE);
   if (solve)
     model->optimize();
   return model;

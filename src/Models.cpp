@@ -1000,7 +1000,7 @@ void Models::EPEC::updateLocs()
     LeadLocs &Loc = this->Locations.at(i);
     Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy,
                         this->convexHullVarAddn.at(i));
-    //this->convexHullVarAddn.at(i) = 0;
+    // this->convexHullVarAddn.at(i) = 0;
   }
 }
 
