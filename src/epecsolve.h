@@ -7,13 +7,13 @@
 #include <iostream>
 #include <map>
 #include <vector>
-using namespace std;
-using perps = vector<pair<unsigned int, unsigned int>>;
-ostream &operator<<(ostream &ost, perps C);
-inline bool operator<(vector<int> Fix1, vector<int> Fix2);
-inline bool operator==(vector<int> Fix1, vector<int> Fix2);
-template <class T> ostream &operator<<(ostream &ost, vector<T> v);
-template <class T, class S> ostream &operator<<(ostream &ost, pair<T, S> p);
+
+using perps = std::vector<std::pair<unsigned int, unsigned int>>;
+std::ostream &operator<<(std::ostream &ost, perps C);
+inline bool operator<(std::vector<int> Fix1, std::vector<int> Fix2);
+inline bool operator==(std::vector<int> Fix1, std::vector<int> Fix2);
+template <class T> std::ostream &operator<<(std::ostream &ost, std::vector<T> v);
+template <class T, class S> std::ostream &operator<<(std::ostream &ost, std::pair<T, S> p);
 
 // Forward declarations
 namespace Game {

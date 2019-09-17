@@ -16,23 +16,23 @@ enum class TaxType { StandardTax, SingleTax, CarbonTax };
 
 /// @brief Stores the parameters of the follower in a country model
 struct FollPar {
-  vector<double> costs_quad =
+  std::vector<double> costs_quad =
       {}; ///< Quadratic coefficient of i-th follower's cost. Size of this
-          ///< vector should be equal to n_followers
-  vector<double> costs_lin =
-      {}; ///< Linear  coefficient of i-th follower's cost. Size of this vector
+          ///< std::vector should be equal to n_followers
+  std::vector<double> costs_lin =
+      {}; ///< Linear  coefficient of i-th follower's cost. Size of this std::vector
           ///< should be equal to n_followers
-  vector<double> capacities =
-      {}; ///< Production capacity of each follower. Size of this vector should
+  std::vector<double> capacities =
+      {}; ///< Production capacity of each follower. Size of this std::vector should
           ///< be equal to n_followers
-  vector<double> emission_costs =
+  std::vector<double> emission_costs =
       {}; ///< Emission costs for unit quantity of the fuel. Emission costs
           ///< feature only on the leader's problem
-  vector<double> tax_caps = {}; ///< Individual tax caps for each follower.
-  vector<string> names = {};    ///< Optional Names for the Followers.
-  FollPar(vector<double> costs_quad_ = {}, vector<double> costs_lin_ = {},
-          vector<double> capacities_ = {}, vector<double> emission_costs_ = {},
-          vector<double> tax_caps_ = {}, vector<string> names_ = {})
+  std::vector<double> tax_caps = {}; ///< Individual tax caps for each follower.
+  std::vector<string> names = {};    ///< Optional Names for the Followers.
+  FollPar(std::vector<double> costs_quad_ = {}, std::vector<double> costs_lin_ = {},
+          std::vector<double> capacities_ = {}, std::vector<double> emission_costs_ = {},
+          std::vector<double> tax_caps_ = {}, std::vector<string> names_ = {})
       : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
         emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
 };
@@ -97,13 +97,13 @@ struct LeadAllPar {
 
 /// @brief Stores a single Instance
 struct EPECInstance {
-  vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
+  std::vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
   arma::sp_mat TransportationCosts = {};     ///< Transportation costs matrix
 
   EPECInstance(string filename) {
     this->load(filename);
   } ///< Constructor from instance file
-  EPECInstance(vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_)
+  EPECInstance(std::vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_)
       : Countries{Countries_}, TransportationCosts{Transp_} {}
   ///< Constructor from instance objects
 
@@ -160,16 +160,16 @@ private:
 public:
   // Rest
 private:
-  vector<LeadAllPar> AllLeadPars =
+  std::vector<LeadAllPar> AllLeadPars =
       {}; ///< The parameters of each leader in the EPEC game
-  vector<shared_ptr<Game::QP_Param>> MC_QP =
+  std::vector<shared_ptr<Game::QP_Param>> MC_QP =
       {}; ///< The QP corresponding to the market clearing condition of each
           ///< player
   arma::sp_mat TranspCosts =
       {}; ///< Transportation costs between pairs of countries
-  vector<unsigned int> nImportMarkets =
+  std::vector<unsigned int> nImportMarkets =
       {}; ///< Number of countries from which the i-th country imports
-  vector<LeadLocs> Locations = {}; ///< Location of variables for each country
+  std::vector<LeadLocs> Locations = {}; ///< Location of variables for each country
 
   map<string, unsigned int> name2nos = {};
   unsigned int taxVars = {0};
@@ -260,7 +260,7 @@ public: // Attributes
   // Data access methods
   Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
 
-  Game::LCP *playCountry(vector<Game::LCP *> countries);
+  Game::LCP *playCountry(std::vector<Game::LCP *> countries);
 
   // Writing model files
   void write(const string filename, const unsigned int i,

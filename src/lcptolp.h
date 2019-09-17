@@ -13,14 +13,14 @@ namespace Game {
 arma::vec LPSolve(const arma::sp_mat &A, const arma::vec &b, const arma::vec &c,
                   int &status, bool Positivity = false);
 
-unsigned int ConvexHull(const vector<arma::sp_mat *> *Ai,
-                        const vector<arma::vec *> *bi, arma::sp_mat &A,
+unsigned int ConvexHull(const std::vector<arma::sp_mat *> *Ai,
+                        const std::vector<arma::vec *> *bi, arma::sp_mat &A,
                         arma::vec &b, const arma::sp_mat Acom = {},
                         const arma::vec bcom = {});
 
 void compConvSize(arma::sp_mat &A, const unsigned int nFinCons,
-                  const unsigned int nFinVar, const vector<arma::sp_mat *> *Ai,
-                  const vector<arma::vec *> *bi, const arma::sp_mat &Acom,
+                  const unsigned int nFinVar, const std::vector<arma::sp_mat *> *Ai,
+                  const std::vector<arma::vec *> *bi, const arma::sp_mat &Acom,
                   const arma::vec &bcom);
 /**
  * @brief Class to handle and solve linear complementarity problems
@@ -33,8 +33,8 @@ void compConvSize(arma::sp_mat &A, const unsigned int nFinCons,
  */
 
 class LCP {
-  using spmat_Vec = std::vector<unique_ptr<arma::sp_mat>>;
-  using vec_Vec = std::vector<unique_ptr<arma::vec>>;
+  using spmat_Vec = std::vector<std::unique_ptr<arma::sp_mat>>;
+  using vec_Vec = std::vector<std::unique_ptr<arma::vec>>;
 
 private:
   // Essential data ironment for MIP/LP solves
@@ -53,9 +53,9 @@ private:
   int feasiblePolyhedra{-1};
   /// LCP feasible region is a union of polyhedra. Keeps track which of those
   /// inequalities are fixed to equality to get the individual polyhedra
-  vector<vector<short int>> AllPolyhedra;
-  unique_ptr<spmat_Vec> Ai;
-  unique_ptr<vec_Vec> bi;
+  std::vector<std::vector<short int>> AllPolyhedra;
+  std::unique_ptr<spmat_Vec> Ai;
+  std::unique_ptr<vec_Vec> bi;
   GRBModel RlxdModel; ///< A gurobi model with all complementarity constraints
                       ///< removed.
 
@@ -66,16 +66,16 @@ private:
   void makeRelaxed();
 
   /* Solving relaxations and restrictions */
-  unique_ptr<GRBModel> LCPasMIP(vector<unsigned int> FixEq = {},
-                                vector<unsigned int> FixVar = {},
+  std::unique_ptr<GRBModel> LCPasMIP(std::vector<unsigned int> FixEq = {},
+                                std::vector<unsigned int> FixVar = {},
                                 bool solve = false);
 
-  unique_ptr<GRBModel> LCPasMIP(vector<short int> Fixes, bool solve);
+  std::unique_ptr<GRBModel> LCPasMIP(std::vector<short int> Fixes, bool solve);
 
-  unique_ptr<GRBModel> LCP_Polyhed_fixed(vector<unsigned int> FixEq = {},
-                                         vector<unsigned int> FixVar = {});
+  std::unique_ptr<GRBModel> LCP_Polyhed_fixed(std::vector<unsigned int> FixEq = {},
+                                         std::vector<unsigned int> FixVar = {});
 
-  unique_ptr<GRBModel> LCP_Polyhed_fixed(arma::Col<int> FixEq,
+  std::unique_ptr<GRBModel> LCP_Polyhed_fixed(arma::Col<int> FixEq,
                                          arma::Col<int> FixVar);
 
   /* Branch and Prune Methods */
@@ -83,27 +83,27 @@ private:
     return (val > -eps && val < eps);
   }
 
-  inline vector<short int> solEncode(GRBModel *model) const;
+  inline std::vector<short int> solEncode(GRBModel *model) const;
 
-  vector<short int> solEncode(const arma::vec &z, const arma::vec &x) const;
+  std::vector<short int> solEncode(const arma::vec &z, const arma::vec &x) const;
 
-  void branch(int loc, const vector<short int> &Fixes);
+  void branch(int loc, const std::vector<short int> &Fixes);
 
-  vector<short int> anyBranch(const vector<vector<short int>> &vecOfFixes,
-                              const vector<short int> Fix) const;
+  std::vector<short int> anyBranch(const std::vector<std::vector<short int>> &vecOfFixes,
+                              const std::vector<short int> Fix) const;
 
-  int branchLoc(unique_ptr<GRBModel> &m, const vector<short int> &Fix);
+  int branchLoc(std::unique_ptr<GRBModel> &m, const std::vector<short int> &Fix);
 
-  int branchProcLoc(const vector<short int> &Fix,
-                    const vector<short int> &Leaf) const;
+  int branchProcLoc(const std::vector<short int> &Fix,
+                    const std::vector<short int> &Leaf) const;
 
   LCP &EnumerateAll(bool solveLP = false);
 
-  LCP &FixToPoly(const vector<short int> Fix, bool checkFeas = false,
+  LCP &FixToPoly(const std::vector<short int> Fix, bool checkFeas = false,
                  bool custom = false, spmat_Vec *custAi = {},
                  vec_Vec *custbi = {});
 
-  LCP &FixToPolies(const vector<short int> Fix, bool checkFeas = false,
+  LCP &FixToPolies(const std::vector<short int> Fix, bool checkFeas = false,
                    bool custom = false, spmat_Vec *custAi = {},
                    vec_Vec *custbi = {});
 
@@ -155,7 +155,7 @@ public:
   inline perps getCompl() {
     return this->Compl;
   }                              ///< Read-only access to LCP::Compl
-  void print(string end = "\n"); ///< Print a summary of the LCP
+  void print(std::string end = "\n"); ///< Print a summary of the LCP
   inline unsigned int getNcol() { return this->M.n_cols; };
 
   inline unsigned int getNrow() { return this->M.n_rows; };
@@ -163,18 +163,18 @@ public:
   bool extractSols(GRBModel *model, arma::vec &z, arma::vec &x,
                    bool extractZ = false) const;
 
-  vector<vector<short int>> BranchAndPrune();
+  std::vector<std::vector<short int>> BranchAndPrune();
 
   /* Getting single point solutions */
-  unique_ptr<GRBModel> LCPasQP(bool solve = false);
+  std::unique_ptr<GRBModel> LCPasQP(bool solve = false);
 
-  unique_ptr<GRBModel> LCPasMIP(bool solve = false);
+  std::unique_ptr<GRBModel> LCPasMIP(bool solve = false);
 
-  unique_ptr<GRBModel> MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
+  std::unique_ptr<GRBModel> MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
                                   const arma::vec &x_minus_i,
                                   bool solve = false);
 
-  unique_ptr<GRBModel> MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
+  std::unique_ptr<GRBModel> MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
                                   const arma::vec &c,
                                   const arma::vec &x_minus_i,
                                   bool solve = false);
@@ -188,17 +188,17 @@ public:
    * Computes the convex hull of the feasible region of the LCP
    */
   {
-    const vector<arma::sp_mat *> tempAi = [](spmat_Vec &uv) {
-      vector<arma::sp_mat *> v{};
+    const std::vector<arma::sp_mat *> tempAi = [](spmat_Vec &uv) {
+      std::vector<arma::sp_mat *> v{};
       for (const auto &x : uv)
         v.push_back(x.get());
       return v;
     }(*this->Ai);
-    const vector<arma::vec *> tempbi = [](vec_Vec &uv) {
-      vector<arma::vec *> v{};
+    const std::vector<arma::vec *> tempbi = [](vec_Vec &uv) {
+      std::vector<arma::vec *> v{};
       std::for_each(
           uv.begin(), uv.end(),
-          [&v](const unique_ptr<arma::vec> &ptr) { v.push_back(ptr.get()); });
+          [&v](const std::unique_ptr<arma::vec> &ptr) { v.push_back(ptr.get()); });
       return v;
     }(*this->bi);
     arma::sp_mat A_common;
@@ -212,11 +212,11 @@ public:
 
   int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 
-  void write(string filename, bool append = true) const;
+  void write(std::string filename, bool append = true) const;
 
-  void save(string filename, bool erase = true) const;
+  void save(std::string filename, bool erase = true) const;
 
-  long int load(string filename, long int pos = 0);
+  long int load(std::string filename, long int pos = 0);
 };
 } // namespace Game
 
@@ -312,7 +312,7 @@ public:
  lcp.useIndicators = true;
  auto indModel = lcp.LCPasMIP(true);
  * @endcode
- * Both @p bigMModel and @p indModel are unique_ptr  to GRBModel objects. So all
+ * Both @p bigMModel and @p indModel are std::unique_ptr  to GRBModel objects. So all
  native gurobi operations can be performed on these objects.
  *
  * This LCP as multiple solutions. In fact the solution set can be parameterized

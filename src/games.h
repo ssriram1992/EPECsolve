@@ -10,7 +10,7 @@
 using namespace std;
 using namespace Game;
 
-template <class T> ostream &operator<<(ostream &ost, vector<T> v) {
+template <class T> ostream &operator<<(ostream &ost, std::vector<T> v) {
   for (auto elem : v)
     ost << elem << " ";
   ost << '\n';
@@ -246,16 +246,16 @@ private:
   arma::sp_mat LeaderConstraints;       ///< Upper level leader constraints LHS
   arma::vec LeaderConsRHS;              ///< Upper level leader constraints RHS
   unsigned int Nplayers;                ///< Number of players in the Nash Game
-  vector<shared_ptr<QP_Param>> Players; ///< The QP that each player solves
+  std::vector<shared_ptr<QP_Param>> Players; ///< The QP that each player solves
   arma::sp_mat MarketClearing;          ///< Market clearing constraints
   arma::vec MCRHS; ///< RHS to the Market Clearing constraints
 
   /// @internal In the vector of variables of all players,
   /// which position does the variable corrresponding to this player starts.
-  vector<unsigned int> primal_position;
+  std::vector<unsigned int> primal_position;
   ///@internal In the vector of variables of all players,
   /// which position do the DUAL variable corrresponding to this player starts.
-  vector<unsigned int> dual_position;
+  std::vector<unsigned int> dual_position;
   /// @internal Manages the position of Market clearing constraints' duals
   unsigned int MC_dual_position;
   /// @internal Manages the position of where the leader's variables start
@@ -270,7 +270,7 @@ public: // Constructors
   NashGame(GRBEnv *e)
       : env{e} {}; ///< To be used only when NashGame is being loaded from a
                    ///< file.
-  NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
+  NashGame(GRBEnv *e, std::vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
            arma::vec MCRHS, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {},
            arma::vec LeadRHS = {});
 
@@ -394,7 +394,7 @@ struct EPECStatistics {
   int numConstraints = {-1}; ///< Number of constraints in findNashEq model
   int numNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
                          ///< matrix of findNashEq model
-  vector<int> feasiblePolyhedra =
+  std::vector<int> feasiblePolyhedra =
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
           ///< leader (country)
   double wallClockTime = {-1.0};
@@ -402,20 +402,20 @@ struct EPECStatistics {
 
 class EPEC {
 private:
-  vector<unsigned int> SizesWithoutHull{};
+  std::vector<unsigned int> SizesWithoutHull{};
 
 protected: // Datafields
-  vector<shared_ptr<Game::NashGame>> countries_LL{};
-  vector<unique_ptr<Game::LCP>> countries_LCP{};
+  std::vector<shared_ptr<Game::NashGame>> countries_LL{};
+  std::vector<unique_ptr<Game::LCP>> countries_LCP{};
 
-  vector<arma::sp_mat> LeadConses{}; ///< Stores each leader's constraint LHS
-  vector<arma::vec> LeadRHSes{};     ///< Stores each leader's constraint RHS
+  std::vector<arma::sp_mat> LeadConses{}; ///< Stores each leader's constraint LHS
+  std::vector<arma::vec> LeadRHSes{};     ///< Stores each leader's constraint RHS
 
-  vector<shared_ptr<Game::QP_Param>>
+  std::vector<shared_ptr<Game::QP_Param>>
       country_QP{}; ///< The QP corresponding to each player
-  vector<shared_ptr<Game::QP_objective>>
+  std::vector<shared_ptr<Game::QP_objective>>
       LeadObjec{}; ///< Objective of each leader
-  vector<shared_ptr<Game::QP_objective>>
+  std::vector<shared_ptr<Game::QP_objective>>
       LeadObjec_ConvexHull{}; ///< Objective of each leader, given the convex
                               ///< hull computation
 
@@ -424,10 +424,10 @@ protected: // Datafields
   unique_ptr<GRBModel>
       lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
 
-  vector<unsigned int> LeaderLocations{}; ///< Location of each leader
-  vector<const unsigned int *> LocStarts{};
-  vector<const unsigned int *> LocEnds{};
-  vector<unsigned int> convexHullVarAddn{};
+  std::vector<unsigned int> LeaderLocations{}; ///< Location of each leader
+  std::vector<const unsigned int *> LocStarts{};
+  std::vector<const unsigned int *> LocEnds{};
+  std::vector<unsigned int> convexHullVarAddn{};
   unsigned int n_MCVar{0};
 
   GRBEnv *env;
