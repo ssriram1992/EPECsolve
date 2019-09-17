@@ -428,6 +428,7 @@ protected: // Datafields
   std::vector<const unsigned int *> LocStarts{};
   std::vector<const unsigned int *> LocEnds{};
   std::vector<unsigned int> convexHullVarAddn{};
+  std::vector<unsigned int> convexHullVariables{};
   unsigned int n_MCVar{0};
 
   GRBEnv *env;

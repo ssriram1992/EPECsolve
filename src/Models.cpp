@@ -606,6 +606,7 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   this->EPEC::LocStarts.push_back(&Loc[LeaderVars::FollowerStart]);
   this->EPEC::LocEnds.push_back(&this->Locations.back().at(LeaderVars::End));
   this->EPEC::convexHullVarAddn.push_back(0);
+  this->EPEC::convexHullVariables.push_back(0);
 
   this->LeadConses.push_back(N->RewriteLeadCons());
   this->AllLeadPars.push_back(Params);
@@ -1000,7 +1001,8 @@ void Models::EPEC::updateLocs()
     LeadLocs &Loc = this->Locations.at(i);
     Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy,
                         this->convexHullVarAddn.at(i));
-    // this->convexHullVarAddn.at(i) = 0;
+    this->convexHullVariables.at(i) += this->convexHullVarAddn.at(i);
+    this->convexHullVarAddn.at(i) = 0;
   }
 }
 

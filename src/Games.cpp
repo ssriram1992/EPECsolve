@@ -1226,9 +1226,9 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
 
   const unsigned int nEPECvars = this->nVarinEPEC;
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
-  const unsigned int nThisCountryHullVars = this->convexHullVarAddn.at(i);
+  const unsigned int nThisCountryHullVars = this->convexHullVariables.at(i);
   const unsigned int nConvexHullVars = std::accumulate(
-      this->convexHullVarAddn.rbegin(), this->convexHullVarAddn.rend(), 0);
+      this->convexHullVariables.rbegin(), this->convexHullVariables.rend(), 0);
 
   arma::vec solOther;
   solOther.zeros(nEPECvars - nThisCountryvars - nConvexHullVars +
@@ -1236,7 +1236,7 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
 
   for (unsigned int j = 0, count = 0, current = 0; j < this->nCountr; ++j) {
     if (i != j) {
-      current = *this->LocEnds.at(j) - this->convexHullVarAddn.at(j);
+      current = *this->LocEnds.at(j) - this->convexHullVariables.at(j);
       solOther.subvec(count, count + current - 1) =
           x.subvec(*this->LocEnds.at(j), *this->LocEnds.at(j) + current - 1);
       count += current;
