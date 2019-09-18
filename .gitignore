@@ -33,3 +33,4 @@ tags
 *.txt
 EPECsolve
 .*
+style.clang-format

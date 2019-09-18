@@ -1311,7 +1311,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
   return true;
 }
 
-void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
+void Game::EPEC::make_country_QP(const unsigned int i)
 /**
  * @brief Makes the Game::QP_Param corresponding to the @p i-th country.
  * @details
@@ -1334,8 +1334,11 @@ void Game::EPEC::make_country_QP(const unsigned int i, const int algorithm)
         "Error in Game::EPEC::make_country_QP: Invalid country number");
   if (!this->country_QP.at(i).get()) {
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
+    // In the last parameter, we specify whether we want to have full
+    // enumeration or not
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
-                                      *this->country_QP.at(i).get());
+                                      *this->country_QP.at(i).get(),
+                                      this->algorithm == 0 ? true : false);
     this->Stats.feasiblePolyhedra.push_back(
         this->countries_LCP.at(i)->getFeasiblePolyhedra());
   }
@@ -1398,7 +1401,11 @@ void Game::EPEC::giveAllDevns(
 }
 
 void Game::EPEC::addDeviatedPolyhedron(
-    const std::vector<arma::vec> &devns) const {}
+    const std::vector<arma::vec> &devns) const {
+
+  for (unsigned int i = 0; i < this->nCountr; ++i) // For each country
+    this->countries_LCP.at(i)->addPolyFromX(devns.at(i));
+}
 
 void Game::EPEC::iterativeNash() {
 
@@ -1410,22 +1417,24 @@ void Game::EPEC::iterativeNash() {
   this->sol_x.zeros(this->nVarinEPEC);
   std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
 
-  this->giveAllDevns(devns, this->sol_x);
-  this->addDeviatedPolyhedron(devns);
+  bool notSolved = {true};
+  unsigned int deviatedCountry;
+  arma::vec countryDeviation;
 
-  int Nvar =
-      this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
-  arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
-  arma::vec MCRHS, dumb;
-  MCRHS.zeros(0);
-  dumb.zeros(0);
-  this->make_MC_cons(MC, MCRHS);
-  this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
-      this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
+  while (notSolved) {
+    this->giveAllDevns(devns, this->sol_x);
+    this->addDeviatedPolyhedron(devns);
+    this->make_country_QP();
+    this->computeNashEq();
+    // Algorithmically, it would be better to use data from previously computed
+    // deviations
+    if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+      notSolved = false;
+    }
+  }
 }
 
-void Game::EPEC::findNashEq() {
-  this->make_country_QP();
+void Game::EPEC::computeNashEq() {
   if (this->country_QP.front() != nullptr) {
     int Nvar =
         this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
@@ -1476,25 +1485,35 @@ void Game::EPEC::findNashEq() {
         }
 
       } catch (GRBException &e) {
-        cerr << "GRBException in Game::EPEC::findNashEq : " << e.getErrorCode()
-             << ": " << e.getMessage() << " " << temp << '\n';
+        cerr << "GRBException in Game::EPEC::computeNashEq : "
+             << e.getErrorCode() << ": " << e.getMessage() << " " << temp
+             << '\n';
       }
       this->Stats.status = 1;
     } else {
       if (status == GRB_TIME_LIMIT) {
         this->Stats.status = 2;
-        BOOST_LOG_TRIVIAL(warning)
-            << "Game::EPEC::findNashEq: no nash equilibrium found (timeLimit)."
-            << '\n';
+        BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no nash "
+                                      "equilibrium found (timeLimit)."
+                                   << '\n';
       } else
-        BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::findNashEq: no nash "
+        BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no nash "
                                       "equilibrium found (infeasibility)."
                                    << '\n';
     }
-
   } else {
-    cerr << "Exception in Game::EPEC::findNashEq : no country QP has been made."
+    cerr << "Exception in Game::EPEC::computeNashEq : no country QP has been "
+            "made."
          << '\n';
     throw;
+  }
+}
+
+void Game::EPEC::findNashEq() {
+  if (this->algorithm == 0) {
+    this->make_country_QP();
+    this->computeNashEq();
+  } else if (this->algorithm == 1) {
+    this->iterativeNash();
   }
 }

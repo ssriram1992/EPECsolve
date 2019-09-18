@@ -403,6 +403,7 @@ struct EPECStatistics {
 class EPEC {
 private:
   std::vector<unsigned int> SizesWithoutHull{};
+  int algorithm = 0; ///< Stores the type of algorithm used by the EPEC. 0 is FullEnumeration, 1 is Inner Approximation
 
 protected: // Datafields
   std::vector<shared_ptr<Game::NashGame>> countries_LL{};
@@ -452,8 +453,7 @@ public:                  // Datafields
 private:
   virtual void add_Dummy_Lead(
       const unsigned int i) final; ///< Add Dummy variables for the leaders
-  virtual void make_country_QP(const unsigned int i,
-                               const int algorithm = 0) final;
+  virtual void make_country_QP(const unsigned int i) final;
   virtual void make_country_QP() final;
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
@@ -461,6 +461,7 @@ private:
   void giveAllDevns(std::vector<arma::vec> &devns,
                     const arma::vec &guessSol) const;
   void addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
+  virtual void computeNashEq() final;
 
 protected: // functions
   EPEC(GRBEnv *env)
@@ -504,6 +505,15 @@ public:                  // functions
   ///@brief Get the EPECStatistics object for the current instance
   virtual const EPECStatistics getStatistics() const final {
     return this->Stats;
+  }
+  virtual void setAlgorithm(unsigned int algorithm) final{
+    switch (algorithm){
+    case 0: this->algorithm=0;
+      break;
+    case 1: this->algorithm=1;
+      break;
+    default: this->algorithm=0;
+    }
   }
 };
 } // namespace Game
