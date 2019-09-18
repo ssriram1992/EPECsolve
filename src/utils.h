@@ -16,8 +16,8 @@ arma::mat resize_patch(const arma::mat &Mat, const unsigned int nR,
 arma::vec resize_patch(const arma::vec &Mat, const unsigned int nR);
 
 // Saving and retrieving an arma::vec
-void appendSave(const vec &matrix, const std::string out, const std::string header = "",
-                bool erase = false);
+void appendSave(const vec &matrix, const std::string out,
+                const std::string header = "", bool erase = false);
 
 long int appendRead(vec &matrix, const std::string in, long int pos,
                     const std::string header = "");
@@ -42,8 +42,8 @@ void appendSave(const std::string v, const std::string out, bool erase = false);
 long int appendRead(std::string &v, const std::string in, long int pos);
 
 // Saving A long int
-void appendSave(const long int v, const std::string out, const std::string header = "",
-                bool erase = false);
+void appendSave(const long int v, const std::string out,
+                const std::string header = "", bool erase = false);
 
 long int appendRead(long int &v, const std::string in, long int pos,
                     const std::string header = "");

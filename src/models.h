@@ -20,18 +20,20 @@ struct FollPar {
       {}; ///< Quadratic coefficient of i-th follower's cost. Size of this
           ///< std::vector should be equal to n_followers
   std::vector<double> costs_lin =
-      {}; ///< Linear  coefficient of i-th follower's cost. Size of this std::vector
-          ///< should be equal to n_followers
+      {}; ///< Linear  coefficient of i-th follower's cost. Size of this
+          ///< std::vector should be equal to n_followers
   std::vector<double> capacities =
-      {}; ///< Production capacity of each follower. Size of this std::vector should
-          ///< be equal to n_followers
+      {}; ///< Production capacity of each follower. Size of this std::vector
+          ///< should be equal to n_followers
   std::vector<double> emission_costs =
       {}; ///< Emission costs for unit quantity of the fuel. Emission costs
           ///< feature only on the leader's problem
   std::vector<double> tax_caps = {}; ///< Individual tax caps for each follower.
   std::vector<string> names = {};    ///< Optional Names for the Followers.
-  FollPar(std::vector<double> costs_quad_ = {}, std::vector<double> costs_lin_ = {},
-          std::vector<double> capacities_ = {}, std::vector<double> emission_costs_ = {},
+  FollPar(std::vector<double> costs_quad_ = {},
+          std::vector<double> costs_lin_ = {},
+          std::vector<double> capacities_ = {},
+          std::vector<double> emission_costs_ = {},
           std::vector<double> tax_caps_ = {}, std::vector<string> names_ = {})
       : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
         emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
@@ -98,7 +100,7 @@ struct LeadAllPar {
 /// @brief Stores a single Instance
 struct EPECInstance {
   std::vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
-  arma::sp_mat TransportationCosts = {};     ///< Transportation costs matrix
+  arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
 
   EPECInstance(string filename) {
     this->load(filename);
@@ -169,7 +171,8 @@ private:
       {}; ///< Transportation costs between pairs of countries
   std::vector<unsigned int> nImportMarkets =
       {}; ///< Number of countries from which the i-th country imports
-  std::vector<LeadLocs> Locations = {}; ///< Location of variables for each country
+  std::vector<LeadLocs> Locations =
+      {}; ///< Location of variables for each country
 
   map<string, unsigned int> name2nos = {};
   unsigned int taxVars = {0};

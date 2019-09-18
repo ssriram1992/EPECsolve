@@ -1336,6 +1336,7 @@ void Game::EPEC::make_country_QP()
  */
 {
   for (unsigned int i = 0; i < this->nCountr; ++i) {
+    this->convexHullVarAddn.at(i) = 0;
     this->Game::EPEC::make_country_QP(i);
   }
 
@@ -1346,6 +1347,7 @@ void Game::EPEC::make_country_QP()
         this->LeadObjec_ConvexHull.at(i)->Q.n_rows - *this->LocEnds.at(i);
     // Location details
     this->convexHullVarAddn.at(i) += convHullVarCount;
+    this->convexHullVariables.at(i) += convHullVarCount;
     // All other players' QP
     if (this->nCountr > 1) {
       for (unsigned int j = 0; j < this->nCountr; j++) {

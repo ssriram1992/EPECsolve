@@ -243,11 +243,11 @@ public: // Constructors
 class NashGame {
 private:
   GRBEnv *env = nullptr;
-  arma::sp_mat LeaderConstraints;       ///< Upper level leader constraints LHS
-  arma::vec LeaderConsRHS;              ///< Upper level leader constraints RHS
-  unsigned int Nplayers;                ///< Number of players in the Nash Game
+  arma::sp_mat LeaderConstraints; ///< Upper level leader constraints LHS
+  arma::vec LeaderConsRHS;        ///< Upper level leader constraints RHS
+  unsigned int Nplayers;          ///< Number of players in the Nash Game
   std::vector<shared_ptr<QP_Param>> Players; ///< The QP that each player solves
-  arma::sp_mat MarketClearing;          ///< Market clearing constraints
+  arma::sp_mat MarketClearing;               ///< Market clearing constraints
   arma::vec MCRHS; ///< RHS to the Market Clearing constraints
 
   /// @internal In the vector of variables of all players,
@@ -270,9 +270,9 @@ public: // Constructors
   NashGame(GRBEnv *e)
       : env{e} {}; ///< To be used only when NashGame is being loaded from a
                    ///< file.
-  NashGame(GRBEnv *e, std::vector<shared_ptr<QP_Param>> Players, arma::sp_mat MC,
-           arma::vec MCRHS, unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {},
-           arma::vec LeadRHS = {});
+  NashGame(GRBEnv *e, std::vector<shared_ptr<QP_Param>> Players,
+           arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar = 0,
+           arma::sp_mat LeadA = {}, arma::vec LeadRHS = {});
 
   NashGame(GRBEnv *e, unsigned int Nplayers, unsigned int n_LeadVar = 0,
            arma::sp_mat LeadA = {}, arma::vec LeadRHS = {})
@@ -408,8 +408,9 @@ protected: // Datafields
   std::vector<shared_ptr<Game::NashGame>> countries_LL{};
   std::vector<unique_ptr<Game::LCP>> countries_LCP{};
 
-  std::vector<arma::sp_mat> LeadConses{}; ///< Stores each leader's constraint LHS
-  std::vector<arma::vec> LeadRHSes{};     ///< Stores each leader's constraint RHS
+  std::vector<arma::sp_mat>
+      LeadConses{};                   ///< Stores each leader's constraint LHS
+  std::vector<arma::vec> LeadRHSes{}; ///< Stores each leader's constraint RHS
 
   std::vector<shared_ptr<Game::QP_Param>>
       country_QP{}; ///< The QP corresponding to each player

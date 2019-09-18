@@ -19,7 +19,8 @@ unsigned int ConvexHull(const std::vector<arma::sp_mat *> *Ai,
                         const arma::vec bcom = {});
 
 void compConvSize(arma::sp_mat &A, const unsigned int nFinCons,
-                  const unsigned int nFinVar, const std::vector<arma::sp_mat *> *Ai,
+                  const unsigned int nFinVar,
+                  const std::vector<arma::sp_mat *> *Ai,
                   const std::vector<arma::vec *> *bi, const arma::sp_mat &Acom,
                   const arma::vec &bcom);
 /**
@@ -67,16 +68,17 @@ private:
 
   /* Solving relaxations and restrictions */
   std::unique_ptr<GRBModel> LCPasMIP(std::vector<unsigned int> FixEq = {},
-                                std::vector<unsigned int> FixVar = {},
-                                bool solve = false);
+                                     std::vector<unsigned int> FixVar = {},
+                                     bool solve = false);
 
   std::unique_ptr<GRBModel> LCPasMIP(std::vector<short int> Fixes, bool solve);
 
-  std::unique_ptr<GRBModel> LCP_Polyhed_fixed(std::vector<unsigned int> FixEq = {},
-                                         std::vector<unsigned int> FixVar = {});
+  std::unique_ptr<GRBModel>
+  LCP_Polyhed_fixed(std::vector<unsigned int> FixEq = {},
+                    std::vector<unsigned int> FixVar = {});
 
   std::unique_ptr<GRBModel> LCP_Polyhed_fixed(arma::Col<int> FixEq,
-                                         arma::Col<int> FixVar);
+                                              arma::Col<int> FixVar);
 
   /* Branch and Prune Methods */
   template <class T> inline bool isZero(const T val) const {
@@ -85,14 +87,17 @@ private:
 
   inline std::vector<short int> solEncode(GRBModel *model) const;
 
-  std::vector<short int> solEncode(const arma::vec &z, const arma::vec &x) const;
+  std::vector<short int> solEncode(const arma::vec &z,
+                                   const arma::vec &x) const;
 
   void branch(int loc, const std::vector<short int> &Fixes);
 
-  std::vector<short int> anyBranch(const std::vector<std::vector<short int>> &vecOfFixes,
-                              const std::vector<short int> Fix) const;
+  std::vector<short int>
+  anyBranch(const std::vector<std::vector<short int>> &vecOfFixes,
+            const std::vector<short int> Fix) const;
 
-  int branchLoc(std::unique_ptr<GRBModel> &m, const std::vector<short int> &Fix);
+  int branchLoc(std::unique_ptr<GRBModel> &m,
+                const std::vector<short int> &Fix);
 
   int branchProcLoc(const std::vector<short int> &Fix,
                     const std::vector<short int> &Leaf) const;
@@ -154,7 +159,7 @@ public:
   } ///< Read-only access to LCP::LeadEnd
   inline perps getCompl() {
     return this->Compl;
-  }                              ///< Read-only access to LCP::Compl
+  }                                   ///< Read-only access to LCP::Compl
   void print(std::string end = "\n"); ///< Print a summary of the LCP
   inline unsigned int getNcol() { return this->M.n_cols; };
 
@@ -170,14 +175,14 @@ public:
 
   std::unique_ptr<GRBModel> LCPasMIP(bool solve = false);
 
-  std::unique_ptr<GRBModel> MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
-                                  const arma::vec &x_minus_i,
-                                  bool solve = false);
+  std::unique_ptr<GRBModel> MPECasMILP(const arma::sp_mat &C,
+                                       const arma::vec &c,
+                                       const arma::vec &x_minus_i,
+                                       bool solve = false);
 
-  std::unique_ptr<GRBModel> MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
-                                  const arma::vec &c,
-                                  const arma::vec &x_minus_i,
-                                  bool solve = false);
+  std::unique_ptr<GRBModel>
+  MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::vec &c,
+             const arma::vec &x_minus_i, bool solve = false);
 
   /* Convex hull computation */
   int ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description LHS to
@@ -196,9 +201,10 @@ public:
     }(*this->Ai);
     const std::vector<arma::vec *> tempbi = [](vec_Vec &uv) {
       std::vector<arma::vec *> v{};
-      std::for_each(
-          uv.begin(), uv.end(),
-          [&v](const std::unique_ptr<arma::vec> &ptr) { v.push_back(ptr.get()); });
+      std::for_each(uv.begin(), uv.end(),
+                    [&v](const std::unique_ptr<arma::vec> &ptr) {
+                      v.push_back(ptr.get());
+                    });
       return v;
     }(*this->bi);
     arma::sp_mat A_common;
@@ -312,8 +318,8 @@ public:
  lcp.useIndicators = true;
  auto indModel = lcp.LCPasMIP(true);
  * @endcode
- * Both @p bigMModel and @p indModel are std::unique_ptr  to GRBModel objects. So all
- native gurobi operations can be performed on these objects.
+ * Both @p bigMModel and @p indModel are std::unique_ptr  to GRBModel objects.
+ So all native gurobi operations can be performed on these objects.
  *
  * This LCP as multiple solutions. In fact the solution set can be parameterized
  as below.
