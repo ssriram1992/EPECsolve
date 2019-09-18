@@ -1,4 +1,5 @@
 #include "lcptolp.h"
+#include <algorithm>
 #include <armadillo>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
@@ -750,14 +751,27 @@ bool Game::LCP::extractSols(
   return true;
 }
 
+std::vector<short int> Game::LCP::solEncode(const arma::vec &x) const
+/// @brief Given variable values, encodes it in 0/+1/-1
+/// format and returns it.
+/// @details Gives the 0/+1/-1 notation. The notation is defined as follows.
+/// Note that, if the input is feasible, then in each complementarity pair (Eqn,
+/// Var), at least one of the two is zero.
+///
+/// - If the equation is zero in a certain index and the variable is non-zero,
+/// then that index is noted by +1.
+/// - If the variable is zero in a certain index and the equation is non-zero,
+/// then that index is noted by +1.
+/// - If both the variable and equation are zero, then that index is noted by 0.
+{
+  return this->solEncode(this->M * x + this->q, x);
+}
+
 vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
                                        const arma::vec &x  ///< Variable values
                                        ) const
 /// @brief Given variable values and equation values, encodes it in 0/+1/-1
 /// format and returns it.
-/// @warning Note that the vector returned by this function might have to be
-/// explicitly deleted using the delete operator. For specific uses in
-/// LCP::BranchAndPrune, this delete is handled by the class destructor.
 {
   vector<signed short int> solEncoded(nR, 0);
   for (auto p : Compl) {
@@ -784,6 +798,36 @@ vector<short int> Game::LCP::solEncode(GRBModel *model) const
     return {}; // If infeasible model, return empty!
   else
     return this->solEncode(z, x);
+}
+
+LCP &Game::LCP::addPolyFromX(const arma::vec &x)
+/**
+ * Given a <i> feasible </i> point @p x, checks if any polyhedron that contains
+ * @p x is already a part of this->Ai and this-> bi. If it is, then this does
+ * nothing, except for printing a log message. If not, it adds a polyhedron
+ * containing this vector.
+ */
+{
+  vector<short int> encoding = this->solEncode(x);
+  // Check if the encoding polyhedron is already in this->AllPolyhedra
+  auto iterator =
+      std::find_if(this->AllPolyhedra.begin(), this->AllPolyhedra.end(),
+                   [encoding](const vector<short int> &AllPolyElem) {
+                     return encoding < AllPolyElem;
+                   });
+  if (iterator == this->AllPolyhedra.end()) { // If it is not in AllPolyhedra
+    // First change any zero indices of encoding to 1
+    std::for_each(encoding.begin(), encoding.end(), [](short int &elem) {
+      if (elem == 0)
+        ++elem;
+    });
+    // And then add the relevant polyhedra
+    this->FixToPoly(encoding, false);
+  } else
+    BOOST_LOG_TRIVIAL(info)
+        << " -- No polyhedron added, as best deviation is already feasible.";
+
+  return *this;
 }
 
 void Game::LCP::branch(

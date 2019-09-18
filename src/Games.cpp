@@ -1231,8 +1231,12 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
       this->convexHullVariables.rbegin(), this->convexHullVariables.rend(), 0);
 
   arma::vec solOther;
-  solOther.zeros(nEPECvars - nThisCountryvars - nConvexHullVars +
-                 nThisCountryHullVars);
+  solOther.zeros(nEPECvars -        // All variables in EPEC
+                 nThisCountryvars - // Subtracting this country's variables,
+                                    // since we only want others'
+                 nConvexHullVars +  // We don't want any convex hull variables
+                 nThisCountryHullVars); // We double subtracted our country's
+                                        // convex hull vars
 
   for (unsigned int j = 0, count = 0, current = 0; j < this->nCountr; ++j) {
     if (i != j) {
@@ -1253,10 +1257,8 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
 double Game::EPEC::RespondSol(
     arma::vec &sol,      ///< [out] Optimal response
     unsigned int player, ///< Player whose optimal response is to be computed
-    const arma::vec &x,  ///< A vector of pure strategies (either for all
-    ///< players or all other players)
-    bool fullvec ///< Is @p x strategy of all players? (including player @p
-                 ///< player)
+    const arma::vec &x ///< A vector of pure strategies (either for all players
+                       ///< or all other players)
     ) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
@@ -1279,7 +1281,20 @@ double Game::EPEC::RespondSol(
 bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
                           double tol) const
 /**
- * @todo Implementation to be done.
+ * @briefs Checks if Game::EPEC is solved, else returns proof of unsolvedness.
+ * @details
+ * Analogous to Game::NashGame::isSolved but checks if the given Game::EPEC is
+ * solved. If it is solved, then retruns true. If not, it returns the country
+ * which has a profitable deviation in @p countryNumber and the profitable
+ * deviation in @p ProfDevn. @p tol is the tolerance for the check. If the <i>
+ * improved objective </i> after the deviation is less than @p tol, then it is
+ * not considered as a profitable deviation.
+ *
+ * Thus we check if the given point is an @f$\epsilon@f$-equilibrium. Value of
+ * @f$\epsilon @f$ can be chosen sufficiently close to 0.
+ *
+ * @warning Setting @p tol = 0 might even reject a real solution as not solved.
+ * This is due to numerical issues arising from the LCP solver (Gurobi).
  */
 {
   this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
@@ -1366,21 +1381,37 @@ void Game::EPEC::make_country_QP()
   this->computeLeaderLocations(this->nCountr);
 }
 
-void Game::EPEC::iterativeNash() {
+void Game::EPEC::giveAllDevns(
+    std::vector<arma::vec>
+        &devns, ///< [out] The vector of deviations for all players
+    const arma::vec &guessSol ///< [in] The guess for the solution vector
+    ) const
+/**
+ * @brief Given a potential solution vector, returns a profitable deviation (if
+ * it exists) for all players.
+ */
+{
+  devns = std::vector<arma::vec>(this->nCountr);
 
   for (unsigned int i = 0; i < this->nCountr; ++i) // For each country
-  {
-    if (this->countries_LCP.at(
-            i)) // If the LCP object for the country is not already there
-    {
-      this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>( // Then make it
-          new LCP(this->env, *this->countries_LL.at(i).get()));
-    } // Now this LCP object has to be outer/inner approximated
-    else
-      throw string("Exception in Game::EPEC::iterativeNash: countries_LCP not "
-                   "initialized for i = " +
-                   to_string(i) + ". ");
-  }
+    this->RespondSol(devns.at(i), i, guessSol);
+}
+
+void Game::EPEC::addDeviatedPolyhedron(
+    const std::vector<arma::vec> &devns) const {}
+
+void Game::EPEC::iterativeNash() {
+
+  if (!this->finalized)
+    throw string(
+        "Error in Game::EPEC::iterativeNash: Object not yet finalized");
+
+  // Set the initial point for all countries as 0 and solve the respective LCPs?
+  this->sol_x.zeros(this->nVarinEPEC);
+  std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
+
+  this->giveAllDevns(devns, this->sol_x);
+  this->addDeviatedPolyhedron(devns);
 
   int Nvar =
       this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
@@ -1452,10 +1483,13 @@ void Game::EPEC::findNashEq() {
     } else {
       if (status == GRB_TIME_LIMIT) {
         this->Stats.status = 2;
-        cerr << "Game::EPEC::findNashEq: no nash equilibrium found (timeLimit)."
-             << '\n';
+        BOOST_LOG_TRIVIAL(warning)
+            << "Game::EPEC::findNashEq: no nash equilibrium found (timeLimit)."
+            << '\n';
       } else
-        cerr << "Game::EPEC::findNashEq: no nash equilibrium found." << '\n';
+        BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::findNashEq: no nash "
+                                      "equilibrium found (infeasibility)."
+                                   << '\n';
     }
 
   } else {

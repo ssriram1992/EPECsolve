@@ -87,6 +87,8 @@ private:
 
   inline std::vector<short int> solEncode(GRBModel *model) const;
 
+  std::vector<short int> solEncode(const arma::vec &x) const;
+
   std::vector<short int> solEncode(const arma::vec &z,
                                    const arma::vec &x) const;
 
@@ -215,6 +217,8 @@ public:
 
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP,
               bool enumerate = true);
+
+  LCP &addPolyFromX(const arma::vec &x);
 
   int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 

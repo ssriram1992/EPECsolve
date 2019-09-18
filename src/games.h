@@ -458,6 +458,10 @@ private:
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
 
+  void giveAllDevns(std::vector<arma::vec> &devns,
+                    const arma::vec &guessSol) const;
+  void addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
+
 protected: // functions
   EPEC(GRBEnv *env)
       : env{env}, timeLimit{
@@ -489,8 +493,8 @@ public:                  // functions
   virtual void iterativeNash() final;
 
   unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
-  double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
-                    bool fullvec = true) const;
+  double RespondSol(arma::vec &sol, unsigned int player,
+                    const arma::vec &x) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
                 double tol = 1e-6) const;
 
