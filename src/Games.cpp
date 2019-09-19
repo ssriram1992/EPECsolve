@@ -1290,7 +1290,7 @@ double Game::EPEC::RespondSol(
 }
 
 bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
-                          double tol)
+                          double tol) const
 /**
  * @briefs Checks if Game::EPEC is solved, else returns proof of unsolvedness.
  * @details
@@ -1309,7 +1309,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
  */
 {
   this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
-  if (this->nashEq == false)
+  if (!this->nashEq)
     return false;
   arma::vec objvals = this->nashgame->ComputeQPObjvals(this->sol_x, true);
   for (unsigned int i = 0; i < this->nCountr; ++i) {
@@ -1401,17 +1401,20 @@ void Game::EPEC::giveAllDevns(
     std::vector<arma::vec>
         &devns, ///< [out] The vector of deviations for all players
     const arma::vec &guessSol ///< [in] The guess for the solution vector
-    )
+    ) const
 /**
  * @brief Given a potential solution vector, returns a profitable deviation (if
  * it exists) for all players.
+ * @return a vector of computed deviations, which empty if at least one
+ * deviation cannot be computed
  */
 {
   devns = std::vector<arma::vec>(this->nCountr);
 
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
+    // If we cannot compute a deviation, it means model is infeasible!
     if (this->RespondSol(devns.at(i), i, guessSol) == -GRB_INFINITY)
-      this->Stats.status = 0;
+      devns.clear();
   }
 }
 
@@ -1440,7 +1443,7 @@ void Game::EPEC::iterativeNash() {
   // LCP
   while (notSolved) {
     this->giveAllDevns(devns, this->sol_x);
-    if (this->Stats.status != 0) {
+    if (devns.size() != 0) {
       this->addDeviatedPolyhedron(devns);
       this->make_country_QP();
       this->computeNashEq();
@@ -1450,6 +1453,7 @@ void Game::EPEC::iterativeNash() {
         notSolved = false;
       }
     } else {
+      this->Stats.status = 0;
       notSolved = false;
       BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::iterativeNash: no nash "
                                     "equilibrium found (infeasible)."
