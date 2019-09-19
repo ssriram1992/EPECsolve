@@ -1502,9 +1502,10 @@ void Game::EPEC::computeNashEq() {
                                    << '\n';
     }
   } else {
-    cerr << "Exception in Game::EPEC::computeNashEq : no country QP has been "
-            "made."
-         << '\n';
+    BOOST_LOG_TRIVIAL(error)
+        << "Exception in Game::EPEC::computeNashEq : no country QP has been "
+           "made."
+        << '\n';
     throw;
   }
 }

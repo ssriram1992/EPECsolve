@@ -26,7 +26,7 @@ using namespace arma;
 
 BOOST_AUTO_TEST_CASE(LoggingOff) {
   boost::log::core::get()->set_filter(boost::log::trivial::severity >=
-                                      boost::log::trivial::warning);
+                                      boost::log::trivial::debug);
 }
 
 BOOST_AUTO_TEST_SUITE(Core__Tests)
@@ -1018,8 +1018,8 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(Models_CnFn__Tests)
 BOOST_AUTO_TEST_CASE(LoggingOff) {
-  boost::log::core::get()->set_filter(boost::log::trivial::severity >=
-                                      boost::log::trivial::warning);
+  // boost::log::core::get()->set_filter(boost::log::trivial::severity >=
+  // boost::log::trivial::warning);
 }
 
 /* This test suite perform  unit tests for generalized EPEC problem with

@@ -403,7 +403,8 @@ struct EPECStatistics {
 class EPEC {
 private:
   std::vector<unsigned int> SizesWithoutHull{};
-  int algorithm = 0; ///< Stores the type of algorithm used by the EPEC. 0 is FullEnumeration, 1 is Inner Approximation
+  int algorithm = 1; ///< Stores the type of algorithm used by the EPEC. 0 is
+                     ///< FullEnumeration, 1 is Inner Approximation
 
 protected: // Datafields
   std::vector<shared_ptr<Game::NashGame>> countries_LL{};
@@ -506,13 +507,16 @@ public:                  // functions
   virtual const EPECStatistics getStatistics() const final {
     return this->Stats;
   }
-  virtual void setAlgorithm(unsigned int algorithm) final{
-    switch (algorithm){
-    case 0: this->algorithm=0;
+  virtual void setAlgorithm(unsigned int algorithm) final {
+    switch (algorithm) {
+    case 0:
+      this->algorithm = 0;
       break;
-    case 1: this->algorithm=1;
+    case 1:
+      this->algorithm = 1;
       break;
-    default: this->algorithm=0;
+    default:
+      this->algorithm = 0;
     }
   }
 };
