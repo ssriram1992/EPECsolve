@@ -389,7 +389,7 @@ void print(const perps &C);
 namespace Game {
 /// @brief Stores statistics for a (solved) EPEC instance
 struct EPECStatistics {
-  int status = {0}; ///< status: 1: nashEq found. 0:no nashEq found. 2:timeLimit
+  int status = {-1}; ///< status: 1: nashEq found. 0:no nashEq found. 2:timeLimit. -1: not initialized
   int numVar = {-1};         ///< Number of variables in findNashEq model
   int numConstraints = {-1}; ///< Number of constraints in findNashEq model
   int numNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
@@ -460,7 +460,7 @@ private:
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
 
   void giveAllDevns(std::vector<arma::vec> &devns,
-                    const arma::vec &guessSol) const;
+                    const arma::vec &guessSol);
   void addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
   virtual void computeNashEq() final;
 
@@ -498,7 +498,7 @@ public:                  // functions
   double RespondSol(arma::vec &sol, unsigned int player,
                     const arma::vec &x) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
-                double tol = 1e-6) const;
+                double tol = 1e-6);
 
   virtual const arma::vec getx() const final { return this->sol_x; }
   void reset() { this->sol_x.ones(); }

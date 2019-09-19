@@ -1081,9 +1081,13 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
    * @param[in] tol - If the additional profit is smaller than this, then it is
    * not considered a profitable deviation.
    */
+  if (this == nullptr)
+    return false;
   arma::vec objvals = this->ComputeQPObjvals(sol, true);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
     double val = this->RespondSol(violSol, i, sol, true);
+    if (val == -GRB_INFINITY)
+      return false;
     if (abs(val - objvals.at(i)) > tol) {
       violPlayer = i;
       return false;
@@ -1258,7 +1262,7 @@ double Game::EPEC::RespondSol(
     arma::vec &sol,      ///< [out] Optimal response
     unsigned int player, ///< Player whose optimal response is to be computed
     const arma::vec &x ///< A vector of pure strategies (either for all players
-                       ///< or all other players)
+                       ///< or all other players
     ) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
@@ -1270,16 +1274,23 @@ double Game::EPEC::RespondSol(
    * @returns The optimal objective value for the player @p player.
    */
   auto model = this->Respond(player, x);
-  unsigned int Nx = this->countries_LCP.at(player)->getNcol();
-  sol.zeros(Nx);
-  for (unsigned int i = 0; i < Nx; ++i)
-    sol.at(i) = model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
+  int status = model->get(GRB_IntAttr_Status);
+  if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
+      status == GRB_SOLUTION_LIMIT) {
+    unsigned int Nx = this->countries_LCP.at(player)->getNcol();
+    sol.zeros(Nx);
+    for (unsigned int i = 0; i < Nx; ++i)
+      sol.at(i) =
+          model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
 
-  return model->get(GRB_DoubleAttr_ObjVal);
+    return model->get(GRB_DoubleAttr_ObjVal);
+  } else {
+    return -GRB_INFINITY;
+  }
 }
 
 bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
-                          double tol) const
+                          double tol)
 /**
  * @briefs Checks if Game::EPEC is solved, else returns proof of unsolvedness.
  * @details
@@ -1303,6 +1314,8 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
   arma::vec objvals = this->nashgame->ComputeQPObjvals(this->sol_x, true);
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     double val = this->RespondSol(*ProfDevn, i, this->sol_x);
+    if (val == -GRB_INFINITY)
+      return false;
     if (abs(val - objvals.at(i)) > tol) {
       *countryNumber = i;
       return false;
@@ -1388,7 +1401,7 @@ void Game::EPEC::giveAllDevns(
     std::vector<arma::vec>
         &devns, ///< [out] The vector of deviations for all players
     const arma::vec &guessSol ///< [in] The guess for the solution vector
-    ) const
+    )
 /**
  * @brief Given a potential solution vector, returns a profitable deviation (if
  * it exists) for all players.
@@ -1396,8 +1409,10 @@ void Game::EPEC::giveAllDevns(
 {
   devns = std::vector<arma::vec>(this->nCountr);
 
-  for (unsigned int i = 0; i < this->nCountr; ++i) // For each country
-    this->RespondSol(devns.at(i), i, guessSol);
+  for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
+    if (this->RespondSol(devns.at(i), i, guessSol) == -GRB_INFINITY)
+      this->Stats.status = 0;
+  }
 }
 
 void Game::EPEC::addDeviatedPolyhedron(
@@ -1421,15 +1436,24 @@ void Game::EPEC::iterativeNash() {
   unsigned int deviatedCountry;
   arma::vec countryDeviation;
 
+  // While problem is not solved and we do not get infeasability in any of the
+  // LCP
   while (notSolved) {
     this->giveAllDevns(devns, this->sol_x);
-    this->addDeviatedPolyhedron(devns);
-    this->make_country_QP();
-    this->computeNashEq();
-    // Algorithmically, it would be better to use data from previously computed
-    // deviations
-    if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+    if (this->Stats.status != 0) {
+      this->addDeviatedPolyhedron(devns);
+      this->make_country_QP();
+      this->computeNashEq();
+      // Algorithmically, it would be better to use data from previously
+      // computed deviations
+      if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+        notSolved = false;
+      }
+    } else {
       notSolved = false;
+      BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::iterativeNash: no nash "
+                                    "equilibrium found (infeasible)."
+                                 << '\n';
     }
   }
 }
@@ -1496,10 +1520,12 @@ void Game::EPEC::computeNashEq() {
         BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no nash "
                                       "equilibrium found (timeLimit)."
                                    << '\n';
-      } else
+      } else {
+        this->Stats.status = 0;
         BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no nash "
                                       "equilibrium found (infeasibility)."
                                    << '\n';
+      }
     }
   } else {
     BOOST_LOG_TRIVIAL(error)
