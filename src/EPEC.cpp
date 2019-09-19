@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char **argv) {
   string resFile, instanceFile = "", logFile;
-  int writeLevel, nThreads, verbosity, bigM;
+  int writeLevel, nThreads, verbosity, bigM, algorithm;
   double timeLimit;
 
   po::options_description desc("EPEC: Allowed options");
@@ -25,6 +25,8 @@ int main(int argc, char **argv) {
       "input,i", po::value<string>(&instanceFile),
       "Sets the input path/filename of the instance file (.json appended "
       "automatically)")(
+      "algorithm,a", po::value<int>(&algorithm),
+      "Sets the algorithm. 0: fullEnumeration, 1:innerApproximation")(
       "solution,s", po::value<string>(&resFile)->default_value("dat/Solution"),
       "Sets the output path/filename of the solution file (.json appended "
       "automatically)")(
@@ -100,6 +102,10 @@ int main(int argc, char **argv) {
     epec.indicators = 0;
   // timeLimit
   epec.timeLimit = timeLimit;
+  // Algorithm
+  if (algorithm != 0) {
+    epec.setAlgorithm(algorithm);
+  }
   //------------
 
   for (unsigned int j = 0; j < Instance.Countries.size(); ++j)
