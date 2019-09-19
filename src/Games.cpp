@@ -1443,31 +1443,53 @@ void Game::EPEC::iterativeNash() {
   unsigned int deviatedCountry;
   arma::vec countryDeviation;
 
+  double initTime = -1;
+  if (this->timeLimit > 0)
+    double initTime = clock() / CLOCKS_PER_SEC;
+
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
   while (notSolved) {
+    // Compute profitable deviation(s)
     this->giveAllDevns(devns, this->sol_x);
+    // If LCP are feasible (!=0) and there is then at least one profitable one
     if (devns.size() != 0) {
+      BOOST_LOG_TRIVIAL(info)
+          << "iterativeNash: found a deviation. Adding polyhedra.";
+      // Add the deviated polyhedra and recompute approximated QP
       this->addDeviatedPolyhedron(devns);
       this->make_country_QP();
+      // Compute the nash EQ given the approximated QPs
       this->computeNashEq();
-      // Algorithmically, it would be better to use data from previously
-      // computed deviations
+      // If we have an equilibrium, we are done
       if (this->isSolved(&deviatedCountry, &countryDeviation)) {
         notSolved = false;
       }
-    } else {
-      this->Stats.status = 0;
+    }
+    // Else, we do not have feasability and/or profitable deviations
+    // OR we triggered the timelimit
+    if (devns.size() == 0 ||
+        (this->timeLimit > 0 &&
+         (clock() / CLOCKS_PER_SEC - initTime) >= this->timeLimit)) {
       notSolved = false;
-      BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::iterativeNash: no nash "
-                                    "equilibrium found (infeasible)."
-                                 << '\n';
+      // No deviations, hence infeasible
+      if (devns.size() == 0)
+        this->Stats.status = 0;
+      // We triggered the timelimit, hence we should return the timelimit status
+      else
+        this->Stats.status = 2;
     }
   }
 }
 
 void Game::EPEC::computeNashEq() {
-  if (this->country_QP.front() != nullptr) {
+  if (this->country_QP.front() == nullptr) {
+    BOOST_LOG_TRIVIAL(error)
+        << "Exception in Game::EPEC::computeNashEq : no country QP has been "
+           "made."
+        << '\n';
+    throw;
+  } else {
     int Nvar =
         this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
     arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
@@ -1484,18 +1506,12 @@ void Game::EPEC::computeNashEq() {
     this->lcpmodel = lcp->LCPasMIP(false);
     Nvar = nashgame->getNprimals() + nashgame->getNduals() +
            nashgame->getNshadow() + nashgame->getNleaderVars();
-    // if (VERBOSE) {
-    // lcpmodel->write("dat/debug/NashLCP.lp");
-    // this->nashgame->write("dat/debug/NashGame", false, true);
     BOOST_LOG_TRIVIAL(trace) << *nashgame;
-    // }
 
     this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
     this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
     this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
     if (this->timeLimit > 0) {
-      BOOST_LOG_TRIVIAL(warning)
-          << "Time limit set: " << this->Game::EPEC::timeLimit;
       this->lcpmodel->set(GRB_DoubleParam_TimeLimit, this->timeLimit);
     }
     lcpmodel->optimize();
@@ -1504,9 +1520,11 @@ void Game::EPEC::computeNashEq() {
     this->sol_z.zeros(Nvar);
     unsigned int temp;
     int status = lcpmodel->get(GRB_IntAttr_Status);
+    // Search just for a feasible point
     if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
         status == GRB_SOLUTION_LIMIT) {
       this->nashEq = true;
+      this->Stats.status = 1;
       try {
         for (unsigned int i = 0; i < (unsigned int)Nvar; i++) {
           this->sol_x(i) =
@@ -1521,34 +1539,39 @@ void Game::EPEC::computeNashEq() {
              << e.getErrorCode() << ": " << e.getMessage() << " " << temp
              << '\n';
       }
-      this->Stats.status = 1;
     } else {
-      if (status == GRB_TIME_LIMIT) {
+      if (status == GRB_TIME_LIMIT)
         this->Stats.status = 2;
-        BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no nash "
-                                      "equilibrium found (timeLimit)."
-                                   << '\n';
-      } else {
+      else
         this->Stats.status = 0;
-        BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no nash "
-                                      "equilibrium found (infeasibility)."
-                                   << '\n';
-      }
     }
-  } else {
-    BOOST_LOG_TRIVIAL(error)
-        << "Exception in Game::EPEC::computeNashEq : no country QP has been "
-           "made."
-        << '\n';
-    throw;
   }
 }
 
 void Game::EPEC::findNashEq() {
   if (this->algorithm == 0) {
+    int status = -1;
     this->make_country_QP();
     this->computeNashEq();
   } else if (this->algorithm == 1) {
     this->iterativeNash();
+  }
+  switch (this->Stats.status) {
+  case 0:
+    BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no Nash "
+                                  "equilibrium found (infeasibility)."
+                               << '\n';
+    break;
+  case 1:
+    BOOST_LOG_TRIVIAL(warning)
+        << "Game::EPEC::computeNashEq: a Nash equilibrium has been found."
+        << '\n';
+
+    break;
+  default:
+    BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no Nash "
+                                  "equilibrium found (timeLimit)."
+                               << '\n';
+    break;
   }
 }

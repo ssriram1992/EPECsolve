@@ -1305,7 +1305,7 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
  */
 {
   unique_ptr<GRBModel> model = this->LCPasMIP(true);
-  //Reset the solution limit. We need to solve to optimality
+  // Reset the solution limit. We need to solve to optimality
   model->set(GRB_IntParam_SolutionLimit, GRB_MAXINT);
   if (C.n_cols != x_minus_i.n_rows)
     throw string("Bad size of x_minus_i");
