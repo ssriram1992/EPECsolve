@@ -1022,13 +1022,20 @@ double Game::NashGame::RespondSol(
    * @returns The optimal objective value for the player @p player.
    */
   auto model = this->Respond(player, x, fullvec);
-  unsigned int Nx =
-      this->primal_position.at(player + 1) - this->primal_position.at(player);
-  sol.zeros(Nx);
-  for (unsigned int i = 0; i < Nx; ++i)
-    sol.at(i) = model->getVarByName("y_" + to_string(i)).get(GRB_DoubleAttr_X);
+  // Check if the model is solved optimally
+  const int status = model->get(GRB_IntAttr_Status);
+  if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
+      status == GRB_SOLUTION_LIMIT) {
+    unsigned int Nx =
+        this->primal_position.at(player + 1) - this->primal_position.at(player);
+    sol.zeros(Nx);
+    for (unsigned int i = 0; i < Nx; ++i)
+      sol.at(i) =
+          model->getVarByName("y_" + to_string(i)).get(GRB_DoubleAttr_X);
 
-  return model->get(GRB_DoubleAttr_ObjVal);
+    return model->get(GRB_DoubleAttr_ObjVal);
+  } else
+    return GRB_INFINITY;
 }
 
 arma::vec Game::NashGame::ComputeQPObjvals(const arma::vec &x,
@@ -1086,7 +1093,7 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
   arma::vec objvals = this->ComputeQPObjvals(sol, true);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
     double val = this->RespondSol(violSol, i, sol, true);
-    if (val == -GRB_INFINITY)
+    if (val == GRB_INFINITY)
       return false;
     if (abs(val - objvals.at(i)) > tol) {
       violPlayer = i;
@@ -1274,7 +1281,7 @@ double Game::EPEC::RespondSol(
    * @returns The optimal objective value for the player @p player.
    */
   auto model = this->Respond(player, x);
-  int status = model->get(GRB_IntAttr_Status);
+  const int status = model->get(GRB_IntAttr_Status);
   if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
       status == GRB_SOLUTION_LIMIT) {
     unsigned int Nx = this->countries_LCP.at(player)->getNcol();
@@ -1285,7 +1292,7 @@ double Game::EPEC::RespondSol(
 
     return model->get(GRB_DoubleAttr_ObjVal);
   } else {
-    return -GRB_INFINITY;
+    return GRB_INFINITY;
   }
 }
 
@@ -1314,7 +1321,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
   arma::vec objvals = this->nashgame->ComputeQPObjvals(this->sol_x, true);
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     double val = this->RespondSol(*ProfDevn, i, this->sol_x);
-    if (val == -GRB_INFINITY)
+    if (val == GRB_INFINITY)
       return false;
     if (abs(val - objvals.at(i)) > tol) {
       *countryNumber = i;
@@ -1413,7 +1420,7 @@ void Game::EPEC::giveAllDevns(
 
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     // If we cannot compute a deviation, it means model is infeasible!
-    if (this->RespondSol(devns.at(i), i, guessSol) == -GRB_INFINITY)
+    if (this->RespondSol(devns.at(i), i, guessSol) == GRB_INFINITY)
       devns.clear();
   }
 }

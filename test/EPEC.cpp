@@ -498,11 +498,11 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_CHECK_CLOSE(t1, 250, 0.01);
   BOOST_CHECK_CLOSE(q1, 66.6666, 0.01);
   */
-  BOOST_REQUIRE_MESSAGE(epec2.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is solved");
+  BOOST_CHECK_MESSAGE(epec2.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved");
   epec2.reset();
-  BOOST_REQUIRE_MESSAGE(!epec2.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is not spuriously solved");
+  BOOST_CHECK_MESSAGE(!epec2.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously solved");
 
   Models::EPEC epec3(&env);
   epec3.indicators = false;
@@ -524,11 +524,11 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
       epec3.getx().at(epec3.getPosition(0, Models::LeaderVars::Tax) + 0), 250,
       0.01);
       */
-  BOOST_REQUIRE_MESSAGE(epec3.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is solved");
+  BOOST_CHECK_MESSAGE(epec3.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved");
   epec3.reset();
-  BOOST_REQUIRE_MESSAGE(!epec3.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is not spuriously solved");
+  BOOST_CHECK_MESSAGE(!epec3.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously solved");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -700,8 +700,8 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap2_test) {
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.getStatistics().status == false, "checking status");
-  BOOST_REQUIRE_MESSAGE(!epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is not spuriously solved");
+  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously solved");
 }
 
 BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
@@ -1100,11 +1100,11 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
               epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
       "checking production");
   epec.writeSolution(2, "Solution");
-  BOOST_REQUIRE_MESSAGE(epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is solved");
+  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved");
   epec.reset();
-  BOOST_REQUIRE_MESSAGE(!epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is not spuriously solved");
+  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously solved");
 }
 
 BOOST_AUTO_TEST_CASE(C2F2_test) {
@@ -1202,11 +1202,11 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
       epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0,
       0.01);
 
-  BOOST_REQUIRE_MESSAGE(epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is solved");
+  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved");
   epec.reset();
-  BOOST_REQUIRE_MESSAGE(!epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is not spuriously solved");
+  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously solved");
 }
 
 BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
@@ -1313,11 +1313,11 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
       epec.getx().at(epec.getPosition(0, Models::LeaderVars::NetImport)), 27.50,
       0.01);
 
-  BOOST_REQUIRE_MESSAGE(epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is solved");
+  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved");
   epec.reset();
-  BOOST_REQUIRE_MESSAGE(!epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is not spuriously soled");
+  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously soled");
 }
 
 BOOST_AUTO_TEST_CASE(C3F1_test) {
@@ -1399,11 +1399,11 @@ BOOST_AUTO_TEST_CASE(C3F1_test) {
                      0),
       84.62, 0.01);
 
-  BOOST_REQUIRE_MESSAGE(epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is solved");
+  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved");
   epec.reset();
-  BOOST_REQUIRE_MESSAGE(!epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is not spuriously solved");
+  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously solved");
 }
 
 BOOST_AUTO_TEST_CASE(C3F2_test) {
@@ -1487,10 +1487,10 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
       epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) +
                      1),
       30, 0.01);
-  BOOST_REQUIRE_MESSAGE(epec.isSolved(&n_c, &devn),
+  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                         "Checking if the EPEC is solved");
   epec.reset();
-  BOOST_REQUIRE_MESSAGE(!epec.isSolved(&n_c, &devn),
+  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
                         "Checking if the EPEC is not spuriously solved");
   */
 }
@@ -1573,11 +1573,11 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
   BOOST_CHECK_CLOSE(
       epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 49.2857,
       0.01);
-  BOOST_REQUIRE_MESSAGE(epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is solved");
+  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved");
   epec.reset();
-  BOOST_REQUIRE_MESSAGE(!epec.isSolved(&n_c, &devn),
-                        "Checking if the EPEC is not spuriously solved");
+  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously solved");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
