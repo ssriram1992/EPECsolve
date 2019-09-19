@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
   if (!existCheck.good()) {
     results << "Instance;Countries;Followers;Status;numFeasiblePolyhedra;"
                "numVar;numConstraints;numNonZero;CPUTime "
-               "(ms);Threads;Indicators;quadraticTax\n";
+               "(ms);Threads;Indicators\n";
   }
   existCheck.close();
   stringstream PolyT;

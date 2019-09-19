@@ -1460,7 +1460,12 @@ void Game::EPEC::iterativeNash() {
       this->addDeviatedPolyhedron(devns);
       this->make_country_QP();
       // Compute the nash EQ given the approximated QPs
-      this->computeNashEq();
+      // setting timelimit to remaining time -epsilon seconds
+      if (this->timeLimit > 0)
+        this->computeNashEq(this->timeLimit -
+                            (clock() / CLOCKS_PER_SEC - initTime) - 0.2);
+      else
+        this->computeNashEq();
       // If we have an equilibrium, we are done
       if (this->isSolved(&deviatedCountry, &countryDeviation)) {
         notSolved = false;
@@ -1482,7 +1487,7 @@ void Game::EPEC::iterativeNash() {
   }
 }
 
-void Game::EPEC::computeNashEq() {
+void Game::EPEC::computeNashEq(double localTimeLimit) {
   if (this->country_QP.front() == nullptr) {
     BOOST_LOG_TRIVIAL(error)
         << "Exception in Game::EPEC::computeNashEq : no country QP has been "
@@ -1511,8 +1516,8 @@ void Game::EPEC::computeNashEq() {
     this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
     this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
     this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
-    if (this->timeLimit > 0) {
-      this->lcpmodel->set(GRB_DoubleParam_TimeLimit, this->timeLimit);
+    if (localTimeLimit > 0) {
+      this->lcpmodel->set(GRB_DoubleParam_TimeLimit, localTimeLimit);
     }
     lcpmodel->optimize();
     this->Stats.wallClockTime = lcpmodel->get(GRB_DoubleAttr_Runtime);
@@ -1552,7 +1557,7 @@ void Game::EPEC::findNashEq() {
   if (this->algorithm == 0) {
     int status = -1;
     this->make_country_QP();
-    this->computeNashEq();
+    this->computeNashEq(this->timeLimit);
   } else if (this->algorithm == 1) {
     this->iterativeNash();
   }
