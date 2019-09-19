@@ -455,12 +455,11 @@ double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
     arma::vec slack = A * x + B * y - b;
     if (slack.n_rows) // if infeasible
       if (slack.max() >= tol)
-        return -GRB_INFINITY;
+        return GRB_INFINITY;
     if (y.min() <= -tol) // if infeasible
-      return -GRB_INFINITY;
+      return GRB_INFINITY;
   }
   arma::vec obj = 0.5 * y.t() * Q * y + (C * x).t() * y + c.t() * y;
-  arma::vec temp = (C * x) + c;
   return obj(0);
 }
 
@@ -1260,7 +1259,6 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
     solOther.at(solOther.n_rows - this->n_MCVar + j) =
         x.at(this->nVarinEPEC - this->n_MCVar + j);
   }
-
   return this->countries_LCP.at(i).get()->MPECasMILP(
       this->LeadObjec.at(i).get()->C, this->LeadObjec.at(i).get()->c, solOther,
       true);
@@ -1282,8 +1280,7 @@ double Game::EPEC::RespondSol(
    */
   auto model = this->Respond(player, x);
   const int status = model->get(GRB_IntAttr_Status);
-  if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
-      status == GRB_SOLUTION_LIMIT) {
+  if (status == GRB_OPTIMAL) {
     unsigned int Nx = this->countries_LCP.at(player)->getNcol();
     sol.zeros(Nx);
     for (unsigned int i = 0; i < Nx; ++i)
