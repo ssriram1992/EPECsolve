@@ -1512,40 +1512,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
   file.close();
 }
 
-void Models::EPEC::testQP(const unsigned int i) {
-  /// @todo Are we using Models::EPEC::testQP anywhere? If not remove this.
-  QP_Param *QP = this->country_QP.at(i).get();
-  arma::vec x;
-  x.ones(QP->getNx());
-  x.fill(555);
-  cout << "*** COUNTRY QP TEST***\n";
-  std::unique_ptr<GRBModel> model = QP->solveFixed(x);
-  model->write("dat/debug/CountryQP_" + to_string(i) + ".lp");
-  int status = model->get(GRB_IntAttr_Status);
-  if (status != GRB_INF_OR_UNBD && status != GRB_INFEASIBLE &&
-      status != GRB_INFEASIBLE) {
-    arma::vec sol;
-    sol.zeros(QP->getNy());
-    try {
-      GRBVar *vars = model->getVars();
-      int i = 0;
-      for (GRBVar *p = vars; i < model->get(GRB_IntAttr_NumVars); i++, p++) {
-        sol.at(i) = p->get(GRB_DoubleAttr_X);
-      }
-    } catch (GRBException &e) {
-      cerr << "GRBException in Models::EPEC::testQP: " << e.getErrorCode()
-           << ": " << e.getMessage() << '\n';
-    }
-    sol.save("dat/QP_Sol_" + to_string(i) + ".txt", arma::arma_ascii);
-    this->WriteCountry(i, "dat/temp_" + to_string(i) + ".txt", sol, false);
-  } else {
-    cout << "Models::EPEC::testQP: QP of country " << i
-         << " is infeasible or unbounded." << '\n';
-  }
-}
-
 void Models::EPEC::testLCP(const unsigned int i) {
-  /// @todo Are we using Models::EPEC::testLCP anywhere? If not remove this.
   auto country = this->get_LowerLevelNash(i);
   LCP CountryLCP(this->env, *country);
   CountryLCP.write("dat/LCP_" + to_string(i));

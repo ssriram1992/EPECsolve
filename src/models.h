@@ -235,8 +235,6 @@ public: // Attributes
       : Game::EPEC(env), TranspCosts{TranspCosts} {}
 
   // Unit tests
-  void testQP(const unsigned int i);
-
   void testLCP(const unsigned int i);
 
   ///@brief %Models a Standard Nash-Cournot game within a country
