@@ -404,7 +404,7 @@ struct EPECStatistics {
 class EPEC {
 private:
   std::vector<unsigned int> SizesWithoutHull{};
-  int algorithm = 0; ///< Stores the type of algorithm used by the EPEC. 0 is
+  int algorithm = 1; ///< Stores the type of algorithm used by the EPEC. 0 is
                      ///< FullEnumeration, 1 is Inner Approximation
 
 protected: // Datafields

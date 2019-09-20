@@ -558,8 +558,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
 
-  // @todo change tax limit
-
   BOOST_TEST_MESSAGE("MaxTax:20 with alpha=300 and beta=0.05");
   BOOST_TEST_MESSAGE("Expected: q=0;t=290");
   Models::EPEC epec(&env);
@@ -601,8 +599,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
-
-  // @todo change tax limit
 
   BOOST_TEST_MESSAGE("MaxTax:20 with alpha=300 and beta=0.05");
   BOOST_TEST_MESSAGE("Expected: q=100;t=20");
@@ -854,17 +850,11 @@ BOOST_AUTO_TEST_CASE(C1F1_Capacities_test) {
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_TEST_MESSAGE("checking production levels");
-  BOOST_CHECK_MESSAGE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1) >
-          epec.getx().at(
-              epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
-      "checking production on Rosso");
-  BOOST_TEST_MESSAGE("checking taxation");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 100,
-      0.01);
+  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved");
+  epec.reset();
+  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is not spuriously solved");
 }
 
 BOOST_AUTO_TEST_CASE(C1F5_test) {
