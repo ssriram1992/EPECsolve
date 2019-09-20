@@ -1095,7 +1095,7 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
     double val = this->RespondSol(violSol, i, sol, true);
     if (val == GRB_INFINITY)
       return false;
-    if (val - objvals.at(i) > tol) {
+    if (abs(val - objvals.at(i)) > tol) {
       violPlayer = i;
       return false;
     }
@@ -1227,27 +1227,20 @@ void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
       this->LeaderLocations.back() + *this->LocEnds.back() + addSpaceForMC;
 }
 
-unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
-                                         const arma::vec &x) const {
-  if (!this->finalized)
-    throw string("Error in Game::EPEC::Respond: Model not finalized");
-
-  if (i >= this->nCountr)
-    throw string("Error in Game::EPEC::Respond: Invalid country number");
-
+void EPEC::get_x_minus_i(const arma::vec &x, const int &i,
+                         arma::vec &solOther) const {
   const unsigned int nEPECvars = this->nVarinEPEC;
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
   const unsigned int nThisCountryHullVars = this->convexHullVariables.at(i);
   const unsigned int nConvexHullVars = std::accumulate(
       this->convexHullVariables.rbegin(), this->convexHullVariables.rend(), 0);
 
-  arma::vec solOther;
   solOther.zeros(nEPECvars -        // All variables in EPEC
                  nThisCountryvars - // Subtracting this country's variables,
-                                    // since we only want others'
-                 nConvexHullVars +  // We don't want any convex hull variables
+                 // since we only want others'
+                 nConvexHullVars + // We don't want any convex hull variables
                  nThisCountryHullVars); // We double subtracted our country's
-                                        // convex hull vars
+  // convex hull vars
 
   for (unsigned int j = 0, count = 0, current = 0; j < this->nCountr; ++j) {
     if (i != j) {
@@ -1260,6 +1253,19 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
     solOther.at(solOther.n_rows - this->n_MCVar + j) =
         x.at(this->nVarinEPEC - this->n_MCVar + j);
   }
+}
+
+
+unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
+                                         const arma::vec &x) const {
+  if (!this->finalized)
+    throw string("Error in Game::EPEC::Respond: Model not finalized");
+
+  if (i >= this->nCountr)
+    throw string("Error in Game::EPEC::Respond: Invalid country number");
+
+  arma::vec solOther;
+  this->get_x_minus_i(x, i, solOther);
   return this->countries_LCP.at(i).get()->MPECasMILP(
       this->LeadObjec.at(i).get()->C, this->LeadObjec.at(i).get()->c, solOther,
       true);
@@ -1288,6 +1294,7 @@ double Game::EPEC::RespondSol(
       sol.at(i) =
           model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
 
+    model->write("dat/Respond_"+to_string(player)+".lp");
     return model->get(GRB_DoubleAttr_ObjVal);
   } else {
     return GRB_INFINITY;
@@ -1321,7 +1328,11 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
     double val = this->RespondSol(*ProfDevn, i, this->sol_x);
     if (val == GRB_INFINITY)
       return false;
-    if (val - objvals.at(i) > tol) {
+    if (abs(val - objvals.at(i)) > tol) {
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::isSolved: found a deviation for player "
+          << to_string(i) << ".\nActual: " << objvals.at(i)
+          << "\tOptimized: " << val;
       *countryNumber = i;
       return false;
     }
@@ -1461,6 +1472,7 @@ void Game::EPEC::iterativeNash() {
 
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
+  this->Stats.numIteration = 0;
   while (notSolved) {
     // Compute profitable deviation(s)
     BOOST_LOG_TRIVIAL(trace)
@@ -1484,12 +1496,14 @@ void Game::EPEC::iterativeNash() {
         BOOST_LOG_TRIVIAL(trace)
             << "Game::EPEC::iterativeNash: solving approximated EPEC.";
         this->computeNashEq(timeRemaining);
-      } else
+      } else {
         this->computeNashEq();
+      }
       // If we have an equilibrium, we are done
       if (this->isSolved(&deviatedCountry, &countryDeviation)) {
         notSolved = false;
       }
+      ++this->Stats.numIteration;
     }
     // Else, we do not have feasability and/or profitable deviations
     // OR we triggered the timelimit
@@ -1556,7 +1570,7 @@ void Game::EPEC::computeNashEq(
     int status = lcpmodel->get(GRB_IntAttr_Status);
     // Search just for a feasible point
     if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
-        status == GRB_SOLUTION_LIMIT) {
+                                 status == GRB_SOLUTION_LIMIT) {
       BOOST_LOG_TRIVIAL(trace)
           << "Game::EPEC::computeNashEq: an equilibrium has been found.";
       this->nashEq = true;
@@ -1592,6 +1606,7 @@ void Game::EPEC::findNashEq() {
    * Checks the value of Game::EPEC::algorithm and delegates the task to
    * appropriate algorithm wrappers.
    */
+  this->Stats.algorithm = this->algorithm;
   switch (this->algorithm) {
   case 1:
     this->iterativeNash();
