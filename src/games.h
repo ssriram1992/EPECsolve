@@ -404,7 +404,7 @@ struct EPECStatistics {
 class EPEC {
 private:
   std::vector<unsigned int> SizesWithoutHull{};
-  int algorithm = 1; ///< Stores the type of algorithm used by the EPEC. 0 is
+  int algorithm = 0; ///< Stores the type of algorithm used by the EPEC. 0 is
                      ///< FullEnumeration, 1 is Inner Approximation
 
 protected: // Datafields
@@ -436,7 +436,8 @@ protected: // Datafields
   unsigned int n_MCVar{0};
 
   GRBEnv *env;
-  bool finalized{false}, nashEq{false};
+  bool finalized{false};
+  bool nashEq{false};
 
   unsigned int nCountr{0};
   unsigned int nVarinEPEC{0};
@@ -463,7 +464,7 @@ private:
   void giveAllDevns(std::vector<arma::vec> &devns,
                     const arma::vec &guessSol) const;
   void addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
-  virtual void computeNashEq(double localTimeLimit=-1 ) final;
+  virtual void computeNashEq(double localTimeLimit = -1) final;
 
 protected: // functions
   EPEC(GRBEnv *env)

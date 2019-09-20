@@ -3,8 +3,8 @@
 #include <boost/log/expressions.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
+#include <chrono>
 #include <cstdlib>
-#include <ctime>
 #include <gurobi_c++.h>
 #include <iostream>
 #include <iterator>
@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
   // --------------------------------
   // TEST STARTS
   // --------------------------------
-  clock_t time_start = clock();
+  auto time_start = std::chrono::high_resolution_clock::now();
   GRBEnv env = GRBEnv();
   env.set(GRB_IntParam_Threads, nThreads);
 
@@ -117,8 +117,9 @@ int main(int argc, char **argv) {
     epec.findNashEq();
   } catch (...) {
   }
-  clock_t time_stop = clock();
-  double CPUTime = 1000.0 * (time_stop - time_start) / CLOCKS_PER_SEC;
+  auto time_stop = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> time_diff = time_stop - time_start;
+  double CPUTime = time_diff.count();
 
   // --------------------------------
   // WRITING STATISTICS AND SOLUTION

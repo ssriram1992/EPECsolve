@@ -4,6 +4,7 @@
 #include <array>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
+#include <chrono>
 #include <iostream>
 #include <memory>
 
@@ -1423,7 +1424,19 @@ void Game::EPEC::giveAllDevns(
 }
 
 void Game::EPEC::addDeviatedPolyhedron(
-    const std::vector<arma::vec> &devns) const {
+    const std::vector<arma::vec>
+        &devns ///< devns.at(i) is a profitable deviation
+               ///< for the i-th country from the current this->sol_x
+    ) const {
+  /**
+   * Given a profitable deviation for each country, adds <i>a</i> polyhedron in
+   * the feasible region of each country to the corresponding country's
+   * Game::LCP object (this->countries_LCP.at(i)) 's vector of feasible
+   * polyhedra.
+   *
+   * Naturally, this makes the inner approximation of the Game::LCP better, by
+   * including one additional polyhedron.
+   */
 
   for (unsigned int i = 0; i < this->nCountr; ++i) // For each country
     this->countries_LCP.at(i)->addPolyFromX(devns.at(i));
@@ -1443,9 +1456,10 @@ void Game::EPEC::iterativeNash() {
   unsigned int deviatedCountry;
   arma::vec countryDeviation;
 
-  double initTime = -1;
-  if (this->timeLimit > 0)
-    double initTime = clock() / CLOCKS_PER_SEC;
+  std::chrono::high_resolution_clock::time_point initTime;
+  if (this->timeLimit > 0) {
+    initTime = std::chrono::high_resolution_clock::now();
+  }
 
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
@@ -1461,10 +1475,12 @@ void Game::EPEC::iterativeNash() {
       this->make_country_QP();
       // Compute the nash EQ given the approximated QPs
       // setting timelimit to remaining time -epsilon seconds
-      if (this->timeLimit > 0)
-        this->computeNashEq(this->timeLimit -
-                            (clock() / CLOCKS_PER_SEC - initTime) - 0.2);
-      else
+      if (this->timeLimit > 0) {
+        const std::chrono::duration<double> timeElapsed =
+            std::chrono::high_resolution_clock::now() - initTime;
+        const double timeRemaining = this->timeLimit - timeElapsed.count();
+        this->computeNashEq(timeRemaining);
+      } else
         this->computeNashEq();
       // If we have an equilibrium, we are done
       if (this->isSolved(&deviatedCountry, &countryDeviation)) {
@@ -1473,9 +1489,11 @@ void Game::EPEC::iterativeNash() {
     }
     // Else, we do not have feasability and/or profitable deviations
     // OR we triggered the timelimit
+    const std::chrono::duration<double> timeElapsed =
+        std::chrono::high_resolution_clock::now() - initTime;
+    const double timeRemaining = this->timeLimit - timeElapsed.count();
     if (devns.size() == 0 ||
-        (this->timeLimit > 0 &&
-         (clock() / CLOCKS_PER_SEC - initTime) >= this->timeLimit)) {
+        (this->timeLimit > 0 && timeRemaining >= this->timeLimit)) {
       notSolved = false;
       // No deviations, hence infeasible
       if (devns.size() == 0)
