@@ -499,13 +499,6 @@ unsigned int Game::ConvexHull(
     throw string(
         "Inconsistent number of rows in LHS and RHS in the common polyhedron");
 
-  if (nPoly == 1) {
-    A.zeros(Ai->at(0)->n_rows + Acom.n_rows, Ai->at(0)->n_cols + Acom.n_cols);
-    b.zeros(bi->at(0)->n_rows + bcom.n_rows);
-    A = arma::join_cols(*Ai->at(0), Acom);
-    b = arma::join_cols(*bi->at(0), bcom);
-    return nPoly;
-  }
   // Count the number of variables in the convex hull.
   unsigned int nFinCons{0}, nFinVar{0};
   if (nPoly != bi->size())
@@ -807,7 +800,7 @@ vector<short int> Game::LCP::solEncode(GRBModel *model) const
     return this->solEncode(z, x);
 }
 
-LCP &Game::LCP::addPolyFromX(const arma::vec &x)
+LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
 /**
  * Given a <i> feasible </i> point @p x, checks if any polyhedron that contains
  * @p x is already a part of this->Ai and this-> bi. If it is, then this does
@@ -830,9 +823,12 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x)
     });
     // And then add the relevant polyhedra
     this->FixToPoly(encoding, false);
-  } else
+    ret = true;
+  } else {
     BOOST_LOG_TRIVIAL(info)
         << " -- No polyhedron added, as best deviation is already feasible.";
+    ret = false;
+  }
 
   return *this;
 }

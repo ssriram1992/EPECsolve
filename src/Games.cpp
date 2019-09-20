@@ -1255,7 +1255,6 @@ void EPEC::get_x_minus_i(const arma::vec &x, const int &i,
   }
 }
 
-
 unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
                                          const arma::vec &x) const {
   if (!this->finalized)
@@ -1294,7 +1293,6 @@ double Game::EPEC::RespondSol(
       sol.at(i) =
           model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
 
-    model->write("dat/Respond_"+to_string(player)+".lp");
     return model->get(GRB_DoubleAttr_ObjVal);
   } else {
     return GRB_INFINITY;
@@ -1434,7 +1432,7 @@ void Game::EPEC::giveAllDevns(
   }
 }
 
-void Game::EPEC::addDeviatedPolyhedron(
+unsigned int Game::EPEC::addDeviatedPolyhedron(
     const std::vector<arma::vec>
         &devns ///< devns.at(i) is a profitable deviation
                ///< for the i-th country from the current this->sol_x
@@ -1449,8 +1447,14 @@ void Game::EPEC::addDeviatedPolyhedron(
    * including one additional polyhedron.
    */
 
-  for (unsigned int i = 0; i < this->nCountr; ++i) // For each country
-    this->countries_LCP.at(i)->addPolyFromX(devns.at(i));
+  unsigned int added = 0;
+  for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
+    bool ret = false;
+    this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
+    if (ret)
+      ++added;
+  }
+  return added;
 }
 
 void Game::EPEC::iterativeNash() {
@@ -1483,7 +1487,11 @@ void Game::EPEC::iterativeNash() {
       BOOST_LOG_TRIVIAL(trace)
           << "Game::EPEC::iterativeNash: found a deviation. Adding polyhedra.";
       // Add the deviated polyhedra and recompute approximated QP
-      this->addDeviatedPolyhedron(devns);
+      if (this->addDeviatedPolyhedron(devns) == 0){
+        BOOST_LOG_TRIVIAL(error)
+            << "Game::EPEC::iterativeNash: no polyhedron has been added.";
+        throw ;
+      }
       BOOST_LOG_TRIVIAL(trace)
           << "Game::EPEC::iterativeNash: reformulating approximated QPs.";
       this->make_country_QP();
@@ -1570,7 +1578,7 @@ void Game::EPEC::computeNashEq(
     int status = lcpmodel->get(GRB_IntAttr_Status);
     // Search just for a feasible point
     if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
-                                 status == GRB_SOLUTION_LIMIT) {
+        status == GRB_SOLUTION_LIMIT) {
       BOOST_LOG_TRIVIAL(trace)
           << "Game::EPEC::computeNashEq: an equilibrium has been found.";
       this->nashEq = true;

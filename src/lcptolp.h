@@ -51,7 +51,7 @@ private:
   bool madeRlxdModel{false}; ///< Keep track if LCP::RlxdModel is made
   unsigned int nR, nC;
   int polyCounter{0};
-  int feasiblePolyhedra{-1};
+  unsigned int feasiblePolyhedra{-1};
   /// LCP feasible region is a union of polyhedra. Keeps track which of those
   /// inequalities are fixed to equality to get the individual polyhedra
   std::vector<std::vector<short int>> AllPolyhedra;
@@ -187,7 +187,7 @@ public:
              const arma::vec &x_minus_i, bool solve = false);
 
   /* Convex hull computation */
-  int ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description LHS to
+  unsigned int ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description LHS to
                                   ///< be stored here
                  arma::vec &b) ///< Convex hull inequality description RHS to be
                                ///< stored here
@@ -212,15 +212,23 @@ public:
     arma::sp_mat A_common;
     A_common = arma::join_cols(this->_A, -this->M);
     arma::vec b_common = arma::join_cols(this->_b, this->q);
-    return Game::ConvexHull(&tempAi, &tempbi, A, b, A_common, b_common);
+    if (Ai->size() == 1) {
+      A.zeros(Ai->at(0)->n_rows + A_common.n_rows,
+              Ai->at(0)->n_cols + A_common.n_cols);
+      b.zeros(bi->at(0)->n_rows + b_common.n_rows);
+      A = arma::join_cols(*Ai->at(0), A_common);
+      b = arma::join_cols(*bi->at(0), b_common);
+      return 1;
+    } else
+      return Game::ConvexHull(&tempAi, &tempbi, A, b, A_common, b_common);
   };
 
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP,
               bool enumerate = true);
 
-  LCP &addPolyFromX(const arma::vec &x);
+  LCP &addPolyFromX(const arma::vec &x, bool &ret);
 
-  int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
+  unsigned int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 
   void write(std::string filename, bool append = true) const;
 

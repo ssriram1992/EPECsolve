@@ -467,7 +467,7 @@ private:
 
   void giveAllDevns(std::vector<arma::vec> &devns,
                     const arma::vec &guessSol) const;
-  void addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
+  unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
   void get_x_minus_i(const arma::vec &x,
                     const int &i, arma::vec &solOther) const;
   virtual void computeNashEq(double localTimeLimit = -1.0) final;
