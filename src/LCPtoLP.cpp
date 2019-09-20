@@ -500,7 +500,7 @@ unsigned int Game::ConvexHull(
         "Inconsistent number of rows in LHS and RHS in the common polyhedron");
 
   if (nPoly == 1) {
-    A.zeros(Ai->at(0)->n_rows + Acom.n_rows,  Ai->at(0)->n_cols + Acom.n_cols);
+    A.zeros(Ai->at(0)->n_rows + Acom.n_rows, Ai->at(0)->n_cols + Acom.n_cols);
     b.zeros(bi->at(0)->n_rows + bcom.n_rows);
     A = arma::join_cols(*Ai->at(0), Acom);
     b = arma::join_cols(*bi->at(0), bcom);

@@ -1095,7 +1095,7 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
     double val = this->RespondSol(violSol, i, sol, true);
     if (val == GRB_INFINITY)
       return false;
-    if (abs(val - objvals.at(i)) > tol) {
+    if (val - objvals.at(i) > tol) {
       violPlayer = i;
       return false;
     }
@@ -1321,7 +1321,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
     double val = this->RespondSol(*ProfDevn, i, this->sol_x);
     if (val == GRB_INFINITY)
       return false;
-    if (abs(val - objvals.at(i)) > tol) {
+    if (val - objvals.at(i) > tol) {
       *countryNumber = i;
       return false;
     }
@@ -1463,13 +1463,17 @@ void Game::EPEC::iterativeNash() {
   // LCP
   while (notSolved) {
     // Compute profitable deviation(s)
+    BOOST_LOG_TRIVIAL(trace)
+        << "Game::EPEC::iterativeNash: computing deviations.";
     this->giveAllDevns(devns, this->sol_x);
     // If LCP are feasible (!=0) and there is then at least one profitable one
     if (devns.size() != 0) {
-      BOOST_LOG_TRIVIAL(info)
-          << "iterativeNash: found a deviation. Adding polyhedra.";
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::iterativeNash: found a deviation. Adding polyhedra.";
       // Add the deviated polyhedra and recompute approximated QP
       this->addDeviatedPolyhedron(devns);
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::iterativeNash: reformulating approximated QPs.";
       this->make_country_QP();
       // Compute the nash EQ given the approximated QPs
       // setting timelimit to remaining time -epsilon seconds
@@ -1477,6 +1481,8 @@ void Game::EPEC::iterativeNash() {
         const std::chrono::duration<double> timeElapsed =
             std::chrono::high_resolution_clock::now() - initTime;
         const double timeRemaining = this->timeLimit - timeElapsed.count();
+        BOOST_LOG_TRIVIAL(trace)
+            << "Game::EPEC::iterativeNash: solving approximated EPEC.";
         this->computeNashEq(timeRemaining);
       } else
         this->computeNashEq();
@@ -1551,6 +1557,8 @@ void Game::EPEC::computeNashEq(
     // Search just for a feasible point
     if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
         status == GRB_SOLUTION_LIMIT) {
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::computeNashEq: an equilibrium has been found.";
       this->nashEq = true;
       this->Stats.status = 1;
       try {
