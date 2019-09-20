@@ -1451,8 +1451,15 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     bool ret = false;
     this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
-    if (ret)
+    if (ret){
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::iterativeNash: added polyhedron for player "<<to_string(i);
       ++added;
+    }else{
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::iterativeNash: NO polyhedron added for player "<<to_string(i);
+    }
+
   }
   return added;
 }
@@ -1477,6 +1484,7 @@ void Game::EPEC::iterativeNash() {
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
   this->Stats.numIteration = 0;
+  int addedPoly = 0;
   while (notSolved) {
     // Compute profitable deviation(s)
     BOOST_LOG_TRIVIAL(trace)
@@ -1485,13 +1493,16 @@ void Game::EPEC::iterativeNash() {
     // If LCP are feasible (!=0) and there is then at least one profitable one
     if (devns.size() != 0) {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::iterativeNash: found a deviation. Adding polyhedra.";
+          << "Game::EPEC::iterativeNash: found a deviation.";
       // Add the deviated polyhedra and recompute approximated QP
-      if (this->addDeviatedPolyhedron(devns) == 0){
+      addedPoly = this->addDeviatedPolyhedron(devns);
+      if (addedPoly == 0){
         BOOST_LOG_TRIVIAL(error)
             << "Game::EPEC::iterativeNash: no polyhedron has been added.";
         throw ;
       }
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::iterativeNash: a total of "<<to_string(addedPoly)<<" polyhedra were added.";
       BOOST_LOG_TRIVIAL(trace)
           << "Game::EPEC::iterativeNash: reformulating approximated QPs.";
       this->make_country_QP();

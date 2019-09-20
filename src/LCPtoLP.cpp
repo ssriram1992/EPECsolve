@@ -824,11 +824,8 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
     // And then add the relevant polyhedra
     this->FixToPoly(encoding, false);
     ret = true;
-  } else {
-    BOOST_LOG_TRIVIAL(info)
-        << " -- No polyhedron added, as best deviation is already feasible.";
+  } else
     ret = false;
-  }
 
   return *this;
 }
