@@ -1620,7 +1620,6 @@ void Game::EPEC::findNashEq() {
     this->iterativeNash();
     break;
   default:
-    int status = -1;
     this->make_country_QP();
     this->computeNashEq(this->timeLimit);
     break;

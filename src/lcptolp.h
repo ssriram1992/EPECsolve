@@ -51,7 +51,7 @@ private:
   bool madeRlxdModel{false}; ///< Keep track if LCP::RlxdModel is made
   unsigned int nR, nC;
   int polyCounter{0};
-  unsigned int feasiblePolyhedra{-1};
+  unsigned int feasiblePolyhedra{0};
   /// LCP feasible region is a union of polyhedra. Keeps track which of those
   /// inequalities are fixed to equality to get the individual polyhedra
   std::vector<std::vector<short int>> AllPolyhedra;
