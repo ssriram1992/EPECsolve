@@ -187,10 +187,11 @@ public:
              const arma::vec &x_minus_i, bool solve = false);
 
   /* Convex hull computation */
-  unsigned int ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description LHS to
-                                  ///< be stored here
-                 arma::vec &b) ///< Convex hull inequality description RHS to be
-                               ///< stored here
+  unsigned int
+  ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description LHS to
+                              ///< be stored here
+             arma::vec &b)    ///< Convex hull inequality description RHS to be
+                              ///< stored here
   /**
    * Computes the convex hull of the feasible region of the LCP
    */

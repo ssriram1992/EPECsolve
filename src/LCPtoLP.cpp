@@ -810,12 +810,16 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
 {
   vector<short int> encoding = this->solEncode(x);
   // Check if the encoding polyhedron is already in this->AllPolyhedra
-  auto iterator =
-      std::find_if(this->AllPolyhedra.begin(), this->AllPolyhedra.end(),
-                   [encoding](const vector<short int> &AllPolyElem) {
-                     return encoding < AllPolyElem;
-                   });
-  if (iterator == this->AllPolyhedra.end()) { // If it is not in AllPolyhedra
+  int found = -1;
+  for (int i = 0; i < AllPolyhedra.size(); ++i) {
+    if (encoding < AllPolyhedra.at(i)) {
+      found = i;
+      break;
+    }
+  }
+
+  if (found == -1) {
+    // If it is not in AllPolyhedra
     // First change any zero indices of encoding to 1
     std::for_each(encoding.begin(), encoding.end(), [](short int &elem) {
       if (elem == 0)
@@ -824,8 +828,9 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
     // And then add the relevant polyhedra
     this->FixToPoly(encoding, false);
     ret = true;
-  } else
+  } else {
     ret = false;
+  }
 
   return *this;
 }

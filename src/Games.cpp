@@ -1451,15 +1451,17 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     bool ret = false;
     this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
-    if (ret){
+    if (ret) {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::iterativeNash: added polyhedron for player "<<to_string(i);
+          << "Game::EPEC::iterativeNash: added polyhedron for player "
+          << to_string(i);
       ++added;
-    }else{
+    } else {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::iterativeNash: NO polyhedron added for player "<<to_string(i);
+          << "Game::EPEC::iterativeNash: NO polyhedron added for player "
+          << to_string(i);
+      return 0;
     }
-
   }
   return added;
 }
@@ -1496,49 +1498,52 @@ void Game::EPEC::iterativeNash() {
           << "Game::EPEC::iterativeNash: found a deviation.";
       // Add the deviated polyhedra and recompute approximated QP
       addedPoly = this->addDeviatedPolyhedron(devns);
-      if (addedPoly == 0){
-        BOOST_LOG_TRIVIAL(error)
-            << "Game::EPEC::iterativeNash: no polyhedron has been added.";
-        throw ;
-      }
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::iterativeNash: a total of "<<to_string(addedPoly)<<" polyhedra were added.";
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::iterativeNash: reformulating approximated QPs.";
-      this->make_country_QP();
-      // Compute the nash EQ given the approximated QPs
-      // setting timelimit to remaining time -epsilon seconds
-      if (this->timeLimit > 0) {
-        const std::chrono::duration<double> timeElapsed =
-            std::chrono::high_resolution_clock::now() - initTime;
-        const double timeRemaining = this->timeLimit - timeElapsed.count();
+      if (addedPoly > 0) {
         BOOST_LOG_TRIVIAL(trace)
-            << "Game::EPEC::iterativeNash: solving approximated EPEC.";
-        this->computeNashEq(timeRemaining);
+            << "Game::EPEC::iterativeNash: a total of " << to_string(addedPoly)
+            << " polyhedra were added.";
+        BOOST_LOG_TRIVIAL(trace)
+            << "Game::EPEC::iterativeNash: reformulating approximated QPs.";
+        this->make_country_QP();
+        // Compute the nash EQ given the approximated QPs
+        // setting timelimit to remaining time -epsilon seconds
+        if (this->timeLimit > 0) {
+          const std::chrono::duration<double> timeElapsed =
+              std::chrono::high_resolution_clock::now() - initTime;
+          const double timeRemaining = this->timeLimit - timeElapsed.count();
+          BOOST_LOG_TRIVIAL(trace)
+              << "Game::EPEC::iterativeNash: solving approximated EPEC.";
+          this->computeNashEq(timeRemaining);
+        } else {
+          this->computeNashEq();
+        }
+        // If we have an equilibrium, we are done
+        if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+          notSolved = false;
+        }
+        ++this->Stats.numIteration;
       } else {
-        this->computeNashEq();
-      }
-      // If we have an equilibrium, we are done
-      if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+        BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: no polyhedron "
+                                   "has been added. Infeasible";
+        this->Stats.status = 0;
         notSolved = false;
       }
-      ++this->Stats.numIteration;
     }
-    // Else, we do not have feasability and/or profitable deviations
-    // OR we triggered the timelimit
-    const std::chrono::duration<double> timeElapsed =
-        std::chrono::high_resolution_clock::now() - initTime;
-    const double timeRemaining = this->timeLimit - timeElapsed.count();
-    if (devns.size() == 0 ||
-        (this->timeLimit > 0 && timeRemaining >= this->timeLimit)) {
-      notSolved = false;
-      // No deviations, hence infeasible
-      if (devns.size() == 0)
-        this->Stats.status = 0;
-      // We triggered the timelimit, hence we should return the timelimit status
-      else
-        this->Stats.status = 2;
-    }
+  }
+  // Else, we do not have feasability and/or profitable deviations
+  // OR we triggered the timelimit
+  const std::chrono::duration<double> timeElapsed =
+      std::chrono::high_resolution_clock::now() - initTime;
+  const double timeRemaining = this->timeLimit - timeElapsed.count();
+  if (devns.size() == 0 ||
+      (this->timeLimit > 0 && timeRemaining >= this->timeLimit)) {
+    notSolved = false;
+    // No deviations, hence infeasible
+    if (devns.size() == 0)
+      this->Stats.status = 0;
+    // We triggered the timelimit, hence we should return the timelimit status
+    else
+      this->Stats.status = 2;
   }
 }
 
