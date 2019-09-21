@@ -1458,50 +1458,52 @@ void Game::EPEC::iterativeNash() {
 
   std::chrono::high_resolution_clock::time_point initTime =
       std::chrono::high_resolution_clock::now();
-}
 
-// While problem is not solved and we do not get infeasability in any of the
-// LCP
-while (notSolved) {
-  // Compute profitable deviation(s)
-  this->giveAllDevns(devns, this->sol_x);
-  // If LCP are feasible (!=0) and there is then at least one profitable one
-  if (devns.size() != 0) {
+  // While problem is not solved and we do not get infeasability in any of the
+  // LCP
+  unsigned int iteration{0};
+  while (notSolved) {
+    // Compute profitable deviation(s)
     BOOST_LOG_TRIVIAL(info)
-        << "iterativeNash: found a deviation. Adding polyhedra.";
-    // Add the deviated polyhedra and recompute approximated QP
-    this->addDeviatedPolyhedron(devns);
-    this->make_country_QP();
-    // Compute the nash EQ given the approximated QPs
-    // setting timelimit to remaining time -epsilon seconds
-    if (this->timeLimit > 0) {
-      const std::chrono::duration<double> timeElapsed =
-          std::chrono::high_resolution_clock::now() - initTime;
-      const double timeRemaining = this->timeLimit - timeElapsed.count();
-      this->computeNashEq(timeRemaining);
-    } else
-      this->computeNashEq();
-    // If we have an equilibrium, we are done
-    if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+        << "Game::EPEC::iterativeNash: Iteration " << ++iteration;
+    this->giveAllDevns(devns, this->sol_x);
+    // If LCP are feasible (!=0) and there is then at least one profitable one
+    if (devns.size() != 0) {
+      BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Found a "
+                                 "deviation. Adding a Polyhedron.";
+      // Add the deviated polyhedra and recompute approximated QP
+      this->addDeviatedPolyhedron(devns);
+      this->make_country_QP();
+      // Compute the nash EQ given the approximated QPs
+      // setting timelimit to remaining time -epsilon seconds
+      if (this->timeLimit > 0) {
+        const std::chrono::duration<double> timeElapsed =
+            std::chrono::high_resolution_clock::now() - initTime;
+        const double timeRemaining = this->timeLimit - timeElapsed.count();
+        this->computeNashEq(timeRemaining);
+      } else
+        this->computeNashEq();
+      // If we have an equilibrium, we are done
+      if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+        notSolved = false;
+      }
+    }
+    // Else, we do not have feasability and/or profitable deviations
+    // OR we triggered the timelimit
+    const std::chrono::duration<double> timeElapsed =
+        std::chrono::high_resolution_clock::now() - initTime;
+    const double timeRemaining = this->timeLimit - timeElapsed.count();
+    if (devns.size() == 0 ||
+        (this->timeLimit > 0 && timeRemaining >= this->timeLimit)) {
       notSolved = false;
+      // No deviations, hence infeasible
+      if (devns.size() == 0)
+        this->Stats.status = 0;
+      // We triggered the timelimit, hence we should return the timelimit status
+      else
+        this->Stats.status = 2;
     }
   }
-  // Else, we do not have feasability and/or profitable deviations
-  // OR we triggered the timelimit
-  const std::chrono::duration<double> timeElapsed =
-      std::chrono::high_resolution_clock::now() - initTime;
-  const double timeRemaining = this->timeLimit - timeElapsed.count();
-  if (devns.size() == 0 ||
-      (this->timeLimit > 0 && timeRemaining >= this->timeLimit)) {
-    notSolved = false;
-    // No deviations, hence infeasible
-    if (devns.size() == 0)
-      this->Stats.status = 0;
-    // We triggered the timelimit, hence we should return the timelimit status
-    else
-      this->Stats.status = 2;
-  }
-}
 }
 
 void Game::EPEC::computeNashEq(
@@ -1585,9 +1587,9 @@ void Game::EPEC::findNashEq() {
    * Checks the value of Game::EPEC::algorithm and delegates the task to
    * appropriate algorithm wrappers.
    */
+  int status = -1;
   switch (this->algorithm) {
   case 0:
-    int status = -1;
     this->make_country_QP();
     this->computeNashEq(this->timeLimit);
     break;
@@ -1597,18 +1599,18 @@ void Game::EPEC::findNashEq() {
   }
   switch (this->Stats.status) {
   case 0:
-    BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no Nash "
+    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: no Nash "
                                   "equilibrium found (infeasibility)."
                                << '\n';
     break;
   case 1:
-    BOOST_LOG_TRIVIAL(warning)
+    BOOST_LOG_TRIVIAL(info)
         << "Game::EPEC::computeNashEq: a Nash equilibrium has been found."
         << '\n';
 
     break;
   default:
-    BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::computeNashEq: no Nash "
+    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: no Nash "
                                   "equilibrium found (timeLimit)."
                                << '\n';
     break;

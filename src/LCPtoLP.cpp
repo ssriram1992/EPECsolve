@@ -539,7 +539,7 @@ unsigned int Game::ConvexHull(
   // Counting rows completed
   /****************** SLOW LOOP BEWARE *******************/
   for (unsigned int i = 0; i < nPoly; i++) {
-    BOOST_LOG_TRIVIAL(info) << "Game::ConvexHull: Handling Polyhedron " << i + 1
+    BOOST_LOG_TRIVIAL(trace) << "Game::ConvexHull: Handling Polyhedron " << i + 1
                             << " out of " << nPoly;
     // First constraint in (4.31)
     // A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) =
