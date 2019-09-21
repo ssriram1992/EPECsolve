@@ -56,7 +56,7 @@ void Game::LCP::defConst(GRBEnv *env)
  * to assign default values to some attributes of the class.
  */
 {
-  AllPolyhedra = {};
+  AllPolyhedra = std::vector<std::vector<short int>>();
   this->Ai = unique_ptr<spmat_Vec>(new spmat_Vec());
   this->bi = unique_ptr<vec_Vec>(new vec_Vec());
   this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
@@ -821,10 +821,10 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
   if (found == -1) {
     // If it is not in AllPolyhedra
     // First change any zero indices of encoding to 1
-    std::for_each(encoding.begin(), encoding.end(), [](short int &elem) {
-      if (elem == 0)
-        ++elem;
-    });
+    for (short & i : encoding) {
+      if (i == 0)
+        ++i;
+    }
     // And then add the relevant polyhedra
     this->FixToPoly(encoding, false);
     ret = true;
@@ -1041,29 +1041,26 @@ Game::LCP &Game::LCP::FixToPoly(
  *level code. Instead use LCP::FixToPolies.
  */
 {
-  if (!custom) {
+  if (!custom && AllPolyhedra.size() > 0) {
     bool flag{false};
-    for (const auto &ff : AllPolyhedra) {
-      if (ff == Fix) {
-        flag = true;
-        break;
+    BOOST_LOG_TRIVIAL(trace) << "\tChecking if polyhedron is already included in the LCP";
+    for (int i = 0; i < AllPolyhedra.size(); ++i) {
+      if (Fix ==  AllPolyhedra.at(i)) {
+        return *this;
       }
     }
-    if (flag)
-      return *this;
   }
-
-  BOOST_LOG_TRIVIAL(trace) << "\tChecking feasibility for polyhedron "
-                           << to_string(++this->polyCounter);
 
   unique_ptr<arma::sp_mat> Aii =
       unique_ptr<arma::sp_mat>(new arma::sp_mat(nR, nC));
   unique_ptr<arma::vec> bii =
       unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
+
+
   for (unsigned int i = 0; i < this->nR; i++) {
     if (Fix.at(i) == 0) {
-      throw string(
-          "Error in Game::LCP::FixToPoly. 0s not allowed in argument vector");
+      BOOST_LOG_TRIVIAL(error) << "Game::LCP::FixToPoly: Polyhedra representation is incorrect. aborting.";
+      throw;
     }
     if (Fix.at(i) == 1) // Equation to be fixed top zero
     {
@@ -1082,6 +1079,8 @@ Game::LCP &Game::LCP::FixToPoly(
   }
   bool add = !checkFeas;
   if (checkFeas) {
+    BOOST_LOG_TRIVIAL(trace) << "\tChecking feasibility for polyhedron "
+                             << to_string(++this->polyCounter);
     unsigned int count{0};
     try {
       makeRelaxed();
@@ -1122,6 +1121,7 @@ Game::LCP &Game::LCP::FixToPoly(
       custbi->push_back(std::move(bii));
     } else {
       AllPolyhedra.push_back(Fix);
+      BOOST_LOG_TRIVIAL(trace)  << "Total number of polyhedra: " <<AllPolyhedra.size() << endl;
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }

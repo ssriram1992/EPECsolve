@@ -1489,8 +1489,8 @@ void Game::EPEC::iterativeNash() {
   this->Stats.numIteration = 0;
   int addedPoly = 0;
   while (notSolved) {
-    boost_log_trivial(info)
-        << "game::epec::iterativenash: iteration " << ++iteration;
+    BOOST_LOG_TRIVIAL(info)
+        << "Game::EPEC::iterativeNash: iteration " << ++iteration;
     // Compute profitable deviation(s)
     this->giveAllDevns(devns, this->sol_x);
     // If LCP are feasible (!=0) and there is then at least one profitable one
