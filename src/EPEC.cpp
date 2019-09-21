@@ -103,9 +103,7 @@ int main(int argc, char **argv) {
   // timeLimit
   epec.timeLimit = timeLimit;
   // Algorithm
-  if (algorithm != 0) {
-    epec.setAlgorithm(algorithm);
-  }
+  epec.setAlgorithm(algorithm);
   //------------
 
   for (unsigned int j = 0; j < Instance.Countries.size(); ++j)

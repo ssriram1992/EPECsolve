@@ -389,9 +389,13 @@ void print(const perps &C);
 namespace Game {
 /// @brief Stores statistics for a (solved) EPEC instance
 struct EPECStatistics {
-  int status = {-1};         ///< status: 1: nashEq found. 0:no nashEq found.
-                             ///< 2:timeLimit. -1: not initialized
-  int numVar = {-1};         ///< Number of variables in findNashEq model
+  int status = {-1};       ///< status: 1: nashEq found. 0:no nashEq found.
+                           ///< 2:timeLimit. -1: not initialized
+  int numVar = {-1};       ///< Number of variables in findNashEq model
+  int numIteration = {-1}; ///< Number of iteration of the algorithm (not valid
+                           ///< for fullEnumeration)
+  int algorithm = {
+      0}; ///< Type of algorithm. 0: fullEnumeration. 1: innerApproximation
   int numConstraints = {-1}; ///< Number of constraints in findNashEq model
   int numNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
                          ///< matrix of findNashEq model
@@ -404,7 +408,7 @@ struct EPECStatistics {
 class EPEC {
 private:
   std::vector<unsigned int> SizesWithoutHull{};
-  int algorithm = 0; ///< Stores the type of algorithm used by the EPEC. 0 is
+  int algorithm = 1; ///< Stores the type of algorithm used by the EPEC. 0 is
                      ///< FullEnumeration, 1 is Inner Approximation
 
 protected: // Datafields
@@ -463,8 +467,10 @@ private:
 
   void giveAllDevns(std::vector<arma::vec> &devns,
                     const arma::vec &guessSol) const;
-  void addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
-  virtual void computeNashEq(double localTimeLimit = -1) final;
+  unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
+  void get_x_minus_i(const arma::vec &x, const int &i,
+                     arma::vec &solOther) const;
+  virtual void computeNashEq(double localTimeLimit = -1.0) final;
 
 protected: // functions
   EPEC(GRBEnv *env)

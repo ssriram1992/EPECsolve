@@ -1227,27 +1227,20 @@ void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
       this->LeaderLocations.back() + *this->LocEnds.back() + addSpaceForMC;
 }
 
-unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
-                                         const arma::vec &x) const {
-  if (!this->finalized)
-    throw string("Error in Game::EPEC::Respond: Model not finalized");
-
-  if (i >= this->nCountr)
-    throw string("Error in Game::EPEC::Respond: Invalid country number");
-
+void EPEC::get_x_minus_i(const arma::vec &x, const int &i,
+                         arma::vec &solOther) const {
   const unsigned int nEPECvars = this->nVarinEPEC;
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
   const unsigned int nThisCountryHullVars = this->convexHullVariables.at(i);
   const unsigned int nConvexHullVars = std::accumulate(
       this->convexHullVariables.rbegin(), this->convexHullVariables.rend(), 0);
 
-  arma::vec solOther;
   solOther.zeros(nEPECvars -        // All variables in EPEC
                  nThisCountryvars - // Subtracting this country's variables,
-                                    // since we only want others'
-                 nConvexHullVars +  // We don't want any convex hull variables
+                 // since we only want others'
+                 nConvexHullVars + // We don't want any convex hull variables
                  nThisCountryHullVars); // We double subtracted our country's
-                                        // convex hull vars
+  // convex hull vars
 
   for (unsigned int j = 0, count = 0, current = 0; j < this->nCountr; ++j) {
     if (i != j) {
@@ -1260,6 +1253,18 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
     solOther.at(solOther.n_rows - this->n_MCVar + j) =
         x.at(this->nVarinEPEC - this->n_MCVar + j);
   }
+}
+
+unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
+                                         const arma::vec &x) const {
+  if (!this->finalized)
+    throw string("Error in Game::EPEC::Respond: Model not finalized");
+
+  if (i >= this->nCountr)
+    throw string("Error in Game::EPEC::Respond: Invalid country number");
+
+  arma::vec solOther;
+  this->get_x_minus_i(x, i, solOther);
   return this->countries_LCP.at(i).get()->MPECasMILP(
       this->LeadObjec.at(i).get()->C, this->LeadObjec.at(i).get()->c, solOther,
       true);
@@ -1322,6 +1327,10 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
     if (val == GRB_INFINITY)
       return false;
     if (abs(val - objvals.at(i)) > tol) {
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::isSolved: found a deviation for player "
+          << to_string(i) << ".\nActual: " << objvals.at(i)
+          << "\tOptimized: " << val;
       *countryNumber = i;
       return false;
     }
@@ -1356,7 +1365,7 @@ void Game::EPEC::make_country_QP(const unsigned int i)
     // enumeration or not
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get(),
-                                      this->algorithm == 0 ? true : false);
+                                      this->algorithm == 0);
     this->Stats.feasiblePolyhedra.push_back(
         this->countries_LCP.at(i)->getFeasiblePolyhedra());
   }
@@ -1423,7 +1432,7 @@ void Game::EPEC::giveAllDevns(
   }
 }
 
-void Game::EPEC::addDeviatedPolyhedron(
+unsigned int Game::EPEC::addDeviatedPolyhedron(
     const std::vector<arma::vec>
         &devns ///< devns.at(i) is a profitable deviation
                ///< for the i-th country from the current this->sol_x
@@ -1438,8 +1447,23 @@ void Game::EPEC::addDeviatedPolyhedron(
    * including one additional polyhedron.
    */
 
-  for (unsigned int i = 0; i < this->nCountr; ++i) // For each country
-    this->countries_LCP.at(i)->addPolyFromX(devns.at(i));
+  unsigned int added = 0;
+  for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
+    bool ret = false;
+    this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
+    if (ret) {
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::iterativeNash: added polyhedron for player "
+          << to_string(i);
+      ++added;
+    } else {
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::iterativeNash: NO polyhedron added for player "
+          << to_string(i);
+      return 0;
+    }
+  }
+  return added;
 }
 
 void Game::EPEC::iterativeNash() {
@@ -1462,47 +1486,65 @@ void Game::EPEC::iterativeNash() {
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
   unsigned int iteration{0};
+  this->Stats.numIteration = 0;
+  int addedPoly = 0;
   while (notSolved) {
+    boost_log_trivial(info)
+        << "game::epec::iterativenash: iteration " << ++iteration;
     // Compute profitable deviation(s)
-    BOOST_LOG_TRIVIAL(info)
-        << "Game::EPEC::iterativeNash: Iteration " << ++iteration;
     this->giveAllDevns(devns, this->sol_x);
     // If LCP are feasible (!=0) and there is then at least one profitable one
     if (devns.size() != 0) {
-      BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Found a "
-                                 "deviation. Adding a Polyhedron.";
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::iterativeNash: found a deviation.";
       // Add the deviated polyhedra and recompute approximated QP
-      this->addDeviatedPolyhedron(devns);
-      this->make_country_QP();
-      // Compute the nash EQ given the approximated QPs
-      // setting timelimit to remaining time -epsilon seconds
-      if (this->timeLimit > 0) {
-        const std::chrono::duration<double> timeElapsed =
-            std::chrono::high_resolution_clock::now() - initTime;
-        const double timeRemaining = this->timeLimit - timeElapsed.count();
-        this->computeNashEq(timeRemaining);
-      } else
-        this->computeNashEq();
-      // If we have an equilibrium, we are done
-      if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+      addedPoly = this->addDeviatedPolyhedron(devns);
+      if (addedPoly > 0) {
+        BOOST_LOG_TRIVIAL(trace)
+            << "Game::EPEC::iterativeNash: a total of " << to_string(addedPoly)
+            << " polyhedra were added.";
+        BOOST_LOG_TRIVIAL(trace)
+            << "Game::EPEC::iterativeNash: reformulating approximated QPs.";
+        this->make_country_QP();
+        // Compute the nash EQ given the approximated QPs
+        // setting timelimit to remaining time -epsilon seconds
+        if (this->timeLimit > 0) {
+          const std::chrono::duration<double> timeElapsed =
+              std::chrono::high_resolution_clock::now() - initTime;
+          const double timeRemaining = this->timeLimit - timeElapsed.count();
+          BOOST_LOG_TRIVIAL(trace)
+              << "Game::EPEC::iterativeNash: solving approximated EPEC.";
+          this->computeNashEq(timeRemaining);
+        } else {
+          this->computeNashEq();
+        }
+        // If we have an equilibrium, we are done
+        if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+          notSolved = false;
+        }
+        ++this->Stats.numIteration;
+      } else {
+        BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: no polyhedron "
+                                   "has been added. Infeasible";
+        this->Stats.status = 0;
         notSolved = false;
       }
     }
-    // Else, we do not have feasability and/or profitable deviations
-    // OR we triggered the timelimit
-    const std::chrono::duration<double> timeElapsed =
-        std::chrono::high_resolution_clock::now() - initTime;
-    const double timeRemaining = this->timeLimit - timeElapsed.count();
-    if (devns.size() == 0 ||
-        (this->timeLimit > 0 && timeRemaining >= this->timeLimit)) {
-      notSolved = false;
-      // No deviations, hence infeasible
-      if (devns.size() == 0)
-        this->Stats.status = 0;
-      // We triggered the timelimit, hence we should return the timelimit status
-      else
-        this->Stats.status = 2;
-    }
+  }
+  // Else, we do not have feasability and/or profitable deviations
+  // OR we triggered the timelimit
+  const std::chrono::duration<double> timeElapsed =
+      std::chrono::high_resolution_clock::now() - initTime;
+  const double timeRemaining = this->timeLimit - timeElapsed.count();
+  if (devns.size() == 0 ||
+      (this->timeLimit > 0 && timeRemaining >= this->timeLimit)) {
+    notSolved = false;
+    // No deviations, hence infeasible
+    if (devns.size() == 0)
+      this->Stats.status = 0;
+    // We triggered the timelimit, hence we should return the timelimit status
+    else
+      this->Stats.status = 2;
   }
 }
 
@@ -1554,6 +1596,8 @@ void Game::EPEC::computeNashEq(
     // Search just for a feasible point
     if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
         status == GRB_SOLUTION_LIMIT) {
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::computeNashEq: an equilibrium has been found.";
       this->nashEq = true;
       this->Stats.status = 1;
       try {
@@ -1587,21 +1631,21 @@ void Game::EPEC::findNashEq() {
    * Checks the value of Game::EPEC::algorithm and delegates the task to
    * appropriate algorithm wrappers.
    */
-  int status = -1;
+  this->Stats.algorithm = this->algorithm;
   switch (this->algorithm) {
+  case 1:
+    this->iterativeNash();
+    break;
   case 0:
     this->make_country_QP();
     this->computeNashEq(this->timeLimit);
-    break;
-  case 1:
-    this->iterativeNash();
     break;
   }
   switch (this->Stats.status) {
   case 0:
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: no Nash "
-                                  "equilibrium found (infeasibility)."
-                               << '\n';
+                               "equilibrium found (infeasibility)."
+                            << '\n';
     break;
   case 1:
     BOOST_LOG_TRIVIAL(info)
@@ -1611,8 +1655,8 @@ void Game::EPEC::findNashEq() {
     break;
   default:
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: no Nash "
-                                  "equilibrium found (timeLimit)."
-                               << '\n';
+                               "equilibrium found (timeLimit)."
+                            << '\n';
     break;
   }
 }

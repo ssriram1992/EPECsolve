@@ -539,8 +539,8 @@ unsigned int Game::ConvexHull(
   // Counting rows completed
   /****************** SLOW LOOP BEWARE *******************/
   for (unsigned int i = 0; i < nPoly; i++) {
-    BOOST_LOG_TRIVIAL(trace) << "Game::ConvexHull: Handling Polyhedron " << i + 1
-                            << " out of " << nPoly;
+    BOOST_LOG_TRIVIAL(trace) << "Game::ConvexHull: Handling Polyhedron "
+                             << i + 1 << " out of " << nPoly;
     // First constraint in (4.31)
     // A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) =
     // *Ai->at(i); // Slowest line. Will arma improve this? First constraint RHS
@@ -800,7 +800,7 @@ vector<short int> Game::LCP::solEncode(GRBModel *model) const
     return this->solEncode(z, x);
 }
 
-LCP &Game::LCP::addPolyFromX(const arma::vec &x)
+LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
 /**
  * Given a <i> feasible </i> point @p x, checks if any polyhedron that contains
  * @p x is already a part of this->Ai and this-> bi. If it is, then this does
@@ -810,12 +810,16 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x)
 {
   vector<short int> encoding = this->solEncode(x);
   // Check if the encoding polyhedron is already in this->AllPolyhedra
-  auto iterator =
-      std::find_if(this->AllPolyhedra.begin(), this->AllPolyhedra.end(),
-                   [encoding](const vector<short int> &AllPolyElem) {
-                     return encoding < AllPolyElem;
-                   });
-  if (iterator == this->AllPolyhedra.end()) { // If it is not in AllPolyhedra
+  int found = -1;
+  for (int i = 0; i < AllPolyhedra.size(); ++i) {
+    if (encoding < AllPolyhedra.at(i)) {
+      found = i;
+      break;
+    }
+  }
+
+  if (found == -1) {
+    // If it is not in AllPolyhedra
     // First change any zero indices of encoding to 1
     std::for_each(encoding.begin(), encoding.end(), [](short int &elem) {
       if (elem == 0)
@@ -823,9 +827,10 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x)
     });
     // And then add the relevant polyhedra
     this->FixToPoly(encoding, false);
-  } else
-    BOOST_LOG_TRIVIAL(info)
-        << " -- No polyhedron added, as best deviation is already feasible.";
+    ret = true;
+  } else {
+    ret = false;
+  }
 
   return *this;
 }
