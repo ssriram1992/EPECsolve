@@ -445,7 +445,7 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
  * \f$q_{exp}\f$, cap on each player, \f$\tilde{x_i}\f$, and the tax for each
  * player \f$t_i\f$.
  *
- * The leader is also constrained to not expo rt or import anything more than the
+ * The leader is also constrained to not export or import anything more than the
  * limits set by `export_limit` and `import_limit`. A negative value to these
  * input variables imply that there is no such limit.
  *

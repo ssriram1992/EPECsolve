@@ -21,9 +21,10 @@ bool operator==(vector<int> Fix1, vector<int> Fix2)
 {
   if (Fix1.size() != Fix2.size())
     return false;
-  for (unsigned int i = 0; i < Fix1.size(); i++)
-    if (Fix1[i] != Fix2[i])
+  for (unsigned int i = 0; i < Fix1.size(); i++) {
+    if (Fix1.at(i) != Fix2.at(i))
       return false;
+  }
   return true;
 }
 
@@ -41,9 +42,10 @@ bool operator<(vector<int> Fix1, vector<int> Fix2)
 {
   if (Fix1.size() != Fix2.size())
     return false;
-  for (unsigned int i = 0; i < Fix1.size(); i++)
-    if (Fix1[i] != Fix2[i] && Fix1[i] * Fix2[i] != 0)
+  for (unsigned int i = 0; i < Fix1.size(); i++) {
+    if (Fix1.at(i) != Fix2.at(i) && Fix1.at(i) * Fix2.at(i) != 0)
       return false; // Fix1 is not a child of Fix2
+  }
   return true;      // Fix1 is a child of Fix2
 }
 
@@ -56,7 +58,7 @@ void Game::LCP::defConst(GRBEnv *env)
  * to assign default values to some attributes of the class.
  */
 {
-  AllPolyhedra = std::vector<std::vector<short int>>();
+  AllPolyhedra = {};
   this->Ai = unique_ptr<spmat_Vec>(new spmat_Vec());
   this->bi = unique_ptr<vec_Vec>(new vec_Vec());
   this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
@@ -810,28 +812,36 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
 {
   vector<short int> encoding = this->solEncode(x);
   // Check if the encoding polyhedron is already in this->AllPolyhedra
+  cout << "\nAllPolyhedra: ";
+  for (const auto & i : AllPolyhedra) {
+    cout << "\nPoly: ";
+    for (short &i : encoding) {
+      cout << to_string(i)<<"\t";
+    }
+  }
+  cout << "\nEncoding (original): ";
+  for (short &i : encoding) {
+    cout << to_string(i)<<"\t";
+    if (i == 0)
+      ++i;
+  }
   int found = -1;
-  for (int i = 0; i < AllPolyhedra.size(); ++i) {
-    if (encoding < AllPolyhedra.at(i)) {
-      found = i;
-      break;
+  for (const auto & i : AllPolyhedra) {
+    if (encoding < i || encoding == i) {
+      ret = false;
+      return *this;
     }
   }
 
-  if (found == -1) {
-    // If it is not in AllPolyhedra
-    // First change any zero indices of encoding to 1
-    for (short & i : encoding) {
-      if (i == 0)
-        ++i;
-    }
-    // And then add the relevant polyhedra
-    this->FixToPoly(encoding, false);
-    ret = true;
-  } else {
-    ret = false;
+  // If it is not in AllPolyhedra
+  // First change any zero indices of encoding to 1
+  cout << "\nEncoding (edited): ";
+  for (short &i : encoding) {
+    cout << to_string(i)<<"\t";
   }
-
+  // And then add the relevant polyhedra
+  this->FixToPoly(encoding, false);
+  ret = true;
   return *this;
 }
 
@@ -1041,11 +1051,11 @@ Game::LCP &Game::LCP::FixToPoly(
  *level code. Instead use LCP::FixToPolies.
  */
 {
-  if (!custom && AllPolyhedra.size() > 0) {
+  if (!custom && !AllPolyhedra.empty()) {
     bool flag{false};
-    BOOST_LOG_TRIVIAL(trace) << "\tChecking if polyhedron is already included in the LCP";
-    for (int i = 0; i < AllPolyhedra.size(); ++i) {
-      if (Fix ==  AllPolyhedra.at(i)) {
+    for (const auto &ff : AllPolyhedra) {
+      if (ff == Fix) {
+        BOOST_LOG_TRIVIAL(warning) << "\tPolyhedron already added!.";
         return *this;
       }
     }
@@ -1055,12 +1065,10 @@ Game::LCP &Game::LCP::FixToPoly(
       unique_ptr<arma::sp_mat>(new arma::sp_mat(nR, nC));
   unique_ptr<arma::vec> bii =
       unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
-
-
   for (unsigned int i = 0; i < this->nR; i++) {
     if (Fix.at(i) == 0) {
-      BOOST_LOG_TRIVIAL(error) << "Game::LCP::FixToPoly: Polyhedra representation is incorrect. aborting.";
-      throw;
+      throw string(
+          "Error in Game::LCP::FixToPoly. 0s not allowed in argument vector");
     }
     if (Fix.at(i) == 1) // Equation to be fixed top zero
     {
@@ -1121,7 +1129,6 @@ Game::LCP &Game::LCP::FixToPoly(
       custbi->push_back(std::move(bii));
     } else {
       AllPolyhedra.push_back(Fix);
-      BOOST_LOG_TRIVIAL(trace)  << "Total number of polyhedra: " <<AllPolyhedra.size() << endl;
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }

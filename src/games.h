@@ -462,6 +462,7 @@ private:
       const unsigned int i) final; ///< Add Dummy variables for the leaders
   virtual void make_country_QP(const unsigned int i) final;
   virtual void make_country_QP() final;
+  virtual void resetLCP() final;
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
 
@@ -499,7 +500,6 @@ public:                  // functions
 
   virtual void finalize() final;
   virtual void findNashEq() final;
-
   virtual void iterativeNash() final;
 
   unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
