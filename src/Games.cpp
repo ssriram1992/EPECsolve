@@ -1498,7 +1498,7 @@ void Game::EPEC::iterativeNash() {
   // If for two iterations we do not add at least one polyhedron, abort.
   while (notSolved) {
     BOOST_LOG_TRIVIAL(trace)
-        << "Game::EPEC::iterativeNash: Iteration " << to_string(iteration);
+        << "Game::EPEC::iterativeNash: Iteration " << to_string(iteration++);
     // Compute profitable deviation(s)
     this->giveAllDevns(devns, this->sol_x);
     // If LCP are feasible (!=0) and there is then at least one profitable one
@@ -1507,7 +1507,8 @@ void Game::EPEC::iterativeNash() {
           << "Game::EPEC::iterativeNash: found a deviation.";
       // Add the deviated polyhedra and recompute approximated QP
       addedPoly = this->addDeviatedPolyhedron(devns);
-      if (addedPoly > 0) {
+        BOOST_LOG_TRIVIAL(trace) << iteration <<" iteration going on";
+      if (addedPoly > 0 || iteration < 2) {
         BOOST_LOG_TRIVIAL(trace)
             << "Game::EPEC::iterativeNash: a total of " << to_string(addedPoly)
             << " polyhedra were added.";
