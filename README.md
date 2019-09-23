@@ -1,6 +1,6 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-# EPECcode
+# EPECsolve
 Code to compute mixed-equilibrium in linear EPECs. Code available on [Github](https://github.com/ssriram1992/EPECsolve/).
 
 *Manuscript in preparation. Link will be shared once ready*
@@ -45,3 +45,9 @@ make docDetailed
 - Optionally run `make EPECtest` to run the set of unit tests. It should all succeed without a problem.
 - Run `make` to create the binary.
 - Run `./bin/EPEC -h` to get a list of command line options with which you can run the executable.
+
+# Maintenance
+[@ssriram1992](https://github.com/ssriram1992/) - Contact: [sriram.sankaranarayanan@polymtl.ca](mailto:sriram.sankaranarayanan@polymtl.ca)
+
+[@gdragotto](https://github.com/gdragotto) - Contact: [gabriele.dragotto@polymtl.ca](mailto:gabriele.dragotto@polymtl.ca)
+
