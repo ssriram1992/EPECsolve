@@ -289,7 +289,6 @@ BOOST_AUTO_TEST_CASE(NashGame_test) {
   BOOST_CHECK_NO_THROW(lcp.save("test/lcp.dat"));
 
   LCP lcp2(&env);
-  // lcp2.load("test/lcp.dat");
   BOOST_CHECK_NO_THROW(lcp2.load("test/lcp.dat"));
   BOOST_CHECK_NO_THROW(lcp2.save("test/lcp2.dat"));
 

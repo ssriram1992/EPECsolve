@@ -58,7 +58,6 @@ void Game::LCP::defConst(GRBEnv *env)
  * to assign default values to some attributes of the class.
  */
 {
-  AllPolyhedra = {};
   this->Ai = unique_ptr<spmat_Vec>(new spmat_Vec());
   this->bi = unique_ptr<vec_Vec>(new vec_Vec());
   this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
@@ -570,7 +569,8 @@ unsigned int Game::ConvexHull(
   // Third Constraint RHS
   b.at(FirstCons + nC * 2) = 1;
   b.at(FirstCons + nC * 2 + 1) = -1;
-  return nPoly;		///< Perfrorm increasingly better inner approximations in iterations
+  return nPoly; ///< Perfrorm increasingly better inner approximations in
+                ///< iterations
 }
 
 void Game::compConvSize(
@@ -707,7 +707,6 @@ Game::LPSolve(const arma::sp_mat &A, ///< The constraint matrix
       sol.at(i) = x[i].get(GRB_DoubleAttr_X);
   return sol;
 }
-
 
 bool Game::LCP::extractSols(
     GRBModel *model, ///< The Gurobi Model that was solved (perhaps using
@@ -857,13 +856,18 @@ Game::LCP &Game::LCP::FixToPoly(
  *level code. Instead use LCP::FixToPolies.
  */
 {
+
+  if (knownInfeas.find(Fix) != knownInfeas.end()) {
+    BOOST_LOG_TRIVIAL(trace) << "Game::LCP::FixToPoly: Previously known "
+                                "infeasible polyhedron. Not added";
+    return *this;
+  }
+
   if (!custom && !AllPolyhedra.empty()) {
-    bool flag{false};
-    for (const auto &ff : AllPolyhedra) {
-      if (ff == Fix) {
-        BOOST_LOG_TRIVIAL(warning) << "\tPolyhedron already added!.";
-        return *this;
-      }
+    if (AllPolyhedra.find(Fix) != AllPolyhedra.end()) {
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::LCP::FixToPoly: Previously added polyhedron. Not added";
+      return *this;
     }
   }
 
@@ -914,6 +918,8 @@ Game::LCP &Game::LCP::FixToPoly(
       model.optimize();
       if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL)
         add = true;
+      else // Remember that this is an infeasible polyhedra
+        knownInfeas.insert(Fix);
     } catch (const char *e) {
       cerr << "Error in Game::LCP::FixToPoly: " << e << '\n';
       throw;
@@ -934,7 +940,7 @@ Game::LCP &Game::LCP::FixToPoly(
       custAi->push_back(std::move(Aii));
       custbi->push_back(std::move(bii));
     } else {
-      AllPolyhedra.push_back(Fix);
+      AllPolyhedra.insert(Fix);
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }

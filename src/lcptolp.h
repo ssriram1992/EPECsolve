@@ -5,6 +5,7 @@
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
+#include <set>
 
 // using namespace Game;
 
@@ -54,7 +55,10 @@ private:
   unsigned int feasiblePolyhedra{0};
   /// LCP feasible region is a union of polyhedra. Keeps track which of those
   /// inequalities are fixed to equality to get the individual polyhedra
-  std::vector<std::vector<short int>> AllPolyhedra;
+  std::set<std::vector<short int>> AllPolyhedra =
+      {}; ///< Encoding of polyhedra that have been enumerated
+  std::set<std::vector<short int>> knownInfeas =
+      {}; ///< Encoding of polyhedra known to be infeasible
   std::unique_ptr<spmat_Vec> Ai;
   std::unique_ptr<vec_Vec> bi;
   GRBModel RlxdModel; ///< A gurobi model with all complementarity constraints
@@ -91,7 +95,6 @@ private:
 
   std::vector<short int> solEncode(const arma::vec &z,
                                    const arma::vec &x) const;
-
 
   LCP &EnumerateAll(bool solveLP = false);
 
