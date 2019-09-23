@@ -718,7 +718,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap2_test) {
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   epec.setAlgorithm(0);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_CHECK_MESSAGE(epec.getStatistics().status == false, "checking status");
+  BOOST_CHECK_MESSAGE(epec.getStatistics().status == Game::EPECsolveStatus::nashEqNotFound,"checking status");
   BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is not spuriously solved");
   epec.setAlgorithm(1);
@@ -1090,7 +1090,7 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
   epec.setAlgorithm(0);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_CHECK_MESSAGE(epec.getStatistics().status == false, "checking status");
+  BOOST_CHECK_MESSAGE(epec.getStatistics().status == Game::EPECsolveStatus::nashEqNotFound, "checking status");
   BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
   epec.setAlgorithm(1);
