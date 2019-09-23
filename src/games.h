@@ -1,11 +1,11 @@
 #pragma once
-
 // #include"epecsolve.h"
 #include "lcptolp.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
+#include <string>
 
 using namespace std;
 using namespace Game;
@@ -387,15 +387,31 @@ void print(const perps &C);
 
 // The EPEC stuff
 namespace Game {
+
+enum class EPECsolveStatus {
+  /**
+   * Set of status in which the solution status of a Game::EPEC can be.
+   */
+  nashEqNotFound, ///< Instance proved to be infeasible.
+  nashEqFound,    ///< Solution found for the instance.
+  timeLimit,      ///< Time limit reached, nash equilibrium not found.
+  unInitialized   ///< Not started to solve the problem.
+};
+
+enum class EPECalgorithm {
+  fullEnumeration,   ///< Completely enumerate the set of polyhedra for all
+                     ///< followers
+  innerApproximation ///< Perfrorm increasingly better inner approximations in
+                     ///< iterations
+};
+
 /// @brief Stores statistics for a (solved) EPEC instance
 struct EPECStatistics {
-  int status = {-1};       ///< status: 1: nashEq found. 0:no nashEq found.
-                           ///< 2:timeLimit. -1: not initialized
+  Game::EPECsolveStatus status = Game::EPECsolveStatus::unInitialized;
   int numVar = {-1};       ///< Number of variables in findNashEq model
   int numIteration = {-1}; ///< Number of iteration of the algorithm (not valid
                            ///< for fullEnumeration)
-  int algorithm = {
-      0}; ///< Type of algorithm. 0: fullEnumeration. 1: innerApproximation
+  Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   int numConstraints = {-1}; ///< Number of constraints in findNashEq model
   int numNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
                          ///< matrix of findNashEq model
@@ -408,8 +424,9 @@ struct EPECStatistics {
 class EPEC {
 private:
   std::vector<unsigned int> SizesWithoutHull{};
-  int algorithm = 1; ///< Stores the type of algorithm used by the EPEC. 0 is
-                     ///< FullEnumeration, 1 is Inner Approximation
+  Game::EPECalgorithm algorithm =
+      Game::EPECalgorithm::fullEnumeration; ///< Stores the type of algorithm
+                                            ///< used by the EPEC.
 
 protected: // Datafields
   std::vector<shared_ptr<Game::NashGame>> countries_LL{};
@@ -515,20 +532,14 @@ public:                  // functions
   virtual const EPECStatistics getStatistics() const final {
     return this->Stats;
   }
-  virtual void setAlgorithm(unsigned int algorithm) final {
-    switch (algorithm) {
-    case 0:
-      this->algorithm = 0;
-      break;
-    case 1:
-      this->algorithm = 1;
-      break;
-    default:
-      this->algorithm = 0;
-    }
-  }
+  void setAlgorithm(unsigned int algorithm); // Should be deprecated and removed
+  void setAlgorithm(Game::EPECalgorithm algorithm);
 };
 } // namespace Game
+
+namespace std {
+string to_string(const Game::EPECsolveStatus st);
+};
 
 /* Example for QP_Param */
 /**

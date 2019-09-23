@@ -46,7 +46,7 @@ bool operator<(vector<int> Fix1, vector<int> Fix2)
     if (Fix1.at(i) != Fix2.at(i) && Fix1.at(i) * Fix2.at(i) != 0)
       return false; // Fix1 is not a child of Fix2
   }
-  return true;      // Fix1 is a child of Fix2
+  return true; // Fix1 is a child of Fix2
 }
 
 bool operator>(vector<int> Fix1, vector<int> Fix2) { return (Fix2 < Fix1); }
@@ -177,7 +177,7 @@ void Game::LCP::makeRelaxed()
       return;
     GRBVar x[nC], z[nR];
     BOOST_LOG_TRIVIAL(trace)
-        << "LCP::makeRelaxed() is creating a model with : " << nR
+        << "Game::LCP::makeRelaxed: Creating a model with : " << nR
         << " variables and  " << nC << " constraints";
     for (unsigned int i = 0; i < nC; i++)
       x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS,
@@ -185,6 +185,7 @@ void Game::LCP::makeRelaxed()
     for (unsigned int i = 0; i < nR; i++)
       z[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS,
                               "z_" + to_string(i));
+    BOOST_LOG_TRIVIAL(trace) << "Game::LCP::makeRelaxed: Added variables";
     for (unsigned int i = 0; i < nR; i++) {
       GRBLinExpr expr = 0;
       for (auto v = M.begin_row(i); v != M.end_row(i); ++v)
@@ -192,6 +193,8 @@ void Game::LCP::makeRelaxed()
       expr += q(i);
       RlxdModel.addConstr(expr, GRB_EQUAL, z[i], "z_" + to_string(i) + "_def");
     }
+    BOOST_LOG_TRIVIAL(trace)
+        << "Game::LCP::makeRelaxed: Added equation definitions";
     // If @f$Ax \leq b@f$ constraints are there, they should be included too!
     if (this->_A.n_nonzero != 0 && this->_b.n_rows != 0) {
       if (_A.n_cols != nC || _A.n_rows != _b.n_rows) {
@@ -206,6 +209,8 @@ void Game::LCP::makeRelaxed()
         RlxdModel.addConstr(expr, GRB_LESS_EQUAL, _b(i),
                             "commonCons_" + to_string(i));
       }
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::LCP::makeRelaxed: Added common constraints";
     }
     RlxdModel.update();
     this->madeRlxdModel = true;
@@ -813,20 +818,20 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
   vector<short int> encoding = this->solEncode(x);
   // Check if the encoding polyhedron is already in this->AllPolyhedra
   cout << "\nAllPolyhedra: ";
-  for (const auto & i : AllPolyhedra) {
+  for (const auto &i : AllPolyhedra) {
     cout << "\nPoly: ";
     for (short &i : encoding) {
-      cout << to_string(i)<<"\t";
+      cout << to_string(i) << "\t";
     }
   }
   cout << "\nEncoding (original): ";
   for (short &i : encoding) {
-    cout << to_string(i)<<"\t";
+    cout << to_string(i) << "\t";
     if (i == 0)
       ++i;
   }
   int found = -1;
-  for (const auto & i : AllPolyhedra) {
+  for (const auto &i : AllPolyhedra) {
     if (encoding < i || encoding == i) {
       ret = false;
       return *this;
@@ -837,7 +842,7 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
   // First change any zero indices of encoding to 1
   cout << "\nEncoding (edited): ";
   for (short &i : encoding) {
-    cout << to_string(i)<<"\t";
+    cout << to_string(i) << "\t";
   }
   // And then add the relevant polyhedra
   this->FixToPoly(encoding, false);

@@ -1124,8 +1124,14 @@ void Game::EPEC::postfinalize()
 {}
 
 void Game::EPEC::resetLCP() {
+  /**
+   * Resets the LCP objects to blank objects with no polyhedron added.
+   * Useful in testing, or resolving a problem with a different algorithm.
+   */
   BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::resetLCP: resetting LCPs.";
   for (int i = 0; i < this->nCountr; ++i) {
+    if (this->countries_LCP.at(i))
+      this->countries_LCP.at(i).reset();
     this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
         new LCP(this->env, *this->countries_LL.at(i).get()));
   }
@@ -1371,9 +1377,9 @@ void Game::EPEC::make_country_QP(const unsigned int i)
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
     // In the last parameter, we specify whether we want to have full
     // enumeration or not
-    this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
-                                      *this->country_QP.at(i).get(),
-                                      this->algorithm == 0);
+    this->countries_LCP.at(i)->makeQP(
+        *this->LeadObjec_ConvexHull.at(i).get(), *this->country_QP.at(i).get(),
+        this->algorithm == Game::EPECalgorithm::fullEnumeration);
     this->Stats.feasiblePolyhedra.push_back(
         this->countries_LCP.at(i)->getFeasiblePolyhedra());
   }
@@ -1492,13 +1498,12 @@ void Game::EPEC::iterativeNash() {
 
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
-  unsigned int iteration{0};
   this->Stats.numIteration = 0;
   int addedPoly = 0;
   // If for two iterations we do not add at least one polyhedron, abort.
   while (notSolved) {
-    BOOST_LOG_TRIVIAL(trace)
-        << "Game::EPEC::iterativeNash: Iteration " << to_string(iteration++);
+    BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::iterativeNash: Iteration "
+                             << to_string(this->Stats.numIteration++);
     // Compute profitable deviation(s)
     this->giveAllDevns(devns, this->sol_x);
     // If LCP are feasible (!=0) and there is then at least one profitable one
@@ -1507,14 +1512,13 @@ void Game::EPEC::iterativeNash() {
           << "Game::EPEC::iterativeNash: found a deviation.";
       // Add the deviated polyhedra and recompute approximated QP
       addedPoly = this->addDeviatedPolyhedron(devns);
-        BOOST_LOG_TRIVIAL(trace) << iteration <<" iteration going on";
-      if (addedPoly > 0 || iteration < 2) {
+      if (addedPoly > 0 || this->Stats.numIteration < 2) {
         BOOST_LOG_TRIVIAL(trace)
             << "Game::EPEC::iterativeNash: a total of " << to_string(addedPoly)
             << " polyhedra were added.";
-        BOOST_LOG_TRIVIAL(trace)
-            << "Game::EPEC::iterativeNash: reformulating approximated QPs.";
         this->make_country_QP();
+        BOOST_LOG_TRIVIAL(trace)
+            << "Game::EPEC::iterativeNash: Reformulated approximate QPs.";
         // Compute the nash EQ given the approximated QPs
         // setting timelimit to remaining time -epsilon seconds
         if (this->timeLimit > 0) {
@@ -1535,7 +1539,7 @@ void Game::EPEC::iterativeNash() {
       } else {
         BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::iterativeNash: no polyhedron "
                                     "has been added. Infeasible";
-        this->Stats.status = 0;
+        this->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
         notSolved = false;
       }
     }
@@ -1550,10 +1554,10 @@ void Game::EPEC::iterativeNash() {
       notSolved = false;
       // No deviations, hence infeasible
       if (devns.empty())
-        this->Stats.status = 0;
+        this->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
       // We triggered the timelimit, hence we should return the timelimit status
       else
-        this->Stats.status = 2;
+        this->Stats.status = Game::EPECsolveStatus::timeLimit;
     }
   }
 }
@@ -1609,7 +1613,7 @@ void Game::EPEC::computeNashEq(
       BOOST_LOG_TRIVIAL(trace)
           << "Game::EPEC::computeNashEq: an equilibrium has been found.";
       this->nashEq = true;
-      this->Stats.status = 1;
+      this->Stats.status = Game::EPECsolveStatus::nashEqFound;
       try {
         for (unsigned int i = 0; i < (unsigned int)Nvar; i++) {
           this->sol_x(i) =
@@ -1626,9 +1630,9 @@ void Game::EPEC::computeNashEq(
       }
     } else {
       if (status == GRB_TIME_LIMIT)
-        this->Stats.status = 2;
+        this->Stats.status = Game::EPECsolveStatus::timeLimit;
       else
-        this->Stats.status = 0;
+        this->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
     }
   }
 }
@@ -1644,37 +1648,77 @@ void Game::EPEC::findNashEq() {
 
   this->Stats.algorithm = this->algorithm;
   switch (this->algorithm) {
-  case 1:
-    if (this->Stats.status != -1) {
+  case Game::EPECalgorithm::innerApproximation:
+    if (this->Stats.status != Game::EPECsolveStatus::unInitialized) {
       BOOST_LOG_TRIVIAL(warning)
           << "Game::EPEC::findNashEq: a Nash Eq was "
-             "already found. Calling this findNashEq might lead to errors!"
-          << '\n';
+             "already found. Calling this findNashEq might lead to errors!";
       this->resetLCP();
     }
     this->iterativeNash();
     break;
-  case 0:
+  case Game::EPECalgorithm::fullEnumeration:
     this->make_country_QP();
     this->computeNashEq(this->timeLimit);
     break;
   }
   switch (this->Stats.status) {
-  case 0:
+  case Game::EPECsolveStatus::nashEqNotFound:
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: no Nash "
-                               "equilibrium found (infeasibility)."
-                            << '\n';
+                               "equilibrium found (infeasibility).";
     break;
-  case 1:
+  case Game::EPECsolveStatus::nashEqFound:
     BOOST_LOG_TRIVIAL(info)
-        << "Game::EPEC::computeNashEq: a Nash equilibrium has been found."
-        << '\n';
+        << "Game::EPEC::computeNashEq: a Nash equilibrium has been found.";
 
     break;
   default:
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: no Nash "
-                               "equilibrium found (timeLimit)."
-                            << '\n';
+                               "equilibrium found (timeLimit).";
     break;
+  }
+}
+
+void Game::EPEC::setAlgorithm(unsigned int algorithm)
+/**
+ * Sets the algorithm to solve the given instance of Game::EPEC.
+ * @warning Deprecated. To be removed soon
+ */
+{
+  BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::setAlgorithm (unsigned int) is "
+                                "deprecated. Use enum class ";
+  switch (algorithm) {
+  case 0:
+    this->algorithm = Game::EPECalgorithm::fullEnumeration;
+    break;
+  case 1:
+    this->algorithm = Game::EPECalgorithm::innerApproximation;
+    break;
+  default:
+    this->algorithm = Game::EPECalgorithm::fullEnumeration;
+  }
+}
+
+void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
+/**
+ * Decides the algorithm to be used for solving the given instance of the
+ * problem. The choice of algorithms are documented in Game::EPECalgorithm
+ */
+{
+  this->algorithm = algorithm;
+}
+
+std::string std::to_string(const Game::EPECsolveStatus st) {
+  switch (st) {
+  case EPECsolveStatus::nashEqNotFound:
+    return string("NO_NASH_EQ_FOUND");
+  case EPECsolveStatus::nashEqFound:
+    return string("NASH_EQ_FOUND");
+  case EPECsolveStatus::timeLimit:
+    return string("TIME_LIMIT");
+  case EPECsolveStatus::unInitialized:
+    return string("UNINITIALIZED");
+  default:
+    return string("UNKNOWN_STATUS_") + to_string(static_cast<int>(st));
   }
 }

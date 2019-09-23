@@ -1167,7 +1167,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
    * @p writeLevel is an integer representing the write configuration. 0: only
    * Json solution; 1: only human readable solution; 2:both
    */
-  if (this->Stats.status == 1) {
+  if (this->Stats.status == Game::EPECsolveStatus::nashEqFound) {
     if (writeLevel == 1 || writeLevel == 2) {
       this->WriteCountry(0, filename + ".txt", this->sol_x, false);
       for (unsigned int ell = 1; ell < this->nCountr; ++ell)

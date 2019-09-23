@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
   // WRITING STATISTICS AND SOLUTION
   // --------------------------------
   Game::EPECStatistics stat = epec.getStatistics();
-  if (stat.status == 1)
+  if (stat.status == Game::EPECsolveStatus::nashEqFound)
     epec.writeSolution(writeLevel, resFile);
   ifstream existCheck(logFile);
   std::ofstream results(logFile, ios::app);
