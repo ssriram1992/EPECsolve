@@ -1679,7 +1679,6 @@ void Game::EPEC::findNashEq() {
   }
 }
 
-
 void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
 /**
  * Decides the algorithm to be used for solving the given instance of the

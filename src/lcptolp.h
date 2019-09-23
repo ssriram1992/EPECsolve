@@ -92,17 +92,6 @@ private:
   std::vector<short int> solEncode(const arma::vec &z,
                                    const arma::vec &x) const;
 
-  void branch(int loc, const std::vector<short int> &Fixes);
-
-  std::vector<short int>
-  anyBranch(const std::vector<std::vector<short int>> &vecOfFixes,
-            const std::vector<short int> Fix) const;
-
-  int branchLoc(std::unique_ptr<GRBModel> &m,
-                const std::vector<short int> &Fix);
-
-  int branchProcLoc(const std::vector<short int> &Fix,
-                    const std::vector<short int> &Leaf) const;
 
   LCP &EnumerateAll(bool solveLP = false);
 
@@ -169,8 +158,6 @@ public:
 
   bool extractSols(GRBModel *model, arma::vec &z, arma::vec &x,
                    bool extractZ = false) const;
-
-  std::vector<std::vector<short int>> BranchAndPrune();
 
   /* Getting single point solutions */
   std::unique_ptr<GRBModel> LCPasQP(bool solve = false);
