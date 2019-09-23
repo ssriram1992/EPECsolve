@@ -532,7 +532,6 @@ public:                  // functions
   virtual const EPECStatistics getStatistics() const final {
     return this->Stats;
   }
-  void setAlgorithm(unsigned int algorithm); // Should be deprecated and removed
   void setAlgorithm(Game::EPECalgorithm algorithm);
 };
 } // namespace Game

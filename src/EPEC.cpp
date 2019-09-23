@@ -103,7 +103,14 @@ int main(int argc, char **argv) {
   // timeLimit
   epec.timeLimit = timeLimit;
   // Algorithm
-  epec.setAlgorithm(algorithm);
+
+  switch (algorithm) {
+  case 1:
+    epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+    break;
+  default:
+    epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
+  }
   //------------
 
   for (unsigned int j = 0; j < Instance.Countries.size(); ++j)

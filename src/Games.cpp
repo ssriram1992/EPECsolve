@@ -1679,25 +1679,6 @@ void Game::EPEC::findNashEq() {
   }
 }
 
-void Game::EPEC::setAlgorithm(unsigned int algorithm)
-/**
- * Sets the algorithm to solve the given instance of Game::EPEC.
- * @warning Deprecated. To be removed soon
- */
-{
-  BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::setAlgorithm (unsigned int) is "
-                                "deprecated. Use enum class ";
-  switch (algorithm) {
-  case 0:
-    this->algorithm = Game::EPECalgorithm::fullEnumeration;
-    break;
-  case 1:
-    this->algorithm = Game::EPECalgorithm::innerApproximation;
-    break;
-  default:
-    this->algorithm = Game::EPECalgorithm::fullEnumeration;
-  }
-}
 
 void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
 /**

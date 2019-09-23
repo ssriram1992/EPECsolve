@@ -488,11 +488,11 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec2.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec2.setAlgorithm(0);
+  epec2.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec2.findNashEq());
   BOOST_CHECK_MESSAGE(epec2.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec2.setAlgorithm(1);
+  epec2.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec2.findNashEq());
   BOOST_CHECK_MESSAGE(epec2.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -510,11 +510,11 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec3.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec3.setAlgorithm(0);
+  epec3.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec3.findNashEq());
   BOOST_CHECK_MESSAGE(epec3.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec3.setAlgorithm(1);
+  epec3.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec3.findNashEq());
   BOOST_CHECK_MESSAGE(epec3.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -560,7 +560,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
   BOOST_CHECK_CLOSE(
@@ -572,7 +572,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
       0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -612,7 +612,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
   BOOST_CHECK_CLOSE(
@@ -624,7 +624,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
       0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -666,7 +666,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_CHECK_NO_THROW(epec.testLCP(0));
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
   BOOST_CHECK_CLOSE(
@@ -675,7 +675,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
       20, 0.001);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -716,12 +716,14 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap2_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_CHECK_MESSAGE(epec.getStatistics().status == Game::EPECsolveStatus::nashEqNotFound,"checking status");
+  BOOST_CHECK_MESSAGE(epec.getStatistics().status ==
+                          Game::EPECsolveStatus::nashEqNotFound,
+                      "checking status");
   BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is not spuriously solved");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(
       !epec.isSolved(&n_c, &devn),
@@ -760,7 +762,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
   BOOST_CHECK_CLOSE(
@@ -772,7 +774,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
       0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -821,7 +823,7 @@ BOOST_AUTO_TEST_CASE(C1F1_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margRosso =
       FP.costs_quad[0] *
@@ -853,7 +855,7 @@ BOOST_AUTO_TEST_CASE(C1F1_test) {
       0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -897,11 +899,11 @@ BOOST_AUTO_TEST_CASE(C1F1_Capacities_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -940,7 +942,7 @@ BOOST_AUTO_TEST_CASE(C1F5_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking taxation");
   BOOST_CHECK_CLOSE(
@@ -973,7 +975,7 @@ BOOST_AUTO_TEST_CASE(C1F5_test) {
       20, 0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -1015,7 +1017,7 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCap_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking taxation");
   BOOST_CHECK_CLOSE(
@@ -1048,7 +1050,7 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCap_test) {
       20, 0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -1088,12 +1090,14 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_CHECK_MESSAGE(epec.getStatistics().status == Game::EPECsolveStatus::nashEqNotFound, "checking status");
+  BOOST_CHECK_MESSAGE(epec.getStatistics().status ==
+                          Game::EPECsolveStatus::nashEqNotFound,
+                      "checking status");
   BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -1148,7 +1152,7 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margCountryOne =
       FP.costs_quad[0] *
@@ -1172,7 +1176,7 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
       "checking production");
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -1243,7 +1247,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production");
   BOOST_CHECK_CLOSE(
@@ -1278,7 +1282,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
 
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -1352,7 +1356,7 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production");
   BOOST_CHECK_CLOSE(
@@ -1394,7 +1398,7 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
 
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -1447,7 +1451,7 @@ BOOST_AUTO_TEST_CASE(C3F1_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margCountryOne =
       FP.costs_quad[0] *
@@ -1485,7 +1489,7 @@ BOOST_AUTO_TEST_CASE(C3F1_test) {
 
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -1538,7 +1542,7 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   epec.writeSolution(2, "dat/Solutionasd");
   double margCountryOne =
@@ -1577,7 +1581,7 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
       30, 0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
@@ -1632,7 +1636,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(0);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production on Bianco-followers");
   BOOST_CHECK_CLOSE(
@@ -1656,7 +1660,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
       0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(1);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
