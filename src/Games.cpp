@@ -1341,11 +1341,13 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
     if (val == GRB_INFINITY)
       return false;
     if (abs(val - objvals.at(i)) > tol) {
-      BOOST_LOG_TRIVIAL(trace)
+      BOOST_LOG_TRIVIAL(debug)
           << "Game::EPEC::isSolved: found a deviation for player "
-          << to_string(i) << ".\nActual: " << objvals.at(i)
+          << i << ".\nActual: " << objvals.at(i)
           << "\tOptimized: " << val;
       *countryNumber = i;
+			// cout << "Proof - deviation: "<<*ProfDevn; //Sane
+			// cout << "Current soln: "<<this->sol_x;
       return false;
     }
   }
@@ -1465,14 +1467,14 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
     bool ret = false;
     this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
     if (ret) {
-      BOOST_LOG_TRIVIAL(trace)
+      BOOST_LOG_TRIVIAL(debug)
           << "Game::EPEC::addDeviatedPolyhedron: added polyhedron for player "
-          << to_string(i);
+          << i;
       ++added;
     } else {
-      BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::addDeviatedPolyhedron: NO "
+      BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::addDeviatedPolyhedron: NO "
                                   "polyhedron added for player "
-                               << to_string(i);
+                               << i;
     }
   }
   return added;
@@ -1501,34 +1503,38 @@ void Game::EPEC::iterativeNash() {
   int addedPoly = 0;
   // If for two iterations we do not add at least one polyhedron, abort.
   while (notSolved) {
-    BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::iterativeNash: Iteration "
+    BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::iterativeNash: Iteration "
                              << to_string(++this->Stats.numIteration);
     // Compute profitable deviation(s)
     this->giveAllDevns(devns, this->sol_x);
     // If LCP are feasible (!=0) and there is then at least one profitable one
     bool innerApproxNashEq{false};
     if (!devns.empty()) {
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::iterativeNash: found a deviation.";
       // Add the deviated polyhedra and recompute approximated QP
       addedPoly = this->addDeviatedPolyhedron(devns);
+      BOOST_LOG_TRIVIAL(debug)
+          << "Game::EPEC::iterativeNash: found a deviation in " << addedPoly
+          << " new polyhedra!";
+
       if (addedPoly > 0 || this->Stats.numIteration < 2) {
-        BOOST_LOG_TRIVIAL(trace)
+        BOOST_LOG_TRIVIAL(debug)
             << "Game::EPEC::iterativeNash: a total of " << to_string(addedPoly)
             << " polyhedra were added.";
-        this->make_country_QP();
-        BOOST_LOG_TRIVIAL(trace)
+        BOOST_LOG_TRIVIAL(debug)
             << "Game::EPEC::iterativeNash: Reformulated approximate QPs.";
         // Compute the nash EQ given the approximated QPs
         // setting timelimit to remaining time -epsilon seconds
+        this->make_country_QP();
         if (this->timeLimit > 0) {
           const std::chrono::duration<double> timeElapsed =
               std::chrono::high_resolution_clock::now() - initTime;
           const double timeRemaining = this->timeLimit - timeElapsed.count();
-          BOOST_LOG_TRIVIAL(trace)
-              << "Game::EPEC::iterativeNash: solving approximated EPEC.";
+          BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::iterativeNash: solving "
+                                      "approximated EPEC with timelimit.";
           innerApproxNashEq = this->computeNashEq(timeRemaining);
         } else {
+          BOOST_LOG_TRIVIAL(debug)
+              << "Game::EPEC::iterativeNash: solving approximated EPEC.";
           innerApproxNashEq = this->computeNashEq();
         }
         if (innerApproxNashEq) {
@@ -1536,6 +1542,9 @@ void Game::EPEC::iterativeNash() {
           if (this->isSolved(&deviatedCountry, &countryDeviation)) {
             notSolved = false;
           }
+					else{ 
+						BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::iterativeNash: Deviation in " <<deviatedCountry;
+					}
         } else {
           bool seriousTrouble{true};
           for (auto &countrLCP : this->countries_LCP) {
@@ -1553,7 +1562,6 @@ void Game::EPEC::iterativeNash() {
                 "equilibrium does not exist. No new polyhedron addable!");
           }
         }
-        ++this->Stats.numIteration;
       } else {
         BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::iterativeNash: no polyhedron "
                                     "has been added. Infeasible";
@@ -1561,6 +1569,9 @@ void Game::EPEC::iterativeNash() {
         notSolved = false;
       }
     }
+
+    this->lcp->save("dat/LCP.dat");
+    this->lcpmodel->write("dat/lcpmodel.lp");
 
     // Else, we do not have feasability and/or profitable deviations
     // OR we triggered the timelimit
@@ -1636,14 +1647,14 @@ bool Game::EPEC::computeNashEq(
         << ": " << e.getMessage() << " ";
   }
   if (foundNash) { // If a Nash equilibrium is found, then update appropriately
-    BOOST_LOG_TRIVIAL(trace)
-        << "Game::EPEC::computeNashEq: an equilibrium has been found.";
+    BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::computeNashEq: an equilibrium for "
+                                "inner approx has been found.";
     this->nashEq = true;
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
 
   } else { // If not, then update accordingly
-    BOOST_LOG_TRIVIAL(trace)
-        << "Game::EPEC::computeNashEq: NO EQUILIBRIUM HAS BEEN FOUND.";
+    BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::computeNashEq: NO EQUILIBRIUM FOR "
+                                "INNER APPROX HAS BEEN FOUND.";
     int status = this->lcpmodel->get(GRB_IntAttr_Status);
     if (status == GRB_TIME_LIMIT)
       this->Stats.status = Game::EPECsolveStatus::timeLimit;
@@ -1693,8 +1704,8 @@ void Game::EPEC::findNashEq() {
                                "equilibrium found (infeasibility).";
     break;
   case Game::EPECsolveStatus::nashEqFound:
-    BOOST_LOG_TRIVIAL(info)
-        << "Game::EPEC::computeNashEq: a Nash equilibrium has been found.";
+    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: a Nash equilibrium "
+                               "for inner approx has been found.";
 
     break;
   default:

@@ -87,7 +87,7 @@ private:
                                               arma::Col<int> FixVar);
 
   template <class T> inline bool isZero(const T val) const {
-    return (val > -eps && val < eps);
+    return (val >= -eps && val <= eps);
   }
 
   inline std::vector<short int> solEncode(GRBModel *model) const;
@@ -111,7 +111,7 @@ public:
   // Fudgible data
   long double bigM{1e7}; ///< bigM used to rewrite the LCP as MIP
   long double eps{
-      1e-5}; ///< The threshold for optimality and feasability tollerances
+      1e-15}; ///< The threshold for optimality and feasability tollerances
   long double eps_int{1e-8}; ///< The threshold, below which a number would be
                              ///< considered to be zero.
   bool useIndicators{

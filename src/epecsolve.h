@@ -10,8 +10,8 @@
 
 using perps = std::vector<std::pair<unsigned int, unsigned int>>;
 std::ostream &operator<<(std::ostream &ost, perps C);
-inline bool operator<(std::vector<int> Fix1, std::vector<int> Fix2);
-inline bool operator==(std::vector<int> Fix1, std::vector<int> Fix2);
+inline bool operator<(std::vector<short int> Fix1, std::vector<short int> Fix2);
+inline bool operator==(std::vector<short int> Fix1, std::vector<short int> Fix2);
 template <class T>
 std::ostream &operator<<(std::ostream &ost, std::vector<T> v);
 template <class T, class S>

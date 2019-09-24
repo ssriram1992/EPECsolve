@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Utils;
 
-bool operator==(vector<int> Fix1, vector<int> Fix2)
+bool operator==(vector<short int> Fix1, vector<short int> Fix2)
 /**
  * @brief Checks if two vector<int> are of same size and hold same values in the
  * same order
@@ -31,7 +31,7 @@ bool operator==(vector<int> Fix1, vector<int> Fix2)
   return true;
 }
 
-bool operator<(vector<int> Fix1, vector<int> Fix2)
+bool operator<(vector<short int> Fix1, vector<short int> Fix2)
 /**
  * @details \b GrandParent:
  *  	Either the same value as the grand child, or has 0 in that location
@@ -47,7 +47,9 @@ bool operator<(vector<int> Fix1, vector<int> Fix2)
     return false;
   for (unsigned int i = 0; i < Fix1.size(); i++) {
     if (Fix1.at(i) != Fix2.at(i) && Fix1.at(i) * Fix2.at(i) != 0)
+		{
       return false; // Fix1 is not a child of Fix2
+		}
   }
   return true; // Fix1 is a child of Fix2
 }
@@ -810,29 +812,29 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
       number /= 2;
     }
     std::reverse(binary.begin(), binary.end());
+		std::for_each(binary.begin(), binary.end(), [](short int &vv){vv = (vv==0?-1:1);});
     return binary;
   }; // End of num_to_vec lambda definition
 
   for (const auto &i : AllPolyhedra) {
     std::vector<short int> bin = num_to_vec(i);
-    if (encoding < bin || encoding == bin) {
-      ret = false;
+    if (encoding < bin) {
+			BOOST_LOG_TRIVIAL (trace) << "LCP::addPolyFromX: Encoding "<< i << " already in All Polyhedra! ";
+			ret = false;
       return *this;
     }
-  }
+  } 
 
+	BOOST_LOG_TRIVIAL (trace) << "LCP::addPolyFromX: New encoding not in All Polyhedra! ";
   // If it is not in AllPolyhedra
   // First change any zero indices of encoding to 1
   for (short &i : encoding) {
     if (i == 0)
       ++i;
   }
-  for (short &i : encoding) {
-    cout << to_string(i) << "\t";
-  }
   // And then add the relevant polyhedra
-  this->FixToPoly(encoding, false);
-  ret = true;
+  ret = this->FixToPoly(encoding, false);
+  // ret = true;
   return *this;
 }
 
@@ -879,15 +881,17 @@ bool Game::LCP::FixToPoly(
   unsigned int FixNumber = vec_to_num(Fix);
 
   if (knownInfeas.find(FixNumber) != knownInfeas.end()) {
-    BOOST_LOG_TRIVIAL(trace) << "Game::LCP::FixToPoly: Previously known "
-                                "infeasible polyhedron. Not added";
+    BOOST_LOG_TRIVIAL(debug) << "Game::LCP::FixToPoly: Previously known "
+                                "infeasible polyhedron. Not added"
+                             << FixNumber;
     return false;
   }
 
   if (!custom && !AllPolyhedra.empty()) {
     if (AllPolyhedra.find(FixNumber) != AllPolyhedra.end()) {
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::LCP::FixToPoly: Previously added polyhedron. Not added";
+      BOOST_LOG_TRIVIAL(debug)
+          << "Game::LCP::FixToPoly: Previously added polyhedron. Not added "
+          << FixNumber;
       return false;
     }
   }
@@ -940,7 +944,11 @@ bool Game::LCP::FixToPoly(
       if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL)
         add = true;
       else // Remember that this is an infeasible polyhedra
+      {
+        BOOST_LOG_TRIVIAL(debug)
+            << "Game::LCP::FixToPoly: Detected infeasibility of " << FixNumber;
         knownInfeas.insert(FixNumber);
+      }
     } catch (const char *e) {
       cerr << "Error in Game::LCP::FixToPoly: " << e << '\n';
       throw;
@@ -965,6 +973,8 @@ bool Game::LCP::FixToPoly(
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }
+    BOOST_LOG_TRIVIAL(debug)
+        << "Game::LCP::FixToPoly:  Successfully added " << FixNumber;
     return true; // Successfully added
   }
   return false;
