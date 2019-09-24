@@ -487,7 +487,7 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec2.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec2.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec2.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec2.findNashEq());
   BOOST_CHECK_MESSAGE(epec2.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
@@ -498,7 +498,6 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   epec2.reset();
   BOOST_CHECK_MESSAGE(!epec2.isSolved(&n_c, &devn),
                       "Checking if the EPEC is not spuriously solved");
-
   Models::EPEC epec3(&env);
   epec3.indicators = false;
   BOOST_TEST_MESSAGE("----Testing Models with bigM constraints----");
@@ -509,7 +508,7 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec3.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec3.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec3.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec3.findNashEq());
   BOOST_CHECK_MESSAGE(epec3.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
@@ -548,7 +547,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
-
   BOOST_TEST_MESSAGE("MaxTax:20 with alpha=300 and beta=0.05");
   BOOST_TEST_MESSAGE("Expected: q=0;t=290");
   Models::EPEC epec(&env);
@@ -559,7 +557,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
   BOOST_CHECK_CLOSE(
@@ -600,7 +598,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
-
   BOOST_TEST_MESSAGE("MaxTax:20 with alpha=300 and beta=0.05");
   BOOST_TEST_MESSAGE("Expected: q=100;t=20");
   Models::EPEC epec(&env);
@@ -611,7 +608,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
   BOOST_CHECK_CLOSE(
@@ -639,7 +636,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
    **/
   BOOST_TEST_MESSAGE(
       "Testing a single bilevel problem with feasible price cap.");
-
   Models::FollPar FP;
   FP.capacities = {100};
   FP.costs_lin = {10};
@@ -650,7 +646,6 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
   GRBEnv env = GRBEnv();
   arma::sp_mat TrCo(1, 1);
   TrCo(0, 0) = 0;
-
   Models::EPEC epec(&env);
   Models::LeadAllPar Country(FP.capacities.size(), "One", FP, {300, 0.05},
                              {-1, -1, 299, false, 0});
@@ -665,13 +660,9 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap1_test) {
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_CHECK_NO_THROW(epec.testLCP(0));
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     0),
-      20, 0.001);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
   epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
@@ -715,18 +706,16 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCap2_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
+  BOOST_CHECK_NO_THROW(epec.findNashEq());
+  BOOST_CHECK_MESSAGE(epec.getStatistics().status ==
+                          Game::EPECsolveStatus::nashEqNotFound,
+                      "checking status");
   epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.getStatistics().status ==
                           Game::EPECsolveStatus::nashEqNotFound,
                       "checking status");
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_CHECK_MESSAGE(
-      !epec.isSolved(&n_c, &devn),
-      "Checking if the EPEC is not solved (innerApproximation)");
 }
 
 BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
@@ -761,7 +750,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_PriceCapTaxCap_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("Testing results:");
   BOOST_CHECK_CLOSE(
@@ -822,7 +811,7 @@ BOOST_AUTO_TEST_CASE(C1F1_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margRosso =
       FP.costs_quad[0] *
@@ -898,7 +887,7 @@ BOOST_AUTO_TEST_CASE(C1F1_Capacities_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (fullEnumeration)");
@@ -941,7 +930,7 @@ BOOST_AUTO_TEST_CASE(C1F5_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking taxation");
   BOOST_CHECK_CLOSE(
@@ -1016,7 +1005,7 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCap_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking taxation");
   BOOST_CHECK_CLOSE(
@@ -1089,17 +1078,16 @@ BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
+  BOOST_CHECK_NO_THROW(epec.findNashEq());
+  BOOST_CHECK_MESSAGE(epec.getStatistics().status ==
+                          Game::EPECsolveStatus::nashEqNotFound,
+                      "checking status");
   epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.getStatistics().status ==
                           Game::EPECsolveStatus::nashEqNotFound,
                       "checking status");
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -1151,7 +1139,7 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margCountryOne =
       FP.costs_quad[0] *
@@ -1179,6 +1167,26 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
+  margCountryOne =
+      FP.costs_quad[0] *
+          epec.getx().at(
+              epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+      FP.costs_lin[0] +
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+  margCountryTwo =
+      FP.costs_quad[0] *
+          epec.getx().at(
+              epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+      FP.costs_lin[0] +
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+  BOOST_CHECK_MESSAGE(margCountryTwo < margCountryOne,
+                      "checking marginal costs");
+  BOOST_CHECK_MESSAGE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
+                     0) >
+          epec.getx().at(
+              epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
+      "checking production");
   epec.reset();
   BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is not spuriously solved");
@@ -1246,7 +1254,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production");
   BOOST_CHECK_CLOSE(
@@ -1283,6 +1291,36 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
                       "Checking if the EPEC is solved (fullEnumeration)");
   epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
+  BOOST_TEST_MESSAGE("checking production");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
+                     0),
+      100, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
+                     1),
+      40, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
+                     0),
+      48.57, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
+                     1),
+      71.43, 0.01);
+  BOOST_TEST_MESSAGE("checking taxation");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0,
+      0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 78,
+      0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 61.43,
+      0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0,
+      0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
   epec.reset();
@@ -1355,7 +1393,7 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production");
   BOOST_CHECK_CLOSE(
@@ -1399,6 +1437,43 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
                       "Checking if the EPEC is solved (fullEnumeration)");
   epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
+  BOOST_TEST_MESSAGE("checking production");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
+                     0),
+      100, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
+                     1),
+      12.50, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
+                     0),
+      76.07, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
+                     1),
+      71.43, 0.01);
+  BOOST_TEST_MESSAGE("checking taxation");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0,
+      0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100,
+      0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 33.93,
+      0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0,
+      0.01);
+  BOOST_TEST_MESSAGE("checking exports/imports");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::NetExport)), 27.50,
+      0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::NetImport)), 27.50,
+      0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
   epec.reset();
@@ -1450,7 +1525,7 @@ BOOST_AUTO_TEST_CASE(C3F1_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   double margCountryOne =
       FP.costs_quad[0] *
@@ -1490,6 +1565,39 @@ BOOST_AUTO_TEST_CASE(C3F1_test) {
                       "Checking if the EPEC is solved (fullEnumeration)");
   epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
+  margCountryOne =
+      FP.costs_quad[0] *
+          epec.getx().at(
+              epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
+      FP.costs_lin[0] +
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
+  margCountryTwo =
+      FP.costs_quad[0] *
+          epec.getx().at(
+              epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
+      FP.costs_lin[0] +
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
+  margCountryThree =
+      FP.costs_quad[0] *
+          epec.getx().at(
+              epec.getPosition(2, Models::LeaderVars::FollowerStart) + 0) +
+      FP.costs_lin[0] +
+      epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0);
+  BOOST_CHECK_MESSAGE(margCountryTwo > margCountryOne &&
+                          margCountryTwo < margCountryThree,
+                      "checking marginal costs");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
+                     0),
+      45.07, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
+                     0),
+      56.25, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) +
+                     0),
+      84.62, 0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
   epec.reset();
@@ -1541,9 +1649,8 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
-  epec.writeSolution(2, "dat/Solutionasd");
   double margCountryOne =
       FP.costs_quad[1] *
           epec.getx().at(
@@ -1582,13 +1689,47 @@ BOOST_AUTO_TEST_CASE(C3F2_test) {
                       "Checking if the EPEC is solved (fullEnumeration)");
   epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
+  margCountryOne =
+      FP.costs_quad[1] *
+          epec.getx().at(
+              epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) +
+      FP.costs_lin[1] +
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1);
+  margCountryTwo =
+      FP.costs_quad[1] *
+          epec.getx().at(
+              epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1) +
+      FP.costs_lin[1] +
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1);
+  margCountryThree =
+      FP.costs_quad[1] *
+          epec.getx().at(
+              epec.getPosition(2, Models::LeaderVars::FollowerStart) + 1) +
+      FP.costs_lin[1] +
+      epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 1);
+  BOOST_CHECK_MESSAGE(margCountryTwo < margCountryOne &&
+                          margCountryTwo < margCountryThree,
+                      "checking marginal costs");
+  BOOST_TEST_MESSAGE("checking production on Bianco-followers");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
+                     1),
+      30, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
+                     1),
+      30, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) +
+                     1),
+      30, 0.01);
+  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
+                      "Checking if the EPEC is solved (fullEnumeration)");
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
   epec.reset();
   BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is not spuriously solved");
-  /* Too slow tests
-   */
 }
 
 BOOST_AUTO_TEST_CASE(C2F2_test2) {
@@ -1635,7 +1776,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
   BOOST_TEST_MESSAGE("testing Models::finalize");
   BOOST_CHECK_NO_THROW(epec.finalize());
   BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
   BOOST_TEST_MESSAGE("checking production on Bianco-followers");
   BOOST_CHECK_CLOSE(
@@ -1661,6 +1802,26 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
                       "Checking if the EPEC is solved (fullEnumeration)");
   epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   BOOST_CHECK_NO_THROW(epec.findNashEq());
+  BOOST_TEST_MESSAGE("checking production on Bianco-followers");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
+                     1),
+      30, 0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
+                     1),
+      30, 0.01);
+  BOOST_TEST_MESSAGE("checking tax on Bianco-followers");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 43,
+      0.01);
+  BOOST_TEST_MESSAGE("checking tax on Rosso-followers");
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 95,
+      0.01);
+  BOOST_CHECK_CLOSE(
+      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 49.2857,
+      0.01);
   BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
                       "Checking if the EPEC is solved (innerApproximation)");
   epec.reset();
