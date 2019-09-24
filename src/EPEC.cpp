@@ -136,7 +136,12 @@ int main(int argc, char **argv) {
   // epec.make_country_QP();
   try {
     epec.findNashEq();
-  } catch (...) {
+  } catch (string &s) {
+    std::cerr << "Error while finding Nash equilibrium: " << s << '\n';
+    ;
+  } catch (exception &e) {
+    std::cerr << "Error while finding Nash equilibrium: " << e.what() << '\n';
+    ;
   }
   auto time_stop = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> time_diff = time_stop - time_start;

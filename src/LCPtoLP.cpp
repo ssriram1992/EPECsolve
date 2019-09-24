@@ -46,10 +46,9 @@ bool operator<(vector<short int> Fix1, vector<short int> Fix2)
   if (Fix1.size() != Fix2.size())
     return false;
   for (unsigned int i = 0; i < Fix1.size(); i++) {
-    if (Fix1.at(i) != Fix2.at(i) && Fix1.at(i) * Fix2.at(i) != 0)
-		{
+    if (Fix1.at(i) != Fix2.at(i) && Fix1.at(i) * Fix2.at(i) != 0) {
       return false; // Fix1 is not a child of Fix2
-		}
+    }
   }
   return true; // Fix1 is a child of Fix2
 }
@@ -84,10 +83,11 @@ Game::LCP::LCP(
 {
   defConst(env);
   this->Compl = perps(Compl);
-  sort(Compl.begin(), Compl.end(),
-       [](pair<unsigned int, unsigned int> a,
-          pair<unsigned int, unsigned int> b) { return a.first < b.first; });
-  for (auto p : Compl)
+  std::sort(
+      this->Compl.begin(), this->Compl.end(),
+      [](pair<unsigned int, unsigned int> a,
+         pair<unsigned int, unsigned int> b) { return a.first < b.first; });
+  for (auto p : this->Compl)
     if (p.first != p.second) {
       this->LeadStart = p.first;
       this->LeadEnd = p.second - 1;
@@ -122,8 +122,12 @@ Game::LCP::LCP(
   this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
   for (unsigned int i = 0; i < M.n_rows; i++) {
     unsigned int count = i < LeadStart ? i : i + nLeader;
-    Compl.push_back({i, count});
+    this->Compl.push_back({i, count});
   }
+  std::sort(
+      this->Compl.begin(), this->Compl.end(),
+      [](pair<unsigned int, unsigned int> a,
+         pair<unsigned int, unsigned int> b) { return a.first < b.first; });
 }
 
 Game::LCP::LCP(GRBEnv *env, const NashGame &N)
@@ -149,10 +153,11 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
   this->_b = N.getMCLeadRHS();
   defConst(env);
   this->Compl = perps(Compl);
-  sort(Compl.begin(), Compl.end(),
+  sort(this->Compl.begin(), this->Compl.end(),
        [](pair<unsigned int, unsigned int> a,
           pair<unsigned int, unsigned int> b) { return a.first < b.first; });
-  for (auto p : Compl)
+  // Delete no more!
+  for (auto p : this->Compl) {
     if (p.first != p.second) {
       this->LeadStart = p.first;
       this->LeadEnd = p.second - 1;
@@ -160,7 +165,7 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
       this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
       break;
     }
-  // Delete no more!
+  }
 }
 
 Game::LCP::~LCP()
@@ -377,7 +382,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
     }
 
     GRBLinExpr expr = 0;
-    for (auto p : Compl) {
+    for (const auto p : Compl) {
       // z[i] <= Mu constraint
 
       // u[j]=0 --> z[i] <=0
@@ -767,8 +772,8 @@ vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
 /// @brief Given variable values and equation values, encodes it in 0/+1/-1
 /// format and returns it.
 {
-  vector<signed short int> solEncoded(nR, 0);
-  for (auto p : Compl) {
+  vector<short int> solEncoded(nR, 0);
+  for (const auto p : Compl) {
     unsigned int i, j;
     i = p.first;
     j = p.second;
@@ -776,7 +781,14 @@ vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
       solEncoded.at(i)++;
     if (isZero(x(j)))
       solEncoded.at(i)--;
+    if (!isZero(x(j)) && !isZero(z(i)))
+      BOOST_LOG_TRIVIAL(error) << "Infeasible point given! Stay alert! " << x(j)
+                               << " " << z(i) << " with i=" << i;
   };
+  // std::stringstream enc_str;
+  // for(auto vv:solEncoded) enc_str << vv <<" ";
+  // BOOST_LOG_TRIVIAL (debug) << "Game::LCP::solEncode: Handling deviation with
+  // encoding: "<< enc_str.str() << '\n';
   return solEncoded;
 }
 
@@ -802,30 +814,40 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
  * containing this vector.
  */
 {
+  const unsigned int nCompl = this->Compl.size();
   vector<short int> encoding = this->solEncode(x);
+  std::stringstream enc_str;
+  for (auto vv : encoding)
+    enc_str << vv << " ";
+  BOOST_LOG_TRIVIAL(trace)
+      << "Game::LCP::addPolyFromX: Handling deviation with encoding: "
+      << enc_str.str() << '\n';
   // Check if the encoding polyhedron is already in this->AllPolyhedra
   int found = -1;
-  auto num_to_vec = [](unsigned int number) {
+  auto num_to_vec = [nCompl](unsigned int number) {
     std::vector<short int> binary{};
-    while (number > 0) {
+    for (unsigned int vv = 0; vv < nCompl; vv++) {
       binary.push_back(number % 2);
       number /= 2;
     }
+    std::for_each(binary.begin(), binary.end(),
+                  [](short int &vv) { vv = (vv == 0 ? -1 : 1); });
     std::reverse(binary.begin(), binary.end());
-		std::for_each(binary.begin(), binary.end(), [](short int &vv){vv = (vv==0?-1:1);});
     return binary;
   }; // End of num_to_vec lambda definition
 
   for (const auto &i : AllPolyhedra) {
     std::vector<short int> bin = num_to_vec(i);
     if (encoding < bin) {
-			BOOST_LOG_TRIVIAL (trace) << "LCP::addPolyFromX: Encoding "<< i << " already in All Polyhedra! ";
-			ret = false;
+      BOOST_LOG_TRIVIAL(trace) << "LCP::addPolyFromX: Encoding " << i
+                               << " already in All Polyhedra! ";
+      ret = false;
       return *this;
     }
-  } 
+  }
 
-	BOOST_LOG_TRIVIAL (trace) << "LCP::addPolyFromX: New encoding not in All Polyhedra! ";
+  BOOST_LOG_TRIVIAL(trace)
+      << "LCP::addPolyFromX: New encoding not in All Polyhedra! ";
   // If it is not in AllPolyhedra
   // First change any zero indices of encoding to 1
   for (short &i : encoding) {
@@ -881,7 +903,7 @@ bool Game::LCP::FixToPoly(
   unsigned int FixNumber = vec_to_num(Fix);
 
   if (knownInfeas.find(FixNumber) != knownInfeas.end()) {
-    BOOST_LOG_TRIVIAL(debug) << "Game::LCP::FixToPoly: Previously known "
+    BOOST_LOG_TRIVIAL(trace) << "Game::LCP::FixToPoly: Previously known "
                                 "infeasible polyhedron. Not added"
                              << FixNumber;
     return false;
@@ -889,7 +911,7 @@ bool Game::LCP::FixToPoly(
 
   if (!custom && !AllPolyhedra.empty()) {
     if (AllPolyhedra.find(FixNumber) != AllPolyhedra.end()) {
-      BOOST_LOG_TRIVIAL(debug)
+      BOOST_LOG_TRIVIAL(trace)
           << "Game::LCP::FixToPoly: Previously added polyhedron. Not added "
           << FixNumber;
       return false;
@@ -898,6 +920,7 @@ bool Game::LCP::FixToPoly(
 
   unique_ptr<arma::sp_mat> Aii =
       unique_ptr<arma::sp_mat>(new arma::sp_mat(nR, nC));
+  Aii->zeros();
   unique_ptr<arma::vec> bii =
       unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
   for (unsigned int i = 0; i < this->nR; i++) {
@@ -922,8 +945,6 @@ bool Game::LCP::FixToPoly(
   }
   bool add = !checkFeas;
   if (checkFeas) {
-    BOOST_LOG_TRIVIAL(trace) << "\tChecking feasibility for polyhedron "
-                             << to_string(++this->polyCounter);
     unsigned int count{0};
     try {
       makeRelaxed();
@@ -945,8 +966,9 @@ bool Game::LCP::FixToPoly(
         add = true;
       else // Remember that this is an infeasible polyhedra
       {
-        BOOST_LOG_TRIVIAL(debug)
-            << "Game::LCP::FixToPoly: Detected infeasibility of " << FixNumber;
+        BOOST_LOG_TRIVIAL(trace)
+            << "Game::LCP::FixToPoly: Detected infeasibility of " << FixNumber
+            << " " << model.get(GRB_IntAttr_Status);
         knownInfeas.insert(FixNumber);
       }
     } catch (const char *e) {
@@ -1088,16 +1110,18 @@ Game::LCP::addAPoly(unsigned int nPoly,
 
   // Otherwise try adding one polyhedron
   unsigned int choice_decimal = this->getNextPoly();
-  if (choice_decimal >= possibleMaxPoly)
+  if (choice_decimal >= maxPoly)
     return Polys;
 
-  // Otherwise convert choice_decimal to binary vector representation
-  auto num_to_vec = [](unsigned int number) {
+  // Now convert choice_decimal to binary vector representation
+  auto num_to_vec = [nCompl](unsigned int number) {
     std::vector<short int> binary{};
-    while (number > 0) {
+    for (unsigned int vv = 0; vv < nCompl; vv++) {
       binary.push_back(number % 2);
       number /= 2;
     }
+    std::for_each(binary.begin(), binary.end(),
+                  [](short int &vv) { vv = (vv == 0 ? -1 : 1); });
     std::reverse(binary.begin(), binary.end());
     return binary;
   }; // End of num_to_vec lambda definition
@@ -1157,9 +1181,12 @@ Game::LCP &Game::LCP::makeQP(
 
   Game::QP_constraints QP_cons;
   this->feasiblePolyhedra = this->ConvexHull(QP_cons.B, QP_cons.b);
+  BOOST_LOG_TRIVIAL(debug) << "LCP::makeQP: Nos feasible polyhedra: "
+                           << this->feasiblePolyhedra;
   // Updated size after convex hull has been computed.
   const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
   const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};
+	BOOST_LOG_TRIVIAL(debug) << "Size: "<<Ncons <<" "<<Ny;
   // Resizing entities.
   QP_cons.A.zeros(Ncons, Nx_old);
   QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
@@ -1185,7 +1212,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
   GRBQuadExpr obj = 0;
   GRBVar x[this->nR];
   GRBVar z[this->nR];
-  for (auto p : this->Compl) {
+  for (const auto p : this->Compl) {
     unsigned int i = p.first;
     unsigned int j = p.second;
     z[i] = model->getVarByName("z_" + to_string(i));
@@ -1372,5 +1399,19 @@ long int Game::LCP::load(string filename, long int pos) {
     unsigned int count = i < LeadStart ? i : i + nLeader;
     Compl.push_back({i, count});
   }
+  std::sort(Compl.begin(), Compl.end(),
+            [](std::pair<unsigned int, unsigned int> a,
+               std::pair<unsigned int, unsigned int> b) {
+              return a.first <= b.first;
+            });
   return pos;
+}
+
+void Game::LCP::print_feas_detail() {
+  cout << "Proven feasible: ";
+  for (auto vv : this->AllPolyhedra)
+    cout << vv << ' ';
+  cout << "Proven infeasible: ";
+  for (auto vv : this->knownInfeas)
+    cout << vv << ' ';
 }

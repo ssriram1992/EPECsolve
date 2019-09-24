@@ -31,7 +31,8 @@ bool isZero(arma::sp_mat M, double tol = 1e-6);
 ///@brief struct to handle the objective params of MP_Param/QP_Param
 ///@details Refer QP_Param class for what Q, C and c mean.
 typedef struct QP_objective {
-  arma::sp_mat Q, C;
+  arma::sp_mat Q;
+  arma::sp_mat C;
   arma::vec c;
 } QP_objective;
 ///@brief struct to handle the constraint params of MP_Param/QP_Param
@@ -484,12 +485,14 @@ private:
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
 
-  void giveAllDevns(std::vector<arma::vec> &devns,
-                    const arma::vec &guessSol) const;
+  bool getAllDevns(std::vector<arma::vec> &devns,
+                   const arma::vec &guessSol) const;
   unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
   void get_x_minus_i(const arma::vec &x, const int &i,
                      arma::vec &solOther) const;
   virtual bool computeNashEq(double localTimeLimit = -1.0) final;
+  bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
+                         bool stopOnSingleInfeasibility = false);
 
 protected: // functions
   EPEC(GRBEnv *env)

@@ -111,7 +111,7 @@ public:
   // Fudgible data
   long double bigM{1e7}; ///< bigM used to rewrite the LCP as MIP
   long double eps{
-      1e-15}; ///< The threshold for optimality and feasability tollerances
+      1e-6}; ///< The threshold for optimality and feasability tollerances
   long double eps_int{1e-8}; ///< The threshold, below which a number would be
                              ///< considered to be zero.
   bool useIndicators{
@@ -221,6 +221,7 @@ public:
   addAPoly(unsigned int nPoly = 1, std::set<std::vector<short int>> Polys = {});
   LCP &addPolyFromX(const arma::vec &x, bool &ret);
   LCP &EnumerateAll(bool solveLP = true);
+  void print_feas_detail();
 
   unsigned int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 

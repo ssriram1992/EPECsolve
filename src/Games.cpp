@@ -1169,7 +1169,6 @@ void Game::EPEC::finalize()
       this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
       this->LeadObjec_ConvexHull.at(i) = std::make_shared<Game::QP_objective>();
       this->make_obj_leader(i, *this->LeadObjec.at(i).get());
-      this->make_obj_leader(i, *this->LeadObjec_ConvexHull.at(i).get());
       this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
           new LCP(this->env, *this->countries_LL.at(i).get()));
       this->SizesWithoutHull.at(i) = *this->LocEnds.at(i);
@@ -1342,12 +1341,11 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
       return false;
     if (abs(val - objvals.at(i)) > tol) {
       BOOST_LOG_TRIVIAL(debug)
-          << "Game::EPEC::isSolved: found a deviation for player "
-          << i << ".\nActual: " << objvals.at(i)
-          << "\tOptimized: " << val;
+          << "Game::EPEC::isSolved: found a deviation for player " << i
+          << ".\nActual: " << objvals.at(i) << "\tOptimized: " << val;
       *countryNumber = i;
-			// cout << "Proof - deviation: "<<*ProfDevn; //Sane
-			// cout << "Current soln: "<<this->sol_x;
+      // cout << "Proof - deviation: "<<*ProfDevn; //Sane
+      // cout << "Current soln: "<<this->sol_x;
       return false;
     }
   }
@@ -1375,10 +1373,15 @@ void Game::EPEC::make_country_QP(const unsigned int i)
   if (i >= this->nCountr)
     throw string(
         "Error in Game::EPEC::make_country_QP: Invalid country number");
-  if (!this->country_QP.at(i).get()) {
+  // if (!this->country_QP.at(i).get()) 
+	{
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
-    // In the last parameter, we specify whether we want to have full
-    // enumeration or not
+
+    const auto &origLeadObjec = *this->LeadObjec.at(i).get();
+
+    this->LeadObjec_ConvexHull.at(i).reset(new Game::QP_objective{
+        origLeadObjec.Q, origLeadObjec.C, origLeadObjec.c});
+
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get());
     this->Stats.feasiblePolyhedra.push_back(
@@ -1426,7 +1429,7 @@ void Game::EPEC::make_country_QP()
   this->computeLeaderLocations(this->nCountr);
 }
 
-void Game::EPEC::giveAllDevns(
+bool Game::EPEC::getAllDevns(
     std::vector<arma::vec>
         &devns, ///< [out] The vector of deviations for all players
     const arma::vec &guessSol ///< [in] The guess for the solution vector
@@ -1436,6 +1439,7 @@ void Game::EPEC::giveAllDevns(
  * it exists) for all players.
  * @return a vector of computed deviations, which empty if at least one
  * deviation cannot be computed
+ * @todo Handle unbounded case
  */
 {
   devns = std::vector<arma::vec>(this->nCountr);
@@ -1443,8 +1447,10 @@ void Game::EPEC::giveAllDevns(
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     // If we cannot compute a deviation, it means model is infeasible!
     if (this->RespondSol(devns.at(i), i, guessSol) == GRB_INFINITY)
-      devns.clear();
+      return false;
+    // cout << "Game::EPEC::getAllDevns: devns(i): " <<devns.at(i);
   }
+  return true;
 }
 
 unsigned int Game::EPEC::addDeviatedPolyhedron(
@@ -1480,113 +1486,93 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
   return added;
 }
 
-void Game::EPEC::iterativeNash() {
+bool Game::EPEC::addRandomPoly2All(unsigned int aggressiveLevel,
+                                   bool stopOnSingleInfeasibility)
+/**
+ * Makes a call to to Game::LCP::addAPoly for each member in
+ * Game::EPEC::countries_LCP and tries to add a polyhedron to get a better inner
+ * approximation for the LCP. @p aggressiveLevel is the maximum number of
+ * polyhedra it will try to add to each country. Setting it to an arbitrarily
+ * high value will mimic complete enumeration.
+ *
+ * If @p stopOnSingleInfeasibility is true, then the function returns false and
+ * aborts all operation as soon as it finds that it cannot add polyhedra to some
+ * country. On the other hand if @p stopOnSingleInfeasibility is false, the
+ * function returns false, only if it is not possible to add polyhedra to
+ * <i>any</i> of the countries.
+ * @returns true if successfully added the maximum possible number of polyhedra
+ * not greater than aggressiveLevel.
+ */
+{
+  BOOST_LOG_TRIVIAL(trace) << "Adding random polyhedra to countries";
+  bool infeasDetect{true};
+  for (unsigned int i = 0; i < this->nCountr; i++) {
+    auto addedPolySet = this->countries_LCP.at(i)->addAPoly(aggressiveLevel);
+    if (stopOnSingleInfeasibility && addedPolySet.empty()) {
+      BOOST_LOG_TRIVIAL(info)
+          << "Game::EPEC::addRandomPoly2All: No Nash equilibrium. due to "
+             "infeasibility of country "
+          << i;
+      infeasDetect = true;
+      break;
+    }
+    if (!addedPolySet.empty())
+      infeasDetect = false;
+  }
+  return !infeasDetect;
+}
 
-  if (!this->finalized)
-    throw string(
-        "Error in Game::EPEC::iterativeNash: Object not yet finalized");
+void Game::EPEC::iterativeNash() {
 
   // Set the initial point for all countries as 0 and solve the respective LCPs?
   this->sol_x.zeros(this->nVarinEPEC);
-  std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
 
-  bool notSolved = {true};
-  unsigned int deviatedCountry;
-  arma::vec countryDeviation;
-
-  std::chrono::high_resolution_clock::time_point initTime =
-      std::chrono::high_resolution_clock::now();
+  bool solved = {false};
+  bool addRandPoly{true};
+  this->Stats.numIteration = 0;
 
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
-  this->Stats.numIteration = 0;
-  int addedPoly = 0;
   // If for two iterations we do not add at least one polyhedron, abort.
-  while (notSolved) {
-    BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::iterativeNash: Iteration "
-                             << to_string(++this->Stats.numIteration);
-    // Compute profitable deviation(s)
-    this->giveAllDevns(devns, this->sol_x);
-    // If LCP are feasible (!=0) and there is then at least one profitable one
-    bool innerApproxNashEq{false};
-    if (!devns.empty()) {
-      // Add the deviated polyhedra and recompute approximated QP
-      addedPoly = this->addDeviatedPolyhedron(devns);
-      BOOST_LOG_TRIVIAL(debug)
-          << "Game::EPEC::iterativeNash: found a deviation in " << addedPoly
-          << " new polyhedra!";
+  while (!solved) {
+    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Iteration "
+                            << to_string(++this->Stats.numIteration);
 
-      if (addedPoly > 0 || this->Stats.numIteration < 2) {
-        BOOST_LOG_TRIVIAL(debug)
-            << "Game::EPEC::iterativeNash: a total of " << to_string(addedPoly)
-            << " polyhedra were added.";
-        BOOST_LOG_TRIVIAL(debug)
-            << "Game::EPEC::iterativeNash: Reformulated approximate QPs.";
-        // Compute the nash EQ given the approximated QPs
-        // setting timelimit to remaining time -epsilon seconds
-        this->make_country_QP();
-        if (this->timeLimit > 0) {
-          const std::chrono::duration<double> timeElapsed =
-              std::chrono::high_resolution_clock::now() - initTime;
-          const double timeRemaining = this->timeLimit - timeElapsed.count();
-          BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::iterativeNash: solving "
-                                      "approximated EPEC with timelimit.";
-          innerApproxNashEq = this->computeNashEq(timeRemaining);
-        } else {
-          BOOST_LOG_TRIVIAL(debug)
-              << "Game::EPEC::iterativeNash: solving approximated EPEC.";
-          innerApproxNashEq = this->computeNashEq();
-        }
-        if (innerApproxNashEq) {
-          // If we have an equilibrium, we are done
-          if (this->isSolved(&deviatedCountry, &countryDeviation)) {
-            notSolved = false;
-          }
-					else{ 
-						BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::iterativeNash: Deviation in " <<deviatedCountry;
-					}
-        } else {
-          bool seriousTrouble{true};
-          for (auto &countrLCP : this->countries_LCP) {
-            auto addedPoly = countrLCP->addAPoly(1);
-            if (!addedPoly.empty())
-              seriousTrouble = false;
-          }
-          if (seriousTrouble) {
-            BOOST_LOG_TRIVIAL(error)
-                << "Error in Game::EPEC::iterativeNash: Inner approximation "
-                   "Nash equilibrium does not exist. No new polyhedron "
-                   "addable!";
-            throw string(
-                "Error in Game::EPEC::iterativeNash: Inner approximation Nash "
-                "equilibrium does not exist. No new polyhedron addable!");
-          }
-        }
-      } else {
-        BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::iterativeNash: no polyhedron "
-                                    "has been added. Infeasible";
+    if (addRandPoly) {
+      bool success = this->addRandomPoly2All(1, this->Stats.numIteration == 1);
+      if (!success) {
         this->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
-        notSolved = false;
+        solved = true;
+        return;
+      }
+    } else { // else we are in the case of finding deviations.
+      unsigned int deviatedCountry{0};
+      arma::vec countryDeviation{};
+      if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+        this->Stats.status = Game::EPECsolveStatus::nashEqFound;
+        solved = true;
+        return;
+      }
+      // Vector of deviations for the countries
+      std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
+      this->getAllDevns(devns, this->sol_x);
+      unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
+      if (addedPoly == 0) {
+        BOOST_LOG_TRIVIAL(error) << " In Game::EPEC::iterativeNash: Not "
+                                    "Solved, but no deviation? Error!";
+        throw string(
+            "Error in Game::EPEC::iterativeNash: Not solved but no deviation!");
       }
     }
 
-    this->lcp->save("dat/LCP.dat");
-    this->lcpmodel->write("dat/lcpmodel.lp");
-
-    // Else, we do not have feasability and/or profitable deviations
-    // OR we triggered the timelimit
-    const std::chrono::duration<double> timeElapsed =
-        std::chrono::high_resolution_clock::now() - initTime;
-    const double timeRemaining = this->timeLimit - timeElapsed.count();
-    if (devns.empty() ||
-        (this->timeLimit > 0 && timeRemaining >= this->timeLimit)) {
-      notSolved = false;
-      // No deviations, hence infeasible
-      if (devns.empty())
-        this->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
-      // We triggered the timelimit, hence we should return the timelimit status
-      else
-        this->Stats.status = Game::EPECsolveStatus::timeLimit;
+    this->make_country_QP();
+    addRandPoly = !this->computeNashEq();
+    this->lcp->save("dat/LCP_alg.dat");
+    this->lcpmodel->write("dat/lcpmodel_alg.lp");
+    for (unsigned int i = 0; i < this->nCountr; ++i) {
+      cout << "Country " << i;
+      this->countries_LCP.at(i)->print_feas_detail();
+      cout << "\n\n";
     }
   }
 }
@@ -1673,6 +1659,10 @@ void Game::EPEC::findNashEq() {
    * appropriate algorithm wrappers.
    */
 
+  if (!this->finalized)
+    throw string("Error in Game::EPEC::iterativeNash: Object not yet "
+                 "finalized. Screw you");
+
   this->Stats.algorithm = this->algorithm;
   // Choosing the appropriate algorithm
   switch (this->algorithm) {
@@ -1684,12 +1674,17 @@ void Game::EPEC::findNashEq() {
       this->resetLCP();
     }
     this->iterativeNash();
+    BOOST_LOG_TRIVIAL(info)
+        << "Game::EPEC::findNashEq: iterativeNash terminated "
+        << static_cast<int>(this->Stats.status);
     break;
   case Game::EPECalgorithm::fullEnumeration:
     for (unsigned int i = 0; i < this->nCountr; ++i)
       this->countries_LCP.at(i)->EnumerateAll(true);
     this->make_country_QP();
     this->computeNashEq(this->timeLimit);
+    this->lcp->save("dat/LCP_enum.dat");
+    this->lcpmodel->write("dat/lcpmodel_enum.lp");
     break;
   }
   // Handing EPECStatistics object to track performance of algorithm
