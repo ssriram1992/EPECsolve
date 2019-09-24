@@ -3,9 +3,12 @@
 #include <armadillo>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
+#include <cmath>
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
+#include <random>
+#include <set>
 #include <string>
 
 using namespace std;
@@ -797,22 +800,20 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
 {
   vector<short int> encoding = this->solEncode(x);
   // Check if the encoding polyhedron is already in this->AllPolyhedra
-  cout << "\nAllPolyhedra: ";
-  for (const auto &i : AllPolyhedra) {
-    cout << "\nPoly: ";
-    for (short &i : encoding) {
-      cout << to_string(i) << "\t";
-    }
-  }
-  cout << "\nEncoding (original): ";
-  for (short &i : encoding) {
-    cout << to_string(i) << "\t";
-    if (i == 0)
-      ++i;
-  }
   int found = -1;
+  auto num_to_vec = [](unsigned int number) {
+    std::vector<short int> binary{};
+    while (number > 0) {
+      binary.push_back(number % 2);
+      number /= 2;
+    }
+    std::reverse(binary.begin(), binary.end());
+    return binary;
+  }; // End of num_to_vec lambda definition
+
   for (const auto &i : AllPolyhedra) {
-    if (encoding < i || encoding == i) {
+    std::vector<short int> bin = num_to_vec(i);
+    if (encoding < bin || encoding == bin) {
       ret = false;
       return *this;
     }
@@ -820,7 +821,10 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
 
   // If it is not in AllPolyhedra
   // First change any zero indices of encoding to 1
-  cout << "\nEncoding (edited): ";
+  for (short &i : encoding) {
+    if (i == 0)
+      ++i;
+  }
   for (short &i : encoding) {
     cout << to_string(i) << "\t";
   }
@@ -830,7 +834,7 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
   return *this;
 }
 
-Game::LCP &Game::LCP::FixToPoly(
+bool Game::LCP::FixToPoly(
     const vector<short int>
         Fix,        ///< A vector of +1 and -1 referring to which
                     ///< equations and variables are taking 0 value.
@@ -851,23 +855,38 @@ Game::LCP &Game::LCP::FixToPoly(
  *provided as arguments.
  *	@p true value to @p checkFeas ensures that the polyhedron is pushed @e
  *only if it is feasible.
+ * @returns @p true if successfully added, else false
  *	@warning Does not entertain 0 in the elements of *Fix. Only +1/-1 are
  *allowed to not encounter undefined behavior. As a result, not meant for high
  *level code. Instead use LCP::FixToPolies.
  */
 {
+  // std::vector representation to decimal number
+  auto vec_to_num = [](std::vector<short int> binary) {
+    unsigned int number = 0;
+    unsigned int posn = 1;
+    while (!binary.empty()) {
+      short int bit = (binary.back() + 1) / 2; // The least significant bit
+      number += (bit * posn);
+      posn *= 2;         // Update place value
+      binary.pop_back(); // Remove that bit
+    }
+    return number;
+  };
 
-  if (knownInfeas.find(Fix) != knownInfeas.end()) {
+  unsigned int FixNumber = vec_to_num(Fix);
+
+  if (knownInfeas.find(FixNumber) != knownInfeas.end()) {
     BOOST_LOG_TRIVIAL(trace) << "Game::LCP::FixToPoly: Previously known "
                                 "infeasible polyhedron. Not added";
-    return *this;
+    return false;
   }
 
   if (!custom && !AllPolyhedra.empty()) {
-    if (AllPolyhedra.find(Fix) != AllPolyhedra.end()) {
+    if (AllPolyhedra.find(FixNumber) != AllPolyhedra.end()) {
       BOOST_LOG_TRIVIAL(trace)
           << "Game::LCP::FixToPoly: Previously added polyhedron. Not added";
-      return *this;
+      return false;
     }
   }
 
@@ -919,7 +938,7 @@ Game::LCP &Game::LCP::FixToPoly(
       if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL)
         add = true;
       else // Remember that this is an infeasible polyhedra
-        knownInfeas.insert(Fix);
+        knownInfeas.insert(FixNumber);
     } catch (const char *e) {
       cerr << "Error in Game::LCP::FixToPoly: " << e << '\n';
       throw;
@@ -940,12 +959,13 @@ Game::LCP &Game::LCP::FixToPoly(
       custAi->push_back(std::move(Aii));
       custbi->push_back(std::move(bii));
     } else {
-      AllPolyhedra.insert(Fix);
+      AllPolyhedra.insert(FixNumber);
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }
+    return true; // Successfully added
   }
-  return *this;
+  return false;
 }
 
 Game::LCP &Game::LCP::FixToPolies(
@@ -994,6 +1014,94 @@ Game::LCP &Game::LCP::FixToPolies(
   } else
     this->FixToPoly(Fix, checkFeas, custom, custAi, custbi);
   return *this;
+}
+
+unsigned int Game::LCP::getNextPoly() const {
+  /**
+   * Returns a polyhedron (in its +1/-1 encoding) that is neither already known
+   * to be infeasible, nor already added in the inner approximation
+   * representation.
+   */
+  std::set<unsigned int> processedPoly{};
+  std::set_union(this->knownInfeas.begin(), this->knownInfeas.end(),
+                 this->AllPolyhedra.begin(), this->AllPolyhedra.end(),
+                 std::inserter(processedPoly, processedPoly.end()));
+  unsigned int count{0};
+  for (auto x : processedPoly) {
+    if (x != count)
+      break;
+    count++;
+  }
+  return count;
+}
+
+std::set<std::vector<short int>>
+Game::LCP::addAPoly(unsigned int nPoly,
+                    std::set<std::vector<short int>> Polys) {
+  /**
+   * Tries to add at most @p nPoly number of polyhedra to the inner
+   * approximation representation of the current LCP. The set of added polyhedra
+   * (+1/-1 encoding) is appended to  @p Polys and returned. The only reason
+   * fewer polyhedra might be added is that the fewer polyhedra already
+   * represent the feasible region of the LCP.
+   */
+  const unsigned int nCompl = this->Compl.size();
+  // 2^n - the number of polyhedra theoretically
+  const unsigned int maxPoly = static_cast<unsigned int>(pow(2, nCompl));
+
+  // We already have polyhedrain AllPolyhedra and polyhedra in
+  // knownInfeas, that are known to be infeasible.
+  // Effective maximum of number of polyhedra that can be added
+  // at most
+  const unsigned int possibleMaxPoly =
+      maxPoly - AllPolyhedra.size() - knownInfeas.size();
+
+  if (maxPoly < nPoly) {       // If you cannot add that many polyhedra
+    BOOST_LOG_TRIVIAL(warning) // Then issue a warning
+        << "Warning in Game::LCP::randomPoly: "
+        << "Cannot add " << nPoly << " polyhedra. Promising a maximum of "
+        << maxPoly;
+    nPoly = maxPoly; // and update maximum possibly addable
+  }
+
+  if (nPoly == 0) // If nothing to be added, then nothing to be done
+    return Polys;
+
+  if (nPoly < 0) // There is no way that this can happen!
+  {
+    BOOST_LOG_TRIVIAL(error) << "nPoly can't be negative, i.e., " << nPoly;
+    throw string(
+        "Error in Game::LCP::addAPoly: nPoly reached a negative value!");
+  }
+
+  // Otherwise try adding one polyhedron
+  unsigned int choice_decimal = this->getNextPoly();
+  if (choice_decimal >= possibleMaxPoly)
+    return Polys;
+
+  // Otherwise convert choice_decimal to binary vector representation
+  auto num_to_vec = [](unsigned int number) {
+    std::vector<short int> binary{};
+    while (number > 0) {
+      binary.push_back(number % 2);
+      number /= 2;
+    }
+    std::reverse(binary.begin(), binary.end());
+    return binary;
+  }; // End of num_to_vec lambda definition
+
+  const std::vector<short int> choice = num_to_vec(choice_decimal);
+
+  auto added = this->FixToPoly(choice, true);
+  if (added) // If choice is added to All Polyhedra
+  {
+    Polys.insert(choice); // Add it to set of added polyhedra
+    return this->addAPoly(nPoly - 1,
+                          Polys); // Now we have one less polyhedron to add
+  } else {
+    return this->addAPoly(
+        nPoly, Polys); // We have to add the same number of polyhedra anyway :(
+  }
 }
 
 Game::LCP &Game::LCP::EnumerateAll(

@@ -55,12 +55,14 @@ private:
   unsigned int feasiblePolyhedra{0};
   /// LCP feasible region is a union of polyhedra. Keeps track which of those
   /// inequalities are fixed to equality to get the individual polyhedra
-  std::set<std::vector<short int>> AllPolyhedra =
-      {}; ///< Encoding of polyhedra that have been enumerated
-  std::set<std::vector<short int>> knownInfeas =
-      {}; ///< Encoding of polyhedra known to be infeasible
-  std::unique_ptr<spmat_Vec> Ai;
-  std::unique_ptr<vec_Vec> bi;
+  std::set<unsigned long int> AllPolyhedra =
+      {}; ///< Decimal encoding of polyhedra that have been enumerated
+  std::set<unsigned long int> knownInfeas =
+      {}; ///< Decimal encoding of polyhedra known to be infeasible
+  std::unique_ptr<spmat_Vec>
+      Ai; ///< Vector to contain the LHS of inner approx polyhedra
+  std::unique_ptr<vec_Vec>
+      bi;             ///< Vector to contain the RHS of inner approx polyhedra
   GRBModel RlxdModel; ///< A gurobi model with all complementarity constraints
                       ///< removed.
 
@@ -84,7 +86,6 @@ private:
   std::unique_ptr<GRBModel> LCP_Polyhed_fixed(arma::Col<int> FixEq,
                                               arma::Col<int> FixVar);
 
-  /* Branch and Prune Methods */
   template <class T> inline bool isZero(const T val) const {
     return (val > -eps && val < eps);
   }
@@ -98,13 +99,17 @@ private:
 
   LCP &EnumerateAll(bool solveLP = false);
 
-  LCP &FixToPoly(const std::vector<short int> Fix, bool checkFeas = false,
+  bool FixToPoly(const std::vector<short int> Fix, bool checkFeas = false,
                  bool custom = false, spmat_Vec *custAi = {},
                  vec_Vec *custbi = {});
 
   LCP &FixToPolies(const std::vector<short int> Fix, bool checkFeas = false,
                    bool custom = false, spmat_Vec *custAi = {},
                    vec_Vec *custbi = {});
+
+  std::set<std::vector<short int>>
+  addAPoly(unsigned int nPoly = 1, std::set<std::vector<short int>> Polys = {});
+  unsigned int getNextPoly() const;
 
 public:
   // Fudgible data
