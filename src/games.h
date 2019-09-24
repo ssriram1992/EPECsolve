@@ -479,6 +479,7 @@ private:
       const unsigned int i) final; ///< Add Dummy variables for the leaders
   virtual void make_country_QP(const unsigned int i) final;
   virtual void make_country_QP() final;
+  virtual void make_country_LCP() final;
   virtual void resetLCP() final;
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;

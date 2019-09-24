@@ -726,7 +726,9 @@ bool Game::LCP::extractSols(
 {
   if (model->get(GRB_IntAttr_Status) == GRB_LOADED)
     model->optimize();
-  if (model->get(GRB_IntAttr_Status) != GRB_OPTIMAL)
+  auto status = model->get(GRB_IntAttr_Status);
+  if (!(status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
+        status == GRB_SOLUTION_LIMIT))
     return false;
   x.zeros(nC);
   if (extractZ)

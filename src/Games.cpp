@@ -1581,6 +1581,34 @@ void Game::EPEC::iterativeNash() {
   }
 }
 
+void ::Game::EPEC::make_country_LCP() {
+  if (this->country_QP.front() == nullptr) {
+    BOOST_LOG_TRIVIAL(error)
+        << "Exception in Game::EPEC::countryLCP : no country QP has been "
+           "made."
+        << '\n';
+    throw;
+  }
+  // Preliminary set up to get the LCP ready
+  int Nvar =
+      this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
+  arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
+  arma::vec MCRHS, dumb;
+  MCRHS.zeros(0);
+  dumb.zeros(0);
+  this->make_MC_cons(MC, MCRHS);
+  this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
+      this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
+  this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
+  this->lcp->useIndicators = this->indicators; // Using indicator constraints
+
+  this->lcpmodel = this->lcp->LCPasMIP(false);
+
+  Nvar = nashgame->getNprimals() + nashgame->getNduals() +
+         nashgame->getNshadow() + nashgame->getNleaderVars();
+  BOOST_LOG_TRIVIAL(trace) << *nashgame;
+}
+
 bool Game::EPEC::computeNashEq(
     double localTimeLimit ///< Allowed time limit to run this function
 ) {
@@ -1591,67 +1619,36 @@ bool Game::EPEC::computeNashEq(
    * @returns true if a Nash equilibrium is found
    */
   bool foundNash{false};
-  if (this->country_QP.front() == nullptr) {
-    BOOST_LOG_TRIVIAL(error)
-        << "Exception in Game::EPEC::computeNashEq : no country QP has been "
-           "made."
-        << '\n';
-    throw;
-  }
-  int Nvar =
-      this->country_QP.front()->getNx() + this->country_QP.front()->getNy();
-  arma::sp_mat MC(0, Nvar), dumA(0, Nvar);
-  arma::vec MCRHS, dumb;
-  MCRHS.zeros(0);
-  dumb.zeros(0);
-  this->make_MC_cons(MC, MCRHS);
-  this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
-      this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
-  lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
-  // Using indicator constraints
-  lcp->useIndicators = this->indicators;
-
-  this->lcpmodel = lcp->LCPasMIP(false);
-  Nvar = nashgame->getNprimals() + nashgame->getNduals() +
-         nashgame->getNshadow() + nashgame->getNleaderVars();
-  BOOST_LOG_TRIVIAL(trace) << *nashgame;
-
-  this->Stats.numVar = lcpmodel->get(GRB_IntAttr_NumVars);
-  this->Stats.numConstraints = lcpmodel->get(GRB_IntAttr_NumConstrs);
-  this->Stats.numNonZero = lcpmodel->get(GRB_IntAttr_NumNZs);
+  // Make the Nash Game between countries
+  this->make_country_LCP();
+  // Handing EPECStatistics object to track performance of algorithm
+  this->Stats.numVar = this->lcpmodel->get(GRB_IntAttr_NumVars);
+  this->Stats.numConstraints = this->lcpmodel->get(GRB_IntAttr_NumConstrs);
+  this->Stats.numNonZero = this->lcpmodel->get(GRB_IntAttr_NumNZs);
   if (localTimeLimit > 0) {
     this->lcpmodel->set(GRB_DoubleParam_TimeLimit, localTimeLimit);
   }
-  lcpmodel->optimize();
-  this->Stats.wallClockTime = lcpmodel->get(GRB_DoubleAttr_Runtime);
-  this->sol_x.zeros(Nvar);
-  this->sol_z.zeros(Nvar);
-  unsigned int temp;
-  int status = lcpmodel->get(GRB_IntAttr_Status);
+  this->lcpmodel->optimize();
+  this->Stats.wallClockTime = this->lcpmodel->get(GRB_DoubleAttr_Runtime);
+
   // Search just for a feasible point
-  if (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL ||
-      status == GRB_SOLUTION_LIMIT) {
+  try {
+    foundNash = this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
+  } catch (GRBException &e) {
+    BOOST_LOG_TRIVIAL(error)
+        << "GRBException in Game::EPEC::computeNashEq : " << e.getErrorCode()
+        << ": " << e.getMessage() << " ";
+  }
+  if (foundNash) {
     BOOST_LOG_TRIVIAL(trace)
         << "Game::EPEC::computeNashEq: an equilibrium has been found.";
     this->nashEq = true;
-    foundNash = true;
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
-    try {
-      for (unsigned int i = 0; i < (unsigned int)Nvar; i++) {
-        this->sol_x(i) =
-            lcpmodel->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
-        this->sol_z(i) =
-            lcpmodel->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
-        temp = i;
-      }
 
-    } catch (GRBException &e) {
-      cerr << "GRBException in Game::EPEC::computeNashEq : " << e.getErrorCode()
-           << ": " << e.getMessage() << " " << temp << '\n';
-    }
   } else {
     BOOST_LOG_TRIVIAL(trace)
         << "Game::EPEC::computeNashEq: NO EQUILIBRIUM HAS BEEN FOUND.";
+    int status = this->lcpmodel->get(GRB_IntAttr_Status);
     if (status == GRB_TIME_LIMIT)
       this->Stats.status = Game::EPECsolveStatus::timeLimit;
     else
@@ -1670,6 +1667,7 @@ void Game::EPEC::findNashEq() {
    */
 
   this->Stats.algorithm = this->algorithm;
+  // Choosing the appropriate algorithm
   switch (this->algorithm) {
   case Game::EPECalgorithm::innerApproximation:
     if (this->Stats.status != Game::EPECsolveStatus::unInitialized) {
@@ -1685,6 +1683,7 @@ void Game::EPEC::findNashEq() {
     this->computeNashEq(this->timeLimit);
     break;
   }
+  // Assigning appropriate status messages after solving
   switch (this->Stats.status) {
   case Game::EPECsolveStatus::nashEqNotFound:
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: no Nash "
