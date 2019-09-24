@@ -1470,9 +1470,9 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
           << to_string(i);
       ++added;
     } else {
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::addDeviatedPolyhedron: NO polyhedron added for player "
-          << to_string(i);
+      BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::addDeviatedPolyhedron: NO "
+                                  "polyhedron added for player "
+                               << to_string(i);
     }
   }
   return added;
@@ -1682,12 +1682,11 @@ void Game::EPEC::findNashEq() {
     break;
   }
   // Handing EPECStatistics object to track performance of algorithm
-	if(this->lcpmodel)
-	{
-  this->Stats.numVar = this->lcpmodel->get(GRB_IntAttr_NumVars);
-  this->Stats.numConstraints = this->lcpmodel->get(GRB_IntAttr_NumConstrs);
-  this->Stats.numNonZero = this->lcpmodel->get(GRB_IntAttr_NumNZs);
-	}  // Assigning appropriate status messages after solving
+  if (this->lcpmodel) {
+    this->Stats.numVar = this->lcpmodel->get(GRB_IntAttr_NumVars);
+    this->Stats.numConstraints = this->lcpmodel->get(GRB_IntAttr_NumConstrs);
+    this->Stats.numNonZero = this->lcpmodel->get(GRB_IntAttr_NumNZs);
+  } // Assigning appropriate status messages after solving
   switch (this->Stats.status) {
   case Game::EPECsolveStatus::nashEqNotFound:
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: no Nash "

@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
       "Sets the writeLevel param. 0: only Json. 1: only human-readable. 2: "
       "both")("message,m", po::value<int>(&verbosity)->default_value(0),
               "Sets the verbosity level for info and warning messages. 0: "
-              "warning and critical. 1: info. 2: trace")(
+              "warning and critical. 1: info. 2: debug. 3: trace")(
       "bigm,b", po::value<int>(&bigM)->default_value(0),
       "Replaces indicator constraints with bigM.")(
       "threads,t", po::value<int>(&nThreads)->default_value(1),
@@ -58,15 +58,32 @@ int main(int argc, char **argv) {
     cout << "-i [--input] option missing" << endl;
     return EXIT_SUCCESS;
   }
-  if (verbosity == 0)
+  switch (verbosity) {
+  case 0:
     logging::core::get()->set_filter(logging::trivial::severity >
                                      logging::trivial::info);
-  else if (verbosity == 1)
+    break;
+  case 1:
     logging::core::get()->set_filter(logging::trivial::severity >=
                                      logging::trivial::info);
-  else if (verbosity == 2) {
+    break;
+  case 2:
+    logging::core::get()->set_filter(logging::trivial::severity >=
+                                     logging::trivial::debug);
+    break;
+  case 3:
     logging::core::get()->set_filter(logging::trivial::severity >=
                                      logging::trivial::trace);
+    break;
+  default:
+    BOOST_LOG_TRIVIAL(warning)
+        << "Invalid option for --message (-m). Setting default value: 0";
+    verbosity = 0;
+    logging::core::get()->set_filter(logging::trivial::severity >
+                                     logging::trivial::info);
+    break;
+  }
+  if (verbosity >= 2) {
     arma::arma_version ver;
     int major, minor, technical;
     GRBversion(&major, &minor, &technical);
@@ -77,7 +94,6 @@ int main(int argc, char **argv) {
     BOOST_LOG_TRIVIAL(info) << "\tBoost: " << to_string(BOOST_VERSION / 100000)
                             << "." << to_string(BOOST_VERSION / 100 % 1000);
   }
-
   // --------------------------------
   // LOADING INSTANCE
   // --------------------------------

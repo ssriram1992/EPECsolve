@@ -1139,7 +1139,7 @@ Game::LCP &Game::LCP::makeQP(
         &QP_obj, ///< The objective function of the QP to be returned. @warning
                  ///< Size of this parameter might change!
     Game::QP_Param &QP ///< The output parameter where the final Game::QP_Param
-                        ///< object is stored
+                       ///< object is stored
 
 ) {
   // Original sizes
