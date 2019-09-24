@@ -1138,17 +1138,14 @@ Game::LCP &Game::LCP::makeQP(
     Game::QP_objective
         &QP_obj, ///< The objective function of the QP to be returned. @warning
                  ///< Size of this parameter might change!
-    Game::QP_Param &QP, ///< The output parameter where the final Game::QP_Param
+    Game::QP_Param &QP ///< The output parameter where the final Game::QP_Param
                         ///< object is stored
-    bool fullEnumerate
 
 ) {
   // Original sizes
   const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
 
   Game::QP_constraints QP_cons;
-  if (fullEnumerate)
-    this->EnumerateAll(true);
   this->feasiblePolyhedra = this->ConvexHull(QP_cons.B, QP_cons.b);
   // Updated size after convex hull has been computed.
   const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};

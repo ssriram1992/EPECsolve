@@ -97,8 +97,6 @@ private:
   std::vector<short int> solEncode(const arma::vec &z,
                                    const arma::vec &x) const;
 
-  LCP &EnumerateAll(bool solveLP = false);
-
   bool FixToPoly(const std::vector<short int> Fix, bool checkFeas = false,
                  bool custom = false, spmat_Vec *custAi = {},
                  vec_Vec *custbi = {});
@@ -217,12 +215,12 @@ public:
       return Game::ConvexHull(&tempAi, &tempbi, A, b, A_common, b_common);
   };
 
-  LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP,
-              bool enumerate = true);
+  LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
 
   std::set<std::vector<short int>>
   addAPoly(unsigned int nPoly = 1, std::set<std::vector<short int>> Polys = {});
   LCP &addPolyFromX(const arma::vec &x, bool &ret);
+  LCP &EnumerateAll(bool solveLP = true);
 
   unsigned int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 

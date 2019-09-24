@@ -1377,9 +1377,8 @@ void Game::EPEC::make_country_QP(const unsigned int i)
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
     // In the last parameter, we specify whether we want to have full
     // enumeration or not
-    this->countries_LCP.at(i)->makeQP(
-        *this->LeadObjec_ConvexHull.at(i).get(), *this->country_QP.at(i).get(),
-        this->algorithm == Game::EPECalgorithm::fullEnumeration);
+    this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
+                                      *this->country_QP.at(i).get());
     this->Stats.feasiblePolyhedra.push_back(
         this->countries_LCP.at(i)->getFeasiblePolyhedra());
   }
@@ -1467,12 +1466,12 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
     this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
     if (ret) {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::iterativeNash: added polyhedron for player "
+          << "Game::EPEC::addDeviatedPolyhedron: added polyhedron for player "
           << to_string(i);
       ++added;
     } else {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::iterativeNash: NO polyhedron added for player "
+          << "Game::EPEC::addDeviatedPolyhedron: NO polyhedron added for player "
           << to_string(i);
     }
   }
@@ -1503,7 +1502,7 @@ void Game::EPEC::iterativeNash() {
   // If for two iterations we do not add at least one polyhedron, abort.
   while (notSolved) {
     BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::iterativeNash: Iteration "
-                             << to_string(this->Stats.numIteration++);
+                             << to_string(++this->Stats.numIteration);
     // Compute profitable deviation(s)
     this->giveAllDevns(devns, this->sol_x);
     // If LCP are feasible (!=0) and there is then at least one profitable one
@@ -1621,31 +1620,28 @@ bool Game::EPEC::computeNashEq(
   bool foundNash{false};
   // Make the Nash Game between countries
   this->make_country_LCP();
-  // Handing EPECStatistics object to track performance of algorithm
-  this->Stats.numVar = this->lcpmodel->get(GRB_IntAttr_NumVars);
-  this->Stats.numConstraints = this->lcpmodel->get(GRB_IntAttr_NumConstrs);
-  this->Stats.numNonZero = this->lcpmodel->get(GRB_IntAttr_NumNZs);
   if (localTimeLimit > 0) {
     this->lcpmodel->set(GRB_DoubleParam_TimeLimit, localTimeLimit);
   }
   this->lcpmodel->optimize();
-  this->Stats.wallClockTime = this->lcpmodel->get(GRB_DoubleAttr_Runtime);
+  this->Stats.wallClockTime += this->lcpmodel->get(GRB_DoubleAttr_Runtime);
 
   // Search just for a feasible point
-  try {
-    foundNash = this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
+  try { // Try finding a Nash equilibrium for the approximation
+    foundNash =
+        this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
   } catch (GRBException &e) {
     BOOST_LOG_TRIVIAL(error)
         << "GRBException in Game::EPEC::computeNashEq : " << e.getErrorCode()
         << ": " << e.getMessage() << " ";
   }
-  if (foundNash) {
+  if (foundNash) { // If a Nash equilibrium is found, then update appropriately
     BOOST_LOG_TRIVIAL(trace)
         << "Game::EPEC::computeNashEq: an equilibrium has been found.";
     this->nashEq = true;
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
 
-  } else {
+  } else { // If not, then update accordingly
     BOOST_LOG_TRIVIAL(trace)
         << "Game::EPEC::computeNashEq: NO EQUILIBRIUM HAS BEEN FOUND.";
     int status = this->lcpmodel->get(GRB_IntAttr_Status);
@@ -1679,11 +1675,19 @@ void Game::EPEC::findNashEq() {
     this->iterativeNash();
     break;
   case Game::EPECalgorithm::fullEnumeration:
+    for (unsigned int i = 0; i < this->nCountr; ++i)
+      this->countries_LCP.at(i)->EnumerateAll(true);
     this->make_country_QP();
     this->computeNashEq(this->timeLimit);
     break;
   }
-  // Assigning appropriate status messages after solving
+  // Handing EPECStatistics object to track performance of algorithm
+	if(this->lcpmodel)
+	{
+  this->Stats.numVar = this->lcpmodel->get(GRB_IntAttr_NumVars);
+  this->Stats.numConstraints = this->lcpmodel->get(GRB_IntAttr_NumConstrs);
+  this->Stats.numNonZero = this->lcpmodel->get(GRB_IntAttr_NumNZs);
+	}  // Assigning appropriate status messages after solving
   switch (this->Stats.status) {
   case Game::EPECsolveStatus::nashEqNotFound:
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: no Nash "

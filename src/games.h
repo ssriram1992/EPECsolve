@@ -418,7 +418,7 @@ struct EPECStatistics {
   std::vector<int> feasiblePolyhedra =
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
           ///< leader (country)
-  double wallClockTime = {-1.0};
+  double wallClockTime = {0};
 };
 
 class EPEC {
