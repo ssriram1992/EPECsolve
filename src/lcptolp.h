@@ -107,8 +107,6 @@ private:
                    bool custom = false, spmat_Vec *custAi = {},
                    vec_Vec *custbi = {});
 
-  std::set<std::vector<short int>>
-  addAPoly(unsigned int nPoly = 1, std::set<std::vector<short int>> Polys = {});
   unsigned int getNextPoly() const;
 
 public:
@@ -222,6 +220,8 @@ public:
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP,
               bool enumerate = true);
 
+  std::set<std::vector<short int>>
+  addAPoly(unsigned int nPoly = 1, std::set<std::vector<short int>> Polys = {});
   LCP &addPolyFromX(const arma::vec &x, bool &ret);
 
   unsigned int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }

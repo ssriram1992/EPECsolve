@@ -488,7 +488,7 @@ private:
   unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
   void get_x_minus_i(const arma::vec &x, const int &i,
                      arma::vec &solOther) const;
-  virtual void computeNashEq(double localTimeLimit = -1.0) final;
+  virtual bool computeNashEq(double localTimeLimit = -1.0) final;
 
 protected: // functions
   EPEC(GRBEnv *env)
