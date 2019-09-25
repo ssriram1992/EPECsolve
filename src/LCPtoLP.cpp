@@ -1186,7 +1186,6 @@ Game::LCP &Game::LCP::makeQP(
   // Updated size after convex hull has been computed.
   const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
   const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};
-  BOOST_LOG_TRIVIAL(debug) << "Size: " << Ncons << " " << Ny;
   // Resizing entities.
   QP_cons.A.zeros(Ncons, Nx_old);
   QP_obj.c = resize_patch(QP_obj.c, Ny, 1);

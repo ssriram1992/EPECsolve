@@ -749,8 +749,6 @@ void Models::EPEC::make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const
   const arma::sp_mat &TrCo = this->TranspCosts;
   // Output matrices
   MCRHS.zeros(this->nCountr);
-  BOOST_LOG_TRIVIAL(debug) << "Models::EPEC::make_MC_cons: nVarinEPEC-->"
-                           << this->getnVarinEPEC();
   MCLHS.zeros(this->nCountr, this->getnVarinEPEC());
   // The MC constraint for each leader country
   if (this->nCountr > 1) {
@@ -948,8 +946,6 @@ void Models::EPEC::make_obj_leader(
   const arma::sp_mat &TrCo = this->TranspCosts;
   const LeadLocs &Loc = this->Locations.at(i);
 
-	BOOST_LOG_TRIVIAL (debug) <<"Models::EPEC::make_obj_leader: nEPECVars: "<<nEPECvars;
-  // QP_obj.Q.zeros(nEPECvars - nThisCountryvars, nEPECvars - nThisCountryvars);
   QP_obj.Q.zeros(nThisCountryvars, nThisCountryvars);
   QP_obj.c.zeros(nThisCountryvars);
   QP_obj.C.zeros(nThisCountryvars, nEPECvars - nThisCountryvars);
