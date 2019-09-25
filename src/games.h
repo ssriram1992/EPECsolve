@@ -427,7 +427,11 @@ private:
   std::vector<unsigned int> SizesWithoutHull{};
   Game::EPECalgorithm algorithm =
       Game::EPECalgorithm::fullEnumeration; ///< Stores the type of algorithm
-                                            ///< used by the EPEC.
+  ///< used by the EPEC.
+  unique_ptr<Game::LCP> lcp; ///< The EPEC nash game written as an LCP
+  unique_ptr<GRBModel>
+      lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
+  unsigned int nVarinEPEC{0};
 
 protected: // Datafields
   std::vector<shared_ptr<Game::NashGame>> countries_LL{};
@@ -446,9 +450,6 @@ protected: // Datafields
                               ///< hull computation
 
   unique_ptr<Game::NashGame> nashgame; ///< The EPEC nash game
-  unique_ptr<Game::LCP> lcp;           ///< The EPEC nash game written as an LCP
-  unique_ptr<GRBModel>
-      lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
 
   std::vector<unsigned int> LeaderLocations{}; ///< Location of each leader
   std::vector<const unsigned int *> LocStarts{};
@@ -462,7 +463,6 @@ protected: // Datafields
   bool nashEq{false};
 
   unsigned int nCountr{0};
-  unsigned int nVarinEPEC{0};
 
   EPECStatistics Stats{}; ///< Store run time information
 
@@ -482,6 +482,7 @@ private:
   virtual void make_country_QP() final;
   virtual void make_country_LCP() final;
   virtual void resetLCP() final;
+  virtual void iterativeNash() final;
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
 
@@ -513,6 +514,12 @@ protected: // functions
     MC.zeros();
     RHS.zeros();
   };
+  virtual bool hasLCP() const final {
+    if (this->lcp)
+      return true;
+    else
+      return false;
+  }
 
 public:                  // functions
   EPEC() = delete;       ///< No default constructor
@@ -521,7 +528,6 @@ public:                  // functions
 
   virtual void finalize() final;
   virtual void findNashEq() final;
-  virtual void iterativeNash() final;
 
   unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
   double RespondSol(arma::vec &sol, unsigned int player,
@@ -535,6 +541,9 @@ public:                  // functions
   ///@brief Get the EPECStatistics object for the current instance
   virtual const EPECStatistics getStatistics() const final {
     return this->Stats;
+  }
+  virtual const unsigned int getnVarinEPEC() const final {
+    return this->nVarinEPEC;
   }
   void setAlgorithm(Game::EPECalgorithm algorithm);
 };

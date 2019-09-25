@@ -750,7 +750,9 @@ void Models::EPEC::make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const
   const arma::sp_mat &TrCo = this->TranspCosts;
   // Output matrices
   MCRHS.zeros(this->nCountr);
-  MCLHS.zeros(this->nCountr, this->nVarinEPEC);
+  BOOST_LOG_TRIVIAL(debug) << "Models::EPEC::make_MC_cons: nVarinEPEC-->"
+                           << this->getnVarinEPEC();
+  MCLHS.zeros(this->nCountr, this->getnVarinEPEC());
   // The MC constraint for each leader country
   if (this->nCountr > 1) {
     for (unsigned int i = 0; i < this->nCountr; ++i) {
@@ -788,7 +790,7 @@ void Models::EPEC::make_MC_leader(const unsigned int i)
                  "Bad argument");
   try {
     const arma::sp_mat &TrCo = this->TranspCosts;
-    const unsigned int nEPECvars = this->nVarinEPEC;
+    const unsigned int nEPECvars = this->getnVarinEPEC();
     const unsigned int nThisMCvars = 1;
     arma::sp_mat C(nThisMCvars, nEPECvars - nThisMCvars);
 
@@ -879,7 +881,7 @@ bool Models::EPEC::dataCheck(
     return false;
   if (!chkLeaderLocations && LeaderLocations.size() != this->nCountr)
     return false;
-  if (!chkLeaderLocations && this->nVarinEPEC == 0)
+  if (!chkLeaderLocations && this->getnVarinEPEC() == 0)
     return false;
   if (!chkLeadObjec && LeadObjec.size() != this->nCountr)
     return false;
@@ -940,7 +942,7 @@ void Models::EPEC::make_obj_leader(
  * Makes the objective function of each country.
  */
 {
-  const unsigned int nEPECvars = this->nVarinEPEC;
+  const unsigned int nEPECvars = this->getnVarinEPEC();
   const unsigned int nThisCountryvars =
       this->Locations.at(i).at(Models::LeaderVars::End);
   const LeadAllPar &Params = this->AllLeadPars.at(i);
@@ -1031,13 +1033,13 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
 
 void Models::EPEC::gur_WriteCountry_conv(const unsigned int i,
                                          string filename) const {
-  if (!lcp)
+  if (!this->hasLCP())
     throw;
 }
 
 void Models::EPEC::gur_WriteEpecMip(const unsigned int i,
                                     string filename) const {
-  if (!lcp)
+  if (!this->hasLCP())
     throw;
 }
 

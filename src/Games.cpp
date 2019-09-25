@@ -1397,6 +1397,8 @@ void Game::EPEC::make_country_QP()
  * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for
  * each valid @p i
  * @note Overloaded as EPEC::make_country_QP(unsigned int)
+ * @todo manage removal of convexHull variables (eg,  convHullVarCount is
+ * negative)
  */
 {
   for (unsigned int i = 0; i < this->nCountr; ++i) {
@@ -1406,8 +1408,18 @@ void Game::EPEC::make_country_QP()
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     // LeadLocs &Loc = this->Locations.at(i);
     // Adjusting "stuff" because we now have new convHull variables
-    unsigned int convHullVarCount =
+    int convHullVarCount =
         this->LeadObjec_ConvexHull.at(i)->Q.n_rows - *this->LocEnds.at(i);
+    if (convHullVarCount < 0) {
+      BOOST_LOG_TRIVIAL(error)
+          << "Error in Game::EPEC::make_country_QP: adding a negative number "
+             "of convexHull variables to Country "
+          << i;
+      throw;
+    }
+    BOOST_LOG_TRIVIAL(info)
+        << "Adding " << convHullVarCount << " convex hull variables to the "
+        << i << "-th QP.";
     // Location details
     this->convexHullVarAddn.at(i) += convHullVarCount;
     this->convexHullVariables.at(i) += convHullVarCount;
@@ -1592,6 +1604,8 @@ void ::Game::EPEC::make_country_LCP() {
   MCRHS.zeros(0);
   dumb.zeros(0);
   this->make_MC_cons(MC, MCRHS);
+  BOOST_LOG_TRIVIAL(debug) << "EPEC.nVar=" << Nvar;
+  BOOST_LOG_TRIVIAL(debug) << "MC:" << MC.n_rows << "x" << MC.n_cols << endl;
   this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
       this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
   this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
@@ -1599,8 +1613,6 @@ void ::Game::EPEC::make_country_LCP() {
 
   this->lcpmodel = this->lcp->LCPasMIP(false);
 
-  Nvar = nashgame->getNprimals() + nashgame->getNduals() +
-         nashgame->getNshadow() + nashgame->getNleaderVars();
   BOOST_LOG_TRIVIAL(trace) << *nashgame;
 }
 

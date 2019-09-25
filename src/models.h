@@ -220,7 +220,8 @@ public: // Attributes
   const unsigned int &nCountries{
       nCountr}; ///< Constant attribute for number of leaders in the EPEC
   const unsigned int &nVarEPEC{
-      nVarinEPEC}; ///< Constant attribute for number of variables in the EPEC
+      this->getnVarinEPEC()}; ///< Constant attribute for number of variables in
+                              ///< the EPEC
   bool indicators = {
       true}; ///< Controls the flag useIndicators in LCPtoLP class. If true,
              ///< indicators constraints replace bigM ones.
