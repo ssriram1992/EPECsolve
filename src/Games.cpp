@@ -1156,6 +1156,7 @@ void Game::EPEC::finalize()
   this->prefinalize();
 
   try {
+    this->Stats.feasiblePolyhedra = std::vector<unsigned int>(this->nCountr, 0);
     this->computeLeaderLocations(this->n_MCVar);
     // Initialize leader objective and country_QP
     this->LeadObjec = vector<shared_ptr<Game::QP_objective>>(nCountr);
@@ -1373,8 +1374,8 @@ void Game::EPEC::make_country_QP(const unsigned int i)
   if (i >= this->nCountr)
     throw string(
         "Error in Game::EPEC::make_country_QP: Invalid country number");
-  // if (!this->country_QP.at(i).get()) 
-	{
+  // if (!this->country_QP.at(i).get())
+  {
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
 
     const auto &origLeadObjec = *this->LeadObjec.at(i).get();
@@ -1384,8 +1385,8 @@ void Game::EPEC::make_country_QP(const unsigned int i)
 
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get());
-    this->Stats.feasiblePolyhedra.push_back(
-        this->countries_LCP.at(i)->getFeasiblePolyhedra());
+    this->Stats.feasiblePolyhedra.at(i) =
+        this->countries_LCP.at(i)->getFeasiblePolyhedra();
   }
 }
 
@@ -1402,7 +1403,6 @@ void Game::EPEC::make_country_QP()
     this->convexHullVarAddn.at(i) = 0;
     this->Game::EPEC::make_country_QP(i);
   }
-
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     // LeadLocs &Loc = this->Locations.at(i);
     // Adjusting "stuff" because we now have new convHull variables
@@ -1564,10 +1564,9 @@ void Game::EPEC::iterativeNash() {
             "Error in Game::EPEC::iterativeNash: Not solved but no deviation!");
       }
     }
-
     this->make_country_QP();
     addRandPoly = !this->computeNashEq();
-    this->lcp->save("dat/LCP_alg.dat");
+    // this->lcp->save("dat/LCP_alg.dat");
     this->lcpmodel->write("dat/lcpmodel_alg.lp");
     for (unsigned int i = 0; i < this->nCountr; ++i) {
       cout << "Country " << i;
@@ -1633,14 +1632,14 @@ bool Game::EPEC::computeNashEq(
         << ": " << e.getMessage() << " ";
   }
   if (foundNash) { // If a Nash equilibrium is found, then update appropriately
-    BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::computeNashEq: an equilibrium for "
-                                "inner approx has been found.";
+    BOOST_LOG_TRIVIAL(debug)
+        << "Game::EPEC::computeNashEq: an equilibrium has been found.";
     this->nashEq = true;
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
 
   } else { // If not, then update accordingly
-    BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::computeNashEq: NO EQUILIBRIUM FOR "
-                                "INNER APPROX HAS BEEN FOUND.";
+    BOOST_LOG_TRIVIAL(debug)
+        << "Game::EPEC::computeNashEq: no equilibrium has been found.";
     int status = this->lcpmodel->get(GRB_IntAttr_Status);
     if (status == GRB_TIME_LIMIT)
       this->Stats.status = Game::EPECsolveStatus::timeLimit;
@@ -1699,8 +1698,8 @@ void Game::EPEC::findNashEq() {
                                "equilibrium found (infeasibility).";
     break;
   case Game::EPECsolveStatus::nashEqFound:
-    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: a Nash equilibrium "
-                               "for inner approx has been found.";
+    BOOST_LOG_TRIVIAL(info)
+        << "Game::EPEC::findNashEq: a Nash equilibrium has been found.";
 
     break;
   default:

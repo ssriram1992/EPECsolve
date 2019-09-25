@@ -416,7 +416,7 @@ struct EPECStatistics {
   int numConstraints = {-1}; ///< Number of constraints in findNashEq model
   int numNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
                          ///< matrix of findNashEq model
-  std::vector<int> feasiblePolyhedra =
+  std::vector<unsigned int> feasiblePolyhedra =
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
           ///< leader (country)
   double wallClockTime = {0};

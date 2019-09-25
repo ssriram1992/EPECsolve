@@ -1181,7 +1181,7 @@ Game::LCP &Game::LCP::makeQP(
 
   Game::QP_constraints QP_cons;
   this->feasiblePolyhedra = this->ConvexHull(QP_cons.B, QP_cons.b);
-  BOOST_LOG_TRIVIAL(debug) << "LCP::makeQP: Nos feasible polyhedra: "
+  BOOST_LOG_TRIVIAL(debug) << "LCP::makeQP: No. feasible polyhedra: "
                            << this->feasiblePolyhedra;
   // Updated size after convex hull has been computed.
   const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
