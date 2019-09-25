@@ -1024,14 +1024,6 @@ double Game::NashGame::RespondSol(
   auto model = this->Respond(player, x, fullvec);
   // Check if the model is solved optimally
   const int status = model->get(GRB_IntAttr_Status);
-  if (status == GRB_UNBOUNDED) {
-    BOOST_LOG_TRIVIAL(warning)
-        << "Game::NashGame::Respondsol: deviation is unbounded. Trying to get "
-           "a feasible one.";
-    GRBLinExpr obj = 0;
-    model->setObjective(obj);
-    model->optimize();
-  }
   if (status == GRB_OPTIMAL) {
     unsigned int Nx =
         this->primal_position.at(player + 1) - this->primal_position.at(player);
