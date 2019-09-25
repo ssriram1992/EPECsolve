@@ -8,7 +8,7 @@ Code to compute mixed-equilibrium in linear EPECs. Code available on [Github](ht
 # Prerequisites
 
 ## Mandatory packages
-- [Armadillo](http://arma.sourceforge.net/) (Version 9.6 or later)
+- [Armadillo](http://arma.sourceforge.net/) (Version 9.6 or later recommended. Minimum 8.5 required.)
 	* BLAS
 	* ARPACK
 	* LAPACK
