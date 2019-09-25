@@ -603,7 +603,6 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
                        // is the number of dual variables for the lower level.
   this->Locations.push_back(Loc);
 
-  this->EPEC::LocStarts.push_back(&Loc[LeaderVars::FollowerStart]);
   this->EPEC::LocEnds.push_back(&this->Locations.back().at(LeaderVars::End));
   this->EPEC::convexHullVarAddn.push_back(0);
   this->EPEC::convexHullVariables.push_back(0);
@@ -949,7 +948,9 @@ void Models::EPEC::make_obj_leader(
   const arma::sp_mat &TrCo = this->TranspCosts;
   const LeadLocs &Loc = this->Locations.at(i);
 
-  QP_obj.Q.zeros(nEPECvars - nThisCountryvars, nEPECvars - nThisCountryvars);
+	BOOST_LOG_TRIVIAL (debug) <<"Models::EPEC::make_obj_leader: nEPECVars: "<<nEPECvars;
+  // QP_obj.Q.zeros(nEPECvars - nThisCountryvars, nEPECvars - nThisCountryvars);
+  QP_obj.Q.zeros(nThisCountryvars, nThisCountryvars);
   QP_obj.c.zeros(nThisCountryvars);
   QP_obj.C.zeros(nThisCountryvars, nEPECvars - nThisCountryvars);
   // emission term
@@ -1001,8 +1002,11 @@ void Models::EPEC::updateLocs()
 {
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     LeadLocs &Loc = this->Locations.at(i);
+    Models::decreaseVal(Loc, Models::LeaderVars::ConvHullDummy,
+                        Loc[Models::LeaderVars::ConvHullDummy + 1] -
+                            Loc[Models::LeaderVars::ConvHullDummy]);
     Models::increaseVal(Loc, Models::LeaderVars::ConvHullDummy,
-                        this->convexHullVarAddn.at(i));
+                        this->convexHullVariables.at(i));
   }
 }
 
@@ -1016,6 +1020,20 @@ void Models::increaseVal(LeadLocs &L, const LeaderVars start,
   for (LeaderVars l = start_rl; l != Models::LeaderVars::End; l = l + 1)
     L[l] += val;
   L[Models::LeaderVars::End] += val;
+  // BOOST_LOG_TRIVIAL(error)<<"End location changed to:
+  // "<<L[Models::LeaderVars::End];
+}
+
+void Models::decreaseVal(LeadLocs &L, const LeaderVars start,
+                         const unsigned int val, const bool startnext)
+/**
+ * Should be called ONLY after initializing @p L by calling Models::init
+ */
+{
+  LeaderVars start_rl = startnext ? start + 1 : start;
+  for (LeaderVars l = start_rl; l != Models::LeaderVars::End; l = l + 1)
+    L[l] -= val;
+  L[Models::LeaderVars::End] -= val;
   // BOOST_LOG_TRIVIAL(error)<<"End location changed to:
   // "<<L[Models::LeaderVars::End];
 }

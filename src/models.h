@@ -145,6 +145,8 @@ using LeadLocs = map<LeaderVars, unsigned int>;
 
 void increaseVal(LeadLocs &L, const LeaderVars start, const unsigned int val,
                  const bool startnext = true);
+void decreaseVal(LeadLocs &L, const LeaderVars start, const unsigned int val,
+                 const bool startnext = true);
 
 void init(LeadLocs &L);
 

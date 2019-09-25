@@ -452,7 +452,10 @@ protected: // Datafields
   unique_ptr<Game::NashGame> nashgame; ///< The EPEC nash game
 
   std::vector<unsigned int> LeaderLocations{}; ///< Location of each leader
-  std::vector<const unsigned int *> LocStarts{};
+  /// Number of variables in the current player, including any number of convex
+  /// hull variables at the current moment. The used, i.e., the inheritor of
+  /// Game::EPEC has the responsibility to keep this correct by implementing an
+  /// override of Game::EPEC::updateLocs.
   std::vector<const unsigned int *> LocEnds{};
   std::vector<unsigned int> convexHullVarAddn{};
   std::vector<unsigned int> convexHullVariables{};
@@ -546,6 +549,15 @@ public:                  // functions
     return this->nVarinEPEC;
   }
   void setAlgorithm(Game::EPECalgorithm algorithm);
+
+  /// Get the Game::LCP object solved in the last iteration either to solve the
+  /// problem or to prove non-existence of Nash equilibrium. Object is returned
+  /// using constant reference.
+  const LCP &getLcpDescr() const { return *this->lcp.get(); }
+  /// Get the GRBModel solved in the last iteration to solve the problem or to
+  /// prove non-existence of Nash equilibrium. Object is returned using constant
+  /// reference.
+  const GRBModel &getLcpModel() const { return *this->lcpmodel.get(); }
 };
 } // namespace Game
 

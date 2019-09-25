@@ -1169,6 +1169,7 @@ void Game::EPEC::finalize()
       this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
       this->LeadObjec_ConvexHull.at(i) = std::make_shared<Game::QP_objective>();
       this->make_obj_leader(i, *this->LeadObjec.at(i).get());
+			cout << "Making objective: "<< this->LeadObjec.at(i)->C.n_rows<<" "<< this->LeadObjec.at(i)->C.n_cols <<'\n';
       this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
           new LCP(this->env, *this->countries_LL.at(i).get()));
       this->SizesWithoutHull.at(i) = *this->LocEnds.at(i);
@@ -1238,6 +1239,7 @@ void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
   }
   this->nVarinEPEC =
       this->LeaderLocations.back() + *this->LocEnds.back() + addSpaceForMC;
+	BOOST_LOG_TRIVIAL (debug) << "Updating in Game::EPEC:L:computeLeaderLocations: nVarinEPEC: "<<nVarinEPEC;
 }
 
 void EPEC::get_x_minus_i(const arma::vec &x, const int &i,
@@ -1389,8 +1391,12 @@ void Game::EPEC::make_country_QP(const unsigned int i)
     this->LeadObjec_ConvexHull.at(i).reset(new Game::QP_objective{
         origLeadObjec.Q, origLeadObjec.C, origLeadObjec.c});
 
+		cout << "Game::EPEC::make_country_QP(unsigned int) " <<i <<" \n";
+		cout << "Before reset: "<< this->LeadObjec_ConvexHull .at(i)->Q.n_rows<<" "<< this->LeadObjec_ConvexHull .at(i)->Q.n_cols <<'\n';
+		cout << "Before reset: "<< this->LeadObjec.at(i)->Q.n_rows<<" "<< this->LeadObjec.at(i)->Q.n_cols <<'\n';
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get());
+
     this->Stats.feasiblePolyhedra.at(i) =
         this->countries_LCP.at(i)->getFeasiblePolyhedra();
   }
@@ -1414,21 +1420,16 @@ void Game::EPEC::make_country_QP()
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     // LeadLocs &Loc = this->Locations.at(i);
     // Adjusting "stuff" because we now have new convHull variables
-    int convHullVarCount =
-        this->LeadObjec_ConvexHull.at(i)->Q.n_rows - *this->LocEnds.at(i);
-    if (convHullVarCount < 0) {
-      BOOST_LOG_TRIVIAL(error)
-          << "Error in Game::EPEC::make_country_QP: adding a negative number "
-             "of convexHull variables to Country "
-          << i;
-      throw;
-    }
-    BOOST_LOG_TRIVIAL(info)
-        << "Adding " << convHullVarCount << " convex hull variables to the "
+    unsigned int originalSizeWithoutHull = this->LeadObjec.at(i)->Q.n_rows;
+    unsigned int convHullVarCount =
+        this->LeadObjec_ConvexHull.at(i)->Q.n_rows - originalSizeWithoutHull;
+
+    BOOST_LOG_TRIVIAL(debug)
+        << "Added " << convHullVarCount << " convex hull variables to the "
         << i << "-th QP.";
+
     // Location details
-    this->convexHullVarAddn.at(i) += convHullVarCount;
-    this->convexHullVariables.at(i) += convHullVarCount;
+    this->convexHullVariables.at(i) = convHullVarCount;
     // All other players' QP
     if (this->nCountr > 1) {
       for (unsigned int j = 0; j < this->nCountr; j++) {
@@ -1442,9 +1443,10 @@ void Game::EPEC::make_country_QP()
                                   // clearing variables
       }
     }
+		cout << "After reset: "<< this->LeadObjec_ConvexHull .at(i)->C.n_rows<<" "<< this->LeadObjec_ConvexHull .at(i)->C.n_cols <<'\n';
   }
   this->updateLocs();
-  this->computeLeaderLocations(this->nCountr);
+  this->computeLeaderLocations(this->n_MCVar);
 }
 
 bool Game::EPEC::getAllDevns(
@@ -1610,8 +1612,13 @@ void ::Game::EPEC::make_country_LCP() {
   MCRHS.zeros(0);
   dumb.zeros(0);
   this->make_MC_cons(MC, MCRHS);
-  BOOST_LOG_TRIVIAL(debug) << "EPEC.nVar=" << Nvar;
-  BOOST_LOG_TRIVIAL(debug) << "MC:" << MC.n_rows << "x" << MC.n_cols << endl;
+  BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::make_country_LCP: EPEC.nVar=" << Nvar;
+	for(unsigned int i=0; i<this->nCountr;i++)
+	{
+		cout<<i<<":- Nx: "<<this->country_QP.at(i)->getNx() <<"\t Ny: "
+		<< this->country_QP.at(i)->getNy() << '\n';
+	}
+  BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::make_country_LCP: MC:" << MC.n_rows << "x" << MC.n_cols << endl;
   this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
       this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
   this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
