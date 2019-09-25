@@ -1419,8 +1419,8 @@ void Game::EPEC::make_country_QP()
     unsigned int convHullVarCount =
         this->LeadObjec_ConvexHull.at(i)->Q.n_rows - originalSizeWithoutHull;
 
-    BOOST_LOG_TRIVIAL(debug)
-        << "Added " << convHullVarCount << " convex hull variables to QP #" << i ;
+    BOOST_LOG_TRIVIAL(debug) << "Added " << convHullVarCount
+                             << " convex hull variables to QP #" << i;
 
     // Location details
     this->convexHullVariables.at(i) = convHullVarCount;
@@ -1541,7 +1541,7 @@ void Game::EPEC::iterativeNash() {
   this->sol_x.zeros(this->nVarinEPEC);
 
   bool solved = {false};
-  bool addRandPoly{true};
+  bool addRandPoly{false};
   this->Stats.numIteration = 0;
 
   // While problem is not solved and we do not get infeasability in any of the
@@ -1570,7 +1570,7 @@ void Game::EPEC::iterativeNash() {
       std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
       this->getAllDevns(devns, this->sol_x);
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
-      if (addedPoly == 0) {
+      if (addedPoly == 0 && this->Stats.numIteration > 1) {
         BOOST_LOG_TRIVIAL(error) << " In Game::EPEC::iterativeNash: Not "
                                     "Solved, but no deviation? Error!";
         throw string(
