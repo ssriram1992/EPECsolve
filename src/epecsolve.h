@@ -27,6 +27,13 @@ class QP_Param;
 class NashGame;
 class LCP;
 class EPEC;
+enum class EPECAddPolyMethod {
+  sequential,         ///< Adds polyhedra by selecting them in order
+  reverse_sequential, ///< Adds polyhedra by selecting them in reverse
+                      ///< sequential order
+  random ///< Adds the next polyhedra by selecting random feasible one
+};
+
 } // namespace Game
 namespace Models {
 class EPEC;

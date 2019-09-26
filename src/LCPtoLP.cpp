@@ -1052,7 +1052,7 @@ Game::LCP &Game::LCP::FixToPolies(
   return *this;
 }
 
-unsigned int Game::LCP::getNextPoly() const {
+unsigned int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
   /**
    * Returns a polyhedron (in its decimal encoding) that is neither already
    * known to be infeasible, nor already added in the inner approximation
@@ -1062,17 +1062,53 @@ unsigned int Game::LCP::getNextPoly() const {
   std::set_union(this->knownInfeas.begin(), this->knownInfeas.end(),
                  this->AllPolyhedra.begin(), this->AllPolyhedra.end(),
                  std::inserter(processedPoly, processedPoly.end()));
-  unsigned int count{0};
-  for (auto x : processedPoly) {
-    if (x != count)
-      break;
-    count++;
+  const unsigned int nCompl = this->Compl.size();
+  // 2^n - the number of polyhedra theoretically
+  const unsigned int maxPoly = static_cast<unsigned int>(pow(2, nCompl));
+  switch (method) {
+  case Game::EPECAddPolyMethod::sequential: {
+    unsigned int count{0};
+    for (auto x : processedPoly) {
+      if (x != count)
+        break;
+      count++;
+    }
+    return count;
   }
-  return count;
+  case Game::EPECAddPolyMethod::reverse_sequential: {
+    unsigned int count{maxPoly - 1};
+    for (auto x : processedPoly) {
+      if (x != count)
+        break;
+      count--;
+    }
+    return count;
+  }
+  case Game::EPECAddPolyMethod::random: {
+    std::random_device random_device;
+    std::mt19937 engine{random_device()};
+    std::uniform_int_distribution<int> dist(0, maxPoly - 1);
+    bool found{false};
+    unsigned int x{0};
+    while (!found) {
+      x = dist(engine);
+      if (processedPoly.find(x) == processedPoly.end()) {
+        found = true;
+        return x;
+      }
+    }
+  }
+  default: {
+    BOOST_LOG_TRIVIAL(error)
+        << "Error in Game::LCP::getNextPoly: unrecognized method "
+        << to_string(method);
+    throw;
+  }
+  }
 }
 
 std::set<std::vector<short int>>
-Game::LCP::addAPoly(unsigned int nPoly,
+Game::LCP::addAPoly(unsigned int nPoly, Game::EPECAddPolyMethod method,
                     std::set<std::vector<short int>> Polys) {
   /**
    * Tries to add at most @p nPoly number of polyhedra to the inner
@@ -1080,6 +1116,7 @@ Game::LCP::addAPoly(unsigned int nPoly,
    * (+1/-1 encoding) is appended to  @p Polys and returned. The only reason
    * fewer polyhedra might be added is that the fewer polyhedra already
    * represent the feasible region of the LCP.
+   * @p method is casted from Game::EPEC::EPECAddPolyMethod
    */
   const unsigned int nCompl = this->Compl.size();
   // 2^n - the number of polyhedra theoretically
@@ -1111,7 +1148,7 @@ Game::LCP::addAPoly(unsigned int nPoly,
   }
 
   // Otherwise try adding one polyhedron
-  unsigned int choice_decimal = this->getNextPoly();
+  unsigned int choice_decimal = this->getNextPoly(method);
   if (choice_decimal >= maxPoly)
     return Polys;
 
@@ -1134,11 +1171,12 @@ Game::LCP::addAPoly(unsigned int nPoly,
   if (added) // If choice is added to All Polyhedra
   {
     Polys.insert(choice); // Add it to set of added polyhedra
-    return this->addAPoly(nPoly - 1,
+    return this->addAPoly(nPoly - 1, method,
                           Polys); // Now we have one less polyhedron to add
   } else {
     return this->addAPoly(
-        nPoly, Polys); // We have to add the same number of polyhedra anyway :(
+        nPoly, method,
+        Polys); // We have to add the same number of polyhedra anyway :(
   }
 }
 

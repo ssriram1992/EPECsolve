@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char **argv) {
   string resFile, instanceFile = "", logFile;
-  int writeLevel, nThreads, verbosity, bigM, algorithm, aggressiveness;
+  int writeLevel, nThreads, verbosity, bigM, algorithm, aggressiveness, add{0};
   double timeLimit;
 
   po::options_description desc("EPEC: Allowed options");
@@ -46,7 +46,10 @@ int main(int argc, char **argv) {
       "auto (number of processors)")(
       "aggr,ag", po::value<int>(&aggressiveness)->default_value(1),
       "Sets the aggressiveness for the innerApproximation, namely the number "
-      "of random polyhedra added if no deviation is found. (int).");
+      "of random polyhedra added if no deviation is found. (int).")(
+      "add,ad", po::value<int>(&add)->default_value(0),
+      "Sets the EPECAddPolyMethod for the innerApproximation. 0: sequential. "
+      "1: reverse_sequential. 2:random.");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -128,6 +131,17 @@ int main(int argc, char **argv) {
     epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
     if (aggressiveness != 1)
       epec.setAggressiveness(aggressiveness);
+    switch (add) {
+    case 1:
+      epec.setAddPolyMethod(EPECAddPolyMethod::reverse_sequential);
+      break;
+    case 2:
+      epec.setAddPolyMethod(EPECAddPolyMethod::random);
+      break;
+    default:
+      epec.setAddPolyMethod(EPECAddPolyMethod::sequential);
+    }
+
     break;
   }
   default:

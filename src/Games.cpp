@@ -1522,7 +1522,8 @@ bool Game::EPEC::addRandomPoly2All(unsigned int aggressiveLevel,
   BOOST_LOG_TRIVIAL(trace) << "Adding random polyhedra to countries";
   bool infeasDetect{true};
   for (unsigned int i = 0; i < this->nCountr; i++) {
-    auto addedPolySet = this->countries_LCP.at(i)->addAPoly(aggressiveLevel);
+    auto addedPolySet = this->countries_LCP.at(i)->addAPoly(
+        aggressiveLevel, this->Stats.AlgorithmParam.addPolyMethod);
     if (stopOnSingleInfeasibility && addedPolySet.empty()) {
       BOOST_LOG_TRIVIAL(info)
           << "Game::EPEC::addRandomPoly2All: No Nash equilibrium. due to "
@@ -1788,6 +1789,18 @@ std::string std::to_string(const Game::EPECalgorithm al) {
     return string("innerApproximation");
   default:
     return string("UNKNOWN_ALGORITHM_") + to_string(static_cast<int>(al));
+  }
+}
+std::string std::to_string(const Game::EPECAddPolyMethod add) {
+  switch (add) {
+  case EPECAddPolyMethod::sequential:
+    return string("sequential");
+  case EPECAddPolyMethod::reverse_sequential:
+    return string("reverse_sequential");
+  case EPECAddPolyMethod::random:
+    return string("random");
+  default:
+    return string("UNKNOWN_ALGORITHM_") + to_string(static_cast<int>(add));
   }
 }
 std::string std::to_string(const Game::EPECAlgorithmParams al) {

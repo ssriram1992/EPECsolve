@@ -406,10 +406,10 @@ enum class EPECalgorithm {
                      ///< iterations
 };
 
-
 /// @brief Stores the configuration for EPEC algorithms
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
+  Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
   bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
   ///< Uses @p bigM if @p false.
   double timeLimit{
@@ -573,6 +573,12 @@ public:                  // functions
   virtual unsigned int getAggressiveness() const final {
     return this->Stats.AlgorithmParam.aggressiveness;
   }
+  void setAddPolyMethod(Game::EPECAddPolyMethod add) {
+    this->Stats.AlgorithmParam.addPolyMethod = add;
+  }
+  virtual Game::EPECAddPolyMethod getAddPolyMethod() const final {
+    return this->Stats.AlgorithmParam.addPolyMethod;
+  }
 
   /// Get the Game::LCP object solved in the last iteration either to solve the
   /// problem or to prove non-existence of Nash equilibrium. Object is returned
@@ -589,6 +595,7 @@ namespace std {
 string to_string(const Game::EPECsolveStatus st);
 string to_string(const Game::EPECalgorithm al);
 string to_string(const Game::EPECAlgorithmParams al);
+string to_string(const Game::EPECAddPolyMethod add);
 }; // namespace std
 
 /* Example for QP_Param */
