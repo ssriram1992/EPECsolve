@@ -1582,9 +1582,8 @@ void Game::EPEC::iterativeNash() {
     // this->lcp->save("dat/LCP_alg.dat");
     this->lcpmodel->write("dat/lcpmodel_alg.lp");
     for (unsigned int i = 0; i < this->nCountr; ++i) {
-      cout << "Country " << i;
-      this->countries_LCP.at(i)->print_feas_detail();
-      cout << "\n\n";
+      BOOST_LOG_TRIVIAL(info)
+          << "Country " << i << this->countries_LCP.at(i)->feas_detail_str();
     }
   }
 }
@@ -1643,13 +1642,13 @@ bool Game::EPEC::computeNashEq(
         << ": " << e.getMessage() << " ";
   }
   if (foundNash) { // If a Nash equilibrium is found, then update appropriately
-    BOOST_LOG_TRIVIAL(debug)
+    BOOST_LOG_TRIVIAL(info)
         << "Game::EPEC::computeNashEq: an equilibrium has been found.";
     this->nashEq = true;
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
 
   } else { // If not, then update accordingly
-    BOOST_LOG_TRIVIAL(debug)
+    BOOST_LOG_TRIVIAL(info)
         << "Game::EPEC::computeNashEq: no equilibrium has been found.";
     int status = this->lcpmodel->get(GRB_IntAttr_Status);
     if (status == GRB_TIME_LIMIT)

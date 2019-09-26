@@ -223,7 +223,7 @@ public:
   addAPoly(unsigned int nPoly = 1, std::set<std::vector<short int>> Polys = {});
   LCP &addPolyFromX(const arma::vec &x, bool &ret);
   LCP &EnumerateAll(bool solveLP = true);
-  void print_feas_detail();
+  std::string feas_detail_str() const;
 
   unsigned int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
 

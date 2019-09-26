@@ -477,15 +477,15 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   // Basing on the taxation paradigm, allocate the right number of taxVars in
   // the class
   if (Params.LeaderParam.tax_type == Models::TaxType::StandardTax) {
-    BOOST_LOG_TRIVIAL(info)
+    BOOST_LOG_TRIVIAL(trace)
         << "Country " << Params.name << " has a standard tax paradigm.";
     this->taxVars = Params.n_followers;
   } else {
     if (Params.LeaderParam.tax_type == Models::TaxType::SingleTax) {
-      BOOST_LOG_TRIVIAL(info)
+      BOOST_LOG_TRIVIAL(trace)
           << "Country " << Params.name << " has a single tax paradigm.";
     } else if (Params.LeaderParam.tax_type == Models::TaxType::CarbonTax) {
-      BOOST_LOG_TRIVIAL(info)
+      BOOST_LOG_TRIVIAL(trace)
           << "Country " << Params.name << " has a carbon tax paradigm.";
     }
     this->taxVars = 1;

@@ -1406,11 +1406,13 @@ long int Game::LCP::load(string filename, long int pos) {
   return pos;
 }
 
-void Game::LCP::print_feas_detail() {
-  cout << "\n\tProven feasible: ";
+std::string Game::LCP::feas_detail_str() const {
+  std::stringstream ss;
+  ss << "\tProven feasible: ";
   for (auto vv : this->AllPolyhedra)
-    cout << vv << ' ';
-  cout << "\n\tProven infeasible: ";
+    ss << vv << ' ';
+  ss << "\tProven infeasible: ";
   for (auto vv : this->knownInfeas)
-    cout << vv << ' ';
+    ss << vv << ' ';
+  return ss.str();
 }
