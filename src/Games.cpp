@@ -1547,7 +1547,7 @@ void Game::EPEC::iterativeNash() {
   this->Stats.numIteration = 0;
 
   std::chrono::high_resolution_clock::time_point initTime;
-  if (this->timeLimit > 0)
+  if (this->Stats.AlgorithmParam.timeLimit > 0)
     initTime = std::chrono::high_resolution_clock::now();
 
   // While problem is not solved and we do not get infeasability in any of the
@@ -1558,7 +1558,7 @@ void Game::EPEC::iterativeNash() {
                             << to_string(++this->Stats.numIteration);
 
     if (addRandPoly) {
-      bool success = this->addRandomPoly2All(1, this->Stats.numIteration == 1);
+      bool success = this->addRandomPoly2All(3, this->Stats.numIteration == 1);
       if (!success) {
         this->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
         solved = true;
@@ -1588,10 +1588,11 @@ void Game::EPEC::iterativeNash() {
     this->make_country_QP();
 
     // TimeLimit
-    if (this->timeLimit > 0) {
+    if (this->Stats.AlgorithmParam.timeLimit > 0) {
       const std::chrono::duration<double> timeElapsed =
           std::chrono::high_resolution_clock::now() - initTime;
-      const double timeRemaining = this->timeLimit - timeElapsed.count();
+      const double timeRemaining =
+          this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
       addRandPoly = !this->computeNashEq(timeRemaining);
     } else {
       // No Time Limit
@@ -1605,10 +1606,11 @@ void Game::EPEC::iterativeNash() {
     }
     // This might be reached when a NashEq is found, and need to be verified.
     // Anyway, we are over the timeLimit and we should stop
-    if (this->timeLimit > 0) {
+    if (this->Stats.AlgorithmParam.timeLimit > 0) {
       const std::chrono::duration<double> timeElapsed =
           std::chrono::high_resolution_clock::now() - initTime;
-      const double timeRemaining = this->timeLimit - timeElapsed.count();
+      const double timeRemaining =
+          this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
       if (timeRemaining <= 0) {
         solved = false;
         this->Stats.status = Game::EPECsolveStatus::timeLimit;
@@ -1710,11 +1712,9 @@ void Game::EPEC::findNashEq() {
     this->resetLCP();
   }
 
-  this->Stats.algorithm = this->algorithm;
-
   bool foundNash;
   // Choosing the appropriate algorithm
-  switch (this->algorithm) {
+  switch (this->Stats.AlgorithmParam.algorithm) {
 
   case Game::EPECalgorithm::innerApproximation:
     final_msg << "Inner approximation algorithm complete. ";
@@ -1762,7 +1762,7 @@ void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
  * problem. The choice of algorithms are documented in Game::EPECalgorithm
  */
 {
-  this->algorithm = algorithm;
+  this->Stats.AlgorithmParam.algorithm = algorithm;
 }
 
 std::string std::to_string(const Game::EPECsolveStatus st) {
@@ -1788,4 +1788,12 @@ std::string std::to_string(const Game::EPECalgorithm al) {
   default:
     return string("UNKNOWN_ALGORITHM_") + to_string(static_cast<int>(al));
   }
+}
+std::string std::to_string(const Game::EPECAlgorithmParams al) {
+  std::stringstream ss;
+  ss<<"Algorithm: "<< to_string(al.algorithm)<<'\n';
+  ss << "Time Limit: "<< al.timeLimit<<'\n';
+  ss << "Use Indicators? " << std::boolalpha << al.indicators << '\n';
+  ss << "Aggressiveness: "<<al.aggressiveness;
+  return ss.str();
 }

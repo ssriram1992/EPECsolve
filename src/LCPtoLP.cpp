@@ -1413,8 +1413,9 @@ std::string Game::LCP::feas_detail_str() const {
   ss << "\tProven feasible: ";
   for (auto vv : this->AllPolyhedra)
     ss << vv << ' ';
-  ss << "\tProven infeasible: ";
-  for (auto vv : this->knownInfeas)
-    ss << vv << ' ';
+  // ss << "\tProven infeasible: ";
+  // for (auto vv : this->knownInfeas)
+  // ss << vv << ' ';
+
   return ss.str();
 }
