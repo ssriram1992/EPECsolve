@@ -39,6 +39,8 @@ struct FollPar {
         emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
 };
 
+FollPar operator+(const FollPar &F1, const FollPar &F2);
+
 /// @brief Stores the parameters of the demand curve in a country model
 struct DemPar {
   double alpha = 100; ///< Intercept of the demand curve. Written as: Price =

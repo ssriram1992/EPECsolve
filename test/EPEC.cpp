@@ -1,22 +1,4 @@
-#include "../src/games.h"
-#include "../src/lcptolp.h"
-#include "../src/models.h"
-#include <armadillo>
-#include <boost/log/core.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/trivial.hpp>
-#include <chrono>
-#include <cstdlib>
-#include <ctime>
-#include <exception>
-#include <gurobi_c++.h>
-#include <iomanip>
-#include <iostream>
-#include <random>
-
-#define BOOST_TEST_MODULE EPECTest
-
-#include <boost/test/unit_test.hpp>
+#include "test/epectests.h"
 
 unsigned int n_c;
 arma::vec devn;
@@ -26,7 +8,7 @@ using namespace arma;
 
 BOOST_AUTO_TEST_CASE(LoggingOff) {
   boost::log::core::get()->set_filter(boost::log::trivial::severity >=
-                                      boost::log::trivial::debug);
+                                      boost::log::trivial::warning);
 }
 
 BOOST_AUTO_TEST_SUITE(Core__Tests)

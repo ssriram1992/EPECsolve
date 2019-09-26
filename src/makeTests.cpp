@@ -21,6 +21,7 @@ std::default_random_engine give;
 std::uniform_int_distribution<int> binaryRandom(0, 1);
 std::uniform_int_distribution<int> intRandom(0, 1e5);
 
+/*
 Models::FollPar operator+(Models::FollPar a, Models::FollPar b) {
   vector<double> costs_quad = a.costs_quad;
   vector<double> costs_lin = a.costs_lin;
@@ -39,7 +40,7 @@ Models::FollPar operator+(Models::FollPar a, Models::FollPar b) {
 
   return Models::FollPar(costs_quad, costs_lin, capacities, emission_costs,
                          tax_caps, names);
-}
+} */
 
 Models::FollPar makeFollPar(int costParam = 0, int polluting = 0,
                             int capac = 0) {
