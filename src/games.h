@@ -359,7 +359,7 @@ public: // Constructors
   arma::vec ComputeQPObjvals(const arma::vec &x, bool checkFeas = false) const;
 
   bool isSolved(const arma::vec &sol, unsigned int &violPlayer,
-                arma::vec &violSol, double tol = 1e-6) const;
+                arma::vec &violSol, double tol = 1e-4) const;
 
   //  Modify NashGame members
 
@@ -536,7 +536,7 @@ public:                  // functions
   double RespondSol(arma::vec &sol, unsigned int player,
                     const arma::vec &x) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
-                double tol = 1e-6) const;
+                double tol = 1e-4) const;
 
   virtual const arma::vec getx() const final { return this->sol_x; }
   void reset() { this->sol_x.ones(); }

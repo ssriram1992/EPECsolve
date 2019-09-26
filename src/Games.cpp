@@ -1259,7 +1259,8 @@ void EPEC::get_x_minus_i(const arma::vec &x, const int &i,
     if (i != j) {
       current = *this->LocEnds.at(j) - this->convexHullVariables.at(j);
       solOther.subvec(count, count + current - 1) =
-          x.subvec(*this->LocEnds.at(j), *this->LocEnds.at(j) + current - 1);
+          x.subvec(this->LeaderLocations.at(j),
+                   this->LeaderLocations.at(j) + current - 1);
       count += current;
     }
     // We need to keep track of MC_vars also for this country
@@ -1348,7 +1349,8 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
       return false;
     if (abs(val - objvals.at(i)) > tol) {
       BOOST_LOG_TRIVIAL(debug)
-          << "Game::EPEC::isSolved: found a deviation for player " << i
+          << "Game::EPEC::isSolved: found a deviation ("
+          << abs(val - objvals.at(i)) << ")for player " << i
           << ".\nActual: " << objvals.at(i) << "\tOptimized: " << val;
       *countryNumber = i;
       // cout << "Proof - deviation: "<<*ProfDevn; //Sane
@@ -1574,8 +1576,10 @@ void Game::EPEC::iterativeNash() {
       this->getAllDevns(devns, this->sol_x);
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
       if (addedPoly == 0 && this->Stats.numIteration > 1) {
-        BOOST_LOG_TRIVIAL(error) << " In Game::EPEC::iterativeNash: Not "
-                                    "Solved, but no deviation? Error!";
+        BOOST_LOG_TRIVIAL(error)
+            << " In Game::EPEC::iterativeNash: Not "
+               "Solved, but no deviation? Error!\n This might be due to "
+               "numerical issues (tollerances)";
         throw string(
             "Error in Game::EPEC::iterativeNash: Not solved but no deviation!");
       }

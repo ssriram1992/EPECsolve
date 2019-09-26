@@ -221,7 +221,7 @@ private:
 public: // Attributes
   const unsigned int &nCountries{
       nCountr}; ///< Constant attribute for number of leaders in the EPEC
-  const unsigned int &nVarEPEC{
+  const unsigned int nVarEPEC{
       this->getnVarinEPEC()}; ///< Constant attribute for number of variables in
                               ///< the EPEC
   bool indicators = {
