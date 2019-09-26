@@ -406,6 +406,7 @@ enum class EPECalgorithm {
                      ///< iterations
 };
 
+
 /// @brief Stores the configuration for EPEC algorithms
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
@@ -431,9 +432,10 @@ struct EPECStatistics {
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
           ///< leader (country)
   double wallClockTime = {0};
-  EPECAlgorithmParams AlgorithmParam = {}; ///< Stores the configuration for the EPEC algorithm employed in the instance.
+  EPECAlgorithmParams AlgorithmParam =
+      {}; ///< Stores the configuration for the EPEC algorithm employed in the
+          ///< instance.
 };
-
 
 class EPEC {
 private:
@@ -564,6 +566,12 @@ public:                  // functions
   void setAlgorithm(Game::EPECalgorithm algorithm);
   virtual Game::EPECalgorithm getAlgorithm() const final {
     return this->Stats.AlgorithmParam.algorithm;
+  }
+  void setAggressiveness(unsigned int a) {
+    this->Stats.AlgorithmParam.aggressiveness = a;
+  }
+  virtual unsigned int getAggressiveness() const final {
+    return this->Stats.AlgorithmParam.aggressiveness;
   }
 
   /// Get the Game::LCP object solved in the last iteration either to solve the

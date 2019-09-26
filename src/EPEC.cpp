@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char **argv) {
   string resFile, instanceFile = "", logFile;
-  int writeLevel, nThreads, verbosity, bigM, algorithm;
+  int writeLevel, nThreads, verbosity, bigM, algorithm, aggressiveness;
   double timeLimit;
 
   po::options_description desc("EPEC: Allowed options");
@@ -43,7 +43,10 @@ int main(int argc, char **argv) {
       "Replaces indicator constraints with bigM.")(
       "threads,t", po::value<int>(&nThreads)->default_value(1),
       "Sets the number of Threads for Gurobi. (int): number of threads. 0: "
-      "auto (number of processors)");
+      "auto (number of processors)")(
+      "aggr,ag", po::value<int>(&aggressiveness)->default_value(1),
+      "Sets the aggressiveness for the innerApproximation, namely the number "
+      "of random polyhedra added if no deviation is found. (int).");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -121,9 +124,12 @@ int main(int argc, char **argv) {
   // Algorithm
 
   switch (algorithm) {
-  case 1:
+  case 1: {
     epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+    if (aggressiveness != 1)
+      epec.setAggressiveness(aggressiveness);
     break;
+  }
   default:
     epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   }

@@ -1557,7 +1557,9 @@ void Game::EPEC::iterativeNash() {
                             << to_string(++this->Stats.numIteration);
 
     if (addRandPoly) {
-      bool success = this->addRandomPoly2All(3, this->Stats.numIteration == 1);
+      bool success =
+          this->addRandomPoly2All(this->Stats.AlgorithmParam.aggressiveness,
+                                  this->Stats.numIteration == 1);
       if (!success) {
         this->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
         solved = true;
@@ -1790,9 +1792,9 @@ std::string std::to_string(const Game::EPECalgorithm al) {
 }
 std::string std::to_string(const Game::EPECAlgorithmParams al) {
   std::stringstream ss;
-  ss<<"Algorithm: "<< to_string(al.algorithm)<<'\n';
-  ss << "Time Limit: "<< al.timeLimit<<'\n';
+  ss << "Algorithm: " << to_string(al.algorithm) << '\n';
+  ss << "Time Limit: " << al.timeLimit << '\n';
   ss << "Use Indicators? " << std::boolalpha << al.indicators << '\n';
-  ss << "Aggressiveness: "<<al.aggressiveness;
+  ss << "Aggressiveness: " << al.aggressiveness;
   return ss.str();
 }
