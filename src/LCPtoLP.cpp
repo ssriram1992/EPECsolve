@@ -184,10 +184,12 @@ void Game::LCP::makeRelaxed()
   try {
     if (this->madeRlxdModel)
       return;
-    GRBVar x[nC], z[nR];
     BOOST_LOG_TRIVIAL(trace)
         << "Game::LCP::makeRelaxed: Creating a model with : " << nR
         << " variables and  " << nC << " constraints";
+    GRBVar x[nC], z[nR];
+    BOOST_LOG_TRIVIAL(trace)
+        << "Game::LCP::makeRelaxed: Initializing variables";
     for (unsigned int i = 0; i < nC; i++)
       x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS,
                               "x_" + to_string(i));
@@ -968,7 +970,7 @@ bool Game::LCP::FixToPoly(
       {
         BOOST_LOG_TRIVIAL(trace)
             << "Game::LCP::FixToPoly: Detected infeasibility of " << FixNumber
-            << " " << model.get(GRB_IntAttr_Status);
+            << " (GRB_STATUS=" << model.get(GRB_IntAttr_Status) << ")";
         knownInfeas.insert(FixNumber);
       }
     } catch (const char *e) {
