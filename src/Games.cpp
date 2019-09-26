@@ -1698,26 +1698,31 @@ void Game::EPEC::findNashEq() {
    * appropriate algorithm wrappers.
    */
 
+  std::stringstream final_msg;
   if (!this->finalized)
     throw string("Error in Game::EPEC::iterativeNash: Object not yet "
-                 "finalized. Screw you");
+                 "finalized. ");
+
+  if (this->Stats.status != Game::EPECsolveStatus::unInitialized) {
+    BOOST_LOG_TRIVIAL(error)
+        << "Game::EPEC::findNashEq: a Nash Eq was "
+           "already found. Calling this findNashEq might lead to errors!";
+    this->resetLCP();
+  }
 
   this->Stats.algorithm = this->algorithm;
+
+  bool foundNash;
   // Choosing the appropriate algorithm
   switch (this->algorithm) {
+
   case Game::EPECalgorithm::innerApproximation:
-    if (this->Stats.status != Game::EPECsolveStatus::unInitialized) {
-      BOOST_LOG_TRIVIAL(warning)
-          << "Game::EPEC::findNashEq: a Nash Eq was "
-             "already found. Calling this findNashEq might lead to errors!";
-      this->resetLCP();
-    }
+    final_msg << "Inner approximation algorithm complete. ";
     this->iterativeNash();
-    BOOST_LOG_TRIVIAL(info)
-        << "Game::EPEC::findNashEq: iterativeNash terminated "
-        << static_cast<int>(this->Stats.status);
     break;
+
   case Game::EPECalgorithm::fullEnumeration:
+    final_msg << "Full enumeration algorithm complete. ";
     for (unsigned int i = 0; i < this->nCountr; ++i)
       this->countries_LCP.at(i)->EnumerateAll(true);
     this->make_country_QP();
@@ -1732,24 +1737,23 @@ void Game::EPEC::findNashEq() {
     this->Stats.numConstraints = this->lcpmodel->get(GRB_IntAttr_NumConstrs);
     this->Stats.numNonZero = this->lcpmodel->get(GRB_IntAttr_NumNZs);
   } // Assigning appropriate status messages after solving
+
   switch (this->Stats.status) {
   case Game::EPECsolveStatus::nashEqNotFound:
-    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: no Nash "
-                               "equilibrium found (infeasibility).";
+    final_msg << "No Nash equilibrium exists. ";
     break;
   case Game::EPECsolveStatus::nashEqFound:
-    BOOST_LOG_TRIVIAL(info)
-        << "Game::EPEC::findNashEq: a Nash equilibrium has been found.";
+    final_msg << "Found a Nash equilibrium. ";
 
     break;
   case Game::EPECsolveStatus::timeLimit:
-    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: timelimit triggered.";
+    final_msg << "Nash equilibrium not found. Time limit attained";
     break;
   default:
-    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: no Nash "
-                               "equilibrium found (timeLimit).";
+    final_msg << "Nash equilibrium not found. Time limit attained";
     break;
   }
+  BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: " << final_msg.str();
 }
 
 void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
