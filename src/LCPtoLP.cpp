@@ -1054,8 +1054,8 @@ Game::LCP &Game::LCP::FixToPolies(
 
 unsigned int Game::LCP::getNextPoly() const {
   /**
-   * Returns a polyhedron (in its +1/-1 encoding) that is neither already known
-   * to be infeasible, nor already added in the inner approximation
+   * Returns a polyhedron (in its decimal encoding) that is neither already
+   * known to be infeasible, nor already added in the inner approximation
    * representation.
    */
   std::set<unsigned int> processedPoly{};

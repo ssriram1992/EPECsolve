@@ -1550,9 +1550,8 @@ void Game::EPEC::iterativeNash() {
   if (this->Stats.AlgorithmParam.timeLimit > 0)
     initTime = std::chrono::high_resolution_clock::now();
 
-  // While problem is not solved and we do not get infeasability in any of the
-  // LCP
-  // If for two iterations we do not add at least one polyhedron, abort.
+  // Stay in this loop, till you find a Nash equilibrium or prove that there
+  // does not exist a Nash equilibrium or you run out of time.
   while (!solved) {
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Iteration "
                             << to_string(++this->Stats.numIteration);
