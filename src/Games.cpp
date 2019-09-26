@@ -1548,7 +1548,6 @@ void Game::EPEC::iterativeNash() {
   if (this->timeLimit > 0)
     initTime = std::chrono::high_resolution_clock::now();
 
-
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
   // If for two iterations we do not add at least one polyhedron, abort.
@@ -1600,8 +1599,8 @@ void Game::EPEC::iterativeNash() {
       cout << "Country " << i;
       this->countries_LCP.at(i)->print_feas_detail();
     }
-    //This might be reached when a NashEq is found, and need to be verified.
-    //Anyway, we are over the timeLimit and we should stop
+    // This might be reached when a NashEq is found, and need to be verified.
+    // Anyway, we are over the timeLimit and we should stop
     if (this->timeLimit > 0) {
       const std::chrono::duration<double> timeElapsed =
           std::chrono::high_resolution_clock::now() - initTime;
@@ -1770,5 +1769,15 @@ std::string std::to_string(const Game::EPECsolveStatus st) {
     return string("UNINITIALIZED");
   default:
     return string("UNKNOWN_STATUS_") + to_string(static_cast<int>(st));
+  }
+}
+std::string std::to_string(const Game::EPECalgorithm al) {
+  switch (al) {
+  case EPECalgorithm::fullEnumeration:
+    return string("fullEnumeration");
+  case EPECalgorithm::innerApproximation:
+    return string("innerApproximation");
+  default:
+    return string("UNKNOWN_ALGORITHM_") + to_string(static_cast<int>(al));
   }
 }

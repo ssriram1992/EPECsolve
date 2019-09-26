@@ -549,6 +549,9 @@ public:                  // functions
     return this->nVarinEPEC;
   }
   void setAlgorithm(Game::EPECalgorithm algorithm);
+  virtual Game::EPECalgorithm getAlgorithm() const final {
+    return this->algorithm;
+  }
 
   /// Get the Game::LCP object solved in the last iteration either to solve the
   /// problem or to prove non-existence of Nash equilibrium. Object is returned
@@ -563,7 +566,8 @@ public:                  // functions
 
 namespace std {
 string to_string(const Game::EPECsolveStatus st);
-};
+string to_string(const Game::EPECalgorithm al);
+}; // namespace std
 
 /* Example for QP_Param */
 /**

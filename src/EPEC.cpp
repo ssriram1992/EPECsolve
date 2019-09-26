@@ -157,22 +157,24 @@ int main(int argc, char **argv) {
   ifstream existCheck(logFile);
   std::ofstream results(logFile, ios::app);
   if (!existCheck.good()) {
-    results << "Instance;Countries;Followers;Status;numFeasiblePolyhedra;"
-               "numVar;numConstraints;numNonZero;ClockTime"
-               "(s);Threads;Indicators\n";
+    results
+        << "Instance;Algorithm;Countries;Followers;Status;numFeasiblePolyhedra;"
+           "numVar;numConstraints;numNonZero;ClockTime"
+           "(s);Threads;Indicators\n";
   }
   existCheck.close();
   stringstream PolyT;
   copy(stat.feasiblePolyhedra.begin(), stat.feasiblePolyhedra.end(),
        ostream_iterator<int>(PolyT, " "));
 
-  results << instanceFile << ";" << to_string(Instance.Countries.size())
-          << ";[";
+  results << instanceFile << ";" << to_string(epec.getAlgorithm()) << ";"
+          << Instance.Countries.size() << ";[";
   for (auto &Countrie : Instance.Countries)
     results << " " << Countrie.n_followers;
   results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];"
           << stat.numVar << ";" << stat.numConstraints << ";" << stat.numNonZero
-          << ";" << WallClockTime << ";" << realThreads << ";" << to_string(epec.indicators) << "\n";
+          << ";" << WallClockTime << ";" << realThreads << ";"
+          << to_string(epec.indicators) << "\n";
   results.close();
 
   return EXIT_SUCCESS;
