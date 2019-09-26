@@ -145,7 +145,8 @@ int main(int argc, char **argv) {
   }
   auto time_stop = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> time_diff = time_stop - time_start;
-  double CPUTime = time_diff.count();
+  double WallClockTime = time_diff.count();
+  int realThreads = nThreads > 0 ? env.get(GRB_IntParam_Threads) : nThreads;
 
   // --------------------------------
   // WRITING STATISTICS AND SOLUTION
@@ -157,8 +158,8 @@ int main(int argc, char **argv) {
   std::ofstream results(logFile, ios::app);
   if (!existCheck.good()) {
     results << "Instance;Countries;Followers;Status;numFeasiblePolyhedra;"
-               "numVar;numConstraints;numNonZero;CPUTime "
-               "(ms);Threads;Indicators\n";
+               "numVar;numConstraints;numNonZero;ClockTime"
+               "(s);Threads;Indicators\n";
   }
   existCheck.close();
   stringstream PolyT;
@@ -168,12 +169,10 @@ int main(int argc, char **argv) {
   results << instanceFile << ";" << to_string(Instance.Countries.size())
           << ";[";
   for (auto &Countrie : Instance.Countries)
-    results << " " << to_string(Countrie.n_followers);
+    results << " " << Countrie.n_followers;
   results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];"
-          << to_string(stat.numVar) << ";" << to_string(stat.numConstraints)
-          << ";" << to_string(stat.numNonZero) << ";" << to_string(CPUTime)
-          << ";" << to_string(nThreads) << ";" << to_string(epec.indicators)
-          << "\n";
+          << stat.numVar << ";" << stat.numConstraints << ";" << stat.numNonZero
+          << ";" << WallClockTime << ";" << realThreads << ";" << to_string(epec.indicators) << "\n";
   results.close();
 
   return EXIT_SUCCESS;

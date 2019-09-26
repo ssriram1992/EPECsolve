@@ -1544,6 +1544,11 @@ void Game::EPEC::iterativeNash() {
   bool addRandPoly{false};
   this->Stats.numIteration = 0;
 
+  std::chrono::high_resolution_clock::time_point initTime;
+  if (this->timeLimit > 0)
+    initTime = std::chrono::high_resolution_clock::now();
+
+
   // While problem is not solved and we do not get infeasability in any of the
   // LCP
   // If for two iterations we do not add at least one polyhedron, abort.
@@ -1578,13 +1583,34 @@ void Game::EPEC::iterativeNash() {
       }
     }
     this->make_country_QP();
-    addRandPoly = !this->computeNashEq();
+
+    // TimeLimit
+    if (this->timeLimit > 0) {
+      const std::chrono::duration<double> timeElapsed =
+          std::chrono::high_resolution_clock::now() - initTime;
+      const double timeRemaining = this->timeLimit - timeElapsed.count();
+      addRandPoly = !this->computeNashEq(timeRemaining);
+    } else {
+      // No Time Limit
+      addRandPoly = !this->computeNashEq();
+    }
     // this->lcp->save("dat/LCP_alg.dat");
     this->lcpmodel->write("dat/lcpmodel_alg.lp");
     for (unsigned int i = 0; i < this->nCountr; ++i) {
       cout << "Country " << i;
       this->countries_LCP.at(i)->print_feas_detail();
-      cout << "\n\n";
+    }
+    //This might be reached when a NashEq is found, and need to be verified.
+    //Anyway, we are over the timeLimit and we should stop
+    if (this->timeLimit > 0) {
+      const std::chrono::duration<double> timeElapsed =
+          std::chrono::high_resolution_clock::now() - initTime;
+      const double timeRemaining = this->timeLimit - timeElapsed.count();
+      if (timeRemaining <= 0) {
+        solved = false;
+        this->Stats.status = Game::EPECsolveStatus::timeLimit;
+        return;
+      }
     }
   }
 }
@@ -1712,6 +1738,9 @@ void Game::EPEC::findNashEq() {
     BOOST_LOG_TRIVIAL(info)
         << "Game::EPEC::findNashEq: a Nash equilibrium has been found.";
 
+    break;
+  case Game::EPECsolveStatus::timeLimit:
+    BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: timelimit triggered.";
     break;
   default:
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: no Nash "
