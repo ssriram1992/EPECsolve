@@ -105,7 +105,7 @@ private:
                    bool custom = false, spmat_Vec *custAi = {},
                    vec_Vec *custbi = {});
 
-  unsigned int getNextPoly() const;
+  unsigned int getNextPoly(Game::EPECAddPolyMethod method) const;
 
 public:
   // Fudgible data
@@ -220,7 +220,9 @@ public:
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
 
   std::set<std::vector<short int>>
-  addAPoly(unsigned int nPoly = 1, std::set<std::vector<short int>> Polys = {});
+  addAPoly(unsigned int nPoly = 1,
+           Game::EPECAddPolyMethod method = Game::EPECAddPolyMethod::sequential,
+           std::set<std::vector<short int>> Polys = {});
   LCP &addPolyFromX(const arma::vec &x, bool &ret);
   LCP &EnumerateAll(bool solveLP = true);
   std::string feas_detail_str() const;

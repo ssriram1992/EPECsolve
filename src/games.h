@@ -406,13 +406,25 @@ enum class EPECalgorithm {
                      ///< iterations
 };
 
+/// @brief Stores the configuration for EPEC algorithms
+struct EPECAlgorithmParams {
+  Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
+  Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
+  bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
+  ///< Uses @p bigM if @p false.
+  double timeLimit{
+      -1}; ///< Controls the timelimit for solve in Game::EPEC::findNashEq
+  unsigned int aggressiveness{
+      1}; ///< Controls the number of random polyhedra added at each iteration
+  ///< in EPEC::iterativeNash
+};
+
 /// @brief Stores statistics for a (solved) EPEC instance
 struct EPECStatistics {
   Game::EPECsolveStatus status = Game::EPECsolveStatus::unInitialized;
   int numVar = {-1};       ///< Number of variables in findNashEq model
   int numIteration = {-1}; ///< Number of iteration of the algorithm (not valid
                            ///< for fullEnumeration)
-  Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   int numConstraints = {-1}; ///< Number of constraints in findNashEq model
   int numNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
                          ///< matrix of findNashEq model
@@ -420,6 +432,9 @@ struct EPECStatistics {
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
           ///< leader (country)
   double wallClockTime = {0};
+  EPECAlgorithmParams AlgorithmParam =
+      {}; ///< Stores the configuration for the EPEC algorithm employed in the
+          ///< instance.
 };
 
 class EPEC {
@@ -550,7 +565,19 @@ public:                  // functions
   }
   void setAlgorithm(Game::EPECalgorithm algorithm);
   virtual Game::EPECalgorithm getAlgorithm() const final {
-    return this->algorithm;
+    return this->Stats.AlgorithmParam.algorithm;
+  }
+  void setAggressiveness(unsigned int a) {
+    this->Stats.AlgorithmParam.aggressiveness = a;
+  }
+  virtual unsigned int getAggressiveness() const final {
+    return this->Stats.AlgorithmParam.aggressiveness;
+  }
+  void setAddPolyMethod(Game::EPECAddPolyMethod add) {
+    this->Stats.AlgorithmParam.addPolyMethod = add;
+  }
+  virtual Game::EPECAddPolyMethod getAddPolyMethod() const final {
+    return this->Stats.AlgorithmParam.addPolyMethod;
   }
 
   /// Get the Game::LCP object solved in the last iteration either to solve the
@@ -567,6 +594,8 @@ public:                  // functions
 namespace std {
 string to_string(const Game::EPECsolveStatus st);
 string to_string(const Game::EPECalgorithm al);
+string to_string(const Game::EPECAlgorithmParams al);
+string to_string(const Game::EPECAddPolyMethod add);
 }; // namespace std
 
 /* Example for QP_Param */
