@@ -130,7 +130,7 @@ price_limit = price_limit > a*1.05? a * price_lim:price_limit;
 price_limit = (price_limit < 0)? a*price_lim:price_limit;
 */
   price_limit = price_lim * a;
-  unsigned int tax_paradigm = intRandom(give) % (lincos.size() - 2) % 3;
+  unsigned int tax_paradigm = intRandom(give) % 3;
   unsigned int tax_revenue = binaryRandom(give);
 
   Models::LeadAllPar Country(F.capacities.size(),
