@@ -1,4 +1,4 @@
-#include "test/epectests.h"
+#include "epectests.h"
 
 unsigned int n_c;
 arma::vec devn;
@@ -1810,3 +1810,266 @@ BOOST_AUTO_TEST_CASE(C2F2_test2) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+Models::FollPar FP_Rosso() {
+  Models::FollPar FP_Rosso;
+  FP_Rosso.capacities = {550};
+  FP_Rosso.costs_lin = {200};
+  FP_Rosso.costs_quad = {0.3};
+  FP_Rosso.emission_costs = {275};
+  FP_Rosso.tax_caps = {100};
+  FP_Rosso.names = {"Rosso"};
+  return FP_Rosso;
+}
+
+Models::FollPar FP_Bianco() {
+  Models::FollPar FP_Bianco;
+  FP_Bianco.capacities = {30};
+  FP_Bianco.costs_lin = {225};
+  FP_Bianco.costs_quad = {0.2};
+  FP_Bianco.emission_costs = {100};
+  FP_Bianco.tax_caps = {100};
+  FP_Bianco.names = {"Bianco"};
+  return FP_Bianco;
+}
+
+Models::FollPar FP_C3F1() {
+  Models::FollPar FP_C3F1;
+  FP_C3F1.capacities = {550};
+  FP_C3F1.costs_lin = {140};
+  FP_C3F1.costs_quad = {0.3};
+  FP_C3F1.emission_costs = {15};
+  FP_C3F1.tax_caps = {100};
+  FP_C3F1.names = {"C3F1 Rosso"};
+  return FP_C3F1;
+}
+
+Models::FollPar OneGas() {
+  Models::FollPar OneGas;
+  OneGas.capacities = {100};
+  OneGas.costs_lin = {130};
+  OneGas.costs_quad = {0.5};
+  OneGas.emission_costs = {6};
+  OneGas.tax_caps = {100};
+  OneGas.names = {"OneGas"};
+  return OneGas;
+}
+
+Models::FollPar OneCoal() {
+  Models::FollPar OneCoal;
+  OneCoal.capacities = {150};
+  OneCoal.costs_lin = {120};
+  OneCoal.costs_quad = {0.3};
+  OneCoal.emission_costs = {10};
+  OneCoal.tax_caps = {100};
+  OneCoal.names = {"OneCoal"};
+  return OneCoal;
+}
+
+Models::FollPar OneSolar() {
+  Models::FollPar OneSolar;
+  OneSolar.capacities = {80};
+  OneSolar.costs_lin = {140};
+  OneSolar.costs_quad = {0.9};
+  OneSolar.emission_costs = {1};
+  OneSolar.tax_caps = {100};
+  OneSolar.names = {"OneSolar"};
+  return OneSolar;
+}
+
+arma::sp_mat TranspCost(unsigned int n) {
+  arma::sp_mat TrCo(n, n);
+  for (unsigned int i = 0; i < n; ++i) {
+    for (unsigned int j = i; j < n; ++j) {
+      TrCo(i, j) = j - i;
+      TrCo(j, i) = j - i;
+    }
+  }
+  return TrCo;
+}
+
+Models::LeadAllPar LAP_LowDem(Models::FollPar followers, Models::LeadPar leader,
+                              std::string a) {
+  return Models::LeadAllPar(followers.capacities.size(),
+                            "Low demand country " + a, followers, {300, 0.7},
+                            leader);
+}
+
+Models::LeadAllPar LAP_HiDem(Models::FollPar followers, Models::LeadPar leader,
+                             std::string a) {
+  return Models::LeadAllPar(followers.capacities.size(),
+                            "High demand country " + a, followers, {350, 0.5},
+                            leader);
+}
+
+testInst CH_S_F0_CL_SC_F0() {
+  // Problem
+  testInst inst;
+  inst.instance.Countries = {
+      LAP_HiDem(OneSolar(), {-1, -1, 300, false, 0}),
+      LAP_LowDem(OneSolar() + OneCoal(), {-1, -1, 300, false, 0})};
+  inst.instance.TransportationCosts = TranspCost(2);
+
+  // Solution
+  inst.solution.push_back(countrySol{{80}, {48}, 0, 20, 4.48});
+  inst.solution.push_back(countrySol{{67.25, 27.60}, {0, 100}, 20, 0, 3.48});
+
+  return inst;
+}
+
+testInst HardToEnum_1() {
+  // Problem
+  testInst inst;
+  Models::LeadAllPar Country0(2, "One", FP_Rosso() + FP_Bianco(), {300, 0.7},
+                              {-1, -1, 295, false, 0});
+  Models::LeadAllPar Country1(2, "Two", FP_Rosso() + FP_Bianco(), {325, 0.5},
+                              {-1, -1, 285, false, 0});
+  Models::LeadAllPar Country2(2, "Three", FP_Rosso() + FP_Bianco(), {350, 0.5},
+                              {-1, -1, 295, false, 0});
+  arma::sp_mat TrCo(3, 3);
+  TrCo.zeros(3, 3);
+  TrCo(0, 1) = 1;
+  TrCo(1, 0) = TrCo(0, 1);
+  TrCo(0, 2) = 2;
+  TrCo(2, 0) = TrCo(0, 2);
+  TrCo(1, 2) = 1.5;
+  TrCo(2, 1) = TrCo(1, 2);
+  inst.instance.Countries = {Country0, Country1, Country2};
+  inst.instance.TransportationCosts = TrCo;
+
+  // Solution
+  inst.solution.push_back(countrySol{{0, 30}, {95, 43}, 22.86, 0, 274});
+  inst.solution.push_back(
+      countrySol{{27.14, 30}, {63.29, 39}, 0, 22.86, 273.50});
+  inst.solution.push_back(countrySol{{80, 30}, {31, 49}, 0, 0, 273.50});
+
+  return inst;
+}
+
+testInst HardToEnum_2() {
+  // Problem
+  testInst inst;
+  Models::LeadAllPar Country0(2, "One", FP_Rosso() + FP_Bianco(), {300, 0.7},
+                              {-1, -1, 295, false, 0});
+  Models::LeadAllPar Country1(2, "Two", FP_Rosso() + FP_Bianco(), {325, 0.5},
+                              {-1, -1, 285, false, 1});
+  Models::LeadAllPar Country2(2, "Three", FP_Rosso() + FP_Bianco(), {350, 0.5},
+                              {-1, -1, 295, false, 2});
+  arma::sp_mat TrCo(3, 3);
+  TrCo.zeros(3, 3);
+  TrCo(0, 1) = 1;
+  TrCo(1, 0) = TrCo(0, 1);
+  TrCo(0, 2) = 2;
+  TrCo(2, 0) = TrCo(0, 2);
+  TrCo(1, 2) = 1.5;
+  TrCo(2, 1) = TrCo(1, 2);
+  inst.instance.Countries = {Country0, Country1, Country2};
+  inst.instance.TransportationCosts = TrCo;
+
+  // Solution
+  inst.solution.push_back(countrySol{{0, 30}, {95, 43}, 22.86, 0, 273});
+  inst.solution.push_back(
+      countrySol{{54, 26}, {41.80, 41.80}, 0, 0, 273.50});
+  inst.solution.push_back(countrySol{{57.14, 30}, {0.18, 0.18}, 0, 22.86, 272.00});
+
+  return inst;
+}
+
+std::vector<Game::EPECAlgorithmParams> allAlgo() {
+  std::vector<Game::EPECAlgorithmParams> algs;
+  Game::EPECAlgorithmParams alg;
+  alg.algorithm = Game::EPECalgorithm::fullEnumeration;
+  // algs.push_back(alg);
+
+  for (int i = 0; i < 2; i++) {
+    Game::EPECAlgorithmParams alg_in;
+    alg_in.algorithm = Game::EPECalgorithm::innerApproximation;
+    alg_in.addPolyMethod = static_cast<Game::EPECAddPolyMethod>(i);
+    for (int j = 1; j < 10; j += 3) {
+      alg_in.aggressiveness = j;
+      algs.push_back(alg_in);
+    }
+  }
+  return algs;
+}
+
+void testEPECInstance(const testInst inst,
+                      const std::vector<Game::EPECAlgorithmParams> algorithms) {
+
+  BOOST_TEST_MESSAGE("*** NEW INSTANCE ***");
+  for (auto const algorithm : algorithms) {
+    std::stringstream ss;
+    ss << "Algorithm: " << std::to_string(algorithm.algorithm);
+    if (algorithm.algorithm == Game::EPECalgorithm::innerApproximation) {
+      ss << "\nAggressiveness: " << algorithm.aggressiveness;
+      ss << "\nMethod to add polyhedra: "
+         << std::to_string(algorithm.addPolyMethod);
+    }
+    BOOST_TEST_MESSAGE(ss.str());
+    GRBEnv env;
+    Models::EPEC epec(&env);
+    const unsigned int nCountr = inst.instance.Countries.size();
+    for (unsigned int i = 0; i < nCountr; i++)
+      epec.addCountry(inst.instance.Countries.at(i)); 
+        epec.addTranspCosts(inst.instance.TransportationCosts);
+    epec.finalize();
+
+    epec.setAlgorithm(algorithm.algorithm);
+    epec.setAggressiveness(algorithm.aggressiveness);
+    epec.setAddPolyMethod(algorithm.addPolyMethod);
+
+  const std::chrono::high_resolution_clock::time_point initTime = std::chrono::high_resolution_clock::now();
+    epec.findNashEq();
+  const std::chrono::duration<double> timeElapsed = std::chrono::high_resolution_clock::now() - initTime;
+
+    // Checking
+    for (unsigned int i = 0; i < nCountr; i++) {
+      const auto countryAns = inst.solution.at(i);
+      BOOST_TEST_MESSAGE("Country " + inst.instance.Countries.at(i).name);
+      for (unsigned int j=0; j < countryAns.foll_prod.size(); j++) {
+        // Follower production
+        BOOST_CHECK_CLOSE(
+            epec.getx().at(
+                epec.getPosition(i, Models::LeaderVars::FollowerStart) + j),
+            countryAns.foll_prod.at(j), 1);
+        // Tax
+        BOOST_WARN_CLOSE(
+            epec.getx().at(epec.getPosition(i, Models::LeaderVars::Tax) + j),
+            countryAns.foll_tax.at(j), 1);
+      }
+      // Export
+      BOOST_CHECK_CLOSE(
+          epec.getx().at(epec.getPosition(i, Models::LeaderVars::NetExport)),
+          countryAns.export_, 1);
+      // Import
+      BOOST_CHECK_CLOSE(
+          epec.getx().at(epec.getPosition(i, Models::LeaderVars::NetImport)),
+          countryAns.import, 1);
+      // Export price
+      double exportPrice{epec.getx().at(
+          epec.getPosition(nCountr - 1, Models::LeaderVars::End) + i)};
+      BOOST_WARN_CLOSE(exportPrice, countryAns.export_price, 10);
+    }
+	ss << "\n Successfully completed running in time: " <<timeElapsed.count();
+ 	BOOST_TEST_MESSAGE(ss.str());
+  }
+}
+
+
+BOOST_AUTO_TEST_SUITE(All_Alg)
+
+BOOST_AUTO_TEST_CASE(LoggingOff) {
+  boost::log::core::get()->set_filter(boost::log::trivial::severity >=
+                                      boost::log::trivial::info);
+}
+
+BOOST_AUTO_TEST_CASE(Instance1)
+{
+	testEPECInstance(CH_S_F0_CL_SC_F0(), allAlgo());
+	testEPECInstance(HardToEnum_1(), allAlgo());
+	testEPECInstance(HardToEnum_2(), allAlgo());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
