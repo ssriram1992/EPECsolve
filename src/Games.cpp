@@ -1714,7 +1714,6 @@ void Game::EPEC::findNashEq() {
     this->resetLCP();
   }
 
-  bool foundNash;
   // Choosing the appropriate algorithm
   switch (this->Stats.AlgorithmParam.algorithm) {
 

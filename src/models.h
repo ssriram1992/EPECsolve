@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 
+
 namespace Models {
 typedef struct FollPar FollPar;
 typedef struct DemPar DemPar;
@@ -29,17 +30,16 @@ struct FollPar {
       {}; ///< Emission costs for unit quantity of the fuel. Emission costs
           ///< feature only on the leader's problem
   std::vector<double> tax_caps = {}; ///< Individual tax caps for each follower.
-  std::vector<string> names = {};    ///< Optional Names for the Followers.
+  std::vector<std::string> names = {};    ///< Optional Names for the Followers.
   FollPar(std::vector<double> costs_quad_ = {},
           std::vector<double> costs_lin_ = {},
           std::vector<double> capacities_ = {},
           std::vector<double> emission_costs_ = {},
-          std::vector<double> tax_caps_ = {}, std::vector<string> names_ = {})
+          std::vector<double> tax_caps_ = {}, std::vector<std::string> names_ = {})
       : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
         emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
 };
 
-FollPar operator+(const FollPar &F1, const FollPar &F2);
 
 /// @brief Stores the parameters of the demand curve in a country model
 struct DemPar {
@@ -64,6 +64,10 @@ struct LeadPar {
                                     ///< for carbon tax
   bool tax_revenue = false; ///< Dictates whether the leader objective will
                             ///< include tax revenues
+  // LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
+          // bool tax_revenue = false, Models::TaxType tax_type_ = Models::TaxType::StandardTax)
+      // : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit},tax_type{tax_type_}, 
+        // tax_revenue{tax_revenue} {}
   LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
           bool tax_revenue = false, unsigned int tax_type_ = 0)
       : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit},
@@ -87,11 +91,11 @@ struct LeadPar {
 /// @brief Stores the parameters of a country model
 struct LeadAllPar {
   unsigned int n_followers;           ///< Number of followers in the country
-  string name;                        ///< Country Name
+  std::string name;                        ///< Country Name
   Models::FollPar FollowerParam = {}; ///< A struct to hold Follower Parameters
   Models::DemPar DemandParam = {};    ///< A struct to hold Demand Parameters
   Models::LeadPar LeaderParam = {};   ///< A struct to hold Leader Parameters
-  LeadAllPar(unsigned int n_foll, string name, Models::FollPar FP = {},
+  LeadAllPar(unsigned int n_foll, std::string name, Models::FollPar FP = {},
              Models::DemPar DP = {}, Models::LeadPar LP = {})
       : n_followers{n_foll}, name{name}, FollowerParam{FP}, DemandParam{DP},
         LeaderParam{LP} {
@@ -104,17 +108,17 @@ struct EPECInstance {
   std::vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
   arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
 
-  EPECInstance(string filename) {
+  EPECInstance(std::string filename) {
     this->load(filename);
   } ///< Constructor from instance file
   EPECInstance(std::vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_)
       : Countries{Countries_}, TransportationCosts{Transp_} {}
   ///< Constructor from instance objects
 
-  void load(string filename);
+  void load(std::string filename);
   ///< Reads the EPECInstance from a file
 
-  void save(string filename);
+  void save(std::string filename);
   ///< Writes the EPECInstance from a file
 };
 
@@ -131,19 +135,19 @@ enum class LeaderVars {
   End
 };
 
-ostream &operator<<(ostream &ost, const FollPar P);
+std::ostream &operator<<(std::ostream &ost, const FollPar P);
 
-ostream &operator<<(ostream &ost, const DemPar P);
+std::ostream &operator<<(std::ostream &ost, const DemPar P);
 
-ostream &operator<<(ostream &ost, const LeadPar P);
+std::ostream &operator<<(std::ostream &ost, const LeadPar P);
 
-ostream &operator<<(ostream &ost, const LeadAllPar P);
+std::ostream &operator<<(std::ostream &ost, const LeadAllPar P);
 
-ostream &operator<<(ostream &ost, const LeaderVars l);
+std::ostream &operator<<(std::ostream &ost, const LeaderVars l);
 
-ostream &operator<<(ostream &ost, EPECInstance I);
+std::ostream &operator<<(std::ostream &ost, EPECInstance I);
 
-using LeadLocs = map<LeaderVars, unsigned int>;
+using LeadLocs = std::map<LeaderVars, unsigned int>;
 
 void increaseVal(LeadLocs &L, const LeaderVars start, const unsigned int val,
                  const bool startnext = true);
@@ -168,7 +172,7 @@ public:
 private:
   std::vector<LeadAllPar> AllLeadPars =
       {}; ///< The parameters of each leader in the EPEC game
-  std::vector<shared_ptr<Game::QP_Param>> MC_QP =
+  std::vector<std::shared_ptr<Game::QP_Param>> MC_QP =
       {}; ///< The QP corresponding to the market clearing condition of each
           ///< player
   arma::sp_mat TranspCosts =
@@ -178,7 +182,7 @@ private:
   std::vector<LeadLocs> Locations =
       {}; ///< Location of variables for each country
 
-  map<string, unsigned int> name2nos = {};
+  std::map<std::string, unsigned int> name2nos = {};
   unsigned int taxVars = {0};
 
   bool dataCheck(const bool chkAllLeadPars = true,
@@ -214,11 +218,11 @@ private:
 
   void make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const override;
 
-  void WriteCountry(const unsigned int i, const string filename,
+  void WriteCountry(const unsigned int i, const std::string filename,
                     const arma::vec x, const bool append = true) const;
 
   void WriteFollower(const unsigned int i, const unsigned int j,
-                     const string filename, const arma::vec x) const;
+                     const std::string filename, const arma::vec x) const;
 
 public: // Attributes
   const unsigned int &nCountries{
@@ -257,31 +261,31 @@ public: // Attributes
               const LeaderVars var = LeaderVars::FollowerStart) const;
 
   unsigned int
-  getPosition(const string countryCount,
+  getPosition(const std::string countryCount,
               const LeaderVars var = LeaderVars::FollowerStart) const;
 
   EPEC &unlock();
 
-  unique_ptr<GRBModel> Respond(const string name, const arma::vec &x) const;
+  std::unique_ptr<GRBModel> Respond(const std::string name, const arma::vec &x) const;
   // Data access methods
   Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
 
   Game::LCP *playCountry(std::vector<Game::LCP *> countries);
 
   // Writing model files
-  void write(const string filename, const unsigned int i,
+  void write(const std::string filename, const unsigned int i,
              bool append = true) const;
 
-  void write(const string filename, bool append = true) const;
+  void write(const std::string filename, bool append = true) const;
 
-  void gur_WriteCountry_conv(const unsigned int i, string filename) const;
+  void gur_WriteCountry_conv(const unsigned int i, std::string filename) const;
 
-  void gur_WriteEpecMip(const unsigned int i, string filename) const;
+  void gur_WriteEpecMip(const unsigned int i, std::string filename) const;
 
-  void writeSolutionJSON(string filename, const arma::vec x,
+  void writeSolutionJSON(std::string filename, const arma::vec x,
                          const arma::vec z) const;
 
-  void writeSolution(const int writeLevel, string filename) const;
+  void writeSolution(const int writeLevel, std::string filename) const;
 
   ///@brief Get the current EPECInstance loaded
   const EPECInstance getInstance() const {
@@ -292,15 +296,16 @@ public: // Attributes
 } // namespace Models
 
 // Gurobi functions
-string to_string(const GRBVar &var);
+std::string to_string(const GRBVar &var);
 
-string to_string(const GRBConstr &cons, const GRBModel &model);
+std::string to_string(const GRBConstr &cons, const GRBModel &model);
 
 // ostream functions
 namespace Models {
 enum class prn { label, val };
 
-ostream &operator<<(ostream &ost, Models::prn l);
+std::ostream &operator<<(std::ostream &ost, Models::prn l);
 } // namespace Models
 
+Models::FollPar operator+(const Models::FollPar &F1, const Models::FollPar &F2);
 /* Examples */

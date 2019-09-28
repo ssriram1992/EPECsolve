@@ -15,6 +15,7 @@
 #include <vector>
 
 using namespace rapidjson;
+using namespace std;
 
 ostream &Models::operator<<(ostream &ost, const Models::prn l) {
   switch (l) {
@@ -163,23 +164,23 @@ Models::FollPar operator+(const Models::FollPar &F1,
   std::vector<double> cq, cl, cap, ec, tc;
   std::vector<std::string> nm;
 
-  cq.insert(cq.back(), F1.costs_quad.begin(), F1.costs_quad.end());
-  cq.insert(cq.back(), F2.costs_quad.begin(), F2.costs_quad.end());
+  cq.insert(cq.end(), F1.costs_quad.begin(), F1.costs_quad.end());
+  cq.insert(cq.end(), F2.costs_quad.begin(), F2.costs_quad.end());
 
-  cl.insert(cl.back(), F1.costs_lin.begin(), F1.costs_lin.end());
-  cl.insert(cl.back(), F2.costs_lin.begin(), F2.costs_lin.end());
+  cl.insert(cl.end(), F1.costs_lin.begin(), F1.costs_lin.end());
+  cl.insert(cl.end(), F2.costs_lin.begin(), F2.costs_lin.end());
 
-  cap.insert(cap.back(), F1.capacities.begin(), F1.capacities.end());
-  cap.insert(cap.back(), F2.capacities.begin(), F2.capacities.end());
+  cap.insert(cap.end(), F1.capacities.begin(), F1.capacities.end());
+  cap.insert(cap.end(), F2.capacities.begin(), F2.capacities.end());
 
-  ec.insert(ec.back(), F1.emission_costs.begin(), F1.emission_costs.end());
-  ec.insert(ec.back(), F2.emission_costs.begin(), F2.emission_costs.end());
+  ec.insert(ec.end(), F1.emission_costs.begin(), F1.emission_costs.end());
+  ec.insert(ec.end(), F2.emission_costs.begin(), F2.emission_costs.end());
 
-  tc.insert(tc.back(), F1.tax_caps.begin(), F1.tax_caps.end());
-  tc.insert(tc.back(), F2.tax_caps.begin(), F2.tax_caps.end());
+  tc.insert(tc.end(), F1.tax_caps.begin(), F1.tax_caps.end());
+  tc.insert(tc.end(), F2.tax_caps.begin(), F2.tax_caps.end());
 
-  nm.insert(nm.back(), F1.names.begin(), F1.names.end());
-  nm.insert(nm.back(), F2.names.begin(), F2.names.end());
+  nm.insert(nm.end(), F1.names.begin(), F1.names.end());
+  nm.insert(nm.end(), F2.names.begin(), F2.names.end());
 
   return Models::FollPar(cq, cl, cap, ec, tc, nm);
 }

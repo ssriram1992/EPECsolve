@@ -7,17 +7,16 @@
 #include <memory>
 #include <string>
 
-using namespace std;
 using namespace Game;
 
-template <class T> ostream &operator<<(ostream &ost, std::vector<T> v) {
+template <class T> std::ostream &operator<<(std::ostream &ost, std::vector<T> v) {
   for (auto elem : v)
     ost << elem << " ";
   ost << '\n';
   return ost;
 }
 
-template <class T, class S> ostream &operator<<(ostream &ost, pair<T, S> p) {
+template <class T, class S> std::ostream &operator<<(std::ostream &ost, std::pair<T, S> p) {
   ost << "<" << p.first << ", " << p.second << ">";
   return ost;
 }
@@ -133,7 +132,7 @@ public:
   virtual MP_Param &addDummy(unsigned int pars, unsigned int vars = 0,
                              int position = -1);
 
-  void write(string filename, bool append = true) const;
+  void write(std::string filename, bool append = true) const;
 
   static bool dataCheck(const QP_objective &obj, const QP_constraints &cons,
                         bool checkObj = true, bool checkCons = true);
@@ -175,7 +174,7 @@ public: // Constructors
     this->set(Q, C, A, B, c, b);
     this->size();
     if (!this->dataCheck())
-      throw string("Error in QP_Param::QP_Param: Invalid data for constructor");
+      throw std::string("Error in QP_Param::QP_Param: Invalid data for constructor");
   }
 
   /// Copy constructor
@@ -221,11 +220,11 @@ public: // Constructors
   QP_Param &addDummy(unsigned int pars, unsigned int vars = 0,
                      int position = -1) override;
 
-  void write(string filename, bool append) const;
+  void write(std::string filename, bool append) const;
 
-  void save(string filename, bool erase = true) const;
+  void save(std::string filename, bool erase = true) const;
 
-  long int load(string filename, long int pos = 0);
+  long int load(std::string filename, long int pos = 0);
 };
 
 /**
@@ -247,7 +246,7 @@ private:
   arma::sp_mat LeaderConstraints; ///< Upper level leader constraints LHS
   arma::vec LeaderConsRHS;        ///< Upper level leader constraints RHS
   unsigned int Nplayers;          ///< Number of players in the Nash Game
-  std::vector<shared_ptr<QP_Param>> Players; ///< The QP that each player solves
+  std::vector<std::shared_ptr<QP_Param>> Players; ///< The QP that each player solves
   arma::sp_mat MarketClearing;               ///< Market clearing constraints
   arma::vec MCRHS; ///< RHS to the Market Clearing constraints
 
@@ -271,7 +270,7 @@ public: // Constructors
   NashGame(GRBEnv *e)
       : env{e} {}; ///< To be used only when NashGame is being loaded from a
                    ///< file.
-  NashGame(GRBEnv *e, std::vector<shared_ptr<QP_Param>> Players,
+  NashGame(GRBEnv *e, std::vector<std::shared_ptr<QP_Param>> Players,
            arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar = 0,
            arma::sp_mat LeadA = {}, arma::vec LeadRHS = {});
 
@@ -288,23 +287,23 @@ public: // Constructors
   ~NashGame(){};
 
   // Verbose declaration
-  friend ostream &operator<<(ostream &os, const NashGame &N) {
-    os << endl;
+  friend std::ostream &operator<<(std::ostream &os, const NashGame &N) {
+    os << '\n';
     os << "--------------------------------------------------------------------"
           "---"
-       << endl;
-    os << "Nash Game with " << N.Nplayers << " players" << endl;
+       << '\n';
+    os << "Nash Game with " << N.Nplayers << " players" << '\n';
     os << "--------------------------------------------------------------------"
           "---"
-       << endl;
-    os << "Number of primal variables:\t\t\t " << N.getNprimals() << endl;
-    os << "Number of dual variables:\t\t\t " << N.getNduals() << endl;
+       << '\n';
+    os << "Number of primal variables:\t\t\t " << N.getNprimals() << '\n';
+    os << "Number of dual variables:\t\t\t " << N.getNduals() << '\n';
     os << "Number of shadow price dual variables:\t\t " << N.getNshadow()
-       << endl;
-    os << "Number of leader variables:\t\t\t " << N.getNleaderVars() << endl;
+       << '\n';
+    os << "Number of leader variables:\t\t\t " << N.getNleaderVars() << '\n';
     os << "--------------------------------------------------------------------"
           "---"
-       << endl;
+       << '\n';
     return os;
   }
 
@@ -337,8 +336,8 @@ public: // Constructors
   // Members
   const NashGame &FormulateLCP(arma::sp_mat &M, arma::vec &q, perps &Compl,
                                bool writeToFile = false,
-                               string M_name = "dat/LCP.txt",
-                               string q_name = "dat/q.txt") const;
+                               std::string M_name = "dat/LCP.txt",
+                               std::string q_name = "dat/q.txt") const;
 
   arma::sp_mat RewriteLeadCons() const;
 
@@ -350,7 +349,7 @@ public: // Constructors
   }
 
   // Check solution and correctness
-  unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec &x,
+  std::unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec &x,
                                bool fullvec = true) const;
 
   double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
@@ -369,19 +368,19 @@ public: // Constructors
 
   // Read/Write Nashgame functions
 
-  void write(string filename, bool append = true, bool KKT = false) const;
+  void write(std::string filename, bool append = true, bool KKT = false) const;
 
-  void save(string filename, bool erase = true) const;
+  void save(std::string filename, bool erase = true) const;
 
-  long int load(string filename, long int pos = 0);
+  long int load(std::string filename, long int pos = 0);
 };
 
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
 // ostream& operator<< (ostream& os, const QP_Param &Q);
 // void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
-ostream &operator<<(ostream &os, const QP_Param &Q);
+std::ostream &operator<<(std::ostream &os, const QP_Param &Q);
 
-ostream &operator<<(ostream &ost, const perps &C);
+std::ostream &operator<<(std::ostream &ost, const perps &C);
 
 void print(const perps &C);
 } // namespace Game
@@ -443,28 +442,28 @@ private:
   Game::EPECalgorithm algorithm =
       Game::EPECalgorithm::fullEnumeration; ///< Stores the type of algorithm
   ///< used by the EPEC.
-  unique_ptr<Game::LCP> lcp; ///< The EPEC nash game written as an LCP
-  unique_ptr<GRBModel>
+  std::unique_ptr<Game::LCP> lcp; ///< The EPEC nash game written as an LCP
+  std::unique_ptr<GRBModel>
       lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
   unsigned int nVarinEPEC{0};
 
 protected: // Datafields
-  std::vector<shared_ptr<Game::NashGame>> countries_LL{};
-  std::vector<unique_ptr<Game::LCP>> countries_LCP{};
+  std::vector<std::shared_ptr<Game::NashGame>> countries_LL{};
+  std::vector<std::unique_ptr<Game::LCP>> countries_LCP{};
 
   std::vector<arma::sp_mat>
       LeadConses{};                   ///< Stores each leader's constraint LHS
   std::vector<arma::vec> LeadRHSes{}; ///< Stores each leader's constraint RHS
 
-  std::vector<shared_ptr<Game::QP_Param>>
+  std::vector<std::shared_ptr<Game::QP_Param>>
       country_QP{}; ///< The QP corresponding to each player
-  std::vector<shared_ptr<Game::QP_objective>>
+  std::vector<std::shared_ptr<Game::QP_objective>>
       LeadObjec{}; ///< Objective of each leader
-  std::vector<shared_ptr<Game::QP_objective>>
+  std::vector<std::shared_ptr<Game::QP_objective>>
       LeadObjec_ConvexHull{}; ///< Objective of each leader, given the convex
                               ///< hull computation
 
-  unique_ptr<Game::NashGame> nashgame; ///< The EPEC nash game
+  std::unique_ptr<Game::NashGame> nashgame; ///< The EPEC nash game
 
   std::vector<unsigned int> LeaderLocations{}; ///< Location of each leader
   /// Number of variables in the current player, including any number of convex
@@ -547,7 +546,7 @@ public:                  // functions
   virtual void finalize() final;
   virtual void findNashEq() final;
 
-  unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
+  std::unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
   double RespondSol(arma::vec &sol, unsigned int player,
                     const arma::vec &x) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
@@ -560,7 +559,7 @@ public:                  // functions
   virtual const EPECStatistics getStatistics() const final {
     return this->Stats;
   }
-  virtual const unsigned int getnVarinEPEC() const final {
+  virtual unsigned int getnVarinEPEC() const final {
     return this->nVarinEPEC;
   }
   void setAlgorithm(Game::EPECalgorithm algorithm);

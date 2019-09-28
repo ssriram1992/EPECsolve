@@ -61,7 +61,8 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
   }
   if (instanceFile == "") {
-    cout << "-i [--input] option missing" << endl;
+    cout << "-i [--input] option missing.\n Use with --help for help on list "
+            "of arguments\n";
     return EXIT_SUCCESS;
   }
   switch (verbosity) {
@@ -105,7 +106,7 @@ int main(int argc, char **argv) {
   // --------------------------------
   Models::EPECInstance Instance(instanceFile);
   if (Instance.Countries.empty()) {
-    cerr << "Error: instance is empty" << endl;
+    cerr << "Error: instance is empty\n";
     return 1;
   }
 
