@@ -1077,7 +1077,7 @@ unsigned int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
       return maxTheoreticalPoly;
   } break;
   case Game::EPECAddPolyMethod::random: {
-    std::random_device random_device;
+    static std::random_device random_device;
     std::mt19937 engine{random_device()};
     std::uniform_int_distribution<int> dist(0, this->notProcessed.size() - 1);
     return *(std::next(this->notProcessed.begin(), dist(engine)));
