@@ -74,11 +74,11 @@ private:
 
   void makeRelaxed();
 
-  void initializeNotPorcessed(){
+  void initializeNotPorcessed() {
     const unsigned int nCompl = this->Compl.size();
     // 2^n - the number of polyhedra theoretically
     this->maxTheoreticalPoly = static_cast<unsigned int>(pow(2, nCompl));
-    for (unsigned int i = 0;  i < this->maxTheoreticalPoly; ++i)
+    for (unsigned int i = 0; i < this->maxTheoreticalPoly; ++i)
       this->notProcessed.insert(i);
   }
   /* Solving relaxations and restrictions */

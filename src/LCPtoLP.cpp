@@ -975,7 +975,7 @@ bool Game::LCP::FixToPoly(
             << "Game::LCP::FixToPoly: Detected infeasibility of " << FixNumber
             << " (GRB_STATUS=" << model.get(GRB_IntAttr_Status) << ")";
         knownInfeas.insert(FixNumber);
-         notProcessed.erase(FixNumber);
+        notProcessed.erase(FixNumber);
       }
     } catch (const char *e) {
       cerr << "Error in Game::LCP::FixToPoly: " << e << '\n';
@@ -1128,13 +1128,6 @@ Game::LCP::addAPoly(unsigned int nPoly, Game::EPECAddPolyMethod method,
     throw string(
         "Error in Game::LCP::addAPoly: nPoly reached a negative value!");
   }
-
-  // Otherwise try adding one polyhedron
-  unsigned int choice_decimal = this->getNextPoly(method);
-  cout << "adding" << choice_decimal;
-  if (choice_decimal >= maxTheoreticalPoly)
-    return Polys;
-
   // Now convert choice_decimal to binary vector representation
   auto num_to_vec = [nCompl](unsigned int number) {
     std::vector<short int> binary{};
@@ -1148,19 +1141,25 @@ Game::LCP::addAPoly(unsigned int nPoly, Game::EPECAddPolyMethod method,
     return binary;
   }; // End of num_to_vec lambda definition
 
-  const std::vector<short int> choice = num_to_vec(choice_decimal);
+  bool complete{false};
+  while (!complete){
+    unsigned int choice_decimal = this->getNextPoly(method);
+    if (choice_decimal >= maxTheoreticalPoly)
+      return Polys;
 
-  auto added = this->FixToPoly(choice, true);
-  if (added) // If choice is added to All Polyhedra
-  {
-    Polys.insert(choice); // Add it to set of added polyhedra
-    return this->addAPoly(nPoly - 1, method,
-                          Polys); // Now we have one less polyhedron to add
-  } else {
-    return this->addAPoly(
-        nPoly, method,
-        Polys); // We have to add the same number of polyhedra anyway :(
+    const std::vector<short int> choice = num_to_vec(choice_decimal);
+    auto added = this->FixToPoly(choice, true);
+    if (added) // If choice is added to All Polyhedra
+    {
+      Polys.insert(choice); // Add it to set of added polyhedra
+      if (Polys.size()==nPoly) {
+        complete= true;
+        return Polys;
+      }
+    }
   }
+  return Polys;
+
 }
 
 Game::LCP &Game::LCP::EnumerateAll(
