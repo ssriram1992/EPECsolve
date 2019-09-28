@@ -417,6 +417,8 @@ struct EPECAlgorithmParams {
   ///< Uses @p bigM if @p false.
   double timeLimit{
       -1}; ///< Controls the timelimit for solve in Game::EPEC::findNashEq
+  unsigned int threads{
+      0}; ///< Controls the number of threads Gurobi exploits. Default 0 (auto)
   unsigned int aggressiveness{
       1}; ///< Controls the number of random polyhedra added at each iteration
   ///< in EPEC::iterativeNash
@@ -574,6 +576,13 @@ public:                  // functions
   }
   virtual unsigned int getAggressiveness() const final {
     return this->Stats.AlgorithmParam.aggressiveness;
+  }
+  void setNumThreads(unsigned int t) {
+    this->Stats.AlgorithmParam.threads = t;
+    this->env->set(GRB_IntParam_Threads, t);
+  }
+  virtual unsigned int getNumThreads() const final {
+    return this->Stats.AlgorithmParam.threads;
   }
   void setAddPolyMethod(Game::EPECAddPolyMethod add) {
     this->Stats.AlgorithmParam.addPolyMethod = add;

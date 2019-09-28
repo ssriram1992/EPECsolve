@@ -114,8 +114,6 @@ int main(int argc, char **argv) {
   // TEST STARTS
   // --------------------------------
   auto time_start = std::chrono::high_resolution_clock::now();
-  GRBEnv env = GRBEnv();
-  env.set(GRB_IntParam_Threads, nThreads);
 
   // OPTIONS
   //------------
@@ -123,6 +121,8 @@ int main(int argc, char **argv) {
   // Indicator constraints
   if (bigM == 1)
     epec.indicators = 0;
+  if (nThreads != 0)
+    epec.setNumThreads(nThreads);
   // timeLimit
   epec.timeLimit = timeLimit;
   // Algorithm
