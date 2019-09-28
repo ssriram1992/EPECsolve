@@ -44,7 +44,7 @@ private:
   arma::sp_mat M; ///< M in @f$Mx+q@f$ that defines the LCP
   arma::vec q;    ///< q in @f$Mx+q@f$ that defines the LCP
   perps Compl;    ///< Compl stores data in <Eqn, Var> form.
-  unsigned int LeadStart{1}, LeadEnd{0}, nLeader{0};
+  unsigned int LeadStart{1}, LeadEnd{0}, nLeader{0}, maxTheoreticalPoly{0};
   arma::sp_mat _A = {};
   arma::vec _b = {}; ///< Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$
                      ///< Ax\le b@f$ too!
@@ -59,6 +59,8 @@ private:
       {}; ///< Decimal encoding of polyhedra that have been enumerated
   std::set<unsigned long int> knownInfeas =
       {}; ///< Decimal encoding of polyhedra known to be infeasible
+  std::set<unsigned long int> notProcessed =
+      {}; ///< Decimal encoding of polyhedra to be processed
   std::unique_ptr<spmat_Vec>
       Ai; ///< Vector to contain the LHS of inner approx polyhedra
   std::unique_ptr<vec_Vec>
@@ -72,6 +74,13 @@ private:
 
   void makeRelaxed();
 
+  void initializeNotPorcessed(){
+    const unsigned int nCompl = this->Compl.size();
+    // 2^n - the number of polyhedra theoretically
+    this->maxTheoreticalPoly = static_cast<unsigned int>(pow(2, nCompl));
+    for (unsigned int i = 0;  i < this->maxTheoreticalPoly; ++i)
+      this->notProcessed.insert(i);
+  }
   /* Solving relaxations and restrictions */
   std::unique_ptr<GRBModel> LCPasMIP(std::vector<unsigned int> FixEq = {},
                                      std::vector<unsigned int> FixVar = {},
