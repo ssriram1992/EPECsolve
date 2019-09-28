@@ -99,7 +99,7 @@ add_executable(EPEC
                src/Models.cpp
                src/models.h)
 add_executable(EPECInstances
-               src/makeTests.cpp
+               src/makeInstances.cpp
                src/epecsolve.h
                src/Games.cpp
                src/games.h

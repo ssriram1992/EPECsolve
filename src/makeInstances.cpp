@@ -1,5 +1,6 @@
 #include "models.h"
 #include <random>
+using namespace std;
 
 // Global variables
 vector<Models::FollPar> C, G,
@@ -129,10 +130,12 @@ price_limit = price_limit > a*1.05? a * price_lim:price_limit;
 price_limit = (price_limit < 0)? a*price_lim:price_limit;
 */
   price_limit = price_lim * a;
+  unsigned int tax_paradigm = intRandom(give) % (lincos.size() - 2) % 3;
+  unsigned int tax_revenue = binaryRandom(give);
 
   Models::LeadAllPar Country(F.capacities.size(),
                              "Country_" + to_string(country++), F, {a, b},
-                             {-1, -1, price_limit});
+                             {-1, -1, price_limit, static_cast<bool>(tax_revenue), tax_paradigm});
   LeadersVec.push_back(Country);
 
   return Country;
@@ -180,7 +183,7 @@ void MakeInstance(int nCountries = 2) {
         TrCo(i, j) = 0;
 
   Models::EPECInstance Inst(cVec, TrCo);
-  Inst.save("dat/Instance_" + to_string(count++));
+  Inst.save("dat/new/Instance_" + to_string(count++));
 }
 
 int main() {
