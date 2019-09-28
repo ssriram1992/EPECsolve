@@ -1532,7 +1532,12 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
        << ":" << Models::prn::val << lim << "\n";
   // file << "x(): " << foll_lim + j << '\n';
   file << Models::prn::label << "Tax imposed"
-       << ":" << Models::prn::val << tax << "\n";
+       << ":" << Models::prn::val << tax;
+  if (Params.LeaderParam.tax_type == Models::TaxType::CarbonTax) {
+    tax = tax * Params.FollowerParam.emission_costs.at(j);
+    file << " per unit emission; " << tax << " per unit energy";
+  }
+  file << "\n";
   if (Params.LeaderParam.tax_revenue)
     file << Models::prn::label << "Tax imposed (Q)"
          << ":" << Models::prn::val << taxQ << "\n";

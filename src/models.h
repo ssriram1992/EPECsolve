@@ -6,7 +6,6 @@
 #include <iostream>
 #include <memory>
 
-
 namespace Models {
 typedef struct FollPar FollPar;
 typedef struct DemPar DemPar;
@@ -30,16 +29,16 @@ struct FollPar {
       {}; ///< Emission costs for unit quantity of the fuel. Emission costs
           ///< feature only on the leader's problem
   std::vector<double> tax_caps = {}; ///< Individual tax caps for each follower.
-  std::vector<std::string> names = {};    ///< Optional Names for the Followers.
+  std::vector<std::string> names = {}; ///< Optional Names for the Followers.
   FollPar(std::vector<double> costs_quad_ = {},
           std::vector<double> costs_lin_ = {},
           std::vector<double> capacities_ = {},
           std::vector<double> emission_costs_ = {},
-          std::vector<double> tax_caps_ = {}, std::vector<std::string> names_ = {})
+          std::vector<double> tax_caps_ = {},
+          std::vector<std::string> names_ = {})
       : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
         emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
 };
-
 
 /// @brief Stores the parameters of the demand curve in a country model
 struct DemPar {
@@ -65,9 +64,10 @@ struct LeadPar {
   bool tax_revenue = false; ///< Dictates whether the leader objective will
                             ///< include tax revenues
   // LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
-          // bool tax_revenue = false, Models::TaxType tax_type_ = Models::TaxType::StandardTax)
-      // : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit},tax_type{tax_type_}, 
-        // tax_revenue{tax_revenue} {}
+  // bool tax_revenue = false, Models::TaxType tax_type_ =
+  // Models::TaxType::StandardTax)
+  // : import_limit{imp_lim}, export_limit{exp_lim},
+  // price_limit{price_limit},tax_type{tax_type_}, tax_revenue{tax_revenue} {}
   LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
           bool tax_revenue = false, unsigned int tax_type_ = 0)
       : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit},
@@ -91,7 +91,7 @@ struct LeadPar {
 /// @brief Stores the parameters of a country model
 struct LeadAllPar {
   unsigned int n_followers;           ///< Number of followers in the country
-  std::string name;                        ///< Country Name
+  std::string name;                   ///< Country Name
   Models::FollPar FollowerParam = {}; ///< A struct to hold Follower Parameters
   Models::DemPar DemandParam = {};    ///< A struct to hold Demand Parameters
   Models::LeadPar LeaderParam = {};   ///< A struct to hold Leader Parameters
@@ -266,7 +266,8 @@ public: // Attributes
 
   EPEC &unlock();
 
-  std::unique_ptr<GRBModel> Respond(const std::string name, const arma::vec &x) const;
+  std::unique_ptr<GRBModel> Respond(const std::string name,
+                                    const arma::vec &x) const;
   // Data access methods
   Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
 

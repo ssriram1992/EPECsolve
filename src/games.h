@@ -9,14 +9,16 @@
 
 using namespace Game;
 
-template <class T> std::ostream &operator<<(std::ostream &ost, std::vector<T> v) {
+template <class T>
+std::ostream &operator<<(std::ostream &ost, std::vector<T> v) {
   for (auto elem : v)
     ost << elem << " ";
   ost << '\n';
   return ost;
 }
 
-template <class T, class S> std::ostream &operator<<(std::ostream &ost, std::pair<T, S> p) {
+template <class T, class S>
+std::ostream &operator<<(std::ostream &ost, std::pair<T, S> p) {
   ost << "<" << p.first << ", " << p.second << ">";
   return ost;
 }
@@ -174,7 +176,8 @@ public: // Constructors
     this->set(Q, C, A, B, c, b);
     this->size();
     if (!this->dataCheck())
-      throw std::string("Error in QP_Param::QP_Param: Invalid data for constructor");
+      throw std::string(
+          "Error in QP_Param::QP_Param: Invalid data for constructor");
   }
 
   /// Copy constructor
@@ -246,9 +249,10 @@ private:
   arma::sp_mat LeaderConstraints; ///< Upper level leader constraints LHS
   arma::vec LeaderConsRHS;        ///< Upper level leader constraints RHS
   unsigned int Nplayers;          ///< Number of players in the Nash Game
-  std::vector<std::shared_ptr<QP_Param>> Players; ///< The QP that each player solves
-  arma::sp_mat MarketClearing;               ///< Market clearing constraints
-  arma::vec MCRHS; ///< RHS to the Market Clearing constraints
+  std::vector<std::shared_ptr<QP_Param>>
+      Players;                 ///< The QP that each player solves
+  arma::sp_mat MarketClearing; ///< Market clearing constraints
+  arma::vec MCRHS;             ///< RHS to the Market Clearing constraints
 
   /// @internal In the vector of variables of all players,
   /// which position does the variable corrresponding to this player starts.
@@ -350,7 +354,7 @@ public: // Constructors
 
   // Check solution and correctness
   std::unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec &x,
-                               bool fullvec = true) const;
+                                    bool fullvec = true) const;
 
   double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
                     bool fullvec = true) const;
@@ -546,7 +550,8 @@ public:                  // functions
   virtual void finalize() final;
   virtual void findNashEq() final;
 
-  std::unique_ptr<GRBModel> Respond(const unsigned int i, const arma::vec &x) const;
+  std::unique_ptr<GRBModel> Respond(const unsigned int i,
+                                    const arma::vec &x) const;
   double RespondSol(arma::vec &sol, unsigned int player,
                     const arma::vec &x) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
@@ -559,9 +564,7 @@ public:                  // functions
   virtual const EPECStatistics getStatistics() const final {
     return this->Stats;
   }
-  virtual unsigned int getnVarinEPEC() const final {
-    return this->nVarinEPEC;
-  }
+  virtual unsigned int getnVarinEPEC() const final { return this->nVarinEPEC; }
   void setAlgorithm(Game::EPECalgorithm algorithm);
   virtual Game::EPECalgorithm getAlgorithm() const final {
     return this->Stats.AlgorithmParam.algorithm;
