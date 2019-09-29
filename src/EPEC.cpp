@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
   if (bigM == 1)
     epec.indicators = 0;
   // Num Threads
-  if (nThreads!=0)
+  if (nThreads != 0)
     epec.setNumThreads(nThreads);
   // timeLimit
   epec.timeLimit = timeLimit;

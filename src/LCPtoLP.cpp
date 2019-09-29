@@ -1078,7 +1078,7 @@ unsigned int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
   } break;
   case Game::EPECAddPolyMethod::random: {
     static std::random_device random_device;
-    std::mt19937 engine{random_device()};
+    static std::mt19937 engine{random_device()};
     std::uniform_int_distribution<int> dist(0, this->notProcessed.size() - 1);
     return *(std::next(this->notProcessed.begin(), dist(engine)));
   }
@@ -1142,7 +1142,7 @@ Game::LCP::addAPoly(unsigned int nPoly, Game::EPECAddPolyMethod method,
   }; // End of num_to_vec lambda definition
 
   bool complete{false};
-  while (!complete){
+  while (!complete) {
     unsigned int choice_decimal = this->getNextPoly(method);
     if (choice_decimal >= maxTheoreticalPoly)
       return Polys;
@@ -1152,14 +1152,13 @@ Game::LCP::addAPoly(unsigned int nPoly, Game::EPECAddPolyMethod method,
     if (added) // If choice is added to All Polyhedra
     {
       Polys.insert(choice); // Add it to set of added polyhedra
-      if (Polys.size()==nPoly) {
-        complete= true;
+      if (Polys.size() == nPoly) {
+        complete = true;
         return Polys;
       }
     }
   }
   return Polys;
-
 }
 
 Game::LCP &Game::LCP::EnumerateAll(

@@ -122,3 +122,13 @@ install:
 	mkdir -p dat
 	mkdir -p bin
 	mkdir -p obj
+
+$(BIN)/ChileArgentina: $(FILEEPEC) $(OBJ)/ChileArgentina.o 
+	@echo Linking...
+	$(GCC) $(FILEEPEC) $(OBJ)/ChileArgentina.o  $(OPTS) $(LINKOPTS) -o $(BIN)/ChileArgentina
+
+$(OBJ)/ChileArgentina.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/ChileArgentina.cpp
+	$(GCC) -c $(SRC)/ChileArgentina.cpp $(OPTS) -o $(OBJ)/ChileArgentina.o
+
+chile: $(BIN)/ChileArgentina
+	$(BIN)/ChileArgentina
