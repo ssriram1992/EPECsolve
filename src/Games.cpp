@@ -1641,7 +1641,7 @@ void ::Game::EPEC::make_country_LCP() {
   this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
       this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
   this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
-  this->lcp->useIndicators = this->indicators; // Using indicator constraints
+  this->lcp->useIndicators = this->Stats.AlgorithmParam.indicators; // Using indicator constraints
 
   this->lcpmodel = this->lcp->LCPasMIP(false);
 
@@ -1727,7 +1727,7 @@ void Game::EPEC::findNashEq() {
     for (unsigned int i = 0; i < this->nCountr; ++i)
       this->countries_LCP.at(i)->EnumerateAll(true);
     this->make_country_QP();
-    this->computeNashEq(this->timeLimit);
+    this->computeNashEq(this->Stats.AlgorithmParam.timeLimit);
     this->lcp->save("dat/LCP_enum.dat");
     this->lcpmodel->write("dat/lcpmodel_enum.lp");
     break;

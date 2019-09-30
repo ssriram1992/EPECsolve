@@ -492,12 +492,6 @@ protected: // Datafields
   arma::vec sol_z, ///< Solution equation values
       sol_x;       ///< Solution variable values
 
-public:                  // Datafields
-  bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
-                         ///< Uses @p bigM if @p false.
-  double timeLimit{
-      -1}; ///< Controls the timelimit for solve in Game::EPEC::findNashEq
-
 private:
   virtual void add_Dummy_Lead(
       const unsigned int i) final; ///< Add Dummy variables for the leaders
@@ -520,8 +514,7 @@ private:
 
 protected: // functions
   EPEC(GRBEnv *env)
-      : env{env}, timeLimit{
-                      -1} {}; ///< Can be instantiated by a derived class only!
+      : env{env} {}; ///< Can be instantiated by a derived class only!
 
   // virtual function to be implemented by the inheritor.
   virtual void make_obj_leader(const unsigned int i,
@@ -583,6 +576,18 @@ public:                  // functions
   }
   virtual unsigned int getNumThreads() const final {
     return this->Stats.AlgorithmParam.threads;
+  }
+  void setIndicators(bool val) {
+    this->Stats.AlgorithmParam.indicators=val;
+  }
+  virtual bool getIndicators() const final {
+    return this->Stats.AlgorithmParam.indicators;
+  }
+  void setTimeLimit(double val) {
+    this->Stats.AlgorithmParam.timeLimit=val;
+  }
+  virtual double getTimeLimit() const final {
+    return this->Stats.AlgorithmParam.timeLimit;
   }
   void setAddPolyMethod(Game::EPECAddPolyMethod add) {
     this->Stats.AlgorithmParam.addPolyMethod = add;

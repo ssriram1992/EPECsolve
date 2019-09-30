@@ -121,12 +121,12 @@ int main(int argc, char **argv) {
   Models::EPEC epec(&env);
   // Indicator constraints
   if (bigM == 1)
-    epec.indicators = 0;
+    epec.setIndicators(false);
   // Num Threads
   if (nThreads != 0)
     epec.setNumThreads(nThreads);
   // timeLimit
-  epec.timeLimit = timeLimit;
+  epec.setTimeLimit(timeLimit);
   // Algorithm
 
   switch (algorithm) {
