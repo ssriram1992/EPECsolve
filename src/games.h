@@ -503,8 +503,8 @@ private:
   virtual void
   computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
 
-  bool getAllDevns(std::vector<arma::vec> &devns,
-                   const arma::vec &guessSol) const;
+  bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
+                   const std::vector<arma::vec> &prevDev = {}) const;
   unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
   void get_x_minus_i(const arma::vec &x, const int &i,
                      arma::vec &solOther) const;
@@ -547,8 +547,8 @@ public:                  // functions
 
   std::unique_ptr<GRBModel> Respond(const unsigned int i,
                                     const arma::vec &x) const;
-  double RespondSol(arma::vec &sol, unsigned int player,
-                    const arma::vec &x) const;
+  double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
+                    const arma::vec &prevDev) const;
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
                 double tol = 1e-4) const;
 
@@ -577,15 +577,11 @@ public:                  // functions
   virtual unsigned int getNumThreads() const final {
     return this->Stats.AlgorithmParam.threads;
   }
-  void setIndicators(bool val) {
-    this->Stats.AlgorithmParam.indicators=val;
-  }
+  void setIndicators(bool val) { this->Stats.AlgorithmParam.indicators = val; }
   virtual bool getIndicators() const final {
     return this->Stats.AlgorithmParam.indicators;
   }
-  void setTimeLimit(double val) {
-    this->Stats.AlgorithmParam.timeLimit=val;
-  }
+  void setTimeLimit(double val) { this->Stats.AlgorithmParam.timeLimit = val; }
   virtual double getTimeLimit() const final {
     return this->Stats.AlgorithmParam.timeLimit;
   }
