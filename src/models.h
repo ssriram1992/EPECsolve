@@ -230,9 +230,6 @@ public: // Attributes
   const unsigned int nVarEPEC{
       this->getnVarinEPEC()}; ///< Constant attribute for number of variables in
                               ///< the EPEC
-  bool indicators = {
-      true}; ///< Controls the flag useIndicators in LCPtoLP class. If true,
-             ///< indicators constraints replace bigM ones.
   bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax
                                ///< is added to each leader objective
 
