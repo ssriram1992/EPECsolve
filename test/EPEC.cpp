@@ -1968,9 +1968,9 @@ testInst HardToEnum_2() {
 
   // Solution
   inst.solution.push_back(countrySol{{0, 30}, {95, 43}, 22.86, 0, 273});
+  inst.solution.push_back(countrySol{{54, 26}, {41.80, 41.80}, 0, 0, 273.50});
   inst.solution.push_back(
-      countrySol{{54, 26}, {41.80, 41.80}, 0, 0, 273.50});
-  inst.solution.push_back(countrySol{{57.14, 30}, {0.18, 0.18}, 0, 22.86, 272.00});
+      countrySol{{57.14, 30}, {0.18, 0.18}, 0, 22.86, 272.00});
 
   return inst;
 }
@@ -2010,23 +2010,25 @@ void testEPECInstance(const testInst inst,
     Models::EPEC epec(&env);
     const unsigned int nCountr = inst.instance.Countries.size();
     for (unsigned int i = 0; i < nCountr; i++)
-      epec.addCountry(inst.instance.Countries.at(i)); 
-        epec.addTranspCosts(inst.instance.TransportationCosts);
+      epec.addCountry(inst.instance.Countries.at(i));
+    epec.addTranspCosts(inst.instance.TransportationCosts);
     epec.finalize();
 
     epec.setAlgorithm(algorithm.algorithm);
     epec.setAggressiveness(algorithm.aggressiveness);
     epec.setAddPolyMethod(algorithm.addPolyMethod);
 
-  const std::chrono::high_resolution_clock::time_point initTime = std::chrono::high_resolution_clock::now();
+    const std::chrono::high_resolution_clock::time_point initTime =
+        std::chrono::high_resolution_clock::now();
     epec.findNashEq();
-  const std::chrono::duration<double> timeElapsed = std::chrono::high_resolution_clock::now() - initTime;
+    const std::chrono::duration<double> timeElapsed =
+        std::chrono::high_resolution_clock::now() - initTime;
 
     // Checking
     for (unsigned int i = 0; i < nCountr; i++) {
       const auto countryAns = inst.solution.at(i);
       BOOST_TEST_MESSAGE("Country " + inst.instance.Countries.at(i).name);
-      for (unsigned int j=0; j < countryAns.foll_prod.size(); j++) {
+      for (unsigned int j = 0; j < countryAns.foll_prod.size(); j++) {
         // Follower production
         BOOST_CHECK_CLOSE(
             epec.getx().at(
@@ -2050,11 +2052,10 @@ void testEPECInstance(const testInst inst,
           epec.getPosition(nCountr - 1, Models::LeaderVars::End) + i)};
       BOOST_WARN_CLOSE(exportPrice, countryAns.export_price, 10);
     }
-	ss << "\n Successfully completed running in time: " <<timeElapsed.count();
- 	BOOST_TEST_MESSAGE(ss.str());
+    ss << "\n Successfully completed running in time: " << timeElapsed.count();
+    BOOST_TEST_MESSAGE(ss.str());
   }
 }
-
 
 BOOST_AUTO_TEST_SUITE(All_Alg)
 
@@ -2063,13 +2064,10 @@ BOOST_AUTO_TEST_CASE(LoggingOff) {
                                       boost::log::trivial::info);
 }
 
-BOOST_AUTO_TEST_CASE(Instance1)
-{
-	testEPECInstance(CH_S_F0_CL_SC_F0(), allAlgo());
-	testEPECInstance(HardToEnum_1(), allAlgo());
-	testEPECInstance(HardToEnum_2(), allAlgo());
+BOOST_AUTO_TEST_CASE(Instance1) {
+  testEPECInstance(CH_S_F0_CL_SC_F0(), allAlgo());
+  testEPECInstance(HardToEnum_1(), allAlgo());
+  testEPECInstance(HardToEnum_2(), allAlgo());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-

@@ -413,6 +413,7 @@ enum class EPECalgorithm {
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
+  unsigned long int addPolyMethodSeed{0};
   bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
   ///< Uses @p bigM if @p false.
   double timeLimit{

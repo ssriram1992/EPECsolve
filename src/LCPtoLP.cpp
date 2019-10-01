@@ -1081,7 +1081,7 @@ unsigned int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
       static std::mt19937 engine{1};
       std::uniform_int_distribution<unsigned long int> dist(
           0, this->notProcessed.size() - 1);
-      unsigned long int gotIt = dist(engine); 
+      unsigned long int gotIt = dist(engine);
       return *(std::next(this->notProcessed.begin(), gotIt));
     } else {
       return maxTheoreticalPoly;
