@@ -492,6 +492,9 @@ protected: // Datafields
   arma::vec sol_z, ///< Solution equation values
       sol_x;       ///< Solution variable values
 
+  bool warmstart(const arma::vec x,
+                 const arma::vec z); ///< Warmstarts EPEC with a solution
+
 private:
   virtual void add_Dummy_Lead(
       const unsigned int i) final; ///< Add Dummy variables for the leaders

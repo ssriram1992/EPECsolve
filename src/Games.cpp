@@ -1732,6 +1732,43 @@ bool Game::EPEC::computeNashEq(
   return foundNash;
 }
 
+bool Game::EPEC::warmstart(const arma::vec x, const arma::vec z) {
+
+  if (x.size() < this->getnVarinEPEC()) {
+    BOOST_LOG_TRIVIAL(error)
+        << "Exception in Game::EPEC::warmstart: number of variables "
+           "does not fit this instance.";
+    throw;
+  }
+  if (!this->finalized) {
+    BOOST_LOG_TRIVIAL(error)
+        << "Exception in Game::EPEC::warmstart: EPEC is not finalized.";
+    throw;
+  }
+  if (this->country_QP.front() == nullptr) {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Game::EPEC::warmstart: Generating QP as of warmstart.";
+  }
+
+  this->sol_x = x;
+  std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
+  std::vector<arma::vec> prevDevns = std::vector<arma::vec>(this->nCountr);
+  this->getAllDevns(devns, this->sol_x, prevDevns);
+  unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
+  this->make_country_QP();
+
+  unsigned int c;
+  arma::vec devn;
+
+  if (this->isSolved(&c, &devn))
+    BOOST_LOG_TRIVIAL(warning) << "Exception in Game::EPEC::warmstart: "
+                                  "The loaded solution is optimal.";
+  else
+    BOOST_LOG_TRIVIAL(warning)
+        << "Exception in Game::EPEC::warmstart: "
+           "The loaded solution is NOT optimal. Trying to repair.";
+}
+
 void Game::EPEC::findNashEq() {
   /**
    * @brief Computes Nash equilibrium using the algorithm set in

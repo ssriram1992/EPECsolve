@@ -276,6 +276,8 @@ public: // Attributes
 
   void write(const std::string filename, bool append = true) const;
 
+  void readSolutionJSON(const std::string filename);
+
   void gur_WriteCountry_conv(const unsigned int i, std::string filename) const;
 
   void gur_WriteEpecMip(const unsigned int i, std::string filename) const;

@@ -197,7 +197,7 @@ int main(int argc, char **argv) {
   results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];"
           << stat.numVar << ";" << stat.numConstraints << ";" << stat.numNonZero
           << ";" << WallClockTime << ";" << realThreads << ";"
-          << to_string(epec.indicators) << "\n";
+          << to_string(epec.getIndicators()) << "\n";
   results.close();
 
   return EXIT_SUCCESS;
