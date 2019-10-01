@@ -1881,8 +1881,12 @@ std::string std::to_string(const Game::EPECAddPolyMethod add) {
 std::string std::to_string(const Game::EPECAlgorithmParams al) {
   std::stringstream ss;
   ss << "Algorithm: " << to_string(al.algorithm) << '\n';
+  if (al.algorithm == Game::EPECalgorithm::innerApproximation) {
+    ss << "Aggressiveness: " << al.aggressiveness << '\n';
+    ss << "AddPolyMethod: " << to_string(al.addPolyMethod) << '\n';
+  }
   ss << "Time Limit: " << al.timeLimit << '\n';
-  ss << "Use Indicators? " << std::boolalpha << al.indicators << '\n';
-  ss << "Aggressiveness: " << al.aggressiveness;
+  ss << "Indicators: " << std::boolalpha << al.indicators;
+
   return ss.str();
 }

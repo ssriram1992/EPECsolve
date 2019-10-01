@@ -179,13 +179,15 @@ int main(int argc, char **argv) {
     epec.writeSolution(writeLevel, resFile);
   ifstream existCheck(logFile);
   std::ofstream results(logFile, ios::app);
+
   if (!existCheck.good()) {
     results
         << "Instance;Algorithm;Countries;Followers;Status;numFeasiblePolyhedra;"
            "numVar;numConstraints;numNonZero;ClockTime"
-           "(s);Threads;Indicators\n";
+           "(s);Threads;Indicators;Aggressiveness;AddPolyMethod\n";
   }
   existCheck.close();
+
   stringstream PolyT;
   copy(stat.feasiblePolyhedra.begin(), stat.feasiblePolyhedra.end(),
        ostream_iterator<int>(PolyT, " "));
@@ -194,10 +196,18 @@ int main(int argc, char **argv) {
           << Instance.Countries.size() << ";[";
   for (auto &Countrie : Instance.Countries)
     results << " " << Countrie.n_followers;
+
   results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];"
           << stat.numVar << ";" << stat.numConstraints << ";" << stat.numNonZero
           << ";" << WallClockTime << ";" << realThreads << ";"
-          << to_string(epec.getIndicators()) << "\n";
+          << to_string(epec.getIndicators());
+  if (epec.getAlgorithm() == Game::EPECalgorithm::innerApproximation) {
+    results << epec.getAggressiveness() << ";"
+            << to_string(epec.getAddPolyMethod());
+  } else{
+    results << ";-;-";
+  }
+  results << "\n";
   results.close();
 
   return EXIT_SUCCESS;
