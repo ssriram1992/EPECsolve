@@ -1286,8 +1286,10 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
 double Game::EPEC::RespondSol(
     arma::vec &sol,      ///< [out] Optimal response
     unsigned int player, ///< Player whose optimal response is to be computed
-    const arma::vec &x ///< A vector of pure strategies (either for all players
-                       ///< or all other players
+    const arma::vec &x, ///< A vector of pure strategies (either for all players
+                        ///< or all other players
+    const arma::vec &prevDev = {}
+    //< [in] if any, the vector of previous deviations.
     ) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
@@ -1300,21 +1302,51 @@ double Game::EPEC::RespondSol(
    */
   auto model = this->Respond(player, x);
   const int status = model->get(GRB_IntAttr_Status);
-  if (status == GRB_UNBOUNDED) {
-    BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::Respondsol: deviation is "
-                                  "unbounded. Trying to get a feasible one.";
-    GRBLinExpr obj = 0;
-    model->setObjective(obj);
-    model->optimize();
-  }
-  if (status == GRB_OPTIMAL) {
+  if (status == GRB_UNBOUNDED || status == GRB_OPTIMAL) {
     unsigned int Nx = this->countries_LCP.at(player)->getNcol();
     sol.zeros(Nx);
     for (unsigned int i = 0; i < Nx; ++i)
       sol.at(i) =
           model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
 
-    return model->get(GRB_DoubleAttr_ObjVal);
+    if (status == GRB_UNBOUNDED) {
+      BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::Respondsol: deviation is "
+                                    "unbounded.";
+      GRBLinExpr obj = 0;
+      model->setObjective(obj);
+      model->optimize();
+      if (!prevDev.empty()) {
+        BOOST_LOG_TRIVIAL(trace)
+            << "Generating an improvement basing on the extreme ray.";
+        // Fetch objective function coefficients
+        GRBQuadExpr QuadObj = model->getObjective();
+        arma::vec objcoeff;
+        for (unsigned int i = 0; i < QuadObj.size(); ++i)
+          objcoeff.at(i) = QuadObj.getCoeff(i);
+
+        // Create objective function objects
+        arma::vec objvalue = prevDev * objcoeff;
+        arma::vec newobjvalue{0};
+        double improved{false};
+
+        // improve following the unbounded ray
+        while (!improved) {
+          for (unsigned int i = 0; i < Nx; ++i)
+            sol.at(i) = sol.at(i) + model->getVarByName("x_" + to_string(i))
+                                        .get(GRB_DoubleAttr_UnbdRay);
+          newobjvalue = sol * objcoeff;
+          if (newobjvalue.at(0) < objvalue.at(0))
+            improved = true;
+        }
+        return newobjvalue.at(0);
+
+      } else {
+        return model->get(GRB_DoubleAttr_ObjVal);
+      }
+    }
+    if (status == GRB_OPTIMAL) {
+      return model->get(GRB_DoubleAttr_ObjVal);
+    }
   } else {
     return GRB_INFINITY;
   }
@@ -1447,13 +1479,16 @@ void Game::EPEC::make_country_QP()
 bool Game::EPEC::getAllDevns(
     std::vector<arma::vec>
         &devns, ///< [out] The vector of deviations for all players
-    const arma::vec &guessSol ///< [in] The guess for the solution vector
+    const arma::vec &guessSol, ///< [in] The guess for the solution vector
+    const std::vector<arma::vec>
+        &prevDev //<[in] The previous vecrtor of deviations, if any exist.
     ) const
 /**
  * @brief Given a potential solution vector, returns a profitable deviation (if
- * it exists) for all players.
+ * it exists) for all players. @param
  * @return a vector of computed deviations, which empty if at least one
  * deviation cannot be computed
+ * @param prevDev can be empty
  * @todo Handle unbounded case
  */
 {
@@ -1461,7 +1496,8 @@ bool Game::EPEC::getAllDevns(
 
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     // If we cannot compute a deviation, it means model is infeasible!
-    if (this->RespondSol(devns.at(i), i, guessSol) == GRB_INFINITY)
+    if (this->RespondSol(devns.at(i), i, guessSol, prevDev.at(i)) ==
+        GRB_INFINITY)
       return false;
     // cout << "Game::EPEC::getAllDevns: devns(i): " <<devns.at(i);
   }
@@ -1545,6 +1581,7 @@ void Game::EPEC::iterativeNash() {
 
   bool solved = {false};
   bool addRandPoly{false};
+  std::vector<arma::vec> prevDevns(this->nCountr);
   this->Stats.numIteration = 0;
 
   std::chrono::high_resolution_clock::time_point initTime;
@@ -1576,7 +1613,8 @@ void Game::EPEC::iterativeNash() {
       }
       // Vector of deviations for the countries
       std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
-      this->getAllDevns(devns, this->sol_x);
+      this->getAllDevns(devns, this->sol_x, prevDevns);
+      prevDevns = devns;
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
       if (addedPoly == 0 && this->Stats.numIteration > 1) {
         BOOST_LOG_TRIVIAL(error)
@@ -1641,7 +1679,8 @@ void ::Game::EPEC::make_country_LCP() {
   this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
       this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
   this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
-  this->lcp->useIndicators = this->indicators; // Using indicator constraints
+  this->lcp->useIndicators =
+      this->Stats.AlgorithmParam.indicators; // Using indicator constraints
 
   this->lcpmodel = this->lcp->LCPasMIP(false);
 
@@ -1693,6 +1732,43 @@ bool Game::EPEC::computeNashEq(
   return foundNash;
 }
 
+bool Game::EPEC::warmstart(const arma::vec x, const arma::vec z) {
+
+  if (x.size() < this->getnVarinEPEC()) {
+    BOOST_LOG_TRIVIAL(error)
+        << "Exception in Game::EPEC::warmstart: number of variables "
+           "does not fit this instance.";
+    throw;
+  }
+  if (!this->finalized) {
+    BOOST_LOG_TRIVIAL(error)
+        << "Exception in Game::EPEC::warmstart: EPEC is not finalized.";
+    throw;
+  }
+  if (this->country_QP.front() == nullptr) {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Game::EPEC::warmstart: Generating QP as of warmstart.";
+  }
+
+  this->sol_x = x;
+  std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
+  std::vector<arma::vec> prevDevns = std::vector<arma::vec>(this->nCountr);
+  this->getAllDevns(devns, this->sol_x, prevDevns);
+  unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
+  this->make_country_QP();
+
+  unsigned int c;
+  arma::vec devn;
+
+  if (this->isSolved(&c, &devn))
+    BOOST_LOG_TRIVIAL(warning) << "Exception in Game::EPEC::warmstart: "
+                                  "The loaded solution is optimal.";
+  else
+    BOOST_LOG_TRIVIAL(warning)
+        << "Exception in Game::EPEC::warmstart: "
+           "The loaded solution is NOT optimal. Trying to repair.";
+}
+
 void Game::EPEC::findNashEq() {
   /**
    * @brief Computes Nash equilibrium using the algorithm set in
@@ -1727,7 +1803,7 @@ void Game::EPEC::findNashEq() {
     for (unsigned int i = 0; i < this->nCountr; ++i)
       this->countries_LCP.at(i)->EnumerateAll(true);
     this->make_country_QP();
-    this->computeNashEq(this->timeLimit);
+    this->computeNashEq(this->Stats.AlgorithmParam.timeLimit);
     this->lcp->save("dat/LCP_enum.dat");
     this->lcpmodel->write("dat/lcpmodel_enum.lp");
     break;

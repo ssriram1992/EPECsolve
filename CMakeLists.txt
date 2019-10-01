@@ -109,6 +109,17 @@ add_executable(EPECInstances
                src/Utils.cpp
                src/Models.cpp
                src/models.h)
+add_executable(EPECChileArgentina
+               src/ChileArgentina.cpp
+               src/epecsolve.h
+               src/Games.cpp
+               src/games.h
+               src/LCPtoLP.cpp
+               src/lcptolp.h
+               src/utils.h
+               src/Utils.cpp
+               src/Models.cpp
+               src/models.h)
 add_executable(EPECtest
                src/Games.cpp
                src/games.h
@@ -120,6 +131,7 @@ add_executable(EPECtest
                src/models.h
                test/EPEC.cpp)
 target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPEC Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECtest Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 message("\n\nEPEC Cmake configuration terminated:")

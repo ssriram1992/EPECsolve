@@ -1204,6 +1204,47 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x,
   file << s.GetString();
 }
 
+void Models::EPEC::readSolutionJSON(string filename) {
+  /**
+   * @brief Reads the solution file and load it in the current EPEC instance
+   * **/
+  ifstream ifs(filename + ".json");
+  if (ifs.good()) {
+    IStreamWrapper isw(ifs);
+    Document d;
+    try {
+      d.ParseStream(isw);
+      const Value &x = d["Solution"].GetObject()["x"];
+      const Value &z = d["Solution"].GetObject()["z"];
+      arma::vec new_x, new_z;
+      new_x.zeros(x.GetArray().Size());
+      new_z.zeros(z.GetArray().Size());
+
+      for (SizeType i = 0; i < this->getnVarinEPEC(); i++)
+        new_x.at(i) = x[i].GetDouble();
+
+      for (SizeType i = 0; i < this->getnVarinEPEC(); i++)
+        new_z.at(i) = z[i].GetDouble();
+      ifs.close();
+      this->warmstart(new_x, new_z);
+    } catch (exception &e) {
+      cerr << "Exception in Models::readSolutionJSON : cannot read instance "
+              "file."
+           << e.what() << '\n';
+      throw;
+    } catch (...) {
+      cerr
+          << "Exception in Models::readSolutionJSON: cannot read instance file."
+          << '\n';
+      throw;
+    }
+  } else {
+    cerr << "Exception in Models::readSolutionJSON : file instance not found."
+         << '\n';
+    throw;
+  }
+}
+
 void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
   /**
    * @brief Writes the computed Nash Equilibrium in the EPEC instance

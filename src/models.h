@@ -230,9 +230,6 @@ public: // Attributes
   const unsigned int nVarEPEC{
       this->getnVarinEPEC()}; ///< Constant attribute for number of variables in
                               ///< the EPEC
-  bool indicators = {
-      true}; ///< Controls the flag useIndicators in LCPtoLP class. If true,
-             ///< indicators constraints replace bigM ones.
   bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax
                                ///< is added to each leader objective
 
@@ -278,6 +275,8 @@ public: // Attributes
              bool append = true) const;
 
   void write(const std::string filename, bool append = true) const;
+
+  void readSolutionJSON(const std::string filename);
 
   void gur_WriteCountry_conv(const unsigned int i, std::string filename) const;
 

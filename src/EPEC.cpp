@@ -121,12 +121,12 @@ int main(int argc, char **argv) {
   Models::EPEC epec(&env);
   // Indicator constraints
   if (bigM == 1)
-    epec.indicators = 0;
+    epec.setIndicators(false);
   // Num Threads
   if (nThreads != 0)
     epec.setNumThreads(nThreads);
   // timeLimit
-  epec.timeLimit = timeLimit;
+  epec.setTimeLimit(timeLimit);
   // Algorithm
 
   switch (algorithm) {
@@ -197,7 +197,7 @@ int main(int argc, char **argv) {
   results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];"
           << stat.numVar << ";" << stat.numConstraints << ";" << stat.numNonZero
           << ";" << WallClockTime << ";" << realThreads << ";"
-          << to_string(epec.indicators) << "\n";
+          << to_string(epec.getIndicators()) << "\n";
   results.close();
 
   return EXIT_SUCCESS;
