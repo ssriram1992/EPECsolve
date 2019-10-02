@@ -202,7 +202,7 @@ int main(int argc, char **argv) {
           << ";" << WallClockTime << ";" << realThreads << ";"
           << to_string(epec.getIndicators());
   if (epec.getAlgorithm() == Game::EPECalgorithm::innerApproximation) {
-    results << epec.getAggressiveness() << ";"
+    results << ";" << epec.getAggressiveness() << ";"
             << to_string(epec.getAddPolyMethod());
   } else{
     results << ";-;-";

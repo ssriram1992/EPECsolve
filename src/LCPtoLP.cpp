@@ -68,6 +68,9 @@ void Game::LCP::defConst(GRBEnv *env)
   this->env = env;
   this->nR = this->M.n_rows;
   this->nC = this->M.n_cols;
+  this->addPolyMethodSeed =
+      chrono::high_resolution_clock::now().time_since_epoch().count() + 42 +
+      M.n_rows;
 }
 
 Game::LCP::LCP(
@@ -1078,7 +1081,7 @@ unsigned int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
   } break;
   case Game::EPECAddPolyMethod::random: {
     if (!notProcessed.empty()) {
-      static std::mt19937 engine{1};
+      static std::mt19937 engine{this->addPolyMethodSeed};
       std::uniform_int_distribution<unsigned long int> dist(
           0, this->notProcessed.size() - 1);
       unsigned long int gotIt = dist(engine);
