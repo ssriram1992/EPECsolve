@@ -68,9 +68,6 @@ void Game::LCP::defConst(GRBEnv *env)
   this->env = env;
   this->nR = this->M.n_rows;
   this->nC = this->M.n_cols;
-  this->addPolyMethodSeed =
-      chrono::high_resolution_clock::now().time_since_epoch().count() + 42 +
-      M.n_rows;
 }
 
 Game::LCP::LCP(

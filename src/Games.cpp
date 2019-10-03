@@ -1583,7 +1583,17 @@ void Game::EPEC::iterativeNash() {
   bool addRandPoly{false};
   std::vector<arma::vec> prevDevns(this->nCountr);
   this->Stats.numIteration = 0;
-
+  if (this->Stats.AlgorithmParam.addPolyMethod == EPECAddPolyMethod::random) {
+    for (unsigned int i = 0; i < this->nCountr; ++i) {
+      long int seed = this->Stats.AlgorithmParam.addPolyMethodSeed < 0
+                              ? chrono::high_resolution_clock::now()
+                                        .time_since_epoch()
+                                        .count() +
+                                    42 + this->countries_LCP.at(i)->getNrow()
+                              : this->Stats.AlgorithmParam.addPolyMethodSeed;
+      this->countries_LCP.at(i)->addPolyMethodSeed = seed;
+    }
+  }
   std::chrono::high_resolution_clock::time_point initTime;
   if (this->Stats.AlgorithmParam.timeLimit > 0)
     initTime = std::chrono::high_resolution_clock::now();
@@ -1617,7 +1627,7 @@ void Game::EPEC::iterativeNash() {
       prevDevns = devns;
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
       if (addedPoly == 0 && this->Stats.numIteration > 1) {
-         BOOST_LOG_TRIVIAL(error)
+        BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Not "
                "Solved, but no deviation? Error!\n This might be due to "
                "numerical issues (tollerances)";

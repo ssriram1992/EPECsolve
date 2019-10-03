@@ -414,7 +414,7 @@ enum class EPECalgorithm {
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
-  unsigned long int addPolyMethodSeed{0};
+  long int addPolyMethodSeed{-1}; ///< Random seed for the random selection of polyhedra. If -1, a default computed value will seeded.
   bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
   ///< Uses @p bigM if @p false.
   double timeLimit{

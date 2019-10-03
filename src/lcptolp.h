@@ -126,8 +126,8 @@ public:
   bool useIndicators{
       true}; ///< If true, complementarities will be handled with indicator
   ///< constraints. BigM formulation otherwise
-  unsigned int addPolyMethodSeed = {
-      0}; ///< Seeds the random generator for the random polyhedra selection
+  long int addPolyMethodSeed = {
+      -1}; ///< Seeds the random generator for the random polyhedra selection. Should be a positive value
 
   /** Constructors */
   /// Class has no default constructors
