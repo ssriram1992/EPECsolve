@@ -399,6 +399,7 @@ enum class EPECsolveStatus {
   nashEqNotFound, ///< Instance proved to be infeasible.
   nashEqFound,    ///< Solution found for the instance.
   timeLimit,      ///< Time limit reached, nash equilibrium not found.
+  numerical,      ///< Numerical issues
   unInitialized   ///< Not started to solve the problem.
 };
 

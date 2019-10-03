@@ -1617,12 +1617,12 @@ void Game::EPEC::iterativeNash() {
       prevDevns = devns;
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
       if (addedPoly == 0 && this->Stats.numIteration > 1) {
-        BOOST_LOG_TRIVIAL(error)
+         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Not "
                "Solved, but no deviation? Error!\n This might be due to "
                "numerical issues (tollerances)";
-        throw string(
-            "Error in Game::EPEC::iterativeNash: Not solved but no deviation!");
+        this->Stats.status = EPECsolveStatus::numerical;
+        solved = true;
       }
     }
     this->make_country_QP();
@@ -1826,6 +1826,10 @@ void Game::EPEC::findNashEq() {
   case Game::EPECsolveStatus::timeLimit:
     final_msg << "Nash equilibrium not found. Time limit attained";
     break;
+  case Game::EPECsolveStatus::numerical:
+    final_msg << "Nash equilibrium not found. Numerical issues might affect "
+                 "this result.";
+    break;
   default:
     final_msg << "Nash equilibrium not found. Time limit attained";
     break;
@@ -1852,6 +1856,8 @@ std::string std::to_string(const Game::EPECsolveStatus st) {
     return string("TIME_LIMIT");
   case EPECsolveStatus::unInitialized:
     return string("UNINITIALIZED");
+  case EPECsolveStatus::numerical:
+    return string("NUMERICAL_ISSUES");
   default:
     return string("UNKNOWN_STATUS_") + to_string(static_cast<int>(st));
   }
