@@ -46,29 +46,6 @@ Models::EPECInstance ChileArgentinaInstance() {
   Arg.tax_caps = {0.5, 0.5};
   Chi.tax_caps = {0.65, 0, 0, 0};
 
-  // Chi.tax_caps = {Chi.costs_lin.at(0)/Chi.emission_costs.at(0),
-  // Chi.costs_lin.at(1)/Chi.emission_costs.at(1),
-  // Chi.costs_lin.at(2)/Chi.emission_costs.at(2)};
-  // Arg.tax_caps = {Arg.costs_lin.at(0)/Arg.emission_costs.at(0),
-  // Arg.costs_lin.at(1)/Arg.emission_costs.at(1)};
-  /*
-  Chi.costs_lin = { 50, 0, 100, 0, 0, 200 };
-  Arg.costs_lin = {0, 105, 0, 0, 115};
-
-
-  Chi.costs_quad = { 0.1, 0, 0.1, 0, 0, 0.1 };
-  Arg.costs_quad = { 0, 0.1, 0, 0, 0.1 };
-
-  Chi.emission_costs = { 200, 0, 110, 0, 0, 180 };
-  Arg.emission_costs = { 0, 110, 0, 0, 180 };
-
-  Chi.capacities = { 27, 5, 23, 22, 5, 3 };
-  Arg.capacities = {3, 93, 37, 1, 2};
-
-  Chi.tax_caps = {50, 20, 100, 20, 20, 200};
-  Arg.tax_caps = {20, 105, 20, 20, 115};
-
-  */
   Models::LeadAllPar Argentina(Arg.capacities.size(), "Argentina", Arg,
                                {800, 3.11}, {100, 100, -1, false, 2});
   Models::LeadAllPar Chile(Chi.capacities.size(), "Chile", Chi, {150, 1},
