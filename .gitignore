@@ -1,13 +1,17 @@
+.*
 Archive.cpp
 bin/
+build/
 cmake-*
 cmake-build-debug/*
+CMakeFiles/
 *.dat
 dat/*
 docs/latex
 .DS_Store
 EPEC
 EPECInstances
+EPECsolve
 EPECsolve
 EPECtest
 FormulateLCP
@@ -26,7 +30,8 @@ sand
 sand.cpp
 Session.vim
 src/Gams*
+style.clang-format
 *.swp
 tags
+test/Testdata
 *.txt
-EPECsolve

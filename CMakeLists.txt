@@ -23,7 +23,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 ############################################
 ################ DO NOT MODIFY #############
 ############################################
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 project(EPECsolve)
 add_compile_options(-std=c++11)
 set(CMAKE_CXX_STANDARD 14)
@@ -41,6 +41,7 @@ if (NOT GUROBI_FOUND)
 
     set(SEARCH_PATHS_FOR_LIBRARIES
         "$ENV{GUROBI_HOME}/lib"
+		"/opt/gurobi811/linux64/lib"
         "${GUROBI_PATH_MAC}/lib"
         "${GUROBI_PATH_LINUX}/lib"
         "${GUROBI_PATH_WINDOWS}/lib"
@@ -98,7 +99,18 @@ add_executable(EPEC
                src/Models.cpp
                src/models.h)
 add_executable(EPECInstances
-               src/makeTests.cpp
+               src/makeInstances.cpp
+               src/epecsolve.h
+               src/Games.cpp
+               src/games.h
+               src/LCPtoLP.cpp
+               src/lcptolp.h
+               src/utils.h
+               src/Utils.cpp
+               src/Models.cpp
+               src/models.h)
+add_executable(EPECChileArgentina
+               src/ChileArgentina.cpp
                src/epecsolve.h
                src/Games.cpp
                src/games.h
@@ -119,6 +131,7 @@ add_executable(EPECtest
                src/models.h
                test/EPEC.cpp)
 target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPEC Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECtest Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 message("\n\nEPEC Cmake configuration terminated:")

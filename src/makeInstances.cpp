@@ -1,5 +1,6 @@
 #include "models.h"
 #include <random>
+using namespace std;
 
 // Global variables
 vector<Models::FollPar> C, G,
@@ -21,6 +22,7 @@ std::default_random_engine give;
 std::uniform_int_distribution<int> binaryRandom(0, 1);
 std::uniform_int_distribution<int> intRandom(0, 1e5);
 
+/*
 Models::FollPar operator+(Models::FollPar a, Models::FollPar b) {
   vector<double> costs_quad = a.costs_quad;
   vector<double> costs_lin = a.costs_lin;
@@ -39,7 +41,7 @@ Models::FollPar operator+(Models::FollPar a, Models::FollPar b) {
 
   return Models::FollPar(costs_quad, costs_lin, capacities, emission_costs,
                          tax_caps, names);
-}
+} */
 
 Models::FollPar makeFollPar(int costParam = 0, int polluting = 0,
                             int capac = 0) {
@@ -122,16 +124,18 @@ Models::LeadAllPar makeLeader(bool cc, bool gg, bool ss, int cC = 5, int gC = 5,
     else
       total_cap += v;
   /*
-  price_limit = (a - b*total_cap)/price_lim;
+price_limit = (a - b*total_cap)/price_lim;
 
-  price_limit = price_limit > a*1.05? a * price_lim:price_limit;
-  price_limit = (price_limit < 0)? a*price_lim:price_limit;
-  */
+price_limit = price_limit > a*1.05? a * price_lim:price_limit;
+price_limit = (price_limit < 0)? a*price_lim:price_limit;
+*/
   price_limit = price_lim * a;
+  unsigned int tax_paradigm = intRandom(give) % 3;
+  unsigned int tax_revenue = binaryRandom(give);
 
-  Models::LeadAllPar Country(F.capacities.size(),
-                             "Country_" + to_string(country++), F, {a, b},
-                             {-1, -1, price_limit});
+  Models::LeadAllPar Country(
+      F.capacities.size(), "Country_" + to_string(country++), F, {a, b},
+      {-1, -1, price_limit, static_cast<bool>(tax_revenue), tax_paradigm});
   LeadersVec.push_back(Country);
 
   return Country;
@@ -179,15 +183,50 @@ void MakeInstance(int nCountries = 2) {
         TrCo(i, j) = 0;
 
   Models::EPECInstance Inst(cVec, TrCo);
-  Inst.save("dat/Instance_" + to_string(count++));
+  Inst.save("dat/new/Instance_" + to_string(count++));
+}
+
+void makeInstancesGreatAgain() {
+  std::ifstream file("dat/NastyInstances.txt");
+  if (file.is_open()) {
+    std::string line;
+    while (getline(file, line)) {
+      cout << "Processing " << line << endl;
+      Models::EPECInstance Instance("dat/Instances_345/" + line);
+      for (unsigned int i = 0; i < Instance.Countries.size(); ++i) {
+        unsigned int tax_revenue = binaryRandom(give);
+        Models::TaxType tax_type;
+        Instance.Countries.at(i).LeaderParam.tax_revenue = tax_revenue;
+        switch (intRandom(give) % 3) {
+        case 0:
+          tax_type = Models::TaxType::StandardTax;
+          break;
+        case 1:
+          tax_type = Models::TaxType::SingleTax;
+          break;
+        case 2:
+          tax_type = Models::TaxType::CarbonTax;
+          break;
+        default:
+          tax_type = Models::TaxType::StandardTax;
+        }
+        Instance.Countries.at(i).LeaderParam.tax_type = tax_type;
+      }
+      Instance.save("dat/Instance_345_Harder/" + line);
+    }
+    file.close();
+  }
 }
 
 int main() {
-  for (int i = 0; i < 50; ++i)
-    MakeInstance(3);
-  for (int i = 0; i < 50; ++i)
-    MakeInstance(4);
-  for (int i = 0; i < 50; ++i)
-    MakeInstance(5);
+
+  // for (int i = 0; i < 50; ++i)
+  //  MakeInstance(3);
+  // for (int i = 0; i < 50; ++i)
+  //  MakeInstance(4);
+  // for (int i = 0; i < 50; ++i)
+  //  MakeInstance(5);
+  makeInstancesGreatAgain();
+
   return 0;
 }

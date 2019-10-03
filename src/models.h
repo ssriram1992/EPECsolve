@@ -1,5 +1,4 @@
-#ifndef MODELS_H
-#define MODELS_H
+#pragma once
 
 #include "epecsolve.h"
 #include <armadillo>
@@ -13,25 +12,30 @@ typedef struct DemPar DemPar;
 typedef struct LeadPar LeadPar;
 typedef struct LeadAllPar LeadAllPar;
 
+enum class TaxType { StandardTax, SingleTax, CarbonTax };
+
 /// @brief Stores the parameters of the follower in a country model
 struct FollPar {
-  vector<double> costs_quad =
+  std::vector<double> costs_quad =
       {}; ///< Quadratic coefficient of i-th follower's cost. Size of this
-          ///< vector should be equal to n_followers
-  vector<double> costs_lin =
-      {}; ///< Linear  coefficient of i-th follower's cost. Size of this vector
+          ///< std::vector should be equal to n_followers
+  std::vector<double> costs_lin =
+      {}; ///< Linear  coefficient of i-th follower's cost. Size of this
+          ///< std::vector should be equal to n_followers
+  std::vector<double> capacities =
+      {}; ///< Production capacity of each follower. Size of this std::vector
           ///< should be equal to n_followers
-  vector<double> capacities =
-      {}; ///< Production capacity of each follower. Size of this vector should
-          ///< be equal to n_followers
-  vector<double> emission_costs =
+  std::vector<double> emission_costs =
       {}; ///< Emission costs for unit quantity of the fuel. Emission costs
           ///< feature only on the leader's problem
-  vector<double> tax_caps = {}; ///< Individual tax caps for each follower.
-  vector<string> names = {};    ///< Optional Names for the Followers.
-  FollPar(vector<double> costs_quad_ = {}, vector<double> costs_lin_ = {},
-          vector<double> capacities_ = {}, vector<double> emission_costs_ = {},
-          vector<double> tax_caps_ = {}, vector<string> names_ = {})
+  std::vector<double> tax_caps = {}; ///< Individual tax caps for each follower.
+  std::vector<std::string> names = {}; ///< Optional Names for the Followers.
+  FollPar(std::vector<double> costs_quad_ = {},
+          std::vector<double> costs_lin_ = {},
+          std::vector<double> capacities_ = {},
+          std::vector<double> emission_costs_ = {},
+          std::vector<double> tax_caps_ = {},
+          std::vector<std::string> names_ = {})
       : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
         emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
 };
@@ -53,22 +57,45 @@ struct LeadPar {
                             ///< set the value as -1;
   double price_limit =
       -1; ///< Government does not want the price to exceed this limit
+
+  Models::TaxType tax_type =
+      Models::TaxType::StandardTax; ///< 0 For standard, 1 for constant tax, 2
+                                    ///< for carbon tax
   bool tax_revenue = false; ///< Dictates whether the leader objective will
                             ///< include tax revenues
+  // LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
+  // bool tax_revenue = false, Models::TaxType tax_type_ =
+  // Models::TaxType::StandardTax)
+  // : import_limit{imp_lim}, export_limit{exp_lim},
+  // price_limit{price_limit},tax_type{tax_type_}, tax_revenue{tax_revenue} {}
   LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
-          bool tax_revenue = false)
+          bool tax_revenue = false, unsigned int tax_type_ = 0)
       : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit},
-        tax_revenue{tax_revenue} {}
+        tax_revenue{tax_revenue} {
+    switch (tax_type_) {
+    case 0:
+      tax_type = Models::TaxType::StandardTax;
+      break;
+    case 1:
+      tax_type = Models::TaxType::SingleTax;
+      break;
+    case 2:
+      tax_type = Models::TaxType::CarbonTax;
+      break;
+    default:
+      tax_type = Models::TaxType::StandardTax;
+    }
+  }
 };
 
 /// @brief Stores the parameters of a country model
 struct LeadAllPar {
   unsigned int n_followers;           ///< Number of followers in the country
-  string name;                        ///< Country Name
+  std::string name;                   ///< Country Name
   Models::FollPar FollowerParam = {}; ///< A struct to hold Follower Parameters
   Models::DemPar DemandParam = {};    ///< A struct to hold Demand Parameters
   Models::LeadPar LeaderParam = {};   ///< A struct to hold Leader Parameters
-  LeadAllPar(unsigned int n_foll, string name, Models::FollPar FP = {},
+  LeadAllPar(unsigned int n_foll, std::string name, Models::FollPar FP = {},
              Models::DemPar DP = {}, Models::LeadPar LP = {})
       : n_followers{n_foll}, name{name}, FollowerParam{FP}, DemandParam{DP},
         LeaderParam{LP} {
@@ -78,20 +105,20 @@ struct LeadAllPar {
 
 /// @brief Stores a single Instance
 struct EPECInstance {
-  vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
-  arma::sp_mat TransportationCosts = {};     ///< Transportation costs matrix
+  std::vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
+  arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
 
-  EPECInstance(string filename) {
+  EPECInstance(std::string filename) {
     this->load(filename);
   } ///< Constructor from instance file
-  EPECInstance(vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_)
+  EPECInstance(std::vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_)
       : Countries{Countries_}, TransportationCosts{Transp_} {}
   ///< Constructor from instance objects
 
-  void load(string filename);
+  void load(std::string filename);
   ///< Reads the EPECInstance from a file
 
-  void save(string filename);
+  void save(std::string filename);
   ///< Writes the EPECInstance from a file
 };
 
@@ -108,21 +135,23 @@ enum class LeaderVars {
   End
 };
 
-ostream &operator<<(ostream &ost, const FollPar P);
+std::ostream &operator<<(std::ostream &ost, const FollPar P);
 
-ostream &operator<<(ostream &ost, const DemPar P);
+std::ostream &operator<<(std::ostream &ost, const DemPar P);
 
-ostream &operator<<(ostream &ost, const LeadPar P);
+std::ostream &operator<<(std::ostream &ost, const LeadPar P);
 
-ostream &operator<<(ostream &ost, const LeadAllPar P);
+std::ostream &operator<<(std::ostream &ost, const LeadAllPar P);
 
-ostream &operator<<(ostream &ost, const LeaderVars l);
+std::ostream &operator<<(std::ostream &ost, const LeaderVars l);
 
-ostream &operator<<(ostream &ost, EPECInstance I);
+std::ostream &operator<<(std::ostream &ost, EPECInstance I);
 
-using LeadLocs = map<LeaderVars, unsigned int>;
+using LeadLocs = std::map<LeaderVars, unsigned int>;
 
 void increaseVal(LeadLocs &L, const LeaderVars start, const unsigned int val,
+                 const bool startnext = true);
+void decreaseVal(LeadLocs &L, const LeaderVars start, const unsigned int val,
                  const bool startnext = true);
 
 void init(LeadLocs &L);
@@ -132,32 +161,29 @@ LeaderVars operator+(Models::LeaderVars a, int b);
 class EPEC : public Game::EPEC {
   // Mandatory virtuals
 private:
-  void make_obj_leader(const unsigned int i,
-                       Game::QP_objective &QP_obj) override;
-  virtual void
-  computeLeaderLocations(const unsigned int addSpaceForMC = 0) override;
+  void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj) final;
+  virtual void updateLocs() override;
+  virtual void prefinalize() override;
+  virtual void postfinalize() override{};
+  // override;
 
 public:
-  void prefinalize() override;
-  void postfinalize() override{};
-  // void finalize() override;
-  // void findNashEq() override;
-  void make_country_QP() override;
-
   // Rest
 private:
-  vector<LeadAllPar> AllLeadPars =
+  std::vector<LeadAllPar> AllLeadPars =
       {}; ///< The parameters of each leader in the EPEC game
-  vector<shared_ptr<Game::QP_Param>> MC_QP =
+  std::vector<std::shared_ptr<Game::QP_Param>> MC_QP =
       {}; ///< The QP corresponding to the market clearing condition of each
           ///< player
   arma::sp_mat TranspCosts =
       {}; ///< Transportation costs between pairs of countries
-  vector<unsigned int> nImportMarkets =
+  std::vector<unsigned int> nImportMarkets =
       {}; ///< Number of countries from which the i-th country imports
-  vector<LeadLocs> Locations = {}; ///< Location of variables for each country
+  std::vector<LeadLocs> Locations =
+      {}; ///< Location of variables for each country
 
-  map<string, unsigned int> name2nos = {};
+  std::map<std::string, unsigned int> name2nos = {};
+  unsigned int taxVars = {0};
 
   bool dataCheck(const bool chkAllLeadPars = true,
                  const bool chkcountriesLL = true, const bool chkMC_QP = true,
@@ -192,20 +218,18 @@ private:
 
   void make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const override;
 
-  void WriteCountry(const unsigned int i, const string filename,
+  void WriteCountry(const unsigned int i, const std::string filename,
                     const arma::vec x, const bool append = true) const;
 
   void WriteFollower(const unsigned int i, const unsigned int j,
-                     const string filename, const arma::vec x) const;
+                     const std::string filename, const arma::vec x) const;
 
 public: // Attributes
   const unsigned int &nCountries{
       nCountr}; ///< Constant attribute for number of leaders in the EPEC
-  const unsigned int &nVarEPEC{
-      nVarinEPEC}; ///< Constant attribute for number of variables in the EPEC
-  bool indicators = {
-      true}; ///< Controls the flag useIndicators in LCPtoLP class. If true,
-             ///< indicators constraints replace bigM ones.
+  const unsigned int nVarEPEC{
+      this->getnVarinEPEC()}; ///< Constant attribute for number of variables in
+                              ///< the EPEC
   bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax
                                ///< is added to each leader objective
 
@@ -217,8 +241,6 @@ public: // Attributes
       : Game::EPEC(env), TranspCosts{TranspCosts} {}
 
   // Unit tests
-  void testQP(const unsigned int i);
-
   void testLCP(const unsigned int i);
 
   ///@brief %Models a Standard Nash-Cournot game within a country
@@ -236,31 +258,34 @@ public: // Attributes
               const LeaderVars var = LeaderVars::FollowerStart) const;
 
   unsigned int
-  getPosition(const string countryCount,
+  getPosition(const std::string countryCount,
               const LeaderVars var = LeaderVars::FollowerStart) const;
 
   EPEC &unlock();
 
-  unique_ptr<GRBModel> Respond(const string name, const arma::vec &x) const;
+  std::unique_ptr<GRBModel> Respond(const std::string name,
+                                    const arma::vec &x) const;
   // Data access methods
   Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
 
-  Game::LCP *playCountry(vector<Game::LCP *> countries);
+  Game::LCP *playCountry(std::vector<Game::LCP *> countries);
 
   // Writing model files
-  void write(const string filename, const unsigned int i,
+  void write(const std::string filename, const unsigned int i,
              bool append = true) const;
 
-  void write(const string filename, bool append = true) const;
+  void write(const std::string filename, bool append = true) const;
 
-  void gur_WriteCountry_conv(const unsigned int i, string filename) const;
+  void readSolutionJSON(const std::string filename);
 
-  void gur_WriteEpecMip(const unsigned int i, string filename) const;
+  void gur_WriteCountry_conv(const unsigned int i, std::string filename) const;
 
-  void writeSolutionJSON(string filename, const arma::vec x,
+  void gur_WriteEpecMip(const unsigned int i, std::string filename) const;
+
+  void writeSolutionJSON(std::string filename, const arma::vec x,
                          const arma::vec z) const;
 
-  void writeSolution(const int writeLevel, string filename) const;
+  void writeSolution(const int writeLevel, std::string filename) const;
 
   ///@brief Get the current EPECInstance loaded
   const EPECInstance getInstance() const {
@@ -268,20 +293,19 @@ public: // Attributes
   }
 };
 
-}; // namespace Models
+} // namespace Models
 
 // Gurobi functions
-string to_string(const GRBVar &var);
+std::string to_string(const GRBVar &var);
 
-string to_string(const GRBConstr &cons, const GRBModel &model);
+std::string to_string(const GRBConstr &cons, const GRBModel &model);
 
 // ostream functions
 namespace Models {
 enum class prn { label, val };
 
-ostream &operator<<(ostream &ost, Models::prn l);
-}; // namespace Models
+std::ostream &operator<<(std::ostream &ost, Models::prn l);
+} // namespace Models
 
-#endif
-
+Models::FollPar operator+(const Models::FollPar &F1, const Models::FollPar &F2);
 /* Examples */

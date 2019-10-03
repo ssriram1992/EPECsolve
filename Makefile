@@ -42,7 +42,7 @@ GUROPT=$(GURINC)
 # GCC=g++
 GCC=g++-4.8
 #OTHEROPTS= -O2 -std=c++11 -I include/
-OTHEROPTS= -O3 -std=c++11 -I include/
+OTHEROPTS= -O3 -std=c++11 -I include/ #-Wall -Wextra -Wpedantic #-Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wconversion 
 OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS) $(BOOSTOPT) 
 LINKOPTS=$(GURLIB) $(ARMALIB) $(BOOSTLIB)
 
@@ -102,8 +102,8 @@ instance:
 	$(OUTPUT) -i dat/Instance -m 1 -w 2
 
 format:
-	clang-format-8 -style=file -i src/*.cpp
-	clang-format-8 -style=file -i src/*.h
+	@clang-format-8 -style=llvm -i src/*.cpp
+	@clang-format-8 -style=llvm -i src/*.h
 
 docSimple:
 	doxygen docs/refConf
@@ -122,3 +122,13 @@ install:
 	mkdir -p dat
 	mkdir -p bin
 	mkdir -p obj
+
+$(BIN)/ChileArgentina: $(FILEEPEC) $(OBJ)/ChileArgentina.o 
+	@echo Linking...
+	$(GCC) $(FILEEPEC) $(OBJ)/ChileArgentina.o  $(OPTS) $(LINKOPTS) -o $(BIN)/ChileArgentina
+
+$(OBJ)/ChileArgentina.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/ChileArgentina.cpp
+	$(GCC) -c $(SRC)/ChileArgentina.cpp $(OPTS) -o $(OBJ)/ChileArgentina.o
+
+chile: $(BIN)/ChileArgentina
+	$(BIN)/ChileArgentina

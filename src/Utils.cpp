@@ -10,11 +10,11 @@ using namespace arma;
 arma::sp_mat Utils::resize_patch(const arma::sp_mat &Mat, const unsigned int nR,
                                  const unsigned int nC) {
   /**
-   @brief Armadillo patch for resizing sp_mat
-   @details Armadillo sp_mat::resize() is not robust as it initializes garbage
-   values to new columns. This fixes the problem by creating new columns with
-   guaranteed zero values. For arma::sp_mat
-   */
+ @brief Armadillo patch for resizing sp_mat
+ @details Armadillo sp_mat::resize() is not robust as it initializes garbage
+ values to new columns. This fixes the problem by creating new columns with
+ guaranteed zero values. For arma::sp_mat
+ */
   arma::sp_mat MMat(nR, nC);
   MMat.zeros();
   if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
@@ -35,11 +35,11 @@ arma::sp_mat Utils::resize_patch(const arma::sp_mat &Mat, const unsigned int nR,
 arma::mat Utils::resize_patch(const arma::mat &Mat, const unsigned int nR,
                               const unsigned int nC) {
   /**
-   @brief Armadillo patch for resizing mat
-   @details Armadillo mat::resize() is not robust as it initializes garbage
-   values to new columns. This fixes the problem by creating new columns with
-   guaranteed zero values. For arma::mat
-   */
+ @brief Armadillo patch for resizing mat
+ @details Armadillo mat::resize() is not robust as it initializes garbage
+ values to new columns. This fixes the problem by creating new columns with
+ guaranteed zero values. For arma::mat
+ */
   arma::mat MMat(nR, nC);
   MMat.zeros();
   if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
@@ -59,11 +59,11 @@ arma::mat Utils::resize_patch(const arma::mat &Mat, const unsigned int nR,
 // For arma::vec
 arma::vec Utils::resize_patch(const arma::vec &Mat, const unsigned int nR) {
   /**
-   @brief Armadillo patch for resizing vec
-   @details Armadillo vec::resize() is not robust as it initializes garbage
-   values to new columns. This fixes the problem by creating new columns with
-   guaranteed zero values. For arma::vec
-   */
+ @brief Armadillo patch for resizing vec
+ @details Armadillo vec::resize() is not robust as it initializes garbage
+ values to new columns. This fixes the problem by creating new columns with
+ guaranteed zero values. For arma::vec
+ */
   arma::vec MMat(nR);
   MMat.zeros();
   if (nR > Mat.n_rows)
@@ -196,8 +196,8 @@ void Utils::appendSave(const vec &matrix,   ///< The arma::vec to be saved
                        const string out,    ///< File name of the output file
                        const string header, ///< A header that might be used to
                                             ///< check data correctness
-                       bool erase ///< Should the vec be appended to the current
-                                  ///< file or overwritten
+                       bool erase ///< Should the vec be appended to the
+                                  ///< current file or overwritten
 ) {
   /**
    * Utility to append an arma::vec to a data file.
