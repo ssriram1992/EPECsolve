@@ -184,7 +184,9 @@ int main(int argc, char **argv) {
     results
         << "Instance;Algorithm;Countries;Followers;Status;numFeasiblePolyhedra;"
            "numVar;numConstraints;numNonZero;ClockTime"
-           "(s);Threads;Indicators;Aggressiveness;AddPolyMethod\n";
+           "(s);Threads;Indicators;numInnerIterations;lostIntermediateEq;"
+           "Aggressiveness;"
+           "AddPolyMethod;numericalIssuesEncountered\n";
   }
   existCheck.close();
 
@@ -202,10 +204,13 @@ int main(int argc, char **argv) {
           << ";" << WallClockTime << ";" << realThreads << ";"
           << to_string(epec.getIndicators());
   if (epec.getAlgorithm() == Game::EPECalgorithm::innerApproximation) {
-    results << ";" << epec.getAggressiveness() << ";"
-            << to_string(epec.getAddPolyMethod());
-  } else{
-    results << ";-;-";
+    results << ";" << epec.getStatistics().numIteration << ";"
+            << epec.getStatistics().lostIntermediateEq << ";"
+            << epec.getAggressiveness() << ";"
+            << to_string(epec.getAddPolyMethod()) << ";"
+            << epec.getStatistics().numericalIssuesEncountered;
+  } else {
+    results << ";-;-;-;-;-";
   }
   results << "\n";
   results.close();

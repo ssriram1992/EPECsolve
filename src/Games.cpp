@@ -1583,14 +1583,15 @@ void Game::EPEC::iterativeNash() {
   bool addRandPoly{false};
   std::vector<arma::vec> prevDevns(this->nCountr);
   this->Stats.numIteration = 0;
+  this->Stats.lostIntermediateEq = 0;
   if (this->Stats.AlgorithmParam.addPolyMethod == EPECAddPolyMethod::random) {
     for (unsigned int i = 0; i < this->nCountr; ++i) {
       long int seed = this->Stats.AlgorithmParam.addPolyMethodSeed < 0
-                              ? chrono::high_resolution_clock::now()
-                                        .time_since_epoch()
-                                        .count() +
-                                    42 + this->countries_LCP.at(i)->getNrow()
-                              : this->Stats.AlgorithmParam.addPolyMethodSeed;
+                          ? chrono::high_resolution_clock::now()
+                                    .time_since_epoch()
+                                    .count() +
+                                42 + this->countries_LCP.at(i)->getNrow()
+                          : this->Stats.AlgorithmParam.addPolyMethodSeed;
       this->countries_LCP.at(i)->addPolyMethodSeed = seed;
     }
   }
@@ -1601,10 +1602,12 @@ void Game::EPEC::iterativeNash() {
   // Stay in this loop, till you find a Nash equilibrium or prove that there
   // does not exist a Nash equilibrium or you run out of time.
   while (!solved) {
+    ++this->Stats.numIteration;
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Iteration "
-                            << to_string(++this->Stats.numIteration);
+                            << to_string(this->Stats.numIteration);
 
     if (addRandPoly) {
+      ++this->Stats.lostIntermediateEq;
       bool success =
           this->addRandomPoly2All(this->Stats.AlgorithmParam.aggressiveness,
                                   this->Stats.numIteration == 1);
@@ -1632,6 +1635,7 @@ void Game::EPEC::iterativeNash() {
                "Solved, but no deviation? Error!\n This might be due to "
                "numerical issues (tollerances)";
         this->Stats.status = EPECsolveStatus::numerical;
+        this->Stats.numericalIssuesEncountered = true;
         solved = true;
       }
     }
@@ -1806,6 +1810,7 @@ void Game::EPEC::findNashEq() {
   case Game::EPECalgorithm::innerApproximation:
     final_msg << "Inner approximation algorithm complete. ";
     this->iterativeNash();
+    final_msg << " - Number of Iterations: " << this->Stats.numIteration << " ";
     break;
 
   case Game::EPECalgorithm::fullEnumeration:
