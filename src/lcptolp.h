@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * @file To handle Linear Complementarity Problems.
+ */
+
 #include "epecsolve.h"
 #include <armadillo>
 #include <gurobi_c++.h>
@@ -127,7 +131,8 @@ public:
       true}; ///< If true, complementarities will be handled with indicator
   ///< constraints. BigM formulation otherwise
   long int addPolyMethodSeed = {
-      -1}; ///< Seeds the random generator for the random polyhedra selection. Should be a positive value
+      -1}; ///< Seeds the random generator for the random polyhedra selection.
+           ///< Should be a positive value
 
   /** Constructors */
   /// Class has no default constructors

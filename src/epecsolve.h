@@ -1,5 +1,9 @@
 #pragma once
 
+/** @file Forward declaration and for EPEC solve algorithms
+ * in https://github.com/ssriram1992/EPECsolve/
+ */
+
 #define VERBOSE false
 #define EPECVERSION 0.1
 

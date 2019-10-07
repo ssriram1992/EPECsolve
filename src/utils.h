@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * @file Basic utilities
+ */
+
 #include "epecsolve.h"
 #include <armadillo>
 #include <fstream>

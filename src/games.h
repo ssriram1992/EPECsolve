@@ -1,4 +1,8 @@
 #pragma once
+
+/**
+ * @file For Game theory related algorithms
+ */
 // #include"epecsolve.h"
 #include "lcptolp.h"
 #include <armadillo>
@@ -24,9 +28,9 @@ std::ostream &operator<<(std::ostream &ost, std::pair<T, S> p) {
 }
 
 namespace Game {
-bool isZero(arma::mat M, double tol = 1e-6);
+bool isZero(arma::mat M, double tol = 1e-6) noexcept;
 
-bool isZero(arma::sp_mat M, double tol = 1e-6);
+bool isZero(arma::sp_mat M, double tol = 1e-6) noexcept;
 
 // bool isZero(arma::vec M, double tol = 1e-6);
 ///@brief struct to handle the objective params of MP_Param/QP_Param
@@ -49,13 +53,14 @@ protected:
   // Data representing the parameterized QP
   arma::sp_mat Q, A, B, C;
   arma::vec c, b;
-
   // Object for sizes and integrity check
   unsigned int Nx, Ny, Ncons;
-
   unsigned int size();
-
   bool dataCheck(bool forcesymm = true) const;
+  virtual inline bool finalize() {
+    this->size();
+    return this->dataCheck();
+  } ///< Finalize the MP_Param object.
 
 public:
   // Default constructors
@@ -113,11 +118,6 @@ public:
     this->b = b;
     return *this;
   } ///< Set the private variable b
-
-  virtual inline bool finalize() {
-    this->size();
-    return this->dataCheck();
-  } ///< Finalize the MP_Param object.
 
   // Setters and advanced constructors
   virtual MP_Param &set(const arma::sp_mat &Q, const arma::sp_mat &C,
@@ -206,9 +206,10 @@ public: // Constructors
 
   std::unique_ptr<GRBModel> solveFixed(arma::vec x);
 
+  /// Computes the objective value, given a vector @p y and
+  /// a parameterizing vector @p x
   double computeObjective(const arma::vec &y, const arma::vec &x,
                           bool checkFeas = true, double tol = 1e-6) const;
-
   inline bool is_Playable(const QP_Param &P) const
   /// Checks if the current object can play a game with another Game::QP_Param
   /// object @p P.
@@ -219,14 +220,14 @@ public: // Constructors
     b3 = this->Ny <= P.getNx();
     return b1 && b2 && b3;
   }
-
   QP_Param &addDummy(unsigned int pars, unsigned int vars = 0,
                      int position = -1) override;
-
+  /// @brief  Writes a given parameterized Mathematical program to a set of
+  /// files.
   void write(std::string filename, bool append) const;
-
+  /// @brief Saves the @p Game::QP_Param object in a loadable file.
   void save(std::string filename, bool erase = true) const;
-
+  /// @brief Loads the @p Game::QP_Param object stored in a file.
   long int load(std::string filename, long int pos = 0);
 };
 
@@ -271,23 +272,24 @@ private:
   void set_positions();
 
 public: // Constructors
-  NashGame(GRBEnv *e)
-      : env{e} {}; ///< To be used only when NashGame is being loaded from a
-                   ///< file.
-  NashGame(GRBEnv *e, std::vector<std::shared_ptr<QP_Param>> Players,
-           arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar = 0,
-           arma::sp_mat LeadA = {}, arma::vec LeadRHS = {});
-
-  NashGame(GRBEnv *e, unsigned int Nplayers, unsigned int n_LeadVar = 0,
-           arma::sp_mat LeadA = {}, arma::vec LeadRHS = {})
-      : env{e}, LeaderConstraints{LeadA},
-        LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar} {
-    Players.resize(this->Nplayers);
-    primal_position.resize(this->Nplayers);
-    dual_position.resize(this->Nplayers);
-  }
-
-  /// Destructors to `delete` the QP_Param objects that might have been used.
+        /// To be used only when NashGame is being loaded from a file.
+  explicit NashGame(GRBEnv *e) noexcept : env{e} {};
+  /// Constructing a NashGame from a set of Game::QP_Param, Market clearing
+  /// constraints
+  explicit NashGame(GRBEnv *e, std::vector<std::shared_ptr<QP_Param>> Players,
+                    arma::sp_mat MC, arma::vec MCRHS,
+                    unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {},
+                    arma::vec LeadRHS = {});
+  /*
+NashGame(GRBEnv *e, unsigned int Nplayers, unsigned int n_LeadVar = 0,
+     arma::sp_mat LeadA = {}, arma::vec LeadRHS = {})
+: env{e}, LeaderConstraints{LeadA},
+  LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar} {
+Players.resize(this->Nplayers);
+primal_position.resize(this->Nplayers);
+dual_position.resize(this->Nplayers);
+}
+  */
   ~NashGame(){};
 
   // Verbose declaration
@@ -311,28 +313,48 @@ public: // Constructors
     return os;
   }
 
-  /// Return the number of primal variables
+  /// @brief Return the number of primal variables.
   inline unsigned int getNprimals() const {
+    /***
+     * Number of primal variables is the sum of the "y" variables present in
+     * each player's Game::QP_Param
+     */
     return this->primal_position.back();
   }
-
+  /// @brief Gets the number of Market clearing Shadow prices
+  /**
+   * Number of shadow price variables is equal to the number of Market clearing
+   * constraints.
+   */
   inline unsigned int getNshadow() const { return this->MCRHS.n_rows; }
-
+  /// @brief Gets the number of leader variables
+  /**
+   * Leader variables are variables which do not have a complementarity relation
+   * with any equation.
+   */
   inline unsigned int getNleaderVars() const { return this->n_LeadVar; }
-
+  /// @brief Gets the number of dual variables in the problem
   inline unsigned int getNduals() const {
+    /**
+     * This is the count of number of dual variables and that is indeed the sum
+     * of the number dual variables each player has. And the number of dual
+     * variables for any player is equal to the number of linear constraints
+     * they have which is given by the number of rows in the player's
+     * Game::QP_Param::A
+     */
     return this->dual_position.back() - this->dual_position.front() + 0;
   }
 
-  // Size of variables
+  // Position of variables
+  /// Gets the position of the primal variable of i th player
   inline unsigned int getPrimalLoc(unsigned int i = 0) const {
     return primal_position.at(i);
   }
-
+  /// Gets the positin where the Market-clearing dual variables start
   inline unsigned int getMCdualLoc() const { return MC_dual_position; }
-
+  /// Gets the positin where the Leader  variables start
   inline unsigned int getLeaderLoc() const { return Leader_position; }
-
+  /// Gets the location where the dual variables start
   inline unsigned int getDualLoc(unsigned int i = 0) const {
     return dual_position.at(i);
   }
@@ -342,11 +364,8 @@ public: // Constructors
                                bool writeToFile = false,
                                std::string M_name = "dat/LCP.txt",
                                std::string q_name = "dat/q.txt") const;
-
   arma::sp_mat RewriteLeadCons() const;
-
   inline arma::vec getLeadRHS() const { return this->LeaderConsRHS; }
-
   inline arma::vec getMCLeadRHS() const {
     return arma::join_cols(arma::join_cols(this->LeaderConsRHS, this->MCRHS),
                            -this->MCRHS);
@@ -355,38 +374,27 @@ public: // Constructors
   // Check solution and correctness
   std::unique_ptr<GRBModel> Respond(unsigned int player, const arma::vec &x,
                                     bool fullvec = true) const;
-
   double RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
                     bool fullvec = true) const;
-
   arma::vec ComputeQPObjvals(const arma::vec &x, bool checkFeas = false) const;
-
   bool isSolved(const arma::vec &sol, unsigned int &violPlayer,
                 arma::vec &violSol, double tol = 1e-4) const;
-
   //  Modify NashGame members
-
   NashGame &addDummy(unsigned int par = 0, int position = -1);
-
   NashGame &addLeadCons(const arma::vec &a, double b);
-
   // Read/Write Nashgame functions
-
   void write(std::string filename, bool append = true, bool KKT = false) const;
-
+  /// @brief Saves the @p Game::NashGame object in a loadable file.
   void save(std::string filename, bool erase = true) const;
-
+  /// @brief Loads the @p Game::NashGame object stored in a file.
   long int load(std::string filename, long int pos = 0);
 };
 
-// void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
-// ostream& operator<< (ostream& os, const QP_Param &Q);
-// void MPEC(NashGame N, arma::sp_mat Q, QP_Param &P);
 std::ostream &operator<<(std::ostream &os, const QP_Param &Q);
 
 std::ostream &operator<<(std::ostream &ost, const perps &C);
 
-void print(const perps &C);
+void print(const perps &C) noexcept;
 } // namespace Game
 
 // The EPEC stuff
@@ -414,7 +422,9 @@ enum class EPECalgorithm {
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
-  long int addPolyMethodSeed{-1}; ///< Random seed for the random selection of polyhedra. If -1, a default computed value will seeded.
+  long int addPolyMethodSeed{
+      -1}; ///< Random seed for the random selection of polyhedra. If -1, a
+           ///< default computed value will seeded.
   bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
   ///< Uses @p bigM if @p false.
   double timeLimit{
@@ -444,6 +454,7 @@ struct EPECStatistics {
           ///< instance.
 };
 
+///@brief Class to handle a Nash game between leaders of Stackelberg games
 class EPEC {
 private:
   std::vector<unsigned int> SizesWithoutHull{};
@@ -543,9 +554,9 @@ protected: // functions
   }
 
 public:                  // functions
-  EPEC() = delete;       ///< No default constructor
-  EPEC(EPEC &) = delete; ///< Abstract class - no copy constructor
-  ~EPEC() {}             ///< Destructor to free data
+  EPEC() = delete;       // No default constructor
+  EPEC(EPEC &) = delete; // Abstract class - no copy constructor
+  ~EPEC() {}             // Destructor to free data
 
   virtual void finalize() final;
   virtual void findNashEq() final;

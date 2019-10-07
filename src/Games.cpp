@@ -11,15 +11,32 @@
 using namespace std;
 using namespace Utils;
 
-bool Game::isZero(arma::mat M, double tol) {
+bool Game::isZero(arma::mat M, double tol) noexcept {
+  /**
+   * @brief
+   * Checking if a given matrix M is a zero matrix
+   *
+   * @param tol Tolerance, below which a number is treated as 0
+   * @warning tol < 0 always returns @p false with no error.
+   *
+   */
   return (arma::min(arma::min(abs(M))) <= tol);
 }
 
-bool Game::isZero(arma::sp_mat M, double tol) {
+bool Game::isZero(arma::sp_mat M, double tol) noexcept {
+  /**
+   * @brief
+   * Checking if a given sparse matrix M is a zero matrix
+   *
+   * @param tol Tolerance, below which a number is treated as 0
+   *
+   */
+  if (M.n_nonzero == 0)
+    return true;
   return (arma::min(arma::min(abs(M))) <= tol);
 }
 
-void Game::print(const perps &C) {
+void Game::print(const perps &C) noexcept {
   for (auto p : C)
     cout << "<" << p.first << ", " << p.second << ">"
          << "\t";
@@ -41,6 +58,23 @@ ostream &Game::operator<<(ostream &os, const Game::QP_Param &Q) {
 }
 
 void Game::MP_Param::write(string filename, bool) const {
+  /**
+   * @brief  Writes a given parameterized Mathematical program to a set of
+   * files.
+   *
+   * Writes a given parameterized Mathematical program to a set of files.
+   * One file is written for each attribute namely
+   * 1. Game::MP_Param::Q
+   * 2. Game::MP_Param::C
+   * 3. Game::MP_Param::A
+   * 4. Game::MP_Param::B
+   * 5. Game::MP_Param::c
+   * 6. Game::MP_Param::b
+   *
+   * To contrast see, Game::MP_Param::save where all details are written to a
+   * single loadable file
+   *
+   */
   this->getQ().save(filename + "_Q.txt", arma::file_type::arma_ascii);
   this->getC().save(filename + "_C.txt", arma::file_type::arma_ascii);
   this->getA().save(filename + "_A.txt", arma::file_type::arma_ascii);
@@ -101,13 +135,21 @@ Game::MP_Param &Game::MP_Param::addDummy(unsigned int pars, unsigned int vars,
       arma::sp_mat A_temp =
           arma::join_rows(A.cols(0, position - 1),
                           arma::zeros<arma::sp_mat>(this->Ncons, pars));
-      A = arma::join_rows(A_temp, A.cols(position, A.n_cols - 1));
+      if (static_cast<unsigned int>(position) < A.n_cols) {
+        A = arma::join_rows(A_temp, A.cols(position, A.n_cols - 1));
+      } else {
+        A = A_temp;
+      }
     }
     if (vars || pars) {
       C = resize_patch(C, this->Ny, C.n_cols);
       arma::sp_mat C_temp = arma::join_rows(
           C.cols(0, position - 1), arma::zeros<arma::sp_mat>(this->Ny, pars));
-      C = arma::join_rows(C_temp, C.cols(position, C.n_cols - 1));
+      if (static_cast<unsigned int>(position) < C.n_cols) {
+        C = arma::join_rows(C_temp, C.cols(position, C.n_cols - 1));
+      } else {
+        C = C_temp;
+      }
     }
     break;
   };
@@ -191,6 +233,8 @@ bool Game::MP_Param::dataCheck(bool forcesymm) const
  * 	@returns true if all above checks are cleared. false otherwise.
  */
 {
+  if (forcesymm) {
+  }
   if (this->Q.n_cols != Ny) {
     return false;
   }
@@ -359,6 +403,8 @@ Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars,
 
   // Call the superclass function
   try {
+    BOOST_LOG_TRIVIAL(debug) << "Game::QP::Param: Called with :" << pars << " "
+                             << vars << " " << position;
     MP_Param::addDummy(pars, vars, position);
   } catch (const char *e) {
     cerr << " Error in Game::QP_Param::addDummy: " << e << '\n';
@@ -448,6 +494,12 @@ Game::QP_Param &Game::QP_Param::set(const QP_objective &obj,
 
 double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
                                         bool checkFeas, double tol) const {
+  /**
+   * Computes @f$\frac{1}{2} y^TQy + (Cx)^Ty @f$ given the input values @p y and
+   * @p x.
+   * @param checkFeas if @p true, checks if the given @f$(x,y)@f$ satisfies the
+   * constraints of the problem, namely @f$Ax + By \leq b@f$.
+   */
   if (y.n_rows != this->getNy())
     throw string("Error in QP_Param::computeObjective: Invalid size of y");
   if (x.n_rows != this->getNx())
@@ -465,6 +517,10 @@ double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
 }
 
 void Game::QP_Param::save(string filename, bool erase) const {
+  /**
+   * The Game::QP_Param object hence stored can be loaded back using
+   * Game::QP_Param::load
+   */
   Utils::appendSave(string("QP_Param"), filename, erase);
   Utils::appendSave(this->Q, filename, string("QP_Param::Q"), false);
   Utils::appendSave(this->A, filename, string("QP_Param::A"), false);
@@ -477,12 +533,10 @@ void Game::QP_Param::save(string filename, bool erase) const {
 
 long int Game::QP_Param::load(string filename, long int pos) {
   /**
-   * @brief Loads the @p QP_Param object stored in a file.  Before calling this
-   * function, use the constructor QP_Param::QP_Param(GRBEnv *env) to
-   * initialize.
-   * @details Loads the @p QP_Param object stored in a file.  Before calling
-   * this function, use the constructor QP_Param::QP_Param(GRBEnv *env) to
-   * initialize. Example usage:
+   * @details  Before calling this function, use the constructor
+   * QP_Param::QP_Param(GRBEnv *env) to initialize.
+   *
+   * Example usage:
    * @code{.cpp}
    * int main()
    * {
@@ -701,6 +755,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     Ndual = this->Players[i]->getA().n_rows;
     // Adding the primal equations
     // Region 1 in Formulate LCP.ipe
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 1";
     if (i > 0) { // For the first player, no need to add anything 'before' 0-th
       // position
       M.submat(this->primal_position.at(i), 0,
@@ -709,11 +764,13 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
           Ni[i].submat(0, 0, Nprim - 1, this->primal_position.at(i) - 1);
     }
     // Region 2 in Formulate LCP.ipe
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 2";
     M.submat(this->primal_position.at(i), this->primal_position.at(i),
              this->primal_position.at(i + 1) - 1,
              this->primal_position.at(i + 1) - 1) =
         Mi[i].submat(0, 0, Nprim - 1, Nprim - 1);
     // Region 3 in Formulate LCP.ipe
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 3";
     if (this->primal_position.at(i + 1) != this->dual_position.at(0)) {
       M.submat(this->primal_position.at(i), this->primal_position.at(i + 1),
                this->primal_position.at(i + 1) - 1,
@@ -722,6 +779,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
                        Ni[i].n_cols - 1);
     }
     // Region 4 in Formulate LCP.ipe
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 4";
     if (this->dual_position.at(i) != this->dual_position.at(i + 1)) {
       M.submat(this->primal_position.at(i), this->dual_position.at(i),
                this->primal_position.at(i + 1) - 1,
@@ -729,6 +787,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
           Mi[i].submat(0, Nprim, Nprim - 1, Nprim + Ndual - 1);
     }
     // RHS
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region RHS";
     q.subvec(this->primal_position.at(i), this->primal_position.at(i + 1) - 1) =
         qi[i].subvec(0, Nprim - 1);
     for (unsigned int j = this->primal_position.at(i);
@@ -736,6 +795,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
       Compl.push_back({j, j});
     // Adding the dual equations
     // Region 5 in Formulate LCP.ipe
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 5";
     if (Ndual > 0) {
       if (i > 0) // For the first player, no need to add anything 'before' 0-th
         // position
@@ -745,12 +805,23 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
             Ni[i].submat(Nprim, 0, Ni[i].n_rows - 1,
                          this->primal_position.at(i) - 1);
       // Region 6 in Formulate LCP.ipe
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 6";
       M.submat(this->dual_position.at(i) - n_LeadVar,
                this->primal_position.at(i),
                this->dual_position.at(i + 1) - n_LeadVar - 1,
                this->primal_position.at(i + 1) - 1) =
           Mi[i].submat(Nprim, 0, Nprim + Ndual - 1, Nprim - 1);
       // Region 7 in Formulate LCP.ipe
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 7";
+	cout << i <<" "<< this->dual_position.size() <<"\n";
+	cout << this->dual_position.at(i) << " " << n_LeadVar << "\n";
+	cout << this->primal_position.at(i+1) << "\n";
+	cout << this->dual_position.at(i+1) << " " << n_LeadVar << "\n";
+	cout << this->dual_position.at(0) << "\n";
+	cout << M.n_rows << " " <<M.n_cols << "\n";
+	cout << Ni[i].n_rows << " " <<Ni[i].n_cols << "\n";
+	cout << Nprim << "\n";
+	cout << this->primal_position.at(i+1) << "\n";
       M.submat(this->dual_position.at(i) - n_LeadVar,
                this->primal_position.at(i + 1),
                this->dual_position.at(i + 1) - n_LeadVar - 1,
@@ -758,11 +829,17 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
           Ni[i].submat(Nprim, this->primal_position.at(i), Ni[i].n_rows - 1,
                        Ni[i].n_cols - 1);
       // Region 8 in Formulate LCP.ipe
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 8";
+	// cout << i <<" "<< this->dual_position.size() <<"\n";
+	// cout << this->dual_position.at(i) - n_LeadVar<<" "<< this->dual_position.at(i) <<" "
+		// << this->dual_position.at(i + 1) - n_LeadVar - 1<< " "<< 
+               // this->dual_position.at(i + 1) - 1 << "\n";
       M.submat(this->dual_position.at(i) - n_LeadVar, this->dual_position.at(i),
                this->dual_position.at(i + 1) - n_LeadVar - 1,
                this->dual_position.at(i + 1) - 1) =
           Mi[i].submat(Nprim, Nprim, Nprim + Ndual - 1, Nprim + Ndual - 1);
       // RHS
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region RHS";
       q.subvec(this->dual_position.at(i) - n_LeadVar,
                this->dual_position.at(i + 1) - n_LeadVar - 1) =
           qi[i].subvec(Nprim, qi[i].n_rows - 1);
@@ -771,6 +848,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
         Compl.push_back({j, j + n_LeadVar});
     }
   }
+	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: MC RHS";
   if (this->MCRHS.n_elem >= 1) // It is possible that it is a Cournot game and
   // there are no MC conditions!
   {
@@ -1087,7 +1165,7 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
    * @param[in] tol - If the additional profit is smaller than this, then it is
    * not considered a profitable deviation.
    */
-  if (this == nullptr)
+  if (!this)
     return false;
   arma::vec objvals = this->ComputeQPObjvals(sol, true);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
@@ -1128,7 +1206,7 @@ void Game::EPEC::resetLCP() {
    * Useful in testing, or resolving a problem with a different algorithm.
    */
   BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::resetLCP: resetting LCPs.";
-  for (int i = 0; i < this->nCountr; ++i) {
+  for (unsigned int i = 0; i < this->nCountr; ++i) {
     if (this->countries_LCP.at(i))
       this->countries_LCP.at(i).reset();
     this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
@@ -1453,23 +1531,40 @@ void Game::EPEC::make_country_QP()
     unsigned int convHullVarCount =
         this->LeadObjec_ConvexHull.at(i)->Q.n_rows - originalSizeWithoutHull;
 
-    BOOST_LOG_TRIVIAL(debug) << "Added " << convHullVarCount
-                             << " convex hull variables to QP #" << i;
+    BOOST_LOG_TRIVIAL(debug)
+        << "Game::EPEC::make_country_QP: Added " << convHullVarCount
+        << " convex hull variables to QP #" << i;
 
     // Location details
     this->convexHullVariables.at(i) = convHullVarCount;
     // All other players' QP
-    if (this->nCountr > 1) {
-      for (unsigned int j = 0; j < this->nCountr; j++) {
-        if (i != j)
-          this->country_QP.at(j)->addDummy(
-              convHullVarCount, 0,
-              this->country_QP.at(j)->getNx() -
-                  this->n_MCVar); // The position to add parameters is towards
-                                  // the end of all parameters, giving space
-                                  // only for the n_MCVar number of market
-                                  // clearing variables
+    try {
+      if (this->nCountr > 1) {
+        for (unsigned int j = 0; j < this->nCountr; j++) {
+          if (i != j) {
+            this->country_QP.at(j)->addDummy(
+                convHullVarCount, 0,
+                this->country_QP.at(j)->getNx() -
+                    this->n_MCVar); // The position to add parameters is towards
+                                    // the end of all parameters, giving space
+                                    // only for the n_MCVar number of market
+                                    // clearing variables
+          }
+        }
       }
+    } catch (const char *e) {
+      cerr << e << '\n';
+      throw;
+    } catch (string e) {
+      cerr << "String in Game::EPEC::make_country_QP : " << e << '\n';
+      throw;
+    } catch (GRBException &e) {
+      cerr << "GRBException in Game::EPEC::make_country_QP : "
+           << e.getErrorCode() << ": " << e.getMessage() << '\n';
+      throw;
+    } catch (exception &e) {
+      cerr << "Exception in Game::EPEC::make_country_QP : " << e.what() << '\n';
+      throw;
     }
   }
   this->updateLocs();
@@ -1586,11 +1681,11 @@ void Game::EPEC::iterativeNash() {
   if (this->Stats.AlgorithmParam.addPolyMethod == EPECAddPolyMethod::random) {
     for (unsigned int i = 0; i < this->nCountr; ++i) {
       long int seed = this->Stats.AlgorithmParam.addPolyMethodSeed < 0
-                              ? chrono::high_resolution_clock::now()
-                                        .time_since_epoch()
-                                        .count() +
-                                    42 + this->countries_LCP.at(i)->getNrow()
-                              : this->Stats.AlgorithmParam.addPolyMethodSeed;
+                          ? chrono::high_resolution_clock::now()
+                                    .time_since_epoch()
+                                    .count() +
+                                42 + this->countries_LCP.at(i)->getNrow()
+                          : this->Stats.AlgorithmParam.addPolyMethodSeed;
       this->countries_LCP.at(i)->addPolyMethodSeed = seed;
     }
   }
@@ -1673,7 +1768,7 @@ void Game::EPEC::iterativeNash() {
 void ::Game::EPEC::make_country_LCP() {
   if (this->country_QP.front() == nullptr) {
     BOOST_LOG_TRIVIAL(error)
-        << "Exception in Game::EPEC::countryLCP : no country QP has been "
+        << "Exception in Game::EPEC::make_country_LCP : no country QP has been "
            "made."
         << '\n';
     throw;
@@ -1686,9 +1781,12 @@ void ::Game::EPEC::make_country_LCP() {
   MCRHS.zeros(0);
   dumb.zeros(0);
   this->make_MC_cons(MC, MCRHS);
+  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): Market Clearing constraints are ready";
   this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
       this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
+  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): NashGame is ready";
   this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
+  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): LCP is ready";
   this->lcp->useIndicators =
       this->Stats.AlgorithmParam.indicators; // Using indicator constraints
 
@@ -1708,7 +1806,9 @@ bool Game::EPEC::computeNashEq(
    */
   bool foundNash{false};
   // Make the Nash Game between countries
+  BOOST_LOG_TRIVIAL(trace) << " Game::EPEC::computeNashEq: Making the Huge LCP";
   this->make_country_LCP();
+  BOOST_LOG_TRIVIAL(trace) << " Game::EPEC::computeNashEq: Made the Huge LCP";
   if (localTimeLimit > 0) {
     this->lcpmodel->set(GRB_DoubleParam_TimeLimit, localTimeLimit);
   }
@@ -1764,7 +1864,6 @@ bool Game::EPEC::warmstart(const arma::vec x, const arma::vec z) {
   std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
   std::vector<arma::vec> prevDevns = std::vector<arma::vec>(this->nCountr);
   this->getAllDevns(devns, this->sol_x, prevDevns);
-  unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
   this->make_country_QP();
 
   unsigned int c;
@@ -1813,6 +1912,7 @@ void Game::EPEC::findNashEq() {
     for (unsigned int i = 0; i < this->nCountr; ++i)
       this->countries_LCP.at(i)->EnumerateAll(true);
     this->make_country_QP();
+    BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::findNashEq: Starting fullEnumeration search";
     this->computeNashEq(this->Stats.AlgorithmParam.timeLimit);
     this->lcp->save("dat/LCP_enum.dat");
     this->lcpmodel->write("dat/lcpmodel_enum.lp");

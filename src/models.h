@@ -1,5 +1,11 @@
 #pragma once
 
+/**
+ * @file Using EPECSolve to solve problems arising in
+ * international energy markets with climate-conscious
+ * countries.
+ */
+
 #include "epecsolve.h"
 #include <armadillo>
 #include <gurobi_c++.h>
