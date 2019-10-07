@@ -24,9 +24,9 @@ std::ostream &operator<<(std::ostream &ost, std::pair<T, S> p) {
 }
 
 namespace Game {
-bool isZero(arma::mat M, double tol = 1e-6);
+bool isZero(arma::mat M, double tol = 1e-6) noexcept;
 
-bool isZero(arma::sp_mat M, double tol = 1e-6);
+bool isZero(arma::sp_mat M, double tol = 1e-6) noexcept;
 
 // bool isZero(arma::vec M, double tol = 1e-6);
 ///@brief struct to handle the objective params of MP_Param/QP_Param
@@ -386,7 +386,7 @@ std::ostream &operator<<(std::ostream &os, const QP_Param &Q);
 
 std::ostream &operator<<(std::ostream &ost, const perps &C);
 
-void print(const perps &C);
+void print(const perps &C) noexcept;
 } // namespace Game
 
 // The EPEC stuff
