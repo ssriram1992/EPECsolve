@@ -444,7 +444,12 @@ struct EPECStatistics {
                            ///< for fullEnumeration)
   int numConstraints = {-1}; ///< Number of constraints in findNashEq model
   int numNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
-                         ///< matrix of findNashEq model
+  ///< matrix of findNashEq model
+  int lostIntermediateEq = {0}; ///< Numer of times innerApproximation cannot
+                                ///< add polyhedra basing on deviations
+  bool numericalIssuesEncountered = {
+      false}; ///< True if there have been some numerical issues during the
+              ///< iteration of the innerApproximation
   std::vector<unsigned int> feasiblePolyhedra =
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
           ///< leader (country)

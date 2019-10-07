@@ -340,7 +340,7 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed(
                  */
 {
   this->make_yQy(); /// @throws GRBException if argument vector size is not
-                    /// compatible with the
+  /// compatible with the
   /// Game::QP_Param definition.
   if (x.size() != this->Nx)
     throw "Invalid argument size: " + to_string(x.size()) +
@@ -755,7 +755,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     Ndual = this->Players[i]->getA().n_rows;
     // Adding the primal equations
     // Region 1 in Formulate LCP.ipe
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 1";
+    BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 1";
     if (i > 0) { // For the first player, no need to add anything 'before' 0-th
       // position
       M.submat(this->primal_position.at(i), 0,
@@ -764,13 +764,13 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
           Ni[i].submat(0, 0, Nprim - 1, this->primal_position.at(i) - 1);
     }
     // Region 2 in Formulate LCP.ipe
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 2";
+    BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 2";
     M.submat(this->primal_position.at(i), this->primal_position.at(i),
              this->primal_position.at(i + 1) - 1,
              this->primal_position.at(i + 1) - 1) =
         Mi[i].submat(0, 0, Nprim - 1, Nprim - 1);
     // Region 3 in Formulate LCP.ipe
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 3";
+    BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 3";
     if (this->primal_position.at(i + 1) != this->dual_position.at(0)) {
       M.submat(this->primal_position.at(i), this->primal_position.at(i + 1),
                this->primal_position.at(i + 1) - 1,
@@ -779,7 +779,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
                        Ni[i].n_cols - 1);
     }
     // Region 4 in Formulate LCP.ipe
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 4";
+    BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 4";
     if (this->dual_position.at(i) != this->dual_position.at(i + 1)) {
       M.submat(this->primal_position.at(i), this->dual_position.at(i),
                this->primal_position.at(i + 1) - 1,
@@ -787,7 +787,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
           Mi[i].submat(0, Nprim, Nprim - 1, Nprim + Ndual - 1);
     }
     // RHS
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region RHS";
+    BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region RHS";
     q.subvec(this->primal_position.at(i), this->primal_position.at(i + 1) - 1) =
         qi[i].subvec(0, Nprim - 1);
     for (unsigned int j = this->primal_position.at(i);
@@ -795,7 +795,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
       Compl.push_back({j, j});
     // Adding the dual equations
     // Region 5 in Formulate LCP.ipe
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 5";
+    BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 5";
     if (Ndual > 0) {
       if (i > 0) // For the first player, no need to add anything 'before' 0-th
         // position
@@ -805,41 +805,30 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
             Ni[i].submat(Nprim, 0, Ni[i].n_rows - 1,
                          this->primal_position.at(i) - 1);
       // Region 6 in Formulate LCP.ipe
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 6";
+      BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 6";
       M.submat(this->dual_position.at(i) - n_LeadVar,
                this->primal_position.at(i),
                this->dual_position.at(i + 1) - n_LeadVar - 1,
                this->primal_position.at(i + 1) - 1) =
           Mi[i].submat(Nprim, 0, Nprim + Ndual - 1, Nprim - 1);
       // Region 7 in Formulate LCP.ipe
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 7";
-	cout << i <<" "<< this->dual_position.size() <<"\n";
-	cout << this->dual_position.at(i) << " " << n_LeadVar << "\n";
-	cout << this->primal_position.at(i+1) << "\n";
-	cout << this->dual_position.at(i+1) << " " << n_LeadVar << "\n";
-	cout << this->dual_position.at(0) << "\n";
-	cout << M.n_rows << " " <<M.n_cols << "\n";
-	cout << Ni[i].n_rows << " " <<Ni[i].n_cols << "\n";
-	cout << Nprim << "\n";
-	cout << this->primal_position.at(i+1) << "\n";
-      M.submat(this->dual_position.at(i) - n_LeadVar,
-               this->primal_position.at(i + 1),
-               this->dual_position.at(i + 1) - n_LeadVar - 1,
-               this->dual_position.at(0) - 1) =
-          Ni[i].submat(Nprim, this->primal_position.at(i), Ni[i].n_rows - 1,
-                       Ni[i].n_cols - 1);
+      BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 7";
+      if (this->dual_position.at(0) != this->primal_position.at(i + 1)) {
+        M.submat(this->dual_position.at(i) - n_LeadVar,
+                 this->primal_position.at(i + 1),
+                 this->dual_position.at(i + 1) - n_LeadVar - 1,
+                 this->dual_position.at(0) - 1) =
+            Ni[i].submat(Nprim, this->primal_position.at(i), Ni[i].n_rows - 1,
+                         Ni[i].n_cols - 1);
+      }
       // Region 8 in Formulate LCP.ipe
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 8";
-	// cout << i <<" "<< this->dual_position.size() <<"\n";
-	// cout << this->dual_position.at(i) - n_LeadVar<<" "<< this->dual_position.at(i) <<" "
-		// << this->dual_position.at(i + 1) - n_LeadVar - 1<< " "<< 
-               // this->dual_position.at(i + 1) - 1 << "\n";
+      BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region 8";
       M.submat(this->dual_position.at(i) - n_LeadVar, this->dual_position.at(i),
                this->dual_position.at(i + 1) - n_LeadVar - 1,
                this->dual_position.at(i + 1) - 1) =
           Mi[i].submat(Nprim, Nprim, Nprim + Ndual - 1, Nprim + Ndual - 1);
       // RHS
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region RHS";
+      BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: Region RHS";
       q.subvec(this->dual_position.at(i) - n_LeadVar,
                this->dual_position.at(i + 1) - n_LeadVar - 1) =
           qi[i].subvec(Nprim, qi[i].n_rows - 1);
@@ -848,9 +837,9 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
         Compl.push_back({j, j + n_LeadVar});
     }
   }
-	BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: MC RHS";
+  BOOST_LOG_TRIVIAL(debug) << "Game::NashGame::FormulateLCP: MC RHS";
   if (this->MCRHS.n_elem >= 1) // It is possible that it is a Cournot game and
-  // there are no MC conditions!
+                               // there are no MC conditions!
   {
     M.submat(this->MC_dual_position, 0, this->Leader_position - 1,
              this->dual_position.at(0) - 1) = this->MarketClearing;
@@ -1044,7 +1033,7 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
     const arma::vec &x,  ///< A vector of pure strategies (either for all
     ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
-    ///< player)
+                 ///< player)
     ) const
 /**
  * @brief Given the decision of other players, find the optimal response for
@@ -1064,7 +1053,7 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
       player); // Start of the player-th player's primals
   nEnd = this->primal_position.at(
       player + 1); // Start of the player+1-th player's primals or LeaderVrs if
-                   // player is the last player.
+  // player is the last player.
   if (fullvec) {
     solOther.zeros(nVar - nEnd + nStart);
     if (nStart > 0)
@@ -1088,7 +1077,7 @@ double Game::NashGame::RespondSol(
     const arma::vec &x,  ///< A vector of pure strategies (either for all
     ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
-    ///< player)
+                 ///< player)
     ) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
@@ -1365,7 +1354,7 @@ double Game::EPEC::RespondSol(
     arma::vec &sol,      ///< [out] Optimal response
     unsigned int player, ///< Player whose optimal response is to be computed
     const arma::vec &x, ///< A vector of pure strategies (either for all players
-                        ///< or all other players
+    ///< or all other players
     const arma::vec &prevDev = {}
     //< [in] if any, the vector of previous deviations.
     ) const {
@@ -1781,10 +1770,12 @@ void ::Game::EPEC::make_country_LCP() {
   MCRHS.zeros(0);
   dumb.zeros(0);
   this->make_MC_cons(MC, MCRHS);
-  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): Market Clearing constraints are ready";
+  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): Market Clearing "
+                              "constraints are ready";
   this->nashgame = std::unique_ptr<Game::NashGame>(new Game::NashGame(
       this->env, this->country_QP, MC, MCRHS, 0, dumA, dumb));
-  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): NashGame is ready";
+  BOOST_LOG_TRIVIAL(trace)
+      << "Game::EPEC::make_country_LCP(): NashGame is ready";
   this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
   BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): LCP is ready";
   this->lcp->useIndicators =
@@ -1806,9 +1797,10 @@ bool Game::EPEC::computeNashEq(
    */
   bool foundNash{false};
   // Make the Nash Game between countries
-  BOOST_LOG_TRIVIAL(trace) << " Game::EPEC::computeNashEq: Making the Huge LCP";
+  BOOST_LOG_TRIVIAL(trace)
+      << " Game::EPEC::computeNashEq: Making the Master LCP";
   this->make_country_LCP();
-  BOOST_LOG_TRIVIAL(trace) << " Game::EPEC::computeNashEq: Made the Huge LCP";
+  BOOST_LOG_TRIVIAL(trace) << " Game::EPEC::computeNashEq: Made the Master LCP";
   if (localTimeLimit > 0) {
     this->lcpmodel->set(GRB_DoubleParam_TimeLimit, localTimeLimit);
   }
@@ -1912,7 +1904,8 @@ void Game::EPEC::findNashEq() {
     for (unsigned int i = 0; i < this->nCountr; ++i)
       this->countries_LCP.at(i)->EnumerateAll(true);
     this->make_country_QP();
-    BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::findNashEq: Starting fullEnumeration search";
+    BOOST_LOG_TRIVIAL(debug)
+        << "Game::EPEC::findNashEq: Starting fullEnumeration search";
     this->computeNashEq(this->Stats.AlgorithmParam.timeLimit);
     this->lcp->save("dat/LCP_enum.dat");
     this->lcpmodel->write("dat/lcpmodel_enum.lp");
