@@ -542,8 +542,7 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   // Loc[Models::LeaderVars::AddnVar] = 1;
 
   // Leader Constraints
-  short int import_lim_cons{0}, export_lim_cons{0}, price_lim_cons{0},
-      tax_lim_cons{0};
+  short int import_lim_cons{0}, export_lim_cons{0}, price_lim_cons{0};
   if (Params.LeaderParam.import_limit >= 0)
     import_lim_cons = 1;
   if (Params.LeaderParam.export_limit >= 0)
@@ -1072,17 +1071,6 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
   return static_cast<LeaderVars>(static_cast<int>(a) + b);
 }
 
-void Models::EPEC::gur_WriteCountry_conv(const unsigned int i,
-                                         string filename) const {
-  if (!this->hasLCP())
-    throw;
-}
-
-void Models::EPEC::gur_WriteEpecMip(const unsigned int i,
-                                    string filename) const {
-  if (!this->hasLCP())
-    throw;
-}
 
 string to_string(const GRBConstr &cons, const GRBModel &model) {
   const GRBVar *vars = model.getVars();
@@ -1215,18 +1203,19 @@ void Models::EPEC::readSolutionJSON(string filename) {
     try {
       d.ParseStream(isw);
       const Value &x = d["Solution"].GetObject()["x"];
-      const Value &z = d["Solution"].GetObject()["z"];
-      arma::vec new_x, new_z;
+      // const Value &z = d["Solution"].GetObject()["z"];
+      arma::vec new_x;
+	  // arma::vec new_z;
       new_x.zeros(x.GetArray().Size());
-      new_z.zeros(z.GetArray().Size());
+      // new_z.zeros(z.GetArray().Size());
 
       for (SizeType i = 0; i < this->getnVarinEPEC(); i++)
         new_x.at(i) = x[i].GetDouble();
 
-      for (SizeType i = 0; i < this->getnVarinEPEC(); i++)
-        new_z.at(i) = z[i].GetDouble();
+      // for (SizeType i = 0; i < this->getnVarinEPEC(); i++)
+        // new_z.at(i) = z[i].GetDouble();
       ifs.close();
-      this->warmstart(new_x, new_z);
+      this->warmstart(new_x);
     } catch (exception &e) {
       cerr << "Exception in Models::readSolutionJSON : cannot read instance "
               "file."

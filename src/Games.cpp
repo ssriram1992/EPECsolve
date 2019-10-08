@@ -1154,8 +1154,6 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
    * @param[in] tol - If the additional profit is smaller than this, then it is
    * not considered a profitable deviation.
    */
-  if (!this)
-    return false;
   arma::vec objvals = this->ComputeQPObjvals(sol, true);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
     double val = this->RespondSol(violSol, i, sol, true);
@@ -1307,7 +1305,7 @@ void Game::EPEC::computeLeaderLocations(const unsigned int addSpaceForMC) {
       this->LeaderLocations.back() + *this->LocEnds.back() + addSpaceForMC;
 }
 
-void EPEC::get_x_minus_i(const arma::vec &x, const int &i,
+void EPEC::get_x_minus_i(const arma::vec &x, const unsigned int &i,
                          arma::vec &solOther) const {
   const unsigned int nEPECvars = this->nVarinEPEC;
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
@@ -1417,6 +1415,7 @@ double Game::EPEC::RespondSol(
   } else {
     return GRB_INFINITY;
   }
+    return GRB_INFINITY;
 }
 
 bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
@@ -1834,7 +1833,7 @@ bool Game::EPEC::computeNashEq(
   return foundNash;
 }
 
-bool Game::EPEC::warmstart(const arma::vec x, const arma::vec z) {
+bool Game::EPEC::warmstart(const arma::vec x){
 
   if (x.size() < this->getnVarinEPEC()) {
     BOOST_LOG_TRIVIAL(error)
@@ -1862,12 +1861,14 @@ bool Game::EPEC::warmstart(const arma::vec x, const arma::vec z) {
   arma::vec devn;
 
   if (this->isSolved(&c, &devn))
-    BOOST_LOG_TRIVIAL(warning) << "Exception in Game::EPEC::warmstart: "
+    BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::warmstart: "
                                   "The loaded solution is optimal.";
   else
     BOOST_LOG_TRIVIAL(warning)
-        << "Exception in Game::EPEC::warmstart: "
+        << "Game::EPEC::warmstart: "
            "The loaded solution is NOT optimal. Trying to repair.";
+  /// @todo Game::EPEC::warmstart - to complete implementation?
+  return true;
 }
 
 void Game::EPEC::findNashEq() {

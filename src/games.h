@@ -510,8 +510,7 @@ protected: // Datafields
   arma::vec sol_z, ///< Solution equation values
       sol_x;       ///< Solution variable values
 
-  bool warmstart(const arma::vec x,
-                 const arma::vec z); ///< Warmstarts EPEC with a solution
+  bool warmstart(const arma::vec x); ///< Warmstarts EPEC with a solution
 
 private:
   virtual void add_Dummy_Lead(
@@ -527,7 +526,7 @@ private:
   bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
                    const std::vector<arma::vec> &prevDev = {}) const;
   unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
-  void get_x_minus_i(const arma::vec &x, const int &i,
+  void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
   virtual bool computeNashEq(double localTimeLimit = -1.0) final;
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
