@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['boost_5ftest_5fmodule',['BOOST_TEST_MODULE',['../test_2EPEC_8cpp.html#a6b2a3852db8bb19ab6909bac01859985',1,'EPEC.cpp']]]
+  ['epecversion',['EPECVERSION',['../epecsolve_8h.html#ac7db89415a8dfe3d99b6c3897e79ba06',1,'epecsolve.h']]]
 ];

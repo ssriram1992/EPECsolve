@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @file Using EPECSolve to solve problems arising in
+ * @file src/models.h Using EPECSolve to solve problems arising in
  * international energy markets with climate-conscious
  * countries.
  */

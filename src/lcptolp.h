@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @file To handle Linear Complementarity Problems.
+ * @file src/lcptolp.h To handle Linear Complementarity Problems.
  */
 
 #include "epecsolve.h"

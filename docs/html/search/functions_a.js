@@ -1,16 +1,13 @@
 var searchData=
 [
-  ['main',['main',['../src_2EPEC_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'EPEC.cpp']]],
-  ['make_5fcountry_5fqp',['make_country_QP',['../classGame_1_1EPEC.html#a61ab661541f695eef569605f4071af80',1,'Game::EPEC::make_country_QP(const unsigned int i) final'],['../classGame_1_1EPEC.html#a569a086536147a74f74712e1be859ff4',1,'Game::EPEC::make_country_QP()=0'],['../classModels_1_1EPEC.html#aff5d65a8b55e5ac491fdb951a4859a59',1,'Models::EPEC::make_country_QP()']]],
-  ['make_5fll_5fleadcons',['make_LL_LeadCons',['../classModels_1_1EPEC.html#ac0317095ef32ba34772c9e73f26dc0ad',1,'Models::EPEC']]],
-  ['make_5fll_5fqp',['make_LL_QP',['../classModels_1_1EPEC.html#a0245e964632ed72e1606bdb4266ae481',1,'Models::EPEC']]],
-  ['make_5fmc_5fcons',['make_MC_cons',['../classGame_1_1EPEC.html#ac436c2d4d60fdbe5e8d219aaa0989991',1,'Game::EPEC::make_MC_cons()'],['../classModels_1_1EPEC.html#a1c3ddc8dd702e628129fafd148edbbe4',1,'Models::EPEC::make_MC_cons()']]],
-  ['make_5fmc_5fleader',['make_MC_leader',['../classModels_1_1EPEC.html#a295ae8dd8ca635a407940bc78ce8875a',1,'Models::EPEC']]],
-  ['make_5fobj_5fleader',['make_obj_leader',['../classGame_1_1EPEC.html#a50bab61e0943dc5cc730ae660bba2605',1,'Game::EPEC::make_obj_leader()'],['../classModels_1_1EPEC.html#a66942fab84352f89686af81287f7c15f',1,'Models::EPEC::make_obj_leader()']]],
-  ['make_5fyqy',['make_yQy',['../classGame_1_1QP__Param.html#ab9b540c7fcd3f408ad8570d7a770bce8',1,'Game::QP_Param']]],
-  ['makeqp',['makeQP',['../classGame_1_1LCP.html#adc8c8100b88e028500647be036550bfb',1,'Game::LCP::makeQP(const vector&lt; short int &gt; &amp;Fix, vector&lt; arma::sp_mat * &gt; &amp;custAi, vector&lt; arma::vec * &gt; &amp;custbi, Game::QP_objective &amp;QP_obj, Game::QP_Param &amp;QP)'],['../classGame_1_1LCP.html#af75f1aff19db27fd43b33f53cc3ce9e2',1,'Game::LCP::makeQP(Game::QP_objective &amp;QP_obj, Game::QP_Param &amp;QP)']]],
-  ['makerelaxed',['makeRelaxed',['../classGame_1_1LCP.html#a777726134bf9ffc8fa0c6bfe8ffdb6fc',1,'Game::LCP']]],
-  ['mp_5fparam',['MP_Param',['../classGame_1_1MP__Param.html#aa4be3148e505ff9012f47c9966a1475b',1,'Game::MP_Param::MP_Param()=default'],['../classGame_1_1MP__Param.html#a51f2d17e5151e8da6361c0382f62758f',1,'Game::MP_Param::MP_Param(const MP_Param &amp;M)=default']]],
-  ['mpecasmilp',['MPECasMILP',['../classGame_1_1LCP.html#a7e41da234589d7b25c11579566f2c1dc',1,'Game::LCP']]],
-  ['mpecasmiqp',['MPECasMIQP',['../classGame_1_1LCP.html#a36fbc1c8fdaaa40fb583c6d98a82c418',1,'Game::LCP']]]
+  ['lap_5fhidem',['LAP_HiDem',['../test_2EPEC_8cpp.html#acea468413941d1287506bb0963d2e289',1,'EPEC.cpp']]],
+  ['lap_5flowdem',['LAP_LowDem',['../test_2EPEC_8cpp.html#a61df14814d071cf86c3577fa15c42e68',1,'EPEC.cpp']]],
+  ['lcp',['LCP',['../classGame_1_1LCP.html#a8f354ec1846b682d4e8d526c4408e702',1,'Game::LCP::LCP()=delete'],['../classGame_1_1LCP.html#affd1945600584a97ee0b95a803e70a93',1,'Game::LCP::LCP(GRBEnv *e)'],['../classGame_1_1LCP.html#a0e210b1a1e440f17ee2bb05e91b846a0',1,'Game::LCP::LCP(GRBEnv *env, arma::sp_mat M, arma::vec q, unsigned int LeadStart, unsigned LeadEnd, arma::sp_mat A={}, arma::vec b={})'],['../classGame_1_1LCP.html#a26af85e6c2bca5744cf2148da9539f31',1,'Game::LCP::LCP(GRBEnv *env, arma::sp_mat M, arma::vec q, perps Compl, arma::sp_mat A={}, arma::vec b={})'],['../classGame_1_1LCP.html#ad05015288e6d7ae561cea30233128840',1,'Game::LCP::LCP(GRBEnv *env, const Game::NashGame &amp;N)'],['../classGame_1_1LCP.html#abdb1c5a1bf0a9bbabc5685125397ecf9',1,'Game::LCP::LCP(const LCP &amp;)=default']]],
+  ['lcp_5fpolyhed_5ffixed',['LCP_Polyhed_fixed',['../classGame_1_1LCP.html#a4ce9e0b27e543303b855e7c423379d9f',1,'Game::LCP::LCP_Polyhed_fixed(std::vector&lt; unsigned int &gt; FixEq={}, std::vector&lt; unsigned int &gt; FixVar={})'],['../classGame_1_1LCP.html#a646266159d34a17c8b6149e8aa1b34d8',1,'Game::LCP::LCP_Polyhed_fixed(arma::Col&lt; int &gt; FixEq, arma::Col&lt; int &gt; FixVar)']]],
+  ['lcpasmip',['LCPasMIP',['../classGame_1_1LCP.html#a6ff524eb77ff44492107f0863fe1ed00',1,'Game::LCP::LCPasMIP(std::vector&lt; unsigned int &gt; FixEq={}, std::vector&lt; unsigned int &gt; FixVar={}, bool solve=false)'],['../classGame_1_1LCP.html#afeeb624c4f6628463b37bef56bdb6ab7',1,'Game::LCP::LCPasMIP(std::vector&lt; short int &gt; Fixes, bool solve)'],['../classGame_1_1LCP.html#a0ba88cd2f8a2e58cac7794683f384acb',1,'Game::LCP::LCPasMIP(bool solve=false)']]],
+  ['lcpasqp',['LCPasQP',['../classGame_1_1LCP.html#a2d217a014d483a63be2add92c615ec81',1,'Game::LCP']]],
+  ['leadallpar',['LeadAllPar',['../structModels_1_1LeadAllPar.html#ab0e167d9b5b94d15b96d0ef4b8404659',1,'Models::LeadAllPar']]],
+  ['leadpar',['LeadPar',['../structModels_1_1LeadPar.html#a49d19ccb406e39c14e865e2cd53f1bc5',1,'Models::LeadPar']]],
+  ['load',['load',['../classGame_1_1QP__Param.html#a41840543b82947500d6351539378de49',1,'Game::QP_Param::load()'],['../classGame_1_1NashGame.html#a3a4d9cbcbb90ef6bb8a8f53b246aa1fd',1,'Game::NashGame::load()'],['../classGame_1_1LCP.html#a474418dda015aabcfde678cfe45b4080',1,'Game::LCP::load()'],['../structModels_1_1EPECInstance.html#a1224e238323bb6387cea74f8c59acefc',1,'Models::EPECInstance::load()']]],
+  ['lpsolve',['LPSolve',['../namespaceGame.html#aa896f1d65157fdcb9d6ebfc88c720a3d',1,'Game']]]
 ];

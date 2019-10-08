@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['label',['label',['../namespaceModels.html#a54b54aa6ddb1d9e337f9fea85a2d0cebad304ba20e96d87411588eeabac850e34',1,'Models']]]
+  ['innerapproximation',['innerApproximation',['../namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1da917a285f0c43ed809f7a3016574d71a9',1,'Game']]]
 ];

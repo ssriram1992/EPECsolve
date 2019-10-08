@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['val',['val',['../namespaceModels.html#a54b54aa6ddb1d9e337f9fea85a2d0ceba3a6d0284e743dc4a9b86f97d6dd1a3bf',1,'Models']]]
+  ['random',['random',['../namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a7ddf32e17a6ac5ce04a8ecbf782ca509',1,'Game']]],
+  ['reverse_5fsequential',['reverse_sequential',['../namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a9fe44fa38ecb8328bd4c6dcf8364e252',1,'Game']]]
 ];

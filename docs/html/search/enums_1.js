@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['prn',['prn',['../namespaceModels.html#a54b54aa6ddb1d9e337f9fea85a2d0ceb',1,'Models']]]
+  ['leadervars',['LeaderVars',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e',1,'Models']]]
 ];

@@ -73,46 +73,47 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>&quot;</code><br />
+<code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;armadillo&gt;</code><br />
 <code>#include &lt;boost/log/trivial.hpp&gt;</code><br />
 <code>#include &lt;boost/program_options.hpp&gt;</code><br />
+<code>#include &lt;cmath&gt;</code><br />
 <code>#include &lt;gurobi_c++.h&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
 <code>#include &lt;memory&gt;</code><br />
+<code>#include &lt;random&gt;</code><br />
+<code>#include &lt;set&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 </div>
 <p><a href="LCPtoLP_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a9c46a6075d048234e717904ca4d9546f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="LCPtoLP_8cpp.html#a9c46a6075d048234e717904ca4d9546f">operator==</a> (vector&lt; int &gt; Fix1, vector&lt; int &gt; Fix2)</td></tr>
-<tr class="memdesc:a9c46a6075d048234e717904ca4d9546f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if two vector&lt;int&gt; are of same size and hold same values in the same order.  <a href="#a9c46a6075d048234e717904ca4d9546f">More...</a><br /></td></tr>
-<tr class="separator:a9c46a6075d048234e717904ca4d9546f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33351f0df9a0c52ea10f977a7d316c9c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="LCPtoLP_8cpp.html#a33351f0df9a0c52ea10f977a7d316c9c">operator&lt;</a> (vector&lt; int &gt; Fix1, vector&lt; int &gt; Fix2)</td></tr>
-<tr class="separator:a33351f0df9a0c52ea10f977a7d316c9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f2e6608a339c170e0a34bd1bf2912af"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="LCPtoLP_8cpp.html#a1f2e6608a339c170e0a34bd1bf2912af">operator==</a> (vector&lt; short int &gt; Fix1, vector&lt; short int &gt; Fix2)</td></tr>
+<tr class="memdesc:a1f2e6608a339c170e0a34bd1bf2912af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if two vector&lt;int&gt; are of same size and hold same values in the same order.  <a href="#a1f2e6608a339c170e0a34bd1bf2912af">More...</a><br /></td></tr>
+<tr class="separator:a1f2e6608a339c170e0a34bd1bf2912af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f0c76d03047ee9009f8925bc286500a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="LCPtoLP_8cpp.html#a4f0c76d03047ee9009f8925bc286500a">operator&lt;</a> (vector&lt; short int &gt; Fix1, vector&lt; short int &gt; Fix2)</td></tr>
+<tr class="separator:a4f0c76d03047ee9009f8925bc286500a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a136d29bec787625964a6167c8dae8704"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="LCPtoLP_8cpp.html#a136d29bec787625964a6167c8dae8704">operator&gt;</a> (vector&lt; int &gt; Fix1, vector&lt; int &gt; Fix2)</td></tr>
 <tr class="separator:a136d29bec787625964a6167c8dae8704"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a33351f0df9a0c52ea10f977a7d316c9c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33351f0df9a0c52ea10f977a7d316c9c">&#9670;&nbsp;</a></span>operator&lt;()</h2>
+<a id="a4f0c76d03047ee9009f8925bc286500a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f0c76d03047ee9009f8925bc286500a">&#9670;&nbsp;</a></span>operator&lt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool operator&lt; </td>
           <td>(</td>
-          <td class="paramtype">vector&lt; int &gt;&#160;</td>
+          <td class="paramtype">vector&lt; short int &gt;&#160;</td>
           <td class="paramname"><em>Fix1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; int &gt;&#160;</td>
+          <td class="paramtype">vector&lt; short int &gt;&#160;</td>
           <td class="paramname"><em>Fix2</em>&#160;</td>
         </tr>
         <tr>
@@ -121,39 +122,31 @@ Functions</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 <p><b>GrandParent:</b> Either the same value as the grand child, or has 0 in that location</p>
 <p><b>Grandchild:</b> Same val as grand parent in every location, except any val allowed, if grandparent is 0 </p><dl class="section warning"><dt>Warning</dt><dd>Might be deprecated, as it pollutes global namespaces </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if Fix1 is (grand) child of Fix2 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00029">29</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00034">34</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a9c46a6075d048234e717904ca4d9546f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c46a6075d048234e717904ca4d9546f">&#9670;&nbsp;</a></span>operator==()</h2>
+<a id="a1f2e6608a339c170e0a34bd1bf2912af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f2e6608a339c170e0a34bd1bf2912af">&#9670;&nbsp;</a></span>operator==()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool operator== </td>
           <td>(</td>
-          <td class="paramtype">vector&lt; int &gt;&#160;</td>
+          <td class="paramtype">vector&lt; short int &gt;&#160;</td>
           <td class="paramname"><em>Fix1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; int &gt;&#160;</td>
+          <td class="paramtype">vector&lt; short int &gt;&#160;</td>
           <td class="paramname"><em>Fix2</em>&#160;</td>
         </tr>
         <tr>
@@ -162,18 +155,13 @@ Functions</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Checks if two vector&lt;int&gt; are of same size and hold same values in the same order. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Might be deprecated, as it pollutes global namespaces </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if Fix1 and Fix2 have the same elements else <code>false</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00013">13</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00017">17</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -203,7 +191,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00049">49</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00056">56</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>

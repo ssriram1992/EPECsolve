@@ -1,9 +1,15 @@
 var searchData=
 [
-  ['q',['Q',['../structGame_1_1QP__objective.html#a18c0eadf5706175777a16f2d9349f539',1,'Game::QP_objective::Q()'],['../classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d',1,'Game::MP_Param::Q()'],['../classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356',1,'Game::LCP::q()']]],
-  ['qp_5fconstraints',['QP_constraints',['../structGame_1_1QP__constraints.html',1,'Game::QP_constraints'],['../namespaceGame.html#a534ef5781f97cdeff98979ea3c635471',1,'Game::QP_constraints()']]],
-  ['qp_5fobjective',['QP_objective',['../structGame_1_1QP__objective.html',1,'Game::QP_objective'],['../namespaceGame.html#ae36de29ab593d9a093c5f0373f92219e',1,'Game::QP_objective()']]],
-  ['qp_5fparam',['QP_Param',['../classGame_1_1QP__Param.html',1,'Game::QP_Param'],['../classGame_1_1QP__Param.html#aca8de136cfd5597acf66de448dce9edd',1,'Game::QP_Param::QP_Param(GRBEnv *env=nullptr)'],['../classGame_1_1QP__Param.html#a61008ed53ae0d7bf482724c6495931fe',1,'Game::QP_Param::QP_Param(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b, GRBEnv *env=nullptr)'],['../classGame_1_1QP__Param.html#ad02ba73442c9556bae3c184ac3ae7ee8',1,'Game::QP_Param::QP_Param(const QP_Param &amp;Qu)']]],
-  ['quadmodel',['QuadModel',['../classGame_1_1QP__Param.html#ad06f1cf8e5c84e2c6f5de0aaf95d6bb1',1,'Game::QP_Param']]],
-  ['quadratictax',['quadraticTax',['../classModels_1_1EPEC.html#a967c713d494e56a70652d0b5aad10045',1,'Models::EPEC']]]
+  ['paramvalid',['ParamValid',['../classModels_1_1EPEC.html#a043aff53098136d5f60d53a839b0ed85',1,'Models::EPEC']]],
+  ['perps',['perps',['../epecsolve_8h.html#ad87785d9eb3e6e48c0895b348f6660ca',1,'epecsolve.h']]],
+  ['playcountry',['playCountry',['../classModels_1_1EPEC.html#a80a79b00ce06734fdc3776165681fc43',1,'Models::EPEC']]],
+  ['players',['Players',['../classGame_1_1NashGame.html#a726f63874022ff64ca272a158b3a8a20',1,'Game::NashGame']]],
+  ['polycounter',['polyCounter',['../classGame_1_1LCP.html#a74669843d4f553736ab00df512bdba51',1,'Game::LCP']]],
+  ['postfinalize',['postfinalize',['../classGame_1_1EPEC.html#aa17713c9c874ea96c8e939ae2dc58120',1,'Game::EPEC::postfinalize()'],['../classModels_1_1EPEC.html#a7e887c13792ecf65fe86048cdbffc39f',1,'Models::EPEC::postfinalize()']]],
+  ['prefinalize',['prefinalize',['../classGame_1_1EPEC.html#a1650a665591d7a7e982dbb11ef0e897a',1,'Game::EPEC::prefinalize()'],['../classModels_1_1EPEC.html#a928a609004b9034c2117fb920c081b72',1,'Models::EPEC::prefinalize()']]],
+  ['price_5flimit',['price_limit',['../structModels_1_1LeadPar.html#a7b7a2d7ccc4d246c261728f347d23263',1,'Models::LeadPar']]],
+  ['primal_5fposition',['primal_position',['../classGame_1_1NashGame.html#a677a7c875e1c3c8b7786b7328e136be9',1,'Game::NashGame']]],
+  ['print',['print',['../classGame_1_1LCP.html#a0b673739018e4626f4f08b453e580eab',1,'Game::LCP::print()'],['../namespaceGame.html#ae10005492ee312cb7baba9b3d09c77d3',1,'Game::print()']]],
+  ['printends',['printEnds',['../classMy__EPEC__Prob.html#a1830d5f7eed24f73d6e8f533ac19f131',1,'My_EPEC_Prob']]],
+  ['prn',['prn',['../namespaceModels.html#a54b54aa6ddb1d9e337f9fea85a2d0ceb',1,'Models']]]
 ];

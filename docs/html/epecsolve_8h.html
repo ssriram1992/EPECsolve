@@ -70,6 +70,7 @@ $(function() {
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">epecsolve.h File Reference</div>  </div>
@@ -98,26 +99,37 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a2f7d830c8b066973f136eddd7af56290"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> = vector&lt; pair&lt; unsigned int, unsigned int &gt; &gt;</td></tr>
-<tr class="separator:a2f7d830c8b066973f136eddd7af56290"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad87785d9eb3e6e48c0895b348f6660ca"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#ad87785d9eb3e6e48c0895b348f6660ca">perps</a> = std::vector&lt; std::pair&lt; unsigned int, unsigned int &gt; &gt;</td></tr>
+<tr class="separator:ad87785d9eb3e6e48c0895b348f6660ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a1575f114564e7083eaa22c1ae0b2e066"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066">Game::EPECAddPolyMethod</a> { <a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a6ec7489017b25b5fff20d353b6d2162e">Game::EPECAddPolyMethod::sequential</a>, 
+<a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a9fe44fa38ecb8328bd4c6dcf8364e252">Game::EPECAddPolyMethod::reverse_sequential</a>, 
+<a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a7ddf32e17a6ac5ce04a8ecbf782ca509">Game::EPECAddPolyMethod::random</a>
+ }</td></tr>
+<tr class="separator:a1575f114564e7083eaa22c1ae0b2e066"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:afcce0d6b3621f2353bd9213035628984"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#afcce0d6b3621f2353bd9213035628984">operator&lt;&lt;</a> (ostream &amp;ost, <a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> C)</td></tr>
-<tr class="separator:afcce0d6b3621f2353bd9213035628984"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33351f0df9a0c52ea10f977a7d316c9c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a33351f0df9a0c52ea10f977a7d316c9c">operator&lt;</a> (vector&lt; int &gt; Fix1, vector&lt; int &gt; Fix2)</td></tr>
-<tr class="separator:a33351f0df9a0c52ea10f977a7d316c9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c46a6075d048234e717904ca4d9546f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a9c46a6075d048234e717904ca4d9546f">operator==</a> (vector&lt; int &gt; Fix1, vector&lt; int &gt; Fix2)</td></tr>
-<tr class="memdesc:a9c46a6075d048234e717904ca4d9546f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if two vector&lt;int&gt; are of same size and hold same values in the same order.  <a href="#a9c46a6075d048234e717904ca4d9546f">More...</a><br /></td></tr>
-<tr class="separator:a9c46a6075d048234e717904ca4d9546f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a673b99b174be70e4406db4e9bd4a6d7a"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a673b99b174be70e4406db4e9bd4a6d7a"><td class="memTemplItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a673b99b174be70e4406db4e9bd4a6d7a">operator&lt;&lt;</a> (ostream &amp;ost, vector&lt; T &gt; v)</td></tr>
-<tr class="separator:a673b99b174be70e4406db4e9bd4a6d7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a480587ff8bece891c1e6fc76e6ee59e4"><td class="memTemplParams" colspan="2">template&lt;class T , class S &gt; </td></tr>
-<tr class="memitem:a480587ff8bece891c1e6fc76e6ee59e4"><td class="memTemplItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a480587ff8bece891c1e6fc76e6ee59e4">operator&lt;&lt;</a> (ostream &amp;ost, pair&lt; T, S &gt; p)</td></tr>
-<tr class="separator:a480587ff8bece891c1e6fc76e6ee59e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a115ecd3fba0241d9e582929ccac3ff7e"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a115ecd3fba0241d9e582929ccac3ff7e">operator&lt;&lt;</a> (std::ostream &amp;ost, <a class="el" href="epecsolve_8h.html#ad87785d9eb3e6e48c0895b348f6660ca">perps</a> C)</td></tr>
+<tr class="separator:a115ecd3fba0241d9e582929ccac3ff7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d74dae3c1fafea4cc386cf9d05d9497"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a7d74dae3c1fafea4cc386cf9d05d9497">operator&lt;</a> (std::vector&lt; short int &gt; Fix1, std::vector&lt; short int &gt; Fix2)</td></tr>
+<tr class="separator:a7d74dae3c1fafea4cc386cf9d05d9497"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a80ddae5b772bfa43c82fcd1cfcf263"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a2a80ddae5b772bfa43c82fcd1cfcf263">operator==</a> (std::vector&lt; short int &gt; Fix1, std::vector&lt; short int &gt; Fix2)</td></tr>
+<tr class="separator:a2a80ddae5b772bfa43c82fcd1cfcf263"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2227f7d55cb0efe274cd8776e16f717d"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a2227f7d55cb0efe274cd8776e16f717d"><td class="memTemplItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#a2227f7d55cb0efe274cd8776e16f717d">operator&lt;&lt;</a> (std::ostream &amp;ost, std::vector&lt; T &gt; v)</td></tr>
+<tr class="separator:a2227f7d55cb0efe274cd8776e16f717d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1ffe1b9a16567d2d765c957692925fb"><td class="memTemplParams" colspan="2">template&lt;class T , class S &gt; </td></tr>
+<tr class="memitem:ad1ffe1b9a16567d2d765c957692925fb"><td class="memTemplItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="epecsolve_8h.html#ad1ffe1b9a16567d2d765c957692925fb">operator&lt;&lt;</a> (std::ostream &amp;ost, std::pair&lt; T, S &gt; p)</td></tr>
+<tr class="separator:ad1ffe1b9a16567d2d765c957692925fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Forward declaration and for EPEC solve algorithms in <a href="https://github.com/ssriram1992/EPECsolve/">https://github.com/ssriram1992/EPECsolve/</a> </p>
+
+<p class="definition">Definition in file <a class="el" href="epecsolve_8h_source.html">epecsolve.h</a>.</p>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ac7db89415a8dfe3d99b6c3897e79ba06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac7db89415a8dfe3d99b6c3897e79ba06">&#9670;&nbsp;</a></span>EPECVERSION</h2>
 
@@ -130,7 +142,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="epecsolve_8h_source.html#l00005">5</a> of file <a class="el" href="epecsolve_8h_source.html">epecsolve.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="epecsolve_8h_source.html#l00008">8</a> of file <a class="el" href="epecsolve_8h_source.html">epecsolve.h</a>.</p>
 
 </div>
 </div>
@@ -146,30 +158,30 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="epecsolve_8h_source.html#l00004">4</a> of file <a class="el" href="epecsolve_8h_source.html">epecsolve.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="epecsolve_8h_source.html#l00007">7</a> of file <a class="el" href="epecsolve_8h_source.html">epecsolve.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="a2f7d830c8b066973f136eddd7af56290"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f7d830c8b066973f136eddd7af56290">&#9670;&nbsp;</a></span>perps</h2>
+<a id="ad87785d9eb3e6e48c0895b348f6660ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad87785d9eb3e6e48c0895b348f6660ca">&#9670;&nbsp;</a></span>perps</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a> =  vector&lt;pair&lt;unsigned int, unsigned int&gt; &gt;</td>
+          <td class="memname">using <a class="el" href="epecsolve_8h.html#ad87785d9eb3e6e48c0895b348f6660ca">perps</a> =  std::vector&lt;std::pair&lt;unsigned int, unsigned int&gt; &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="epecsolve_8h_source.html#l00014">14</a> of file <a class="el" href="epecsolve_8h_source.html">epecsolve.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="epecsolve_8h_source.html#l00015">15</a> of file <a class="el" href="epecsolve_8h_source.html">epecsolve.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a33351f0df9a0c52ea10f977a7d316c9c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33351f0df9a0c52ea10f977a7d316c9c">&#9670;&nbsp;</a></span>operator&lt;()</h2>
+<a id="a7d74dae3c1fafea4cc386cf9d05d9497"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d74dae3c1fafea4cc386cf9d05d9497">&#9670;&nbsp;</a></span>operator&lt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -180,13 +192,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">bool operator&lt; </td>
           <td>(</td>
-          <td class="paramtype">vector&lt; int &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; short int &gt;&#160;</td>
           <td class="paramname"><em>Fix1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; int &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; short int &gt;&#160;</td>
           <td class="paramname"><em>Fix2</em>&#160;</td>
         </tr>
         <tr>
@@ -201,62 +213,25 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p><b>GrandParent:</b> Either the same value as the grand child, or has 0 in that location</p>
-<p><b>Grandchild:</b> Same val as grand parent in every location, except any val allowed, if grandparent is 0 </p><dl class="section warning"><dt>Warning</dt><dd>Might be deprecated, as it pollutes global namespaces </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if Fix1 is (grand) child of Fix2 </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00029">29</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a480587ff8bece891c1e6fc76e6ee59e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a480587ff8bece891c1e6fc76e6ee59e4">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[1/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class T , class S &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">ostream&amp; operator&lt;&lt; </td>
-          <td>(</td>
-          <td class="paramtype">ostream &amp;&#160;</td>
-          <td class="paramname"><em>ost</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">pair&lt; T, S &gt;&#160;</td>
-          <td class="paramname"><em>p</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00032">32</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
-
-</div>
-</div>
-<a id="afcce0d6b3621f2353bd9213035628984"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afcce0d6b3621f2353bd9213035628984">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[2/3]</span></h2>
+<a id="a115ecd3fba0241d9e582929ccac3ff7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a115ecd3fba0241d9e582929ccac3ff7e">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ostream&amp; operator&lt;&lt; </td>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
           <td>(</td>
-          <td class="paramtype">ostream &amp;&#160;</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
           <td class="paramname"><em>ost</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="epecsolve_8h.html#a2f7d830c8b066973f136eddd7af56290">perps</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="epecsolve_8h.html#ad87785d9eb3e6e48c0895b348f6660ca">perps</a>&#160;</td>
           <td class="paramname"><em>C</em>&#160;</td>
         </tr>
         <tr>
@@ -269,8 +244,40 @@ template&lt;class T , class S &gt; </div>
 
 </div>
 </div>
-<a id="a673b99b174be70e4406db4e9bd4a6d7a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a673b99b174be70e4406db4e9bd4a6d7a">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[3/3]</span></h2>
+<a id="ad1ffe1b9a16567d2d765c957692925fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1ffe1b9a16567d2d765c957692925fb">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T , class S &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>ost</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::pair&lt; T, S &gt;&#160;</td>
+          <td class="paramname"><em>p</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00025">25</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+
+</div>
+</div>
+<a id="a2227f7d55cb0efe274cd8776e16f717d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2227f7d55cb0efe274cd8776e16f717d">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -278,15 +285,15 @@ template&lt;class T , class S &gt; </div>
 template&lt;class T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">ostream&amp; operator&lt;&lt; </td>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
           <td>(</td>
-          <td class="paramtype">ostream &amp;&#160;</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
           <td class="paramname"><em>ost</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; T &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; T &gt;&#160;</td>
           <td class="paramname"><em>v</em>&#160;</td>
         </tr>
         <tr>
@@ -297,12 +304,12 @@ template&lt;class T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00025">25</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00017">17</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
-<a id="a9c46a6075d048234e717904ca4d9546f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c46a6075d048234e717904ca4d9546f">&#9670;&nbsp;</a></span>operator==()</h2>
+<a id="a2a80ddae5b772bfa43c82fcd1cfcf263"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a80ddae5b772bfa43c82fcd1cfcf263">&#9670;&nbsp;</a></span>operator==()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -313,13 +320,13 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="memname">bool operator== </td>
           <td>(</td>
-          <td class="paramtype">vector&lt; int &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; short int &gt;&#160;</td>
           <td class="paramname"><em>Fix1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; int &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; short int &gt;&#160;</td>
           <td class="paramname"><em>Fix2</em>&#160;</td>
         </tr>
         <tr>
@@ -334,12 +341,6 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Checks if two vector&lt;int&gt; are of same size and hold same values in the same order. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Might be deprecated, as it pollutes global namespaces </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if Fix1 and Fix2 have the same elements else <code>false</code> </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00013">13</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>

@@ -73,3 +73,24 @@
 \form#72:$q_2=27.803728$
 \form#73:$ < Ax\le b$
 \form#74:\begin{eqnarray} t_i^{I} &\leq& \bar{t_i^{I}}\\ q^{import} - q^{export} &\leq& \bar{q^{import}}\\ q^{export} - q^{import} &\leq& \bar{q^{export}}\\ \alpha - \beta\left(q^{import} - q^{export} + \sum_i q_i \right) &\leq& *\bar{\pi}\\ q^{export} &\leq& \sum_i q_i +q^{import} \end{eqnarray}
+\form#75:$\frac{1}{2} y^TQy + (Cx)^Ty $
+\form#76:$(x,y)$
+\form#77:$Ax + By \leq b$
+\form#78:$\epsilon$
+\form#79:$\epsilon $
+\form#80:$u$
+\form#81:$v$
+\form#82:$y$
+\form#83:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 & \text{s.t.}\\ u,v \quad&\ge\auad 0\\ u+v_1+v_2 \quad&\leq\quad 10 \end{align*}
+\form#84:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 \\ \text{s.t.}\\ u,v \quad&\ge\auad 0\\ u+v_1+v_2 \quad&\leq\quad 10 \end{align*}
+\form#85:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 \\ \text{s.t.}\\ u,v \quad&\ge\quad 0\\ u+v_1+v_2 \quad&\leq\quad 10 \end{align*}
+\form#86:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 \\ \text{s.t.}\\ u,v \quad&\ge\quad 0\\ u+v_1+v_2 \quad&\leq\quad 10 v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u' v_1 -2v_2 \leq -u \right \} } \end{align*}
+\form#87:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 \\ \text{s.t.}\\ u,v \quad&\ge\quad 0\\ u+v_1+v_2 \quad&\leq\quad 10\\ v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u' v_1 -2v_2 \leq -u \right \} } \end{align*}
+\form#88:\begin{align*} \min_{x,y} \quad&:\quad -x + v_2y_1 + y_2\\ \text{s.t.}\\ x, y \quad&\ge\quad 0\\ x + y_1 + y_2 \quad&\le\quad 10\\ y_1 - y_2 \quad&\ge\quad 0\\ y\quad&\in\quad\arg\min_y \left\{ \right\} } \end{align*}
+\form#89:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 \\ \text{s.t.}\\ u,v \quad&\ge\quad 0\\ u+v_1+v_2 \quad&\leq\quad 10\\ v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u' v_1 -2v_2 \leq -u \right \} \end{align*}
+\form#90:\begin{align*} \min_{x,y} \quad&:\quad -x + v_2y_1 + y_2\\ \text{s.t.}\\ x, y \quad&\ge\quad 0\\ x + y_1 + y_2 \quad&\le\quad 10\\ y_1 - y_2 \quad&\ge\quad 0\\ y\quad&\in\quad\arg\min_y \left\{ \right\} \end{align*}
+\form#91:\begin{align*} \min_{x,y} \quad&:\quad -x + v_2y_1 + y_2\\ \text{s.t.}\\ x, y \quad&\ge\quad 0\\ x + y_1 + y_2 \quad&\le\quad 10\\ y_1 - y_2 \quad&\ge\quad 0\\ y\quad&\in\quad\arg\min_y \left\{ y_1 - y_2: y_1 - y_2 \ge x-5; y_1 - y_2 \ge 3-x \right\} \end{align*}
+\form#92:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 \\ \text{s.t.}\\ u,v \quad&\ge\quad 0\\ u+v_1+v_2 \quad&\leq\quad 10\\ v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u; v_1 -2v_2 \leq -u \right \} \end{align*}
+\form#93:$u = 2.5$
+\form#94:$(v_1, v_2) = (0, 2.5)$
+\form#95:$x = 0$
