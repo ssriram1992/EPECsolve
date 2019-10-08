@@ -81,8 +81,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a586fdd1a48763088b65bb99dfcd856a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1LeadPar.html#a586fdd1a48763088b65bb99dfcd856a8">LeadPar</a> (double imp_lim=-1, double exp_lim=-1, double <a class="el" href="structModels_1_1LeadPar.html#a7b7a2d7ccc4d246c261728f347d23263">price_limit</a>=-1, bool <a class="el" href="structModels_1_1LeadPar.html#a65333bb2bb9c2060513f920f126bfe53">tax_revenue</a>=false)</td></tr>
-<tr class="separator:a586fdd1a48763088b65bb99dfcd856a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49d19ccb406e39c14e865e2cd53f1bc5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1LeadPar.html#a49d19ccb406e39c14e865e2cd53f1bc5">LeadPar</a> (double imp_lim=-1, double exp_lim=-1, double <a class="el" href="structModels_1_1LeadPar.html#a7b7a2d7ccc4d246c261728f347d23263">price_limit</a>=-1, bool <a class="el" href="structModels_1_1LeadPar.html#a65333bb2bb9c2060513f920f126bfe53">tax_revenue</a>=false, unsigned int tax_type_=0)</td></tr>
+<tr class="separator:a49d19ccb406e39c14e865e2cd53f1bc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
@@ -93,16 +93,18 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a7b7a2d7ccc4d246c261728f347d23263"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1LeadPar.html#a7b7a2d7ccc4d246c261728f347d23263">price_limit</a></td></tr>
 <tr class="memdesc:a7b7a2d7ccc4d246c261728f347d23263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Government does not want the price to exceed this limit.  <a href="#a7b7a2d7ccc4d246c261728f347d23263">More...</a><br /></td></tr>
 <tr class="separator:a7b7a2d7ccc4d246c261728f347d23263"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3bef9b0949e2239fcf0b9d82e8f01fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceModels.html#a8fcea6b0a4c8c1403d8151c8a85f02c4">Models::TaxType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1LeadPar.html#ae3bef9b0949e2239fcf0b9d82e8f01fe">tax_type</a></td></tr>
+<tr class="separator:ae3bef9b0949e2239fcf0b9d82e8f01fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65333bb2bb9c2060513f920f126bfe53"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structModels_1_1LeadPar.html#a65333bb2bb9c2060513f920f126bfe53">tax_revenue</a> = false</td></tr>
 <tr class="separator:a65333bb2bb9c2060513f920f126bfe53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Stores the parameters of the leader in a country model. </p>
 
-<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00049">49</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00059">59</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a586fdd1a48763088b65bb99dfcd856a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a586fdd1a48763088b65bb99dfcd856a8">&#9670;&nbsp;</a></span>LeadPar()</h2>
+<a id="a49d19ccb406e39c14e865e2cd53f1bc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49d19ccb406e39c14e865e2cd53f1bc5">&#9670;&nbsp;</a></span>LeadPar()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -132,7 +134,13 @@ Data Fields</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>tax_revenue</em> = <code>false</code>&#160;</td>
+          <td class="paramname"><em>tax_revenue</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>tax_type_</em> = <code>0</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -147,7 +155,7 @@ Data Fields</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00058">58</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00077">77</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
 
 </div>
 </div>
@@ -165,7 +173,7 @@ Data Fields</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum net export in the country. If no limit, set the value as -1; </p>
 
-<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00052">52</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00062">62</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
 
 </div>
 </div>
@@ -182,7 +190,7 @@ Data Fields</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum net import in the country. If no limit, set the value as -1; </p>
 
-<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00050">50</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00060">60</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
 
 </div>
 </div>
@@ -200,7 +208,7 @@ Data Fields</h2></td></tr>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">      -1</div></div><!-- fragment -->
 <p>Government does not want the price to exceed this limit. </p>
 
-<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00054">54</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00064">64</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
 
 </div>
 </div>
@@ -217,7 +225,24 @@ Data Fields</h2></td></tr>
 </div><div class="memdoc">
 <p>Dictates whether the leader objective will include tax revenues </p>
 
-<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00056">56</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00070">70</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+
+</div>
+</div>
+<a id="ae3bef9b0949e2239fcf0b9d82e8f01fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3bef9b0949e2239fcf0b9d82e8f01fe">&#9670;&nbsp;</a></span>tax_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceModels.html#a8fcea6b0a4c8c1403d8151c8a85f02c4">Models::TaxType</a> Models::LeadPar::tax_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">      <a class="code" href="namespaceModels.html#a8fcea6b0a4c8c1403d8151c8a85f02c4a6cf964532157ab0f02d24e287a383f67">Models::TaxType::StandardTax</a></div></div><!-- fragment --><p>0 For standard, 1 for constant tax, 2 for carbon tax </p>
+
+<p class="definition">Definition at line <a class="el" href="models_8h_source.html#l00067">67</a> of file <a class="el" href="models_8h_source.html">models.h</a>.</p>
 
 </div>
 </div>
@@ -225,6 +250,7 @@ Data Fields</h2></td></tr>
 <li><a class="el" href="models_8h_source.html">models.h</a></li>
 </ul>
 </div><!-- contents -->
+<div class="ttc" id="anamespaceModels_html_a8fcea6b0a4c8c1403d8151c8a85f02c4a6cf964532157ab0f02d24e287a383f67"><div class="ttname"><a href="namespaceModels.html#a8fcea6b0a4c8c1403d8151c8a85f02c4a6cf964532157ab0f02d24e287a383f67">Models::TaxType::StandardTax</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

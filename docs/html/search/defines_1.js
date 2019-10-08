@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['epecversion',['EPECVERSION',['../epecsolve_8h.html#ac7db89415a8dfe3d99b6c3897e79ba06',1,'epecsolve.h']]]
+  ['verbose',['VERBOSE',['../epecsolve_8h.html#a42f8c497a1968074f38bf5055c650dca',1,'epecsolve.h']]]
 ];

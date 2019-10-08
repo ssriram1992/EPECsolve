@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @file Basic utilities
+ * @file src/utils.h Basic utilities
  */
 
 #include "epecsolve.h"

@@ -1,12 +1,9 @@
 var searchData=
 [
-  ['readme_2emd',['README.md',['../README_8md.html',1,'']]],
-  ['rel_5fai',['Rel_Ai',['../classGame_1_1LCP.html#aa6884e410d3fe078850b8a69147c8b07',1,'Game::LCP']]],
-  ['rel_5fbi',['Rel_bi',['../classGame_1_1LCP.html#aaed92c9c8d6ada0a46f595a767055995',1,'Game::LCP']]],
-  ['relallpol',['RelAllPol',['../classGame_1_1LCP.html#a3f428890e5a7ef3274b03a6bcf5f29c6',1,'Game::LCP']]],
-  ['resize_5fpatch',['resize_patch',['../namespaceUtils.html#a6ea154370da7e9f4c40959d92f0190f4',1,'Utils::resize_patch(const arma::sp_mat &amp;Mat, const unsigned int nR, const unsigned int nC)'],['../namespaceUtils.html#aeba243e9c0763e38e69aea43be7bf04e',1,'Utils::resize_patch(const arma::mat &amp;Mat, const unsigned int nR, const unsigned int nC)'],['../namespaceUtils.html#a498567a2f139ce1b0cd948480ce0c54c',1,'Utils::resize_patch(const arma::vec &amp;Mat, const unsigned int nR)']]],
-  ['respond',['Respond',['../classGame_1_1NashGame.html#a3f8b9352623a4c15d8186382027461b9',1,'Game::NashGame::Respond()'],['../classGame_1_1EPEC.html#a9cc83c0b4df4a0b4df787213e303715b',1,'Game::EPEC::Respond()'],['../classModels_1_1EPEC.html#a3965e63733c65959597d90de8468d39b',1,'Models::EPEC::Respond()']]],
-  ['respondsol',['RespondSol',['../classGame_1_1NashGame.html#a96b5e4e9d919d672cdce22be5a7b50fd',1,'Game::NashGame']]],
-  ['rewriteleadcons',['RewriteLeadCons',['../classGame_1_1NashGame.html#a64070d10ab0de6d4369934c8f8d04c20',1,'Game::NashGame']]],
-  ['rlxdmodel',['RlxdModel',['../classGame_1_1LCP.html#a187fe2df5192bc2354944d807a361333',1,'Game::LCP']]]
+  ['q',['q',['../classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356',1,'Game::LCP::q()'],['../structGame_1_1QP__objective.html#a18c0eadf5706175777a16f2d9349f539',1,'Game::QP_objective::Q()'],['../classGame_1_1MP__Param.html#ad1ec9489e7f1959f468e459c881cd63d',1,'Game::MP_Param::Q()']]],
+  ['qp_5fconstraints',['QP_constraints',['../structGame_1_1QP__constraints.html',1,'Game::QP_constraints'],['../namespaceGame.html#a534ef5781f97cdeff98979ea3c635471',1,'Game::QP_constraints()']]],
+  ['qp_5fobjective',['QP_objective',['../structGame_1_1QP__objective.html',1,'Game::QP_objective'],['../namespaceGame.html#ae36de29ab593d9a093c5f0373f92219e',1,'Game::QP_objective()']]],
+  ['qp_5fparam',['QP_Param',['../classGame_1_1QP__Param.html',1,'Game::QP_Param'],['../classGame_1_1QP__Param.html#aca8de136cfd5597acf66de448dce9edd',1,'Game::QP_Param::QP_Param(GRBEnv *env=nullptr)'],['../classGame_1_1QP__Param.html#a61008ed53ae0d7bf482724c6495931fe',1,'Game::QP_Param::QP_Param(arma::sp_mat Q, arma::sp_mat C, arma::sp_mat A, arma::sp_mat B, arma::vec c, arma::vec b, GRBEnv *env=nullptr)'],['../classGame_1_1QP__Param.html#ad02ba73442c9556bae3c184ac3ae7ee8',1,'Game::QP_Param::QP_Param(const QP_Param &amp;Qu)']]],
+  ['quadmodel',['QuadModel',['../classGame_1_1QP__Param.html#ad06f1cf8e5c84e2c6f5de0aaf95d6bb1',1,'Game::QP_Param']]],
+  ['quadratictax',['quadraticTax',['../classModels_1_1EPEC.html#a967c713d494e56a70652d0b5aad10045',1,'Models::EPEC']]]
 ];

@@ -1,18 +1,14 @@
 var searchData=
 [
-  ['epec_2ecpp',['EPEC.cpp',['../src_2EPEC_8cpp.html',1,'']]],
-  ['save',['save',['../classGame_1_1QP__Param.html#a1a8fc09ac747bcc7d7b4cb7d2111755b',1,'Game::QP_Param::save()'],['../classGame_1_1NashGame.html#aa95111ef4e53748ee6ed7e6d4866e0bb',1,'Game::NashGame::save()'],['../classGame_1_1LCP.html#a3fc31d3d26b5715b99d28cbbdcf11b44',1,'Game::LCP::save()'],['../structModels_1_1EPECInstance.html#a862b4b7403a75c42ae5efb26b18756f5',1,'Models::EPECInstance::save()']]],
-  ['set',['set',['../classGame_1_1MP__Param.html#a97d7a955cb93ff14144bdce152e906b6',1,'Game::MP_Param::set(const arma::sp_mat &amp;Q, const arma::sp_mat &amp;C, const arma::sp_mat &amp;A, const arma::sp_mat &amp;B, const arma::vec &amp;c, const arma::vec &amp;b)'],['../classGame_1_1MP__Param.html#a4ba89f81adc04cf5e21478f8a7f7748f',1,'Game::MP_Param::set(arma::sp_mat &amp;&amp;Q, arma::sp_mat &amp;&amp;C, arma::sp_mat &amp;&amp;A, arma::sp_mat &amp;&amp;B, arma::vec &amp;&amp;c, arma::vec &amp;&amp;b)'],['../classGame_1_1MP__Param.html#a81d1ef8919a4c554cba2c56832c0e025',1,'Game::MP_Param::set(const QP_objective &amp;obj, const QP_constraints &amp;cons)'],['../classGame_1_1MP__Param.html#ad2f9ad95b1d9f2e8e4aeddb7beb0b101',1,'Game::MP_Param::set(QP_objective &amp;&amp;obj, QP_constraints &amp;&amp;cons)'],['../classGame_1_1QP__Param.html#a3fb0950b780c847e97f34043068ca758',1,'Game::QP_Param::set(const arma::sp_mat &amp;Q, const arma::sp_mat &amp;C, const arma::sp_mat &amp;A, const arma::sp_mat &amp;B, const arma::vec &amp;c, const arma::vec &amp;b) final'],['../classGame_1_1QP__Param.html#ac1555a30b8ba903db65a3fe0b6763ec4',1,'Game::QP_Param::set(arma::sp_mat &amp;&amp;Q, arma::sp_mat &amp;&amp;C, arma::sp_mat &amp;&amp;A, arma::sp_mat &amp;&amp;B, arma::vec &amp;&amp;c, arma::vec &amp;&amp;b) final'],['../classGame_1_1QP__Param.html#a870e896ec83261f542ba67ebb2c8ef87',1,'Game::QP_Param::set(const QP_objective &amp;obj, const QP_constraints &amp;cons) final'],['../classGame_1_1QP__Param.html#afa08cebc99b7f45614661d2dc3ff497a',1,'Game::QP_Param::set(QP_objective &amp;&amp;obj, QP_constraints &amp;&amp;cons) final']]],
-  ['set_5fpositions',['set_positions',['../classGame_1_1NashGame.html#aa3167fac3bfbb1a0093bf0720cc26958',1,'Game::NashGame']]],
-  ['seta',['setA',['../classGame_1_1MP__Param.html#a8a8ed1e4c4879b2c22b979f1803af7a0',1,'Game::MP_Param']]],
-  ['setb',['setb',['../classGame_1_1MP__Param.html#a724891835889f198c4776dbe5b2df469',1,'Game::MP_Param::setb(const arma::vec &amp;b) final'],['../classGame_1_1MP__Param.html#a4090310464360c3e80016828ac4bde86',1,'Game::MP_Param::setB(const arma::sp_mat &amp;B) final']]],
-  ['setc',['setc',['../classGame_1_1MP__Param.html#ab8aa67a1e0b76919aeedaf2416744bfa',1,'Game::MP_Param::setc(const arma::vec &amp;c) final'],['../classGame_1_1MP__Param.html#a4f459257ccbfd0ec32fae9986adc49ee',1,'Game::MP_Param::setC(const arma::sp_mat &amp;C) final']]],
-  ['setq',['setQ',['../classGame_1_1MP__Param.html#a5bd3eaacfb9e96f137d44883c3fe7a30',1,'Game::MP_Param']]],
-  ['size',['size',['../classGame_1_1MP__Param.html#ab133b5225e24bc6445f5abf4552df8b0',1,'Game::MP_Param']]],
-  ['sol_5fx',['sol_x',['../classGame_1_1EPEC.html#afbee4cd7f8c737d79d00c71b0dded3b5',1,'Game::EPEC']]],
-  ['sol_5fz',['sol_z',['../classGame_1_1EPEC.html#a1e77a13dc08a016c2e8232d1f910034b',1,'Game::EPEC']]],
-  ['solencode',['solEncode',['../classGame_1_1LCP.html#a19650ed8a9ae7e071f9ccdc39c8d8606',1,'Game::LCP::solEncode(GRBModel *model) const'],['../classGame_1_1LCP.html#ab3e60f1a1b2b7fda80f26bf39528f1af',1,'Game::LCP::solEncode(const arma::vec &amp;z, const arma::vec &amp;x) const']]],
-  ['solvefixed',['solveFixed',['../classGame_1_1QP__Param.html#a94c1b94ff3a3423dfcec43f2d66e3507',1,'Game::QP_Param']]],
-  ['stats',['Stats',['../classGame_1_1EPEC.html#a827a90f6d6c14f8e6d61694f9a63f450',1,'Game::EPEC']]],
-  ['status',['status',['../structGame_1_1EPECStatistics.html#a62db512e0fda45f7bb525916402c533e',1,'Game::EPECStatistics']]]
+  ['random',['random',['../namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a7ddf32e17a6ac5ce04a8ecbf782ca509',1,'Game']]],
+  ['readme_2emd',['README.md',['../README_8md.html',1,'']]],
+  ['readsolutionjson',['readSolutionJSON',['../classModels_1_1EPEC.html#abdfa0a37634cbecc7a0d1a953d9dae44',1,'Models::EPEC']]],
+  ['reset',['reset',['../classGame_1_1EPEC.html#ad53ac72b21e5d73db9e552aa23fb2fec',1,'Game::EPEC']]],
+  ['resetlcp',['resetLCP',['../classGame_1_1EPEC.html#a9d7ad49dd4b91b6e98f046461cc7fef5',1,'Game::EPEC']]],
+  ['resize_5fpatch',['resize_patch',['../namespaceUtils.html#a6ea154370da7e9f4c40959d92f0190f4',1,'Utils::resize_patch(const arma::sp_mat &amp;Mat, const unsigned int nR, const unsigned int nC)'],['../namespaceUtils.html#aeba243e9c0763e38e69aea43be7bf04e',1,'Utils::resize_patch(const arma::mat &amp;Mat, const unsigned int nR, const unsigned int nC)'],['../namespaceUtils.html#a498567a2f139ce1b0cd948480ce0c54c',1,'Utils::resize_patch(const arma::vec &amp;Mat, const unsigned int nR)']]],
+  ['respond',['Respond',['../classGame_1_1NashGame.html#a3f8b9352623a4c15d8186382027461b9',1,'Game::NashGame::Respond()'],['../classGame_1_1EPEC.html#a9cc83c0b4df4a0b4df787213e303715b',1,'Game::EPEC::Respond()'],['../classModels_1_1EPEC.html#af09e5de4a253c04441cd595ce993a3ff',1,'Models::EPEC::Respond()']]],
+  ['respondsol',['RespondSol',['../classGame_1_1NashGame.html#a96b5e4e9d919d672cdce22be5a7b50fd',1,'Game::NashGame::RespondSol()'],['../classGame_1_1EPEC.html#afee20a9b22d0842f6dbbcdb1bea56ec5',1,'Game::EPEC::RespondSol()']]],
+  ['reverse_5fsequential',['reverse_sequential',['../namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a9fe44fa38ecb8328bd4c6dcf8364e252',1,'Game']]],
+  ['rewriteleadcons',['RewriteLeadCons',['../classGame_1_1NashGame.html#a64070d10ab0de6d4369934c8f8d04c20',1,'Game::NashGame']]],
+  ['rlxdmodel',['RlxdModel',['../classGame_1_1LCP.html#a187fe2df5192bc2354944d807a361333',1,'Game::LCP']]]
 ];

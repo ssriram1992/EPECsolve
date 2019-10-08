@@ -1,2 +1,349 @@
-/home/sriram/Dropbox/code/EPEC/code/src/games.h:344: warning: The following parameters of Game::NashGame::RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, bool fullvec=true) const are not documented:
-  parameter 'sol'
+/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp:52: warning: no matching file member found for 
+ostream & Game::operator<<(ostream &os, const Game::QP_Param &Q)
+Possible candidates:
+ 'std::ostream & operator<<(std::ostream &ost, perps C)' at line 16 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 17 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 25 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &os, const QP_Param &Q)' at line 393 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const perps &C)' at line 395 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const FollPar P)' at line 144 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const DemPar P)' at line 146 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadPar P)' at line 148 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadAllPar P)' at line 150 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeaderVars l)' at line 152 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, EPECInstance I)' at line 154 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, Models::prn l)' at line 313 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'ostream & operator<<(ostream &ost, const perps &C)' at line 45 of file/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp:567: warning: no matching class member found for 
+  Game::NashGame::NashGame(GRBEnv *e, vector< shared_ptr< Game::QP_Param >> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar, arma::sp_mat LeadA, arma::vec LeadRHS)
+Possible candidates:
+  Game::NashGame::NashGame(GRBEnv *e) noexcept
+  Game::NashGame::NashGame(GRBEnv *e, std::vector< std::shared_ptr< QP_Param >> Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={})
+
+/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp:1757: warning: no matching class member found for 
+  void::Game::EPEC::make_country_LCP()
+
+/home/sriram/Dropbox/code/EPEC/code/src/LCPtoLP.cpp:247: warning: no matching class member found for 
+  unique_ptr< GRBModel > Game::LCP::LCP_Polyhed_fixed(vector< unsigned int > FixEq, vector< unsigned int > FixVar)
+Possible candidates:
+  std::unique_ptr< GRBModel > Game::LCP::LCP_Polyhed_fixed(std::vector< unsigned int > FixEq={}, std::vector< unsigned int > FixVar={})
+  std::unique_ptr< GRBModel > Game::LCP::LCP_Polyhed_fixed(arma::Col< int > FixEq, arma::Col< int > FixVar)
+
+/home/sriram/Dropbox/code/EPEC/code/src/LCPtoLP.cpp:317: warning: no matching class member found for 
+  unique_ptr< GRBModel > Game::LCP::LCPasMIP(vector< short int > Fixes, bool solve)
+Possible candidates:
+  std::unique_ptr< GRBModel > Game::LCP::LCPasMIP(std::vector< unsigned int > FixEq={}, std::vector< unsigned int > FixVar={}, bool solve=false)
+  std::unique_ptr< GRBModel > Game::LCP::LCPasMIP(std::vector< short int > Fixes, bool solve)
+  std::unique_ptr< GRBModel > Game::LCP::LCPasMIP(bool solve=false)
+
+/home/sriram/Dropbox/code/EPEC/code/src/LCPtoLP.cpp:347: warning: no matching class member found for 
+  unique_ptr< GRBModel > Game::LCP::LCPasMIP(vector< unsigned int > FixEq, vector< unsigned int > FixVar, bool solve)
+Possible candidates:
+  std::unique_ptr< GRBModel > Game::LCP::LCPasMIP(std::vector< unsigned int > FixEq={}, std::vector< unsigned int > FixVar={}, bool solve=false)
+  std::unique_ptr< GRBModel > Game::LCP::LCPasMIP(std::vector< short int > Fixes, bool solve)
+  std::unique_ptr< GRBModel > Game::LCP::LCPasMIP(bool solve=false)
+
+/home/sriram/Dropbox/code/EPEC/code/src/LCPtoLP.cpp:480: warning: no matching file member found for 
+unsigned int Game::ConvexHull(const vector< arma::sp_mat * > *Ai, const vector< arma::vec * > *bi, arma::sp_mat &A, arma::vec &b, const arma::sp_mat Acom, const arma::vec bcom)
+Possible candidates:
+ 'unsigned int ConvexHull(const std::vector< arma::sp_mat * > *Ai, const std::vector< arma::vec * > *bi, arma::sp_mat &A, arma::vec &b, const arma::sp_mat Acom={}, const arma::vec bcom={})' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/lcptolp.h
+
+/home/sriram/Dropbox/code/EPEC/code/src/LCPtoLP.cpp:591: warning: no matching file member found for 
+void Game::compConvSize(arma::sp_mat &A, unsigned int nFinCons, unsigned int nFinVar, const vector< arma::sp_mat * > *Ai, const vector< arma::vec * > *bi, const arma::sp_mat &Acom, const arma::vec &bcom)
+Possible candidates:
+ 'void compConvSize(arma::sp_mat &A, const unsigned int nFinCons, const unsigned int nFinVar, const std::vector< arma::sp_mat * > *Ai, const std::vector< arma::vec * > *bi, const arma::sp_mat &Acom, const arma::vec &bcom)' at line 26 of file/home/sriram/Dropbox/code/EPEC/code/src/lcptolp.h
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:20: warning: no matching file member found for 
+ostream & Models::operator<<(ostream &ost, const Models::prn l)
+Possible candidates:
+ 'std::ostream & operator<<(std::ostream &ost, perps C)' at line 16 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 17 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 25 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &os, const QP_Param &Q)' at line 393 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const perps &C)' at line 395 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const FollPar P)' at line 144 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const DemPar P)' at line 146 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadPar P)' at line 148 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadAllPar P)' at line 150 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeaderVars l)' at line 152 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, EPECInstance I)' at line 154 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, Models::prn l)' at line 313 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'ostream & operator<<(ostream &ost, const perps &C)' at line 45 of file/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:34: warning: no matching file member found for 
+ostream & Models::operator<<(ostream &ost, const Models::FollPar P)
+Possible candidates:
+ 'std::ostream & operator<<(std::ostream &ost, perps C)' at line 16 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 17 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 25 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &os, const QP_Param &Q)' at line 393 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const perps &C)' at line 395 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const FollPar P)' at line 144 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const DemPar P)' at line 146 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadPar P)' at line 148 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadAllPar P)' at line 150 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeaderVars l)' at line 152 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, EPECInstance I)' at line 154 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, Models::prn l)' at line 313 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'ostream & operator<<(ostream &ost, const perps &C)' at line 45 of file/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:62: warning: no matching file member found for 
+ostream & Models::operator<<(ostream &ost, const Models::DemPar P)
+Possible candidates:
+ 'std::ostream & operator<<(std::ostream &ost, perps C)' at line 16 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 17 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 25 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &os, const QP_Param &Q)' at line 393 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const perps &C)' at line 395 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const FollPar P)' at line 144 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const DemPar P)' at line 146 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadPar P)' at line 148 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadAllPar P)' at line 150 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeaderVars l)' at line 152 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, EPECInstance I)' at line 154 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, Models::prn l)' at line 313 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'ostream & operator<<(ostream &ost, const perps &C)' at line 45 of file/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:70: warning: no matching file member found for 
+ostream & Models::operator<<(ostream &ost, const Models::LeadPar P)
+Possible candidates:
+ 'std::ostream & operator<<(std::ostream &ost, perps C)' at line 16 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 17 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 25 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &os, const QP_Param &Q)' at line 393 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const perps &C)' at line 395 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const FollPar P)' at line 144 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const DemPar P)' at line 146 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadPar P)' at line 148 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadAllPar P)' at line 150 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeaderVars l)' at line 152 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, EPECInstance I)' at line 154 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, Models::prn l)' at line 313 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'ostream & operator<<(ostream &ost, const perps &C)' at line 45 of file/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:92: warning: no matching file member found for 
+ostream & Models::operator<<(ostream &ost, const Models::EPECInstance I)
+Possible candidates:
+ 'std::ostream & operator<<(std::ostream &ost, perps C)' at line 16 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 17 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 25 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &os, const QP_Param &Q)' at line 393 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const perps &C)' at line 395 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const FollPar P)' at line 144 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const DemPar P)' at line 146 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadPar P)' at line 148 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadAllPar P)' at line 150 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeaderVars l)' at line 152 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, EPECInstance I)' at line 154 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, Models::prn l)' at line 313 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'ostream & operator<<(ostream &ost, const perps &C)' at line 45 of file/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:101: warning: no matching file member found for 
+ostream & Models::operator<<(ostream &ost, const Models::LeadAllPar P)
+Possible candidates:
+ 'std::ostream & operator<<(std::ostream &ost, perps C)' at line 16 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 17 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 25 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &os, const QP_Param &Q)' at line 393 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const perps &C)' at line 395 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const FollPar P)' at line 144 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const DemPar P)' at line 146 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadPar P)' at line 148 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadAllPar P)' at line 150 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeaderVars l)' at line 152 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, EPECInstance I)' at line 154 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, Models::prn l)' at line 313 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'ostream & operator<<(ostream &ost, const perps &C)' at line 45 of file/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:123: warning: no matching file member found for 
+ostream & Models::operator<<(ostream &ost, const Models::LeaderVars l)
+Possible candidates:
+ 'std::ostream & operator<<(std::ostream &ost, perps C)' at line 16 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 21 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/epecsolve.h
+ 'std::ostream & operator<<(std::ostream &ost, std::vector< T > v)' at line 17 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, std::pair< T, S > p)' at line 25 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &os, const QP_Param &Q)' at line 393 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const perps &C)' at line 395 of file/home/sriram/Dropbox/code/EPEC/code/src/games.h
+ 'std::ostream & operator<<(std::ostream &ost, const FollPar P)' at line 144 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const DemPar P)' at line 146 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadPar P)' at line 148 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeadAllPar P)' at line 150 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, const LeaderVars l)' at line 152 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, EPECInstance I)' at line 154 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'std::ostream & operator<<(std::ostream &ost, Models::prn l)' at line 313 of file/home/sriram/Dropbox/code/EPEC/code/src/models.h
+ 'ostream & operator<<(ostream &ost, const perps &C)' at line 45 of file/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:927: warning: no matching class member found for 
+  unsigned int Models::EPEC::getPosition(string countryName, const Models::LeaderVars var) const
+Possible candidates:
+  unsigned int Models::EPEC::getPosition(const unsigned int countryCount, const LeaderVars var=LeaderVars::FollowerStart) const
+  unsigned int Models::EPEC::getPosition(const std::string countryCount, const LeaderVars var=LeaderVars::FollowerStart) const
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:1016: warning: no uniquely matching class member found for 
+  unique_ptr< GRBModel > Models::EPEC::Respond(string name, const arma::vec &x) const
+Possible candidates:
+  std::unique_ptr< GRBModel > Game::EPEC::Respond(const unsigned int i, const arma::vec &x) const' at line 569 of file /home/sriram/Dropbox/code/EPEC/code/src/games.h
+  std::unique_ptr< GRBModel > Models::EPEC::Respond(const std::string name, const arma::vec &x) const' at line 272 of file /home/sriram/Dropbox/code/EPEC/code/src/models.h
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:1111: warning: no uniquely matching class member found for 
+  void Models::EPEC::write(string filename, const unsigned int i, bool append) const
+Possible candidates:
+  void Models::EPEC::write(const std::string filename, const unsigned int i, bool append=true) const' at line 280 of file /home/sriram/Dropbox/code/EPEC/code/src/models.h
+  void Models::EPEC::write(const std::string filename, bool append=true) const' at line 283 of file /home/sriram/Dropbox/code/EPEC/code/src/models.h
+
+/home/sriram/Dropbox/code/EPEC/code/src/Models.cpp:1124: warning: no uniquely matching class member found for 
+  void Models::EPEC::write(string filename, bool append) const
+Possible candidates:
+  void Models::EPEC::write(const std::string filename, const unsigned int i, bool append=true) const' at line 280 of file /home/sriram/Dropbox/code/EPEC/code/src/models.h
+  void Models::EPEC::write(const std::string filename, bool append=true) const' at line 283 of file /home/sriram/Dropbox/code/EPEC/code/src/models.h
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:76: warning: no matching file member found for 
+void Utils::appendSave(const sp_mat &matrix, string out, const string header, bool erase)
+Possible candidates:
+ 'void appendSave(const vec &matrix, const std::string out, const std::string header="", bool erase=false)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const sp_mat &matrix, const std::string out, const std::string header="", bool erase=false)' at line 30 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::vector< double > v, const std::string out, const std::string header="", bool erase=false)' at line 37 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::string v, const std::string out, bool erase=false)' at line 44 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const long int v, const std::string out, const std::string header="", bool erase=false)' at line 49 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const unsigned int v, const std::string out, const std::string header="", bool erase=false)' at line 56 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const vector< double > v, const string out, const string header, bool erase)' at line 155 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:105: warning: no matching file member found for 
+long int Utils::appendRead(sp_mat &matrix, string in, long int pos, const string header)
+Possible candidates:
+ 'long int appendRead(vec &matrix, const std::string in, long int pos, const std::string header="")' at line 26 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(sp_mat &matrix, const std::string in, long int pos, const std::string header="")' at line 33 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::vector< double > &v, const std::string in, long int pos, const std::string header="")' at line 40 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::string &v, const std::string in, long int pos)' at line 46 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(long int &v, const std::string in, long int pos, const std::string header="")' at line 52 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(unsigned int &v, const std::string in, long int pos, const std::string header="")' at line 59 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(vector< double > &v, const string in, long int pos, const string header)' at line 167 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:195: warning: no matching file member found for 
+void Utils::appendSave(const vec &matrix, string out, const string header, bool erase)
+Possible candidates:
+ 'void appendSave(const vec &matrix, const std::string out, const std::string header="", bool erase=false)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const sp_mat &matrix, const std::string out, const std::string header="", bool erase=false)' at line 30 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::vector< double > v, const std::string out, const std::string header="", bool erase=false)' at line 37 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::string v, const std::string out, bool erase=false)' at line 44 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const long int v, const std::string out, const std::string header="", bool erase=false)' at line 49 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const unsigned int v, const std::string out, const std::string header="", bool erase=false)' at line 56 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const vector< double > v, const string out, const string header, bool erase)' at line 155 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:221: warning: no matching file member found for 
+long int Utils::appendRead(vec &matrix, string in, long int pos, const string header)
+Possible candidates:
+ 'long int appendRead(vec &matrix, const std::string in, long int pos, const std::string header="")' at line 26 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(sp_mat &matrix, const std::string in, long int pos, const std::string header="")' at line 33 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::vector< double > &v, const std::string in, long int pos, const std::string header="")' at line 40 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::string &v, const std::string in, long int pos)' at line 46 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(long int &v, const std::string in, long int pos, const std::string header="")' at line 52 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(unsigned int &v, const std::string in, long int pos, const std::string header="")' at line 59 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(vector< double > &v, const string in, long int pos, const string header)' at line 167 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:256: warning: no matching file member found for 
+void Utils::appendSave(long int v, string out, const string header, bool erase)
+Possible candidates:
+ 'void appendSave(const vec &matrix, const std::string out, const std::string header="", bool erase=false)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const sp_mat &matrix, const std::string out, const std::string header="", bool erase=false)' at line 30 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::vector< double > v, const std::string out, const std::string header="", bool erase=false)' at line 37 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::string v, const std::string out, bool erase=false)' at line 44 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const long int v, const std::string out, const std::string header="", bool erase=false)' at line 49 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const unsigned int v, const std::string out, const std::string header="", bool erase=false)' at line 56 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const vector< double > v, const string out, const string header, bool erase)' at line 155 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:268: warning: no matching file member found for 
+long int Utils::appendRead(long int &v, string in, long int pos, const string header)
+Possible candidates:
+ 'long int appendRead(vec &matrix, const std::string in, long int pos, const std::string header="")' at line 26 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(sp_mat &matrix, const std::string in, long int pos, const std::string header="")' at line 33 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::vector< double > &v, const std::string in, long int pos, const std::string header="")' at line 40 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::string &v, const std::string in, long int pos)' at line 46 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(long int &v, const std::string in, long int pos, const std::string header="")' at line 52 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(unsigned int &v, const std::string in, long int pos, const std::string header="")' at line 59 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(vector< double > &v, const string in, long int pos, const string header)' at line 167 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:295: warning: no matching file member found for 
+void Utils::appendSave(unsigned int v, string out, const string header, bool erase)
+Possible candidates:
+ 'void appendSave(const vec &matrix, const std::string out, const std::string header="", bool erase=false)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const sp_mat &matrix, const std::string out, const std::string header="", bool erase=false)' at line 30 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::vector< double > v, const std::string out, const std::string header="", bool erase=false)' at line 37 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::string v, const std::string out, bool erase=false)' at line 44 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const long int v, const std::string out, const std::string header="", bool erase=false)' at line 49 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const unsigned int v, const std::string out, const std::string header="", bool erase=false)' at line 56 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const vector< double > v, const string out, const string header, bool erase)' at line 155 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:307: warning: no matching file member found for 
+long int Utils::appendRead(unsigned int &v, string in, long int pos, const string header)
+Possible candidates:
+ 'long int appendRead(vec &matrix, const std::string in, long int pos, const std::string header="")' at line 26 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(sp_mat &matrix, const std::string in, long int pos, const std::string header="")' at line 33 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::vector< double > &v, const std::string in, long int pos, const std::string header="")' at line 40 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::string &v, const std::string in, long int pos)' at line 46 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(long int &v, const std::string in, long int pos, const std::string header="")' at line 52 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(unsigned int &v, const std::string in, long int pos, const std::string header="")' at line 59 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(vector< double > &v, const string in, long int pos, const string header)' at line 167 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:330: warning: no matching file member found for 
+void Utils::appendSave(string v, const string out, bool erase)
+Possible candidates:
+ 'void appendSave(const vec &matrix, const std::string out, const std::string header="", bool erase=false)' at line 23 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const sp_mat &matrix, const std::string out, const std::string header="", bool erase=false)' at line 30 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::vector< double > v, const std::string out, const std::string header="", bool erase=false)' at line 37 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const std::string v, const std::string out, bool erase=false)' at line 44 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const long int v, const std::string out, const std::string header="", bool erase=false)' at line 49 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const unsigned int v, const std::string out, const std::string header="", bool erase=false)' at line 56 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'void appendSave(const vector< double > v, const string out, const string header, bool erase)' at line 155 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp:340: warning: no matching file member found for 
+long int Utils::appendRead(string &v, const string in, long int pos)
+Possible candidates:
+ 'long int appendRead(vec &matrix, const std::string in, long int pos, const std::string header="")' at line 26 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(sp_mat &matrix, const std::string in, long int pos, const std::string header="")' at line 33 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::vector< double > &v, const std::string in, long int pos, const std::string header="")' at line 40 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(std::string &v, const std::string in, long int pos)' at line 46 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(long int &v, const std::string in, long int pos, const std::string header="")' at line 52 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(unsigned int &v, const std::string in, long int pos, const std::string header="")' at line 59 of file/home/sriram/Dropbox/code/EPEC/code/src/utils.h
+ 'long int appendRead(vector< double > &v, const string in, long int pos, const string header)' at line 167 of file/home/sriram/Dropbox/code/EPEC/code/src/Utils.cpp
+
+/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp:1424: warning: Found unknown command `\briefs'
+/home/sriram/Dropbox/code/EPEC/code/src/games.h:571: warning: The following parameters of Game::EPEC::RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, const arma::vec &prevDev={}) const are not documented:
+  parameter 'prevDev'
+/home/sriram/Dropbox/code/EPEC/code/src/games.h:31: warning: The following parameters of Game::isZero(arma::mat M, double tol=1e-6) are not documented:
+  parameter 'M'
+/home/sriram/Dropbox/code/EPEC/code/src/games.h:33: warning: The following parameters of Game::isZero(arma::sp_mat M, double tol=1e-6) are not documented:
+  parameter 'M'
+/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp:1570: warning: unexpected token in comment block while parsing the argument of command param
+/home/sriram/Dropbox/code/EPEC/code/src/games.h:527: warning: The following parameters of Game::EPEC::getAllDevns(std::vector< arma::vec > &devns, const arma::vec &guessSol, const std::vector< arma::vec > &prevDev={}) const are not documented:
+  parameter 'prevDev'
+/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp:1424: warning: Found unknown command `\briefs'
+/home/sriram/Dropbox/code/EPEC/code/src/games.h:571: warning: The following parameters of Game::EPEC::RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, const arma::vec &prevDev={}) const are not documented:
+  parameter 'prevDev'
+/home/sriram/Dropbox/code/EPEC/code/src/games.h:211: warning: The following parameters of Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x, bool checkFeas=true, double tol=1e-6) const are not documented:
+  parameter 'y'
+  parameter 'x'
+  parameter 'tol'
+/home/sriram/Dropbox/code/EPEC/code/src/Games.cpp:1424: warning: Found unknown command `\briefs'
+/home/sriram/Dropbox/code/EPEC/code/src/games.h:571: warning: The following parameters of Game::EPEC::RespondSol(arma::vec &sol, unsigned int player, const arma::vec &x, const arma::vec &prevDev={}) const are not documented:
+  parameter 'prevDev'
+/home/sriram/Dropbox/code/EPEC/code/README.md:51: warning: Illegal command @ssriram1992 as part of a <a>..</a> block
+/home/sriram/Dropbox/code/EPEC/code/README.md:53: warning: Illegal command @gdragotto as part of a <a>..</a> block
+/home/sriram/Dropbox/code/EPEC/code/README.md:51: warning: Illegal command @ssriram1992 as part of a <a>..</a> block
+/home/sriram/Dropbox/code/EPEC/code/README.md:53: warning: Illegal command @gdragotto as part of a <a>..</a> block

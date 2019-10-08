@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wallclocktime',['wallClockTime',['../structGame_1_1EPECStatistics.html#a82c58206e9db642b65a732d85bc2005c',1,'Game::EPECStatistics']]]
+  ['useindicators',['useIndicators',['../classGame_1_1LCP.html#ace47e84dbbbc1e66ffae78d35fd6bb40',1,'Game::LCP']]]
 ];

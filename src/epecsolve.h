@@ -1,6 +1,6 @@
 #pragma once
 
-/** @file Forward declaration and for EPEC solve algorithms
+/** @file src/epecsolve.h Forward declaration and for EPEC solve algorithms
  * in https://github.com/ssriram1992/EPECsolve/
  */
 

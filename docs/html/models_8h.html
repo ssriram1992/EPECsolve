@@ -119,11 +119,16 @@ Typedefs</h2></td></tr>
 <tr class="separator:a14e4af73d28e599c41f07e8ae3edac52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7371f9c9faadf542226ce85ac1cb596"><td class="memItemLeft" align="right" valign="top">typedef struct LeadAllPar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ad7371f9c9faadf542226ce85ac1cb596">Models::LeadAllPar</a></td></tr>
 <tr class="separator:ad7371f9c9faadf542226ce85ac1cb596"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ce8d121e2afc6cfcca06858f6d2e544"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a0ce8d121e2afc6cfcca06858f6d2e544">Models::LeadLocs</a> = map&lt; LeaderVars, unsigned int &gt;</td></tr>
-<tr class="separator:a0ce8d121e2afc6cfcca06858f6d2e544"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec9f0d1d113730ec8734d5f6ab9cab9d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#aec9f0d1d113730ec8734d5f6ab9cab9d">Models::LeadLocs</a> = std::map&lt; LeaderVars, unsigned int &gt;</td></tr>
+<tr class="separator:aec9f0d1d113730ec8734d5f6ab9cab9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:a8fcea6b0a4c8c1403d8151c8a85f02c4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a8fcea6b0a4c8c1403d8151c8a85f02c4">Models::TaxType</a> { <a class="el" href="namespaceModels.html#a8fcea6b0a4c8c1403d8151c8a85f02c4a6cf964532157ab0f02d24e287a383f67">Models::TaxType::StandardTax</a>, 
+<a class="el" href="namespaceModels.html#a8fcea6b0a4c8c1403d8151c8a85f02c4ab73afec7571c480b11f1a595a161a2bf">Models::TaxType::SingleTax</a>, 
+<a class="el" href="namespaceModels.html#a8fcea6b0a4c8c1403d8151c8a85f02c4a3836ce10651ef6e6f12d27e27f257f41">Models::TaxType::CarbonTax</a>
+ }</td></tr>
+<tr class="separator:a8fcea6b0a4c8c1403d8151c8a85f02c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64b758b38a6e4004b84630ec087bf76e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">Models::LeaderVars</a> { <br />
 &#160;&#160;<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eaf2dcda11a77f92f3c0cd7e08f37ce122">Models::LeaderVars::FollowerStart</a>, 
 <a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eabd2f8eff3cf4fc193002ef846a45c155">Models::LeaderVars::NetImport</a>, 
@@ -147,40 +152,78 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1fe9bde9c52bcd4c67e60c82f84e05f1"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a1fe9bde9c52bcd4c67e60c82f84e05f1">Models::operator&lt;&lt;</a> (ostream &amp;ost, const FollPar P)</td></tr>
-<tr class="separator:a1fe9bde9c52bcd4c67e60c82f84e05f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f6641269c168c9ff9ff6a09bb24bab5"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a0f6641269c168c9ff9ff6a09bb24bab5">Models::operator&lt;&lt;</a> (ostream &amp;ost, const DemPar P)</td></tr>
-<tr class="separator:a0f6641269c168c9ff9ff6a09bb24bab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57d7eebb6d7845a03c0f287901888f8b"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a57d7eebb6d7845a03c0f287901888f8b">Models::operator&lt;&lt;</a> (ostream &amp;ost, const LeadPar P)</td></tr>
-<tr class="separator:a57d7eebb6d7845a03c0f287901888f8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a930b278b95aa7f2ef8a4d7d144eed230"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a930b278b95aa7f2ef8a4d7d144eed230">Models::operator&lt;&lt;</a> (ostream &amp;ost, const LeadAllPar P)</td></tr>
-<tr class="separator:a930b278b95aa7f2ef8a4d7d144eed230"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae792fb7a6b02eebf59fd8e4de8d6bf16"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ae792fb7a6b02eebf59fd8e4de8d6bf16">Models::operator&lt;&lt;</a> (ostream &amp;ost, const LeaderVars l)</td></tr>
-<tr class="separator:ae792fb7a6b02eebf59fd8e4de8d6bf16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac48592d478ccf608786b9a07ba9d58a6"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ac48592d478ccf608786b9a07ba9d58a6">Models::operator&lt;&lt;</a> (ostream &amp;ost, EPECInstance I)</td></tr>
-<tr class="separator:ac48592d478ccf608786b9a07ba9d58a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a322ba4df5ecd2c7fbec05df2e81ae9e2"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a322ba4df5ecd2c7fbec05df2e81ae9e2">Models::operator&lt;&lt;</a> (std::ostream &amp;ost, const FollPar P)</td></tr>
+<tr class="separator:a322ba4df5ecd2c7fbec05df2e81ae9e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ec9acc07b1d1a1f52c7fd06a2abaa6d"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a6ec9acc07b1d1a1f52c7fd06a2abaa6d">Models::operator&lt;&lt;</a> (std::ostream &amp;ost, const DemPar P)</td></tr>
+<tr class="separator:a6ec9acc07b1d1a1f52c7fd06a2abaa6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04343873a820be679edc66592061ae3b"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a04343873a820be679edc66592061ae3b">Models::operator&lt;&lt;</a> (std::ostream &amp;ost, const LeadPar P)</td></tr>
+<tr class="separator:a04343873a820be679edc66592061ae3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fcae411a4fb11391d08cc950951ee73"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a2fcae411a4fb11391d08cc950951ee73">Models::operator&lt;&lt;</a> (std::ostream &amp;ost, const LeadAllPar P)</td></tr>
+<tr class="separator:a2fcae411a4fb11391d08cc950951ee73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accb1703e798e52c5b4685207c9d83e06"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#accb1703e798e52c5b4685207c9d83e06">Models::operator&lt;&lt;</a> (std::ostream &amp;ost, const LeaderVars l)</td></tr>
+<tr class="separator:accb1703e798e52c5b4685207c9d83e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7eee90a2b5343b09c570e48040eb39f1"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a7eee90a2b5343b09c570e48040eb39f1">Models::operator&lt;&lt;</a> (std::ostream &amp;ost, EPECInstance I)</td></tr>
+<tr class="separator:a7eee90a2b5343b09c570e48040eb39f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81197aab1f9d6801996579a891f07791"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a81197aab1f9d6801996579a891f07791">Models::increaseVal</a> (LeadLocs &amp;L, const LeaderVars start, const unsigned int val, const bool startnext=true)</td></tr>
 <tr class="separator:a81197aab1f9d6801996579a891f07791"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad589f24f13f96365aa0198322e5a11dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ad589f24f13f96365aa0198322e5a11dc">Models::decreaseVal</a> (LeadLocs &amp;L, const LeaderVars start, const unsigned int val, const bool startnext=true)</td></tr>
+<tr class="separator:ad589f24f13f96365aa0198322e5a11dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a723b05bd3c4740451512f73d0c75ceb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a723b05bd3c4740451512f73d0c75ceb6">Models::init</a> (LeadLocs &amp;L)</td></tr>
 <tr class="separator:a723b05bd3c4740451512f73d0c75ceb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae235f93cb5c937e10ef640f9fe99cba0"><td class="memItemLeft" align="right" valign="top">LeaderVars&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#ae235f93cb5c937e10ef640f9fe99cba0">Models::operator+</a> (<a class="el" href="namespaceModels.html#a64b758b38a6e4004b84630ec087bf76e">Models::LeaderVars</a> a, int b)</td></tr>
 <tr class="separator:ae235f93cb5c937e10ef640f9fe99cba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea048442ba1b089376473071654d3358"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="models_8h.html#aea048442ba1b089376473071654d3358">to_string</a> (const GRBVar &amp;var)</td></tr>
-<tr class="separator:aea048442ba1b089376473071654d3358"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1662fe1a2beec43dc10c18c10ff00d2"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="models_8h.html#ac1662fe1a2beec43dc10c18c10ff00d2">to_string</a> (const GRBConstr &amp;cons, const GRBModel &amp;model)</td></tr>
-<tr class="separator:ac1662fe1a2beec43dc10c18c10ff00d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1cbd6dc7f5292f47117f91d59c6063b6"><td class="memItemLeft" align="right" valign="top">ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a1cbd6dc7f5292f47117f91d59c6063b6">Models::operator&lt;&lt;</a> (ostream &amp;ost, <a class="el" href="namespaceModels.html#a54b54aa6ddb1d9e337f9fea85a2d0ceb">Models::prn</a> l)</td></tr>
-<tr class="separator:a1cbd6dc7f5292f47117f91d59c6063b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cb07b2258983336a21ed1a2cdaffd9e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="models_8h.html#a0cb07b2258983336a21ed1a2cdaffd9e">to_string</a> (const GRBVar &amp;var)</td></tr>
+<tr class="separator:a0cb07b2258983336a21ed1a2cdaffd9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a58b1d925b1f8570e1a81372a7869f8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="models_8h.html#a5a58b1d925b1f8570e1a81372a7869f8">to_string</a> (const GRBConstr &amp;cons, const GRBModel &amp;model)</td></tr>
+<tr class="separator:a5a58b1d925b1f8570e1a81372a7869f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a147b30b6b9732e5afb0d48274c2ec356"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceModels.html#a147b30b6b9732e5afb0d48274c2ec356">Models::operator&lt;&lt;</a> (std::ostream &amp;ost, <a class="el" href="namespaceModels.html#a54b54aa6ddb1d9e337f9fea85a2d0ceb">Models::prn</a> l)</td></tr>
+<tr class="separator:a147b30b6b9732e5afb0d48274c2ec356"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a068bbe67e10741d18e41e9390ecd95b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structModels_1_1FollPar.html">Models::FollPar</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="models_8h.html#a068bbe67e10741d18e41e9390ecd95b0">operator+</a> (const <a class="el" href="structModels_1_1FollPar.html">Models::FollPar</a> &amp;F1, const <a class="el" href="structModels_1_1FollPar.html">Models::FollPar</a> &amp;F2)</td></tr>
+<tr class="separator:a068bbe67e10741d18e41e9390ecd95b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="ac1662fe1a2beec43dc10c18c10ff00d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1662fe1a2beec43dc10c18c10ff00d2">&#9670;&nbsp;</a></span>to_string() <span class="overload">[1/2]</span></h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Using EPECSolve to solve problems arising in international energy markets with climate-conscious countries. </p>
+
+<p class="definition">Definition in file <a class="el" href="models_8h_source.html">models.h</a>.</p>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a068bbe67e10741d18e41e9390ecd95b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a068bbe67e10741d18e41e9390ecd95b0">&#9670;&nbsp;</a></span>operator+()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">string to_string </td>
+          <td class="memname"><a class="el" href="structModels_1_1FollPar.html">Models::FollPar</a> operator+ </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structModels_1_1FollPar.html">Models::FollPar</a> &amp;&#160;</td>
+          <td class="paramname"><em>F1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structModels_1_1FollPar.html">Models::FollPar</a> &amp;&#160;</td>
+          <td class="paramname"><em>F2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l00162">162</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5a58b1d925b1f8570e1a81372a7869f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a58b1d925b1f8570e1a81372a7869f8">&#9670;&nbsp;</a></span>to_string() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string to_string </td>
           <td>(</td>
           <td class="paramtype">const GRBConstr &amp;&#160;</td>
           <td class="paramname"><em>cons</em>, </td>
@@ -199,18 +242,18 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01032">1032</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01087">1087</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aea048442ba1b089376473071654d3358"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea048442ba1b089376473071654d3358">&#9670;&nbsp;</a></span>to_string() <span class="overload">[2/2]</span></h2>
+<a id="a0cb07b2258983336a21ed1a2cdaffd9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cb07b2258983336a21ed1a2cdaffd9e">&#9670;&nbsp;</a></span>to_string() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">string to_string </td>
+          <td class="memname">std::string to_string </td>
           <td>(</td>
           <td class="paramtype">const GRBVar &amp;&#160;</td>
           <td class="paramname"><em>var</em></td><td>)</td>
@@ -219,7 +262,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01051">1051</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Models_8cpp_source.html#l01106">1106</a> of file <a class="el" href="Models_8cpp_source.html">Models.cpp</a>.</p>
 
 </div>
 </div>

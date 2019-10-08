@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @file For Game theory related algorithms
+ * @file src/games.h For Game theory related algorithms
  */
 // #include"epecsolve.h"
 #include "lcptolp.h"
