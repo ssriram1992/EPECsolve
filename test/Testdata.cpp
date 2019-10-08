@@ -1,6 +1,13 @@
 #include "testdata.h"
 
 namespace TestData {
+Models::FollPar FP_Blu FP_Blu.capacities = {100};
+FP_Blu.costs_lin = {10};
+FP_Blu.costs_quad = {0.5};
+FP_Blu.emission_costs = {6};
+FP_Blu.tax_caps = {250};
+FP_Blu.names = {"Blue"};
+
 Models::FollPar FP_Rosso FP_Rosso.capacities = {550};
 FP_Rosso.costs_lin = {200};
 FP_Rosso.costs_quad = {0.3};

@@ -1684,9 +1684,9 @@ void Game::EPEC::iterativeNash() {
   // Stay in this loop, till you find a Nash equilibrium or prove that there
   // does not exist a Nash equilibrium or you run out of time.
   while (!solved) {
+    ++this->Stats.numIteration;
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Iteration "
-                            << to_string(++this->Stats.numIteration);
-
+                            << to_string(this->Stats.numIteration);
     if (addRandPoly) {
       bool success =
           this->addRandomPoly2All(this->Stats.AlgorithmParam.aggressiveness,
@@ -1777,6 +1777,7 @@ void ::Game::EPEC::make_country_LCP() {
       << "Game::EPEC::make_country_LCP(): NashGame is ready";
   this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
   BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): LCP is ready";
+  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): indicators set to "<<this->Stats.AlgorithmParam.indicators;
   this->lcp->useIndicators =
       this->Stats.AlgorithmParam.indicators; // Using indicator constraints
 

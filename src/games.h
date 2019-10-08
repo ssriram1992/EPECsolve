@@ -597,6 +597,12 @@ public:                  // functions
   virtual unsigned int getNumThreads() const final {
     return this->Stats.AlgorithmParam.threads;
   }
+  void setAddPolyMethodSeed(unsigned int t) {
+    this->Stats.AlgorithmParam.addPolyMethodSeed=t;
+  }
+  virtual unsigned int getAddPolyMethodSeed() const final {
+    return this->Stats.AlgorithmParam.addPolyMethodSeed;
+  }
   void setIndicators(bool val) { this->Stats.AlgorithmParam.indicators = val; }
   virtual bool getIndicators() const final {
     return this->Stats.AlgorithmParam.indicators;
