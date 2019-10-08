@@ -1685,8 +1685,9 @@ void Game::EPEC::iterativeNash() {
   // Stay in this loop, till you find a Nash equilibrium or prove that there
   // does not exist a Nash equilibrium or you run out of time.
   while (!solved) {
+    ++this->Stats.numIteration);
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Iteration "
-                            << to_string(++this->Stats.numIteration);
+                            << to_string(this->Stats.numIteration));
 
     if (addRandPoly) {
       bool success =
