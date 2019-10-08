@@ -446,61 +446,11 @@ BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
    *are suggested.
    **/
   BOOST_TEST_MESSAGE("Indicator constraints test");
-  Models::FollPar FP;
-  FP.capacities = {100};
-  FP.costs_lin = {10};
-  FP.costs_quad = {0.5};
-  FP.emission_costs = {6};
-  FP.tax_caps = {250};
-  FP.names = {"Blu"};
-  Models::LeadAllPar Country(1, "One", FP, {300, 0.05}, {-1, -1, -1, false, 0});
-  BOOST_TEST_MESSAGE("MaxTax:250 with alpha=300 and beta=0.05");
-  BOOST_TEST_MESSAGE("Expected: q=66.666;t=250");
-  GRBEnv env = GRBEnv();
-  arma::sp_mat TrCo(1, 1);
-  TrCo(0, 0) = 0;
-
-  BOOST_TEST_MESSAGE("----Testing Models with indicator constraints----");
-  Models::EPEC epec2(&env);
-  BOOST_TEST_MESSAGE("testing Models::addCountry");
-  BOOST_CHECK_NO_THROW(epec2.addCountry(Country));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec2.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec2.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec2.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec2.findNashEq());
-  BOOST_CHECK_MESSAGE(epec2.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec2.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec2.findNashEq());
-  BOOST_CHECK_MESSAGE(epec2.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  epec2.reset();
-  BOOST_CHECK_MESSAGE(!epec2.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
-  Models::EPEC epec3(&env);
-  epec3.indicators = false;
-  BOOST_TEST_MESSAGE("----Testing Models with bigM constraints----");
-  BOOST_TEST_MESSAGE("testing Models::addCountry");
-  BOOST_CHECK_NO_THROW(epec3.addCountry(Country));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec3.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec3.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec3.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec3.findNashEq());
-  BOOST_CHECK_MESSAGE(epec3.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec3.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec3.findNashEq());
-  BOOST_CHECK_MESSAGE(epec3.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  epec3.reset();
-  BOOST_CHECK_MESSAGE(!epec3.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
+  Game::EPECAlgorithmParams common;
+  common.indicators = false;
+  testEPECInstance(SimpleBlue(), allAlgo(common, false));
+  BOOST_TEST_MESSAGE("Disabling indicator constraints.");
+  testEPECInstance(SimpleBlue(), allAlgo(common, true));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -515,49 +465,9 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
   /** Testing a Single country (C1) with a single follower (F1)
    *  LeaderConstraints: no leader constraints are enforced
    **/
-  BOOST_TEST_MESSAGE(
-      "Testing a single bilevel problem with no leader constraints.");
-  Models::FollPar FP;
-  FP.capacities = {100};
-  FP.costs_lin = {10};
-  FP.costs_quad = {0.5};
-  FP.emission_costs = {6};
-  FP.tax_caps = {-1};
-  FP.names = {"Blu"};
-  Models::LeadAllPar Country1(FP.capacities.size(), "One", FP, {300, 0.05},
-                              {-1, -1, -1, false, 0});
-  GRBEnv env = GRBEnv();
-  arma::sp_mat TrCo(1, 1);
-  TrCo(0, 0) = 0;
-  BOOST_TEST_MESSAGE("MaxTax:20 with alpha=300 and beta=0.05");
-  BOOST_TEST_MESSAGE("Expected: q=0;t=290");
-  Models::EPEC epec(&env);
-  BOOST_TEST_MESSAGE("testing Models::addCountry");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_TEST_MESSAGE("Testing results:");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     0),
-      0, 0.001);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 290,
-      0.01);
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  epec.reset();
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
+  testInst SimpleBlue2 = SimpleBlue();
+  SimpleBlue2.instance.Countries.at(0).FollowerParam.tax_caps.at(0) = 20;
+  testEPECInstance(SimpleBlue2, allAlgo(), true);
 }
 
 BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
@@ -1821,6 +1731,16 @@ Models::FollPar FP_Rosso() {
   FP_Rosso.names = {"Rosso"};
   return FP_Rosso;
 }
+Models::FollPar FP_Blu() {
+  Models::FollPar FP_Blu;
+  FP_Blu.capacities = {100};
+  FP_Blu.costs_lin = {10};
+  FP_Blu.costs_quad = {0.5};
+  FP_Blu.emission_costs = {6};
+  FP_Blu.tax_caps = {250};
+  FP_Blu.names = {"Blu"};
+  return FP_Blu;
+}
 
 Models::FollPar FP_Bianco() {
   Models::FollPar FP_Bianco;
@@ -1917,6 +1837,19 @@ testInst CH_S_F0_CL_SC_F0() {
   return inst;
 }
 
+testInst SimpleBlue() {
+
+  testInst inst;
+  Models::LeadAllPar Country(1, "One", FP_Blu(), {300, 0.05},
+                             {-1, -1, -1, false, 0});
+  inst.instance.Countries = {Country};
+  inst.instance.TransportationCosts = TranspCost(1);
+
+  // Solution
+  inst.solution.push_back(countrySol{{66.666}, {250}, 0.0, 0.0, 0.0});
+  return inst;
+}
+
 testInst HardToEnum_1() {
   // Problem
   testInst inst;
@@ -1973,88 +1906,6 @@ testInst HardToEnum_2() {
       countrySol{{57.14, 30}, {0.18, 0.18}, 0, 22.86, 272.00});
 
   return inst;
-}
-
-std::vector<Game::EPECAlgorithmParams> allAlgo() {
-  std::vector<Game::EPECAlgorithmParams> algs;
-  Game::EPECAlgorithmParams alg;
-  alg.algorithm = Game::EPECalgorithm::fullEnumeration;
-  // algs.push_back(alg);
-
-  for (int i = 0; i < 2; i++) {
-    Game::EPECAlgorithmParams alg_in;
-    alg_in.algorithm = Game::EPECalgorithm::innerApproximation;
-    alg_in.addPolyMethod = static_cast<Game::EPECAddPolyMethod>(i);
-    for (int j = 1; j < 10; j += 3) {
-      alg_in.aggressiveness = j;
-      algs.push_back(alg_in);
-    }
-  }
-  return algs;
-}
-
-void testEPECInstance(const testInst inst,
-                      const std::vector<Game::EPECAlgorithmParams> algorithms) {
-
-  BOOST_TEST_MESSAGE("*** NEW INSTANCE ***");
-  for (auto const algorithm : algorithms) {
-    std::stringstream ss;
-    ss << "Algorithm: " << std::to_string(algorithm.algorithm);
-    if (algorithm.algorithm == Game::EPECalgorithm::innerApproximation) {
-      ss << "\nAggressiveness: " << algorithm.aggressiveness;
-      ss << "\nMethod to add polyhedra: "
-         << std::to_string(algorithm.addPolyMethod);
-    }
-    BOOST_TEST_MESSAGE(ss.str());
-    GRBEnv env;
-    Models::EPEC epec(&env);
-    const unsigned int nCountr = inst.instance.Countries.size();
-    for (unsigned int i = 0; i < nCountr; i++)
-      epec.addCountry(inst.instance.Countries.at(i));
-    epec.addTranspCosts(inst.instance.TransportationCosts);
-    epec.finalize();
-
-    epec.setAlgorithm(algorithm.algorithm);
-    epec.setAggressiveness(algorithm.aggressiveness);
-    epec.setAddPolyMethod(algorithm.addPolyMethod);
-
-    const std::chrono::high_resolution_clock::time_point initTime =
-        std::chrono::high_resolution_clock::now();
-    epec.findNashEq();
-    const std::chrono::duration<double> timeElapsed =
-        std::chrono::high_resolution_clock::now() - initTime;
-
-    // Checking
-    for (unsigned int i = 0; i < nCountr; i++) {
-      const auto countryAns = inst.solution.at(i);
-      BOOST_TEST_MESSAGE("Country " + inst.instance.Countries.at(i).name);
-      for (unsigned int j = 0; j < countryAns.foll_prod.size(); j++) {
-        // Follower production
-        BOOST_CHECK_CLOSE(
-            epec.getx().at(
-                epec.getPosition(i, Models::LeaderVars::FollowerStart) + j),
-            countryAns.foll_prod.at(j), 1);
-        // Tax
-        BOOST_WARN_CLOSE(
-            epec.getx().at(epec.getPosition(i, Models::LeaderVars::Tax) + j),
-            countryAns.foll_tax.at(j), 1);
-      }
-      // Export
-      BOOST_CHECK_CLOSE(
-          epec.getx().at(epec.getPosition(i, Models::LeaderVars::NetExport)),
-          countryAns.export_, 1);
-      // Import
-      BOOST_CHECK_CLOSE(
-          epec.getx().at(epec.getPosition(i, Models::LeaderVars::NetImport)),
-          countryAns.import, 1);
-      // Export price
-      double exportPrice{epec.getx().at(
-          epec.getPosition(nCountr - 1, Models::LeaderVars::End) + i)};
-      BOOST_WARN_CLOSE(exportPrice, countryAns.export_price, 10);
-    }
-    ss << "\n Successfully completed running in time: " << timeElapsed.count();
-    BOOST_TEST_MESSAGE(ss.str());
-  }
 }
 
 BOOST_AUTO_TEST_SUITE(All_Alg)
