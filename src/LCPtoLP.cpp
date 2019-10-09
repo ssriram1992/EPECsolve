@@ -1002,8 +1002,6 @@ bool Game::LCP::FixToPoly(
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }
-    BOOST_LOG_TRIVIAL(debug)
-        << "Game::LCP::FixToPoly:  Successfully added " << FixNumber;
     return true; // Successfully added
   }
   return false;
@@ -1209,7 +1207,7 @@ Game::LCP &Game::LCP::makeQP(
 
   Game::QP_constraints QP_cons;
   this->feasiblePolyhedra = this->ConvexHull(QP_cons.B, QP_cons.b);
-  BOOST_LOG_TRIVIAL(debug) << "LCP::makeQP: No. feasible polyhedra: "
+  BOOST_LOG_TRIVIAL(trace) << "LCP::makeQP: No. feasible polyhedra: "
                            << this->feasiblePolyhedra;
   // Updated size after convex hull has been computed.
   const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
