@@ -1152,8 +1152,6 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
    * @param[in] tol - If the additional profit is smaller than this, then it is
    * not considered a profitable deviation.
    */
-  if (!this)
-    return false;
   arma::vec objvals = this->ComputeQPObjvals(sol, true);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
     double val = this->RespondSol(violSol, i, sol, true);
@@ -1437,9 +1435,11 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
  * This is due to numerical issues arising from the LCP solver (Gurobi).
  */
 {
-  this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
+  if (!this->nashgame)
+    return false;
   if (!this->nashEq)
     return false;
+  this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
   arma::vec objvals = this->nashgame->ComputeQPObjvals(this->sol_x, true);
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     double val = this->RespondSol(*ProfDevn, i, this->sol_x);
