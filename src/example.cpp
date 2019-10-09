@@ -16,9 +16,15 @@ public:
     this->LocEnds.push_back(&ends[i]);
     this->nCountr++;
   }
-  void printEnds()
-  {
-	  std::cout << ends[0] << " " << ends[1] << "\n";
+  void printEnds() {
+    std::cout << ends[0] << " " << ends[1] << "\n";
+
+    for (unsigned int i = 0; i < this->nCountr; ++i) {
+      std::cout << "Country variables starts for i = " << i << " at "
+                << this->nashgame->getPrimalLoc(i) << '\n';
+    }
+
+    std::cout << '\n';
   }
 
 private:
@@ -143,9 +149,11 @@ int main() {
   epec.finalize();
   // epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   // Solve
-  try{
-  epec.findNashEq();
-  } catch (std::string &s) { std:: cerr<<"Error: "<<s<<'\n';}
+  try {
+    epec.findNashEq();
+  } catch (std::string &s) {
+    std::cerr << "Error: " << s << '\n';
+  }
   auto M = epec.getLcpModel();
   M.write("dat/ex_model.lp");
   M.optimize();
@@ -156,12 +164,15 @@ int main() {
 
 /**
 @page Epec_example Game::EPEC example
- 
-Consider the following problem: The first player is the u-v player, where the leader's decision variables are @f$u@f$ and the follower's decision variaables are @f$v@f$. The second player is the x-y player where the leader's and the follower's variables are @f$x@f$ and @f$y@f$ respectively.
+
+Consider the following problem: The first player is the u-v player, where the
+leader's decision variables are @f$u@f$ and the follower's decision variaables
+are @f$v@f$. The second player is the x-y player where the leader's and the
+follower's variables are @f$x@f$ and @f$y@f$ respectively.
 
 The u-v player's optimization problem is given below
 @f{align*}{
-min_{u,v} 
+min_{u,v}
 \quad&:\quad
 u + xv_1 - v_2 \\
 \text{s.t.}\\
@@ -170,13 +181,14 @@ u+v_1+v_2 \quad&\leq\quad 10\\
 v \quad&\in\quad
 \arg \min _v
 \left \{
--v_1+v_2 : 
-v \ge 0; 
+-v_1+v_2 :
+v \ge 0;
 2v_1+v_2 \leq u;
 v_1 -2v_2 \leq -u
 \right \}
 @f}
-On a similar note, the optimization problem of the x-y player is given as follows.
+On a similar note, the optimization problem of the x-y player is given as
+follows.
 @f{align*}{
 \min_{x,y} \quad&:\quad
 -x + v_2y_1 + y_2\\
@@ -187,11 +199,11 @@ y_1 - y_2 \quad&\ge\quad 0\\
 y\quad&\in\quad\arg\min_y
 \left\{
 y_1 - y_2:
-y_1 - y_2 \ge x-5; 
+y_1 - y_2 \ge x-5;
 y_1 - y_2 \ge 3-x
 \right\}
 @f}
 
-The solution obtained is @f$u = 2.5@f$, @f$(v_1, v_2) = (0, 2.5)@f$. Similarly for the other leader,
-the solution obtained is @f$x = 0@f$, 
+The solution obtained is @f$u = 2.5@f$, @f$(v_1, v_2) = (0, 2.5)@f$. Similarly
+for the other leader, the solution obtained is @f$x = 0@f$,
 */

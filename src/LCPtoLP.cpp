@@ -95,7 +95,7 @@ Game::LCP::LCP(
       this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
       break;
     }
-  this->initializeNotPorcessed();
+  this->initializeNotProcessed();
 }
 
 Game::LCP::LCP(
@@ -129,7 +129,7 @@ Game::LCP::LCP(
       this->Compl.begin(), this->Compl.end(),
       [](pair<unsigned int, unsigned int> a,
          pair<unsigned int, unsigned int> b) { return a.first < b.first; });
-  this->initializeNotPorcessed();
+  this->initializeNotProcessed();
 }
 
 Game::LCP::LCP(GRBEnv *env, const NashGame &N)
@@ -168,7 +168,7 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
       break;
     }
   }
-  this->initializeNotPorcessed();
+  this->initializeNotProcessed();
 }
 
 Game::LCP::~LCP()
@@ -828,7 +828,6 @@ LCP &Game::LCP::addPolyFromX(const arma::vec &x, bool &ret)
       << "Game::LCP::addPolyFromX: Handling deviation with encoding: "
       << enc_str.str() << '\n';
   // Check if the encoding polyhedron is already in this->AllPolyhedra
-  int found = -1;
   auto num_to_vec = [nCompl](unsigned int number) {
     std::vector<short int> binary{};
     for (unsigned int vv = 0; vv < nCompl; vv++) {
@@ -1066,13 +1065,13 @@ unsigned int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
     if (!notProcessed.empty())
       return *notProcessed.begin();
     else
-      return maxTheoreticalPoly;
+      return this->maxTheoreticalPoly;
   } break;
   case Game::EPECAddPolyMethod::reverse_sequential: {
     if (!notProcessed.empty())
       return *--notProcessed.end();
     else
-      return maxTheoreticalPoly;
+      return this->maxTheoreticalPoly;
   } break;
   case Game::EPECAddPolyMethod::random: {
     if (!notProcessed.empty()) {
@@ -1082,7 +1081,7 @@ unsigned int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
       unsigned long int gotIt = dist(engine);
       return *(std::next(this->notProcessed.begin(), gotIt));
     } else {
-      return maxTheoreticalPoly;
+      return this->maxTheoreticalPoly;
     }
   }
   default: {
@@ -1111,15 +1110,14 @@ Game::LCP::addAPoly(unsigned int nPoly, Game::EPECAddPolyMethod method,
   // Effective maximum of number of polyhedra that can be added
   // at most
   const unsigned int nCompl = this->Compl.size();
-  const unsigned int possibleMaxPoly =
-      maxTheoreticalPoly - AllPolyhedra.size() - knownInfeas.size();
 
-  if (maxTheoreticalPoly < nPoly) { // If you cannot add that many polyhedra
-    BOOST_LOG_TRIVIAL(warning)      // Then issue a warning
+  if (this->maxTheoreticalPoly <
+      nPoly) {                 // If you cannot add that many polyhedra
+    BOOST_LOG_TRIVIAL(warning) // Then issue a warning
         << "Warning in Game::LCP::randomPoly: "
         << "Cannot add " << nPoly << " polyhedra. Promising a maximum of "
-        << maxTheoreticalPoly;
-    nPoly = maxTheoreticalPoly; // and update maximum possibly addable
+        << this->maxTheoreticalPoly;
+    nPoly = this->maxTheoreticalPoly; // and update maximum possibly addable
   }
 
   if (nPoly == 0) // If nothing to be added, then nothing to be done
@@ -1147,7 +1145,7 @@ Game::LCP::addAPoly(unsigned int nPoly, Game::EPECAddPolyMethod method,
   bool complete{false};
   while (!complete) {
     unsigned int choice_decimal = this->getNextPoly(method);
-    if (choice_decimal >= maxTheoreticalPoly)
+    if (choice_decimal >= this->maxTheoreticalPoly)
       return Polys;
 
     const std::vector<short int> choice = num_to_vec(choice_decimal);
@@ -1429,7 +1427,7 @@ long int Game::LCP::load(string filename, long int pos) {
                std::pair<unsigned int, unsigned int> b) {
               return a.first <= b.first;
             });
-  this->initializeNotPorcessed();
+  this->initializeNotProcessed();
   return pos;
 }
 
