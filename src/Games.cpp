@@ -1152,8 +1152,6 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
    * @param[in] tol - If the additional profit is smaller than this, then it is
    * not considered a profitable deviation.
    */
-  if (!this)
-    return false;
   arma::vec objvals = this->ComputeQPObjvals(sol, true);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
     double val = this->RespondSol(violSol, i, sol, true);
@@ -1437,9 +1435,11 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
  * This is due to numerical issues arising from the LCP solver (Gurobi).
  */
 {
-  this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
+  if (!this->nashgame)
+    return false;
   if (!this->nashEq)
     return false;
+  this->nashgame->isSolved(this->sol_x, *countryNumber, *ProfDevn);
   arma::vec objvals = this->nashgame->ComputeQPObjvals(this->sol_x, true);
   for (unsigned int i = 0; i < this->nCountr; ++i) {
     double val = this->RespondSol(*ProfDevn, i, this->sol_x);
@@ -1589,11 +1589,12 @@ bool Game::EPEC::getAllDevns(
 
 unsigned int Game::EPEC::addDeviatedPolyhedron(
     const std::vector<arma::vec>
-        &devns, ///< devns.at(i) is a profitable deviation
-                ///< for the i-th country from the current this->sol_x
-    bool &infeasCheck ///< Useful for the first iteration of iterativeNash. If true, at
-              ///< least one player has no polyhedron that can be added. In the
-              ///< first iteration, this translates to infeasability
+        &devns,       ///< devns.at(i) is a profitable deviation
+                      ///< for the i-th country from the current this->sol_x
+    bool &infeasCheck ///< Useful for the first iteration of iterativeNash. If
+                      ///< true, at least one player has no polyhedron that can
+                      ///< be added. In the first iteration, this translates to
+                      ///< infeasability
     ) const {
   /**
    * Given a profitable deviation for each country, adds <i>a</i> polyhedron in
@@ -1605,7 +1606,7 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
    * including one additional polyhedron.
    */
 
-  infeasCheck=false;
+  infeasCheck = false;
   unsigned int added = 0;
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     bool ret = false;
@@ -1724,7 +1725,7 @@ void Game::EPEC::iterativeNash() {
         this->Stats.status = EPECsolveStatus::numerical;
         solved = true;
       }
-      if (infeasCheck == true && this->Stats.numIteration==1){
+      if (infeasCheck == true && this->Stats.numIteration == 1) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Problem is infeasible";
         this->Stats.status = EPECsolveStatus::nashEqNotFound;
