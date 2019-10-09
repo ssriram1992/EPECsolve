@@ -2000,8 +2000,8 @@ unsigned int Game::EPEC::getPosition_LeadFollPoly(const unsigned int i,
    * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNPoly_Lead(i)
    */
   const auto LeaderStart = this->nashgame->getPrimalLoc(i);
-  const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(j);
-  return LeaderStart + FollPoly + k;
+ const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(k);
+  return LeaderStart + FollPoly + j;
 }
 
 unsigned int Game::EPEC::getPosition_LeadLeadPoly(const unsigned int i,
@@ -2014,8 +2014,8 @@ unsigned int Game::EPEC::getPosition_LeadLeadPoly(const unsigned int i,
    * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNPoly_Lead(i)
    */
   const auto LeaderStart = this->nashgame->getPrimalLoc(i);
-  const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(j);
-  return LeaderStart + FollPoly + this->countries_LCP.at(i)->getLStart() + k;
+  const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(k);
+  return LeaderStart + FollPoly + this->countries_LCP.at(i)->getLStart() + j;
 }
 
 unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
@@ -2026,7 +2026,7 @@ unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
   return this->countries_LCP.at(i)->conv_Npoly();
 }
 
-unsigned int Game::EPEC::getProbab_LeadPoly(const unsigned int i,
+unsigned int Game::EPEC::getPosition_Probab(const unsigned int i,
                                             const unsigned int k) const {
   /**
    * Get the probability associated with the k-th polyhedron (k-th pure
@@ -2037,8 +2037,47 @@ unsigned int Game::EPEC::getProbab_LeadPoly(const unsigned int i,
   return LeaderStart + PolyProbab;
 }
 
+bool Game::EPEC::isPureStrategy(const unsigned int i, const double tol) const {
+  /**
+   * Checks if the returned strategy leader is a pure strategy for the leader i.
+   * The strategy is considered a pure strategy, if it is played with a
+   * probability greater than 1 - tol;
+   */
+  const unsigned int nPoly = this->getNPoly_Lead(i);
+  for (unsigned int j = 0; j < nPoly; j++) {
+    const unsigned int probabPosn = this->getPosition_Probab(i, j);
+    if (probabPosn > 1 - tol) // Current Strategy is a pure strategy!
+      return true;
+  }
+  return false;
+}
+
+std::vector<unsigned int> Game::EPEC::mixedStratPoly(const unsigned int i,
+                                                     const double tol) const
+/**
+ * Returns the indices of polyhedra feasible for the leader, from which
+ * strategies are played with probability greater than tol.
+ */
+{
+  std::vector<unsigned int> polys{};
+  const unsigned int nPoly = this->getNPoly_Lead(i);
+  for (unsigned int j = 0; j < nPoly; j++) {
+    const double probab = this->getVal_Probab(i, j);
+    if (probab > tol)
+      polys.push_back(j);
+  }
+  return polys;
+}
+
+double Game::EPEC::getVal_Probab(const unsigned int i,
+                                       const unsigned int k) const {
+  return this->lcpmodel
+      ->getVarByName("x_" + std::to_string(this->getPosition_Probab(i, k)))
+      .get(GRB_DoubleAttr_X);
+}
+
 double Game::EPEC::getVal_LeadFoll(const unsigned int i,
-                                            const unsigned int j) const {
+                                   const unsigned int j) const {
   if (!this->lcpmodel)
     throw std::string("Error in Game::EPEC::getVal_LeadFoll: "
                       "Game::EPEC::lcpmodel not made and solved");
@@ -2046,8 +2085,9 @@ double Game::EPEC::getVal_LeadFoll(const unsigned int i,
       ->getVarByName("x_" + to_string(this->getPosition_LeadFoll(i, j)))
       .get(GRB_DoubleAttr_X);
 }
+
 double Game::EPEC::getVal_LeadLead(const unsigned int i,
-                                            const unsigned int j) const {
+                                   const unsigned int j) const {
   if (!this->lcpmodel)
     throw std::string("Error in Game::EPEC::getVal_LeadLead: "
                       "Game::EPEC::lcpmodel not made and solved");
@@ -2055,25 +2095,29 @@ double Game::EPEC::getVal_LeadLead(const unsigned int i,
       ->getVarByName("x_" + to_string(this->getPosition_LeadLead(i, j)))
       .get(GRB_DoubleAttr_X);
 }
+
 double Game::EPEC::getVal_LeadFollPoly(const unsigned int i,
-                                                const unsigned int j,
-                                                const unsigned int k) const {
+                                       const unsigned int j,
+                                       const unsigned int k) const {
   if (!this->lcpmodel)
     throw std::string("Error in Game::EPEC::getVal_LeadFollPoly: "
                       "Game::EPEC::lcpmodel not made and solved");
+  const double probab = this->getVal_Probab(i, k);
   return this->lcpmodel
       ->getVarByName("x_" + to_string(this->getPosition_LeadFollPoly(i, j, k)))
-      .get(GRB_DoubleAttr_X);
+      .get(GRB_DoubleAttr_X) / probab;
 }
+
 double Game::EPEC::getVal_LeadLeadPoly(const unsigned int i,
-                                                const unsigned int j,
-                                                const unsigned int k) const {
+                                       const unsigned int j,
+                                       const unsigned int k) const {
   if (!this->lcpmodel)
     throw std::string("Error in Game::EPEC::getVal_LeadLeadPoly: "
                       "Game::EPEC::lcpmodel not made and solved");
+  const double probab = this->getVal_Probab(i, k);
   return this->lcpmodel
       ->getVarByName("x_" + to_string(this->getPosition_LeadLeadPoly(i, j, k)))
-      .get(GRB_DoubleAttr_X);
+      .get(GRB_DoubleAttr_X) / probab;
 }
 
 std::string std::to_string(const Game::EPECsolveStatus st) {

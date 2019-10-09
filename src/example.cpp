@@ -164,11 +164,34 @@ int main() {
   std::cout << "x: " << epec.getVal_LeadLead(0, 0) << '\n';
   std::cout << "y_1: " << epec.getVal_LeadFoll(0, 0) << '\n';
   std::cout << "y_2: " << epec.getVal_LeadFoll(0, 1) << '\n';
-
+  std::cout << "Mixed strategy: \n";
+  auto xy_polys = epec.mixedStratPoly(0);
+  std::for_each(std::begin(xy_polys), std::end(xy_polys),
+                [&epec](const unsigned int i) {
+                  std::cout << "With probability  "
+                            << epec.getVal_Probab(0, i) << '\n';
+                  std::cout << "("
+						    << epec.getVal_LeadLeadPoly(0, 0, i) << ", "
+                            << epec.getVal_LeadFollPoly(0, 0, i) << ", "
+                            << epec.getVal_LeadFollPoly(0, 1, i) << ")\n";
+                });
+  std::cout << '\n'; 
   std::cout << "\nUV LEADER\n";
   std::cout << "u: " << epec.getVal_LeadLead(1, 0) << '\n';
   std::cout << "v_1: " << epec.getVal_LeadFoll(1, 0) << '\n';
   std::cout << "v_2: " << epec.getVal_LeadFoll(1, 1) << '\n';
+  std::cout << "Mixed strategy: \n";
+  auto uv_polys = epec.mixedStratPoly(1);
+  std::for_each(std::begin(uv_polys), std::end(uv_polys),
+                [&epec](const unsigned int i) {
+                  std::cout << "With probability  "
+                            << epec.getVal_Probab(1, i) << '\n';
+                  std::cout << "("
+						    << epec.getVal_LeadLeadPoly(1, 0, i) << ", "
+                            << epec.getVal_LeadFollPoly(1, 0, i) << ", "
+                            << epec.getVal_LeadFollPoly(1, 1, i) << ")\n";
+                });
+  std::cout << '\n';
   return 0;
 }
 

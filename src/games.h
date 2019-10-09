@@ -628,20 +628,24 @@ public:                  // functions
                                         const unsigned int j,
                                         const unsigned int k) const;
   unsigned int getNPoly_Lead(const unsigned int i) const;
-  unsigned int getProbab_LeadPoly(const unsigned int i,
+  unsigned int getPosition_Probab(const unsigned int i,
                                   const unsigned int k) const;
 
-  /// The following obtain the variable values
-  double getVal_LeadFoll(const unsigned int i,
-                                  const unsigned int j) const;
-  double getVal_LeadLead(const unsigned int i,
-                                  const unsigned int j) const;
-  double getVal_LeadFollPoly(const unsigned int i,
-                                      const unsigned int j,
-                                      const unsigned int k) const;
-  double getVal_LeadLeadPoly(const unsigned int i,
-                                      const unsigned int j,
-                                      const unsigned int k) const;
+  // The following obtain the variable values
+  double getVal_LeadFoll(const unsigned int i, const unsigned int j) const;
+  double getVal_LeadLead(const unsigned int i, const unsigned int j) const;
+  double getVal_LeadFollPoly(const unsigned int i, const unsigned int j,
+                             const unsigned int k) const;
+  double getVal_LeadLeadPoly(const unsigned int i, const unsigned int j,
+                             const unsigned int k) const;
+  double getVal_Probab(const unsigned int i,
+                                  const unsigned int k) const;
+
+  // The following checks if the returned strategy leader is a pure strategy
+  // for a leader or appropriately retrieve mixed-strategies
+  bool isPureStrategy(const unsigned int i, const double tol = 1e-5) const;
+  std::vector<unsigned int> mixedStratPoly(const unsigned int i,
+                                           const double tol = 1e-5) const;
 
   /// Get the Game::LCP object solved in the last iteration either to solve the
   /// problem or to prove non-existence of Nash equilibrium. Object is returned
