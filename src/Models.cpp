@@ -1071,7 +1071,6 @@ Models::LeaderVars Models::operator+(Models::LeaderVars a, int b) {
   return static_cast<LeaderVars>(static_cast<int>(a) + b);
 }
 
-
 string to_string(const GRBConstr &cons, const GRBModel &model) {
   const GRBVar *vars = model.getVars();
   const int nVars = model.get(GRB_IntAttr_NumVars);
@@ -1205,7 +1204,7 @@ void Models::EPEC::readSolutionJSON(string filename) {
       const Value &x = d["Solution"].GetObject()["x"];
       // const Value &z = d["Solution"].GetObject()["z"];
       arma::vec new_x;
-	  // arma::vec new_z;
+      // arma::vec new_z;
       new_x.zeros(x.GetArray().Size());
       // new_z.zeros(z.GetArray().Size());
 
@@ -1213,7 +1212,7 @@ void Models::EPEC::readSolutionJSON(string filename) {
         new_x.at(i) = x[i].GetDouble();
 
       // for (SizeType i = 0; i < this->getnVarinEPEC(); i++)
-        // new_z.at(i) = z[i].GetDouble();
+      // new_z.at(i) = z[i].GetDouble();
       ifs.close();
       this->warmstart(new_x);
     } catch (exception &e) {

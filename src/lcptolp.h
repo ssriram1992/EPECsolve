@@ -74,11 +74,8 @@ private:
                       ///< removed.
 
   bool errorCheck(bool throwErr = true) const;
-
   void defConst(GRBEnv *env);
-
   void makeRelaxed();
-
   void initializeNotProcessed() {
     const unsigned int nCompl = this->Compl.size();
     // 2^n - the number of polyhedra theoretically
@@ -90,35 +87,25 @@ private:
   std::unique_ptr<GRBModel> LCPasMIP(std::vector<unsigned int> FixEq = {},
                                      std::vector<unsigned int> FixVar = {},
                                      bool solve = false);
-
   std::unique_ptr<GRBModel> LCPasMIP(std::vector<short int> Fixes, bool solve);
-
   std::unique_ptr<GRBModel>
   LCP_Polyhed_fixed(std::vector<unsigned int> FixEq = {},
                     std::vector<unsigned int> FixVar = {});
-
   std::unique_ptr<GRBModel> LCP_Polyhed_fixed(arma::Col<int> FixEq,
                                               arma::Col<int> FixVar);
-
   template <class T> inline bool isZero(const T val) const {
     return (val >= -eps && val <= eps);
   }
-
   inline std::vector<short int> solEncode(GRBModel *model) const;
-
   std::vector<short int> solEncode(const arma::vec &x) const;
-
   std::vector<short int> solEncode(const arma::vec &z,
                                    const arma::vec &x) const;
-
   bool FixToPoly(const std::vector<short int> Fix, bool checkFeas = false,
                  bool custom = false, spmat_Vec *custAi = {},
                  vec_Vec *custbi = {});
-
   LCP &FixToPolies(const std::vector<short int> Fix, bool checkFeas = false,
                    bool custom = false, spmat_Vec *custAi = {},
                    vec_Vec *custbi = {});
-
   unsigned int getNextPoly(Game::EPECAddPolyMethod method) const;
 
 public:
@@ -184,55 +171,19 @@ public:
 
   /* Getting single point solutions */
   std::unique_ptr<GRBModel> LCPasQP(bool solve = false);
-
   std::unique_ptr<GRBModel> LCPasMIP(bool solve = false);
-
   std::unique_ptr<GRBModel> MPECasMILP(const arma::sp_mat &C,
                                        const arma::vec &c,
                                        const arma::vec &x_minus_i,
                                        bool solve = false);
-
   std::unique_ptr<GRBModel>
   MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C, const arma::vec &c,
              const arma::vec &x_minus_i, bool solve = false);
-
   /* Convex hull computation */
-  unsigned int
-  ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description LHS to
-                              ///< be stored here
-             arma::vec &b)    ///< Convex hull inequality description RHS to be
-                              ///< stored here
-  /**
-   * Computes the convex hull of the feasible region of the LCP
-   */
-  {
-    const std::vector<arma::sp_mat *> tempAi = [](spmat_Vec &uv) {
-      std::vector<arma::sp_mat *> v{};
-      for (const auto &x : uv)
-        v.push_back(x.get());
-      return v;
-    }(*this->Ai);
-    const std::vector<arma::vec *> tempbi = [](vec_Vec &uv) {
-      std::vector<arma::vec *> v{};
-      std::for_each(uv.begin(), uv.end(),
-                    [&v](const std::unique_ptr<arma::vec> &ptr) {
-                      v.push_back(ptr.get());
-                    });
-      return v;
-    }(*this->bi);
-    arma::sp_mat A_common;
-    A_common = arma::join_cols(this->_A, -this->M);
-    arma::vec b_common = arma::join_cols(this->_b, this->q);
-    if (Ai->size() == 1) {
-      A.zeros(Ai->at(0)->n_rows + A_common.n_rows,
-              Ai->at(0)->n_cols + A_common.n_cols);
-      b.zeros(bi->at(0)->n_rows + b_common.n_rows);
-      A = arma::join_cols(*Ai->at(0), A_common);
-      b = arma::join_cols(*bi->at(0), b_common);
-      return 1;
-    } else
-      return Game::ConvexHull(&tempAi, &tempbi, A, b, A_common, b_common);
-  };
+  unsigned int ConvexHull(arma::sp_mat &A, arma::vec &b);
+  unsigned int conv_Npoly() const;
+  unsigned int conv_PolyPosition(const unsigned int i) const;
+  unsigned int conv_PolyWt(const unsigned int i) const;
 
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
 
@@ -243,13 +194,9 @@ public:
   LCP &addPolyFromX(const arma::vec &x, bool &ret);
   LCP &EnumerateAll(bool solveLP = true);
   std::string feas_detail_str() const;
-
   unsigned int getFeasiblePolyhedra() const { return this->feasiblePolyhedra; }
-
   void write(std::string filename, bool append = true) const;
-
   void save(std::string filename, bool erase = true) const;
-
   long int load(std::string filename, long int pos = 0);
 };
 } // namespace Game

@@ -619,6 +619,22 @@ public:                  // functions
     return this->Stats.AlgorithmParam.addPolyMethod;
   }
 
+  // Methods to get positions of variables
+  // The below are all const functions which return an unsigned int.
+  unsigned int getPosition_LeadFoll(const unsigned int i,
+                                    const unsigned int j) const;
+  unsigned int getPosition_LeadLead(const unsigned int i,
+                                    const unsigned int j) const;
+  unsigned int getNPoly_Lead(const unsigned int i) const;
+  unsigned int getPosition_LeadFollPoly(const unsigned int i,
+                                        const unsigned int j,
+                                        const unsigned int k) const;
+  unsigned int getPosition_LeadLeadPoly(const unsigned int i,
+                                        const unsigned int j,
+                                        const unsigned int k) const;
+  unsigned int getProbab_LeadPoly(const unsigned int i,
+                                  const unsigned int k) const;
+
   /// Get the Game::LCP object solved in the last iteration either to solve the
   /// problem or to prove non-existence of Nash equilibrium. Object is returned
   /// using constant reference.

@@ -1589,11 +1589,12 @@ bool Game::EPEC::getAllDevns(
 
 unsigned int Game::EPEC::addDeviatedPolyhedron(
     const std::vector<arma::vec>
-        &devns, ///< devns.at(i) is a profitable deviation
-                ///< for the i-th country from the current this->sol_x
-    bool &infeasCheck ///< Useful for the first iteration of iterativeNash. If true, at
-              ///< least one player has no polyhedron that can be added. In the
-              ///< first iteration, this translates to infeasability
+        &devns,       ///< devns.at(i) is a profitable deviation
+                      ///< for the i-th country from the current this->sol_x
+    bool &infeasCheck ///< Useful for the first iteration of iterativeNash. If
+                      ///< true, at least one player has no polyhedron that can
+                      ///< be added. In the first iteration, this translates to
+                      ///< infeasability
     ) const {
   /**
    * Given a profitable deviation for each country, adds <i>a</i> polyhedron in
@@ -1605,7 +1606,7 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
    * including one additional polyhedron.
    */
 
-  infeasCheck=false;
+  infeasCheck = false;
   unsigned int added = 0;
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     bool ret = false;
@@ -1724,7 +1725,7 @@ void Game::EPEC::iterativeNash() {
         this->Stats.status = EPECsolveStatus::numerical;
         solved = true;
       }
-      if (infeasCheck == true && this->Stats.numIteration==1){
+      if (infeasCheck == true && this->Stats.numIteration == 1) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Problem is infeasible";
         this->Stats.status = EPECsolveStatus::nashEqNotFound;
@@ -1965,6 +1966,75 @@ void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
  */
 {
   this->Stats.AlgorithmParam.algorithm = algorithm;
+}
+
+unsigned int Game::EPEC::getPosition_LeadFoll(const unsigned int i,
+                                              const unsigned int j) const {
+  /**
+   * Get the position of the j-th Follower variable in the i-th leader
+   * Querying Game::EPEC::lcpmodel for x[return-value] variable gives the
+   * appropriate variable
+   */
+  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
+  return LeaderStart + j;
+}
+
+unsigned int Game::EPEC::getPosition_LeadLead(const unsigned int i,
+                                              const unsigned int j) const {
+  /**
+   * Get the position of the j-th Follower variable in the i-th leader
+   * Querying Game::EPEC::lcpmodel for x[return-value] variable gives the
+   * appropriate variable
+   */
+  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
+  return LeaderStart + this->countries_LCP.at(i)->getLStart() + j;
+}
+
+unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
+  /**
+   * Get the number of polyhedra used in the inner approximation of the feasible
+   * region of the i-th leader.*
+   */
+  return this->countries_LCP.at(i)->conv_Npoly();
+}
+
+unsigned int Game::EPEC::getPosition_LeadFollPoly(const unsigned int i,
+                                                  const unsigned int j,
+                                                  const unsigned int k) const {
+  /**
+   * Get the position of the k-th follower variable of the i-th leader, in the
+   * j-th feasible polyhedron.
+   *
+   * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNPoly_Lead(i)
+   */
+  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
+  const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(j);
+  return LeaderStart + FollPoly + k;
+}
+
+unsigned int Game::EPEC::getPosition_LeadLeadPoly(const unsigned int i,
+                                                  const unsigned int j,
+                                                  const unsigned int k) const {
+  /**
+   * Get the position of the k-th leader variable of the i-th leader, in the
+   * j-th feasible polyhedron.
+   *
+   * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNPoly_Lead(i)
+   */
+  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
+  const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(j);
+  return LeaderStart + FollPoly + this->countries_LCP.at(i)->getLStart() + k;
+}
+
+unsigned int Game::EPEC::getProbab_LeadPoly(const unsigned int i,
+                                            const unsigned int k) const {
+  /**
+   * Get the probability associated with the k-th polyhedron (k-th pure
+   * strategy) of the i-th leader.
+   */
+  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
+  const auto PolyProbab = this->countries_LCP.at(i)->conv_PolyWt(k);
+  return LeaderStart + PolyProbab;
 }
 
 std::string std::to_string(const Game::EPECsolveStatus st) {

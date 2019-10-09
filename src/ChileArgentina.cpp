@@ -14,11 +14,11 @@ Models::EPECInstance ChileArgentinaInstance() {
   // In million dollars per terawatt-hour of energy
 
   Models::FollPar Chi_Main{
-      {0.2, 0.1, 0, 0},            // quad
-      {30, 52, 0, 0},               // lin
-      {27, 23, 22, 9},             // cap
-      {200, 110, 0, 0},            // emm
-      {50, 100, 20, 20},            // tax
+      {0.2, 0.1, 0, 0},                               // quad
+      {30, 52, 0, 0},                                 // lin
+      {27, 23, 22, 9},                                // cap
+      {200, 110, 0, 0},                               // emm
+      {50, 100, 20, 20},                              // tax
       {"Coal", "Gas", "Hydro", "Non-conv renewable"}, // name
   };
   Models::FollPar Chi_Wind{{0}, {0}, {5}, {0}, {20}, {"Wind"}};

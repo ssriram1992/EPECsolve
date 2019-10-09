@@ -477,6 +477,43 @@ void Game::LCP::print(string end) {
        << end;
 }
 
+unsigned int
+Game::LCP::ConvexHull(arma::sp_mat &A, ///< Convex hull inequality description
+                                       ///< LHS to be stored here
+                      arma::vec &b) ///< Convex hull inequality description RHS
+                                    ///< to be stored here
+/**
+ * Computes the convex hull of the feasible region of the LCP
+ */
+{
+  const std::vector<arma::sp_mat *> tempAi = [](spmat_Vec &uv) {
+    std::vector<arma::sp_mat *> v{};
+    for (const auto &x : uv)
+      v.push_back(x.get());
+    return v;
+  }(*this->Ai);
+  const std::vector<arma::vec *> tempbi = [](vec_Vec &uv) {
+    std::vector<arma::vec *> v{};
+    std::for_each(uv.begin(), uv.end(),
+                  [&v](const std::unique_ptr<arma::vec> &ptr) {
+                    v.push_back(ptr.get());
+                  });
+    return v;
+  }(*this->bi);
+  arma::sp_mat A_common;
+  A_common = arma::join_cols(this->_A, -this->M);
+  arma::vec b_common = arma::join_cols(this->_b, this->q);
+  if (Ai->size() == 1) {
+    A.zeros(Ai->at(0)->n_rows + A_common.n_rows,
+            Ai->at(0)->n_cols + A_common.n_cols);
+    b.zeros(bi->at(0)->n_rows + b_common.n_rows);
+    A = arma::join_cols(*Ai->at(0), A_common);
+    b = arma::join_cols(*bi->at(0), b_common);
+    return 1;
+  } else
+    return Game::ConvexHull(&tempAi, &tempbi, A, b, A_common, b_common);
+};
+
 unsigned int Game::ConvexHull(
     const vector<arma::sp_mat *>
         *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
@@ -1441,4 +1478,49 @@ std::string Game::LCP::feas_detail_str() const {
   // ss << vv << ' ';
 
   return ss.str();
+}
+
+unsigned int Game::LCP::conv_Npoly() const {
+  /**
+   * To be used in interaction with Game::LCP::ConvexHull.
+   * Gives the number of polyhedra in the current inner approximation of the LCP
+   * feasible region.
+   */
+  return this->AllPolyhedra.size();
+}
+
+unsigned int Game::LCP::conv_PolyPosition(const unsigned int i) const {
+  /**
+   * For the convex hull of the LCP feasible region computed, a bunch of
+   * variables are added for extended formulation and the added variables c
+   */
+  const unsigned int nPoly = this->conv_Npoly();
+  if (i > nPoly) {
+    BOOST_LOG_TRIVIAL(error) << "Error in Game::LCP::conv_PolyPosition: "
+                                "Invalid argument. Out of bounds for i";
+    throw std::string("Error in Game::LCP::conv_PolyPosition: Invalid "
+                      "argument. Out of bounds for i");
+  }
+  const unsigned int nC = this->M.n_cols;
+  return nC + i * nC;
+}
+
+unsigned int Game::LCP::conv_PolyWt(const unsigned int i) const {
+  /**
+   * To be used in interaction with Game::LCP::ConvexHull.
+   * Gives the position of the variable, which assigns the convex weight to the
+   * i-th polyhedron.
+   */
+  const unsigned int nPoly = this->conv_Npoly();
+  if (i > nPoly) {
+    BOOST_LOG_TRIVIAL(error) << "Error in Game::LCP::conv_PolyWt: "
+                                "Invalid argument. Out of bounds for i";
+    throw std::string("Error in Game::LCP::conv_PolyWt: "
+                      "Invalid argument. Out of bounds for i");
+  }
+  const unsigned int nC = this->M.n_cols;
+
+  return nC + nPoly * nC + i;
+
+  return i;
 }
