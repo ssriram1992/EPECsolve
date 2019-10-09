@@ -1,7 +1,5 @@
 #include "epectests.h"
 
-unsigned int n_c;
-arma::vec devn;
 
 using namespace std;
 using namespace arma;
@@ -467,7 +465,7 @@ BOOST_AUTO_TEST_CASE(Bilevel_test) {
    **/
   testInst SimpleBlu2 = SimpleBlu();
   SimpleBlu2.instance.Countries.at(0).FollowerParam.tax_caps.at(0) = -1;
-  testEPECInstance(SimpleBlu2, allAlgo(), TestType::resultCheck);
+  testEPECInstance(SimpleBlu2, allAlgo(), TestType::simpleCheck);
 }
 
 BOOST_AUTO_TEST_CASE(Bilevel_TaxCap_test) {
@@ -537,8 +535,9 @@ BOOST_AUTO_TEST_CASE(C1F2_test) {
   BOOST_TEST_MESSAGE(
       "Testing 2Followers 1 Country with tax cap and price cap.");
   testInst SimpleVerde2 = SimpleVerde();
-  SimpleVerde2.instance.Countries.at(0).FollowerParam.tax_caps = {100,100};
-  SimpleVerde2.solution.at(0) = countrySol{{100, 54.999}, {0,100}, 0.0, 0.0, 0.0};
+  SimpleVerde2.instance.Countries.at(0).FollowerParam.tax_caps = {100, 100};
+  SimpleVerde2.solution.at(0) =
+      countrySol{{100, 54.999}, {0, 100}, 0.0, 0.0, 0.0};
   testEPECInstance(SimpleVerde2, allAlgo(), TestType::resultCheck);
 }
 
@@ -552,14 +551,14 @@ BOOST_AUTO_TEST_CASE(C1F5_test) {
 
 BOOST_AUTO_TEST_CASE(C1F5_PriceCapInfeas_test) {
   /** Testing a Single country (C1) with a 5 followers (F5)
-   *  The price cap is infeasible (<386.5).
+   *  The price cap is infeasible.
    **/
   BOOST_TEST_MESSAGE(
       "Testing 5 Followers 1 Country with a price cap and tax cap.");
   BOOST_TEST_MESSAGE("Expected: Problem is infeasible");
   BOOST_TEST_MESSAGE("Testing 5Followers 1 Country.");
   testInst SimpleViola2 = SimpleViola();
-  SimpleViola2.instance.Countries.at(0).LeaderParam.price_limit={0};
+  SimpleViola2.instance.Countries.at(0).LeaderParam.price_limit = {0};
   testEPECInstance(SimpleViola2, allAlgo(), TestType::infeasabilityCheck);
 }
 
@@ -582,87 +581,14 @@ BOOST_AUTO_TEST_CASE(C2F1_test) {
    **/
   BOOST_TEST_MESSAGE("Testing 2 Countries with a follower each -  with tax cap "
                      "and price cap.");
-  Models::FollPar FP;
-  FP.capacities = {550};
-  FP.costs_lin = {140};
-  FP.costs_quad = {0.3};
-  FP.emission_costs = {290};
-  FP.tax_caps = {100};
-  FP.names = {"Rosso"};
-  Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7},
-                              {-1, -1, 295, false, 0});
-  Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {350, 0.5},
-                              {-1, -1, 285, false, 0});
-  GRBEnv env = GRBEnv();
-  arma::sp_mat TrCo(2, 2);
-  TrCo.zeros(2, 2);
-  TrCo(0, 1) = 1;
-  TrCo(1, 0) = TrCo(0, 1);
-
-  BOOST_TEST_MESSAGE("MaxTax:100, PriceLimit:300 with alpha=300 and beta=0.05");
-  // BOOST_TEST_MESSAGE("Expected:
-  // margCost(Rosso)>margCost(Bianco);t_0=t_1=maxTax=100");
-  Models::EPEC epec(&env);
-  BOOST_TEST_MESSAGE("testing Models::addCountry (0)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country0));
-  BOOST_TEST_MESSAGE("testing Models::addCountry (1)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  double margCountryOne =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-  double margCountryTwo =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
-  BOOST_CHECK_MESSAGE(margCountryTwo < margCountryOne,
-                      "checking marginal costs");
-  BOOST_CHECK_MESSAGE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     0) >
-      epec.getx().at(
-          epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
-      "checking production");
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  margCountryOne =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-  margCountryTwo =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
-  BOOST_CHECK_MESSAGE(margCountryTwo < margCountryOne,
-                      "checking marginal costs");
-  BOOST_CHECK_MESSAGE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     0) >
-      epec.getx().at(
-          epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0),
-      "checking production");
-  epec.reset();
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
+  testInst inst;
+  Models::LeadAllPar Country(1, "One", FP_Blu(), {300, 0.05},
+                             {-1, -1, 295, false, 0});
+  Models::LeadAllPar Country2(1, "Two", FP_Blu(), {300, 0.07},
+                              {-1, -1, 350, false, 0});
+  inst.instance.Countries = {Country, Country2};
+  inst.instance.TransportationCosts = TranspCost(2);
+  testEPECInstance(inst, allAlgo(), TestType::simpleCheck);
 }
 
 BOOST_AUTO_TEST_CASE(C2F2_test) {
@@ -692,113 +618,7 @@ BOOST_AUTO_TEST_CASE(C2F2_test) {
   /************************************/
   BOOST_TEST_MESSAGE(
       "Testing 2 Followers 2 Countries with a price caps, tax caps.");
-  Models::FollPar FP1, FP2;
-  FP1.capacities = {100, 150};
-  FP1.costs_lin = {130, 120};
-  FP1.costs_quad = {0.5, 0.3};
-  FP1.emission_costs = {6, 10};
-  FP1.tax_caps = {100, 100};
-  FP1.names = {"OneGas", "OneCoal"};
-  Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5},
-                         {0, 0, 230, false, 0});
-
-  FP2.capacities = {100, 80};
-  FP2.costs_lin = {130, 140};
-  FP2.costs_quad = {0.5, 0.9};
-  FP2.emission_costs = {6, 1};
-  FP2.tax_caps = {100, 100};
-  FP2.names = {"TwoGas", "TwoSolar"};
-  Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5},
-                         {0, 0, 240, false, 0});
-
-  GRBEnv env = GRBEnv();
-  arma::sp_mat TrCo(2, 2);
-  TrCo.zeros(2, 2);
-  TrCo(0, 1) = 1;
-  TrCo(1, 0) = TrCo(0, 1);
-
-  Models::EPEC epec(&env);
-  BOOST_TEST_MESSAGE("testing Models::addCountry (One)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(One));
-  BOOST_TEST_MESSAGE("testing Models::addCountry (Two)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Two));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_TEST_MESSAGE("checking production");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     0),
-      100, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1),
-      40, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     0),
-      48.57, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     1),
-      71.43, 0.01);
-  BOOST_TEST_MESSAGE("checking taxation");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 78,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 61.43,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0,
-      0.01);
-
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_TEST_MESSAGE("checking production");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     0),
-      100, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1),
-      40, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     0),
-      48.57, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     1),
-      71.43, 0.01);
-  BOOST_TEST_MESSAGE("checking taxation");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 78,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 61.43,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0,
-      0.01);
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  epec.reset();
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
+  testEPECInstance(C2F2_Base(), allAlgo(), TestType::resultCheck);
 }
 
 BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
@@ -828,476 +648,33 @@ BOOST_AUTO_TEST_CASE(C2F2_ImportExportCaps_test) {
    * 	Price:						240
    *									*/
   /************************************/
-  BOOST_TEST_MESSAGE(
-      "Testing 2 Followers 2 Countries with a price caps, tax caps.");
-  BOOST_TEST_MESSAGE("Exports and export caps on both");
-  Models::FollPar FP1, FP2;
-  FP1.capacities = {100, 150};
-  FP1.costs_lin = {130, 120};
-  FP1.costs_quad = {0.5, 0.3};
-  FP1.emission_costs = {6, 10};
-  FP1.tax_caps = {100, 100};
-  FP1.names = {"OneGas", "OneCoal"};
-  Models::LeadAllPar One(FP1.capacities.size(), "One", FP1, {300, 0.5},
-                         {100, 100, 230, false, 0});
-
-  FP2.capacities = {100, 80};
-  FP2.costs_lin = {130, 140};
-  FP2.costs_quad = {0.5, 0.9};
-  FP2.emission_costs = {6, 1};
-  FP2.tax_caps = {100, 100};
-  FP2.names = {"TwoGas", "TwoSolar"};
-  Models::LeadAllPar Two(FP2.capacities.size(), "Two", FP2, {300, 0.5},
-                         {100, 100, 240, false, 0});
-
-  GRBEnv env = GRBEnv();
-  arma::sp_mat TrCo(2, 2);
-  TrCo.zeros(2, 2);
-  TrCo(0, 1) = 1;
-  TrCo(1, 0) = TrCo(0, 1);
-
-  Models::EPEC epec(&env);
-  BOOST_TEST_MESSAGE("testing Models::addCountry (One)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(One));
-  BOOST_TEST_MESSAGE("testing Models::addCountry (Two)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Two));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_TEST_MESSAGE("checking production");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     0),
-      100, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1),
-      12.50, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     0),
-      76.07, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     1),
-      71.43, 0.01);
-  BOOST_TEST_MESSAGE("checking taxation");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 33.93,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0,
-      0.01);
-  BOOST_TEST_MESSAGE("checking exports/imports");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::NetExport)), 27.50,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::NetImport)), 27.50,
-      0.01);
-
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_TEST_MESSAGE("checking production");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     0),
-      100, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1),
-      12.50, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     0),
-      76.07, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     1),
-      71.43, 0.01);
-  BOOST_TEST_MESSAGE("checking taxation");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 0,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 100,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 33.93,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1), 0,
-      0.01);
-  BOOST_TEST_MESSAGE("checking exports/imports");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::NetExport)), 27.50,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::NetImport)), 27.50,
-      0.01);
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  epec.reset();
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
+  BOOST_TEST_MESSAGE("Testing 2 Followers 2 Countries with a price caps, tax "
+                     "caps, and export/import caps.");
+  testInst C2F2_Mod = C2F2_Base();
+  C2F2_Mod.instance.Countries.at(0).LeaderParam.import_limit = 100;
+  C2F2_Mod.instance.Countries.at(1).LeaderParam.import_limit = 100;
+  C2F2_Mod.instance.Countries.at(0).LeaderParam.export_limit = 100;
+  C2F2_Mod.instance.Countries.at(1).LeaderParam.export_limit = 100;
+  C2F2_Mod.instance.Countries.at(0).LeaderParam.price_limit = 230;
+  C2F2_Mod.instance.Countries.at(1).LeaderParam.price_limit = 240;
+  C2F2_Mod.solution.at(0) = countrySol{{100, 12.50}, {0, 100}, 0, 27.50, 230};
+  C2F2_Mod.solution.at(1) =
+      countrySol{{76.07, 71.43}, {33.93, 0}, 27.50, 0, 240};
+  testEPECInstance(C2F2_Mod, allAlgo(), TestType::resultCheck);
 }
 
-BOOST_AUTO_TEST_CASE(C3F1_test) {
-  /** Testing three countries (C3) with a single follower (F1)
-   *  LeaderConstraints: price caps [295,285,315] and tax cap 100
-   *  The follower with the lowest marginal cost will produce more
-   **/
-  BOOST_TEST_MESSAGE("Testing 3 Countries with a follower each -  with tax cap "
-                     "and price cap.");
-  Models::FollPar FP;
-  FP.capacities = {550};
-  FP.costs_lin = {140};
-  FP.costs_quad = {0.3};
-  FP.emission_costs = {15};
-  FP.tax_caps = {100};
-  FP.names = {"Rosso"};
-  Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7},
-                              {-1, -1, 295, false, 0});
-  Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5},
-                              {-1, -1, 285, false, 0});
-  Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5},
-                              {-1, -1, 315, false, 0});
-  GRBEnv env = GRBEnv();
-  arma::sp_mat TrCo(3, 3);
-  TrCo.zeros(3, 3);
-  TrCo(0, 1) = 1;
-  TrCo(1, 0) = TrCo(0, 1);
-  TrCo(0, 2) = 2;
-  TrCo(2, 0) = TrCo(0, 2);
-  TrCo(1, 2) = 1.5;
-  TrCo(2, 1) = TrCo(1, 2);
-
+BOOST_AUTO_TEST_CASE(C2F1_2_test) {
   BOOST_TEST_MESSAGE(
-      "MaxTax:100, PriceLimit:[295,285,315] with alpha=300 and beta=0.05");
-  Models::EPEC epec(&env);
-  BOOST_TEST_MESSAGE("testing Models::addCountry (0)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country0));
-  BOOST_TEST_MESSAGE("testing Models::addCountry (1)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
-  BOOST_TEST_MESSAGE("testing Models::addCountry (2)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country2));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  double margCountryOne =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-  double margCountryTwo =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
-  double margCountryThree =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(2, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0);
-  BOOST_WARN_MESSAGE(margCountryTwo > margCountryOne &&
-                     margCountryTwo < margCountryThree,
-                     "checking marginal costs");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     0),
-      45.07, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     0),
-      56.25, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) +
-                     0),
-      84.62, 0.01);
-
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  margCountryOne =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(0, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0);
-  margCountryTwo =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(1, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0);
-  margCountryThree =
-      FP.costs_quad[0] *
-      epec.getx().at(
-          epec.getPosition(2, Models::LeaderVars::FollowerStart) + 0) +
-      FP.costs_lin[0] +
-      epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 0);
-  BOOST_WARN_MESSAGE(margCountryTwo > margCountryOne &&
-                     margCountryTwo < margCountryThree,
-                     "checking marginal costs");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     0),
-      45.07, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     0),
-      56.25, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) +
-                     0),
-      84.62, 0.01);
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  epec.reset();
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
+      "Testing [1,2] followers with  2 Countries (CH_S_F0_CL_SC_F0)");
+  testEPECInstance(CH_S_F0_CL_SC_F0(), allAlgo());
 }
-
-BOOST_AUTO_TEST_CASE(C3F2_test) {
-  /** Testing three countries (C3) with two followers each (F2)
-   *  LeaderConstraints: price caps [295,285,315] and tax caps [100,10]
-   *  The follower with the lowest marginal cost will produce more
-   **/
-  BOOST_TEST_MESSAGE("Testing 3 Countries with a follower each -  with tax cap "
-                     "and price cap.");
-  Models::FollPar FP;
-  FP.capacities = {550, 30};
-  FP.costs_lin = {200, 225};
-  FP.costs_quad = {0.3, 0.2};
-  FP.emission_costs = {275, 100};
-  FP.tax_caps = {100, 100};
-  FP.names = {"Rosso", "Bianco"};
-  Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7},
-                              {-1, -1, 295, false, 0});
-  Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5},
-                              {-1, -1, 285, false, 0});
-  Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5},
-                              {-1, -1, 295, false, 0});
-  GRBEnv env = GRBEnv();
-  arma::sp_mat TrCo(3, 3);
-  TrCo.zeros(3, 3);
-  TrCo(0, 1) = 1;
-  TrCo(1, 0) = TrCo(0, 1);
-  TrCo(0, 2) = 2;
-  TrCo(2, 0) = TrCo(0, 2);
-  TrCo(1, 2) = 1.5;
-  TrCo(2, 1) = TrCo(1, 2);
-
-  BOOST_TEST_MESSAGE(
-      "MaxTax:100, PriceLimit:[295,285,315] with alpha=300 and beta=0.05");
-  Models::EPEC epec(&env);
-  BOOST_TEST_MESSAGE("testing Models::addCountry (0)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country0));
-  BOOST_TEST_MESSAGE("testing Models::addCountry (1)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
-  BOOST_TEST_MESSAGE("testing Models::addCountry (2)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country2));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  double margCountryOne =
-      FP.costs_quad[1] *
-      epec.getx().at(
-          epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) +
-      FP.costs_lin[1] +
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1);
-  double margCountryTwo =
-      FP.costs_quad[1] *
-      epec.getx().at(
-          epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1) +
-      FP.costs_lin[1] +
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1);
-  double margCountryThree =
-      FP.costs_quad[1] *
-      epec.getx().at(
-          epec.getPosition(2, Models::LeaderVars::FollowerStart) + 1) +
-      FP.costs_lin[1] +
-      epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 1);
-  BOOST_WARN_MESSAGE(margCountryTwo < margCountryOne &&
-                     margCountryTwo < margCountryThree,
-                     "checking marginal costs");
-  BOOST_TEST_MESSAGE("checking production on Bianco-followers");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  margCountryOne =
-      FP.costs_quad[1] *
-      epec.getx().at(
-          epec.getPosition(0, Models::LeaderVars::FollowerStart) + 1) +
-      FP.costs_lin[1] +
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1);
-  margCountryTwo =
-      FP.costs_quad[1] *
-      epec.getx().at(
-          epec.getPosition(1, Models::LeaderVars::FollowerStart) + 1) +
-      FP.costs_lin[1] +
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 1);
-  margCountryThree =
-      FP.costs_quad[1] *
-      epec.getx().at(
-          epec.getPosition(2, Models::LeaderVars::FollowerStart) + 1) +
-      FP.costs_lin[1] +
-      epec.getx().at(epec.getPosition(2, Models::LeaderVars::Tax) + 1);
-  BOOST_WARN_MESSAGE(margCountryTwo < margCountryOne &&
-                     margCountryTwo < margCountryThree,
-                     "checking marginal costs");
-  BOOST_TEST_MESSAGE("checking production on Bianco-followers");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(2, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  epec.reset();
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
+BOOST_AUTO_TEST_CASE(HardToEnum1_test) {
+  BOOST_TEST_MESSAGE("Testing HardToEnum1");
+  testEPECInstance(HardToEnum_1(), allAlgo());
 }
-
-BOOST_AUTO_TEST_CASE(C2F2_test2) {
-  /** Testing three countries (C3) with two followers each (F2)
-   *  LeaderConstraints: price caps [295,285,315] and tax caps [100,10]
-   *  The follower with the lowest marginal cost will produce more
-   **/
-  BOOST_TEST_MESSAGE("Testing 2 Countries with a follower each -  with tax cap "
-                     "and price cap.");
-  Models::FollPar FP;
-  FP.capacities = {550, 30};
-  FP.costs_lin = {200, 225};
-  FP.costs_quad = {0.3, 0.2};
-  FP.emission_costs = {275, 100};
-  FP.tax_caps = {100, 100};
-  FP.names = {"Rosso", "Bianco"};
-  Models::LeadAllPar Country0(FP.capacities.size(), "One", FP, {300, 0.7},
-                              {-1, -1, 295, false, 0});
-  // Models::LeadAllPar Country1(FP.capacities.size(), "Two", FP, {325, 0.5},
-  // {-1, -1, 285});
-  Models::LeadAllPar Country2(FP.capacities.size(), "Three", FP, {350, 0.5},
-                              {-1, -1, 295, false, 0});
-  GRBEnv env = GRBEnv();
-  arma::sp_mat TrCo(2, 2);
-  TrCo.zeros(2, 2);
-  TrCo(0, 1) = 1;
-  TrCo(1, 0) = TrCo(0, 1);
-  // TrCo(0, 2) = 2;
-  // TrCo(2, 0) = TrCo(0, 2);
-  // TrCo(1, 2) = 1.5;
-  // TrCo(2, 1) = TrCo(1, 2);
-
-  BOOST_TEST_MESSAGE(
-      "MaxTax:100, PriceLimit:[295,285,315] with alpha=300 and beta=0.05");
-  Models::EPEC epec(&env);
-  BOOST_TEST_MESSAGE("testing Models::addCountry (0)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country0));
-  // BOOST_TEST_MESSAGE("testing Models::addCountry (1)");
-  // BOOST_CHECK_NO_THROW(epec.addCountry(Country1));
-  BOOST_TEST_MESSAGE("testing Models::addCountry (2)");
-  BOOST_CHECK_NO_THROW(epec.addCountry(Country2));
-  BOOST_TEST_MESSAGE("testing Models::addTranspCost");
-  BOOST_CHECK_NO_THROW(epec.addTranspCosts(TrCo));
-  BOOST_TEST_MESSAGE("testing Models::finalize");
-  BOOST_CHECK_NO_THROW(epec.finalize());
-  BOOST_TEST_MESSAGE("testing Models::findNashEq");
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_TEST_MESSAGE("checking production on Bianco-followers");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_TEST_MESSAGE("checking tax on Bianco-followers");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 43,
-      0.01);
-  BOOST_TEST_MESSAGE("checking tax on Rosso-followers");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 95,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 49.2857,
-      0.01);
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (fullEnumeration)");
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-  BOOST_CHECK_NO_THROW(epec.findNashEq());
-  BOOST_TEST_MESSAGE("checking production on Bianco-followers");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::FollowerStart) +
-                     1),
-      30, 0.01);
-  BOOST_TEST_MESSAGE("checking tax on Bianco-followers");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 1), 43,
-      0.01);
-  BOOST_TEST_MESSAGE("checking tax on Rosso-followers");
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(0, Models::LeaderVars::Tax) + 0), 95,
-      0.01);
-  BOOST_CHECK_CLOSE(
-      epec.getx().at(epec.getPosition(1, Models::LeaderVars::Tax) + 0), 49.2857,
-      0.01);
-  BOOST_CHECK_MESSAGE(epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is solved (innerApproximation)");
-  epec.reset();
-  BOOST_CHECK_MESSAGE(!epec.isSolved(&n_c, &devn),
-                      "Checking if the EPEC is not spuriously solved");
+BOOST_AUTO_TEST_CASE(HardToEnum2_test) {
+  BOOST_TEST_MESSAGE("Testing HardToEnum2");
+  testEPECInstance(HardToEnum_2(), allAlgo());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -1418,16 +795,35 @@ testInst CH_S_F0_CL_SC_F0() {
   return inst;
 }
 
+testInst C2F2_Base() {
+  testInst inst;
+  Models::LeadAllPar One(2, "One", OneGas() + OneCoal(), {300, 0.5},
+                         {0, 0, 230, false, 0});
+
+  Models::LeadAllPar Two(2, "Two", OneGas() + OneSolar(), {300, 0.5},
+                         {0, 0, 240, false, 0});
+  inst.instance.Countries = {One, Two};
+  inst.instance.TransportationCosts = TranspCost(2);
+
+  // Solution
+  // Export and import prices are placeholders
+  inst.solution.push_back(countrySol{{100, 40}, {0, 78}, 0, 0, 0});
+  inst.solution.push_back(countrySol{{48.57, 71.43}, {61.43, 0}, 0, 0, 0});
+  return inst;
+}
+
 testInst SimpleViola() {
   // Problem
   testInst inst;
-  Models::LeadAllPar Country(5, "One", FP_Blu()+FP_Bianco()+OneCoal()+OneGas()+OneSolar(), {300, 0.05},
-                             {-1, -1, -1, false, 0});
+  Models::LeadAllPar Country(
+      5, "One", FP_Blu() + FP_Bianco() + OneCoal() + OneGas() + OneSolar(),
+      {300, 0.05}, {-1, -1, -1, false, 0});
   inst.instance.Countries = {Country};
   inst.instance.TransportationCosts = TranspCost(1);
 
   // Solution is dummy, just check isSolved
-  inst.solution.push_back(countrySol{{0,0,0,0,0}, {0,0,0,0,0}, 0.0, 0.0, 0.0});
+  inst.solution.push_back(
+      countrySol{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, 0.0, 0.0, 0.0});
   return inst;
 }
 
@@ -1444,17 +840,16 @@ testInst SimpleBlu() {
   return inst;
 }
 
-testInst SimpleVerde(){
+testInst SimpleVerde() {
   testInst inst;
   Models::LeadAllPar Country(2, "One", OneGas() + OneSolar(), {300, 0.05},
                              {-1, -1, 300, false, 0});
-  inst.instance.Countries={Country};
-  inst.instance.TransportationCosts=TranspCost(1);
+  inst.instance.Countries = {Country};
+  inst.instance.TransportationCosts = TranspCost(1);
 
-  //Solution
+  // Solution
   inst.solution.push_back(countrySol{{66.666}, {250}, 0.0, 0.0, 0.0});
   return inst;
-
 }
 
 testInst HardToEnum_1() {
@@ -1514,18 +909,3 @@ testInst HardToEnum_2() {
 
   return inst;
 }
-
-BOOST_AUTO_TEST_SUITE(All_Alg)
-
-BOOST_AUTO_TEST_CASE(LoggingOff) {
-  boost::log::core::get()->set_filter(boost::log::trivial::severity >=
-                                      boost::log::trivial::info);
-}
-
-BOOST_AUTO_TEST_CASE(Instance1) {
-  testEPECInstance(CH_S_F0_CL_SC_F0(), allAlgo());
-  testEPECInstance(HardToEnum_1(), allAlgo());
-  testEPECInstance(HardToEnum_2(), allAlgo());
-}
-
-BOOST_AUTO_TEST_SUITE_END()
