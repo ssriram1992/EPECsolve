@@ -1154,6 +1154,8 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
    * @param[in] tol - If the additional profit is smaller than this, then it is
    * not considered a profitable deviation.
    */
+  if (!this)
+    return false;
   arma::vec objvals = this->ComputeQPObjvals(sol, true);
   for (unsigned int i = 0; i < this->Nplayers; ++i) {
     double val = this->RespondSol(violSol, i, sol, true);
@@ -1415,7 +1417,7 @@ double Game::EPEC::RespondSol(
   } else {
     return GRB_INFINITY;
   }
-    return GRB_INFINITY;
+  return GRB_INFINITY;
 }
 
 bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
@@ -1589,8 +1591,11 @@ bool Game::EPEC::getAllDevns(
 
 unsigned int Game::EPEC::addDeviatedPolyhedron(
     const std::vector<arma::vec>
-        &devns ///< devns.at(i) is a profitable deviation
-               ///< for the i-th country from the current this->sol_x
+        &devns, ///< devns.at(i) is a profitable deviation
+                ///< for the i-th country from the current this->sol_x
+    bool &infeasCheck ///< Useful for the first iteration of iterativeNash. If true, at
+              ///< least one player has no polyhedron that can be added. In the
+              ///< first iteration, this translates to infeasability
     ) const {
   /**
    * Given a profitable deviation for each country, adds <i>a</i> polyhedron in
@@ -1602,16 +1607,19 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
    * including one additional polyhedron.
    */
 
+  infeasCheck=false;
   unsigned int added = 0;
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     bool ret = false;
-    this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
+    if (!devns.at(i).empty())
+      this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
     if (ret) {
       BOOST_LOG_TRIVIAL(debug)
           << "Game::EPEC::addDeviatedPolyhedron: added polyhedron for player "
           << i;
       ++added;
     } else {
+      infeasCheck = true;
       BOOST_LOG_TRIVIAL(debug) << "Game::EPEC::addDeviatedPolyhedron: NO "
                                   "polyhedron added for player "
                                << i;
@@ -1639,7 +1647,7 @@ bool Game::EPEC::addRandomPoly2All(unsigned int aggressiveLevel,
  */
 {
   BOOST_LOG_TRIVIAL(trace) << "Adding random polyhedra to countries";
-  bool infeasDetect{true};
+  bool infeasDetect{false};
   for (unsigned int i = 0; i < this->nCountr; i++) {
     auto addedPolySet = this->countries_LCP.at(i)->addAPoly(
         aggressiveLevel, this->Stats.AlgorithmParam.addPolyMethod);
@@ -1664,6 +1672,7 @@ void Game::EPEC::iterativeNash() {
 
   bool solved = {false};
   bool addRandPoly{false};
+  bool infeasCheck{false};
   std::vector<arma::vec> prevDevns(this->nCountr);
   this->Stats.numIteration = 0;
   if (this->Stats.AlgorithmParam.addPolyMethod == EPECAddPolyMethod::random) {
@@ -1708,7 +1717,7 @@ void Game::EPEC::iterativeNash() {
       std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
       this->getAllDevns(devns, this->sol_x, prevDevns);
       prevDevns = devns;
-      unsigned int addedPoly = this->addDeviatedPolyhedron(devns);
+      unsigned int addedPoly = this->addDeviatedPolyhedron(devns, infeasCheck);
       if (addedPoly == 0 && this->Stats.numIteration > 1) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Not "
@@ -1716,6 +1725,13 @@ void Game::EPEC::iterativeNash() {
                "numerical issues (tollerances)";
         this->Stats.status = EPECsolveStatus::numerical;
         solved = true;
+      }
+      if (infeasCheck == true && this->Stats.numIteration==1){
+        BOOST_LOG_TRIVIAL(error)
+            << " In Game::EPEC::iterativeNash: Problem is infeasible";
+        this->Stats.status = EPECsolveStatus::nashEqNotFound;
+        solved = true;
+        return;
       }
     }
     this->make_country_QP();
@@ -1777,7 +1793,9 @@ void ::Game::EPEC::make_country_LCP() {
       << "Game::EPEC::make_country_LCP(): NashGame is ready";
   this->lcp = std::unique_ptr<Game::LCP>(new Game::LCP(this->env, *nashgame));
   BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): LCP is ready";
-  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::make_country_LCP(): indicators set to "<<this->Stats.AlgorithmParam.indicators;
+  BOOST_LOG_TRIVIAL(trace)
+      << "Game::EPEC::make_country_LCP(): indicators set to "
+      << this->Stats.AlgorithmParam.indicators;
   this->lcp->useIndicators =
       this->Stats.AlgorithmParam.indicators; // Using indicator constraints
 
@@ -1834,7 +1852,7 @@ bool Game::EPEC::computeNashEq(
   return foundNash;
 }
 
-bool Game::EPEC::warmstart(const arma::vec x){
+bool Game::EPEC::warmstart(const arma::vec x) {
 
   if (x.size() < this->getnVarinEPEC()) {
     BOOST_LOG_TRIVIAL(error)

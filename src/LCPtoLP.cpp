@@ -1203,6 +1203,8 @@ Game::LCP &Game::LCP::makeQP(
 
 ) {
   // Original sizes
+  if (this->Ai->empty())
+    return *this;
   const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
 
   Game::QP_constraints QP_cons;

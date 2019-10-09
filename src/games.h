@@ -525,7 +525,8 @@ private:
 
   bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
                    const std::vector<arma::vec> &prevDev = {}) const;
-  unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns) const;
+  unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns,
+                                     bool &infeasCheck) const;
   void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
   virtual bool computeNashEq(double localTimeLimit = -1.0) final;
@@ -598,7 +599,7 @@ public:                  // functions
     return this->Stats.AlgorithmParam.threads;
   }
   void setAddPolyMethodSeed(unsigned int t) {
-    this->Stats.AlgorithmParam.addPolyMethodSeed=t;
+    this->Stats.AlgorithmParam.addPolyMethodSeed = t;
   }
   virtual unsigned int getAddPolyMethodSeed() const final {
     return this->Stats.AlgorithmParam.addPolyMethodSeed;
