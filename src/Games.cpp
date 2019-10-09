@@ -1990,14 +1990,6 @@ unsigned int Game::EPEC::getPosition_LeadLead(const unsigned int i,
   return LeaderStart + this->countries_LCP.at(i)->getLStart() + j;
 }
 
-unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
-  /**
-   * Get the number of polyhedra used in the inner approximation of the feasible
-   * region of the i-th leader.*
-   */
-  return this->countries_LCP.at(i)->conv_Npoly();
-}
-
 unsigned int Game::EPEC::getPosition_LeadFollPoly(const unsigned int i,
                                                   const unsigned int j,
                                                   const unsigned int k) const {
@@ -2026,6 +2018,14 @@ unsigned int Game::EPEC::getPosition_LeadLeadPoly(const unsigned int i,
   return LeaderStart + FollPoly + this->countries_LCP.at(i)->getLStart() + k;
 }
 
+unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
+  /**
+   * Get the number of polyhedra used in the inner approximation of the feasible
+   * region of the i-th leader.*
+   */
+  return this->countries_LCP.at(i)->conv_Npoly();
+}
+
 unsigned int Game::EPEC::getProbab_LeadPoly(const unsigned int i,
                                             const unsigned int k) const {
   /**
@@ -2035,6 +2035,45 @@ unsigned int Game::EPEC::getProbab_LeadPoly(const unsigned int i,
   const auto LeaderStart = this->nashgame->getPrimalLoc(i);
   const auto PolyProbab = this->countries_LCP.at(i)->conv_PolyWt(k);
   return LeaderStart + PolyProbab;
+}
+
+double Game::EPEC::getVal_LeadFoll(const unsigned int i,
+                                            const unsigned int j) const {
+  if (!this->lcpmodel)
+    throw std::string("Error in Game::EPEC::getVal_LeadFoll: "
+                      "Game::EPEC::lcpmodel not made and solved");
+  return this->lcpmodel
+      ->getVarByName("x_" + to_string(this->getPosition_LeadFoll(i, j)))
+      .get(GRB_DoubleAttr_X);
+}
+double Game::EPEC::getVal_LeadLead(const unsigned int i,
+                                            const unsigned int j) const {
+  if (!this->lcpmodel)
+    throw std::string("Error in Game::EPEC::getVal_LeadLead: "
+                      "Game::EPEC::lcpmodel not made and solved");
+  return this->lcpmodel
+      ->getVarByName("x_" + to_string(this->getPosition_LeadLead(i, j)))
+      .get(GRB_DoubleAttr_X);
+}
+double Game::EPEC::getVal_LeadFollPoly(const unsigned int i,
+                                                const unsigned int j,
+                                                const unsigned int k) const {
+  if (!this->lcpmodel)
+    throw std::string("Error in Game::EPEC::getVal_LeadFollPoly: "
+                      "Game::EPEC::lcpmodel not made and solved");
+  return this->lcpmodel
+      ->getVarByName("x_" + to_string(this->getPosition_LeadFollPoly(i, j, k)))
+      .get(GRB_DoubleAttr_X);
+}
+double Game::EPEC::getVal_LeadLeadPoly(const unsigned int i,
+                                                const unsigned int j,
+                                                const unsigned int k) const {
+  if (!this->lcpmodel)
+    throw std::string("Error in Game::EPEC::getVal_LeadLeadPoly: "
+                      "Game::EPEC::lcpmodel not made and solved");
+  return this->lcpmodel
+      ->getVarByName("x_" + to_string(this->getPosition_LeadLeadPoly(i, j, k)))
+      .get(GRB_DoubleAttr_X);
 }
 
 std::string std::to_string(const Game::EPECsolveStatus st) {

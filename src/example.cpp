@@ -161,14 +161,14 @@ int main() {
   epec.printEnds();
 
   std::cout << "\nXY LEADER\n";
-  std::cout << "x: " << M.getVarByName("x_"+std::to_string(epec.getPosition_LeadLead(0, 0))).get(GRB_DoubleAttr_X) << '\n';
-  std::cout << "y_1: " << M.getVarByName("x_"+std::to_string(epec.getPosition_LeadFoll(0, 0))).get(GRB_DoubleAttr_X) << '\n';
-  std::cout << "y_2: " << M.getVarByName("x_"+std::to_string(epec.getPosition_LeadFoll(0, 1))).get(GRB_DoubleAttr_X) << '\n';
+  std::cout << "x: " << epec.getVal_LeadLead(0, 0) << '\n';
+  std::cout << "y_1: " << epec.getVal_LeadFoll(0, 0) << '\n';
+  std::cout << "y_2: " << epec.getVal_LeadFoll(0, 1) << '\n';
 
   std::cout << "\nUV LEADER\n";
-  std::cout << "u: " << M.getVarByName("x_"+std::to_string(epec.getPosition_LeadLead(1, 0))).get(GRB_DoubleAttr_X) << '\n';
-  std::cout << "v_1: " << M.getVarByName("x_"+std::to_string(epec.getPosition_LeadFoll(1, 0))).get(GRB_DoubleAttr_X) << '\n';
-  std::cout << "v_2: " << M.getVarByName("x_"+std::to_string(epec.getPosition_LeadFoll(1, 1))).get(GRB_DoubleAttr_X) << '\n';
+  std::cout << "u: " << epec.getVal_LeadLead(1, 0) << '\n';
+  std::cout << "v_1: " << epec.getVal_LeadFoll(1, 0) << '\n';
+  std::cout << "v_2: " << epec.getVal_LeadFoll(1, 1) << '\n';
   return 0;
 }
 

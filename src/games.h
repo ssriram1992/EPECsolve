@@ -502,14 +502,10 @@ protected: // Datafields
   GRBEnv *env;
   bool finalized{false};
   bool nashEq{false};
-
   unsigned int nCountr{0};
-
-  EPECStatistics Stats{}; ///< Store run time information
-
-  arma::vec sol_z, ///< Solution equation values
-      sol_x;       ///< Solution variable values
-
+  EPECStatistics Stats{};            ///< Store run time information
+  arma::vec sol_z,                   ///< Solution equation values
+      sol_x;                         ///< Solution variable values
   bool warmstart(const arma::vec x); ///< Warmstarts EPEC with a solution
 
 private:
@@ -625,15 +621,27 @@ public:                  // functions
                                     const unsigned int j) const;
   unsigned int getPosition_LeadLead(const unsigned int i,
                                     const unsigned int j) const;
-  unsigned int getNPoly_Lead(const unsigned int i) const;
   unsigned int getPosition_LeadFollPoly(const unsigned int i,
                                         const unsigned int j,
                                         const unsigned int k) const;
   unsigned int getPosition_LeadLeadPoly(const unsigned int i,
                                         const unsigned int j,
                                         const unsigned int k) const;
+  unsigned int getNPoly_Lead(const unsigned int i) const;
   unsigned int getProbab_LeadPoly(const unsigned int i,
                                   const unsigned int k) const;
+
+  /// The following obtain the variable values
+  double getVal_LeadFoll(const unsigned int i,
+                                  const unsigned int j) const;
+  double getVal_LeadLead(const unsigned int i,
+                                  const unsigned int j) const;
+  double getVal_LeadFollPoly(const unsigned int i,
+                                      const unsigned int j,
+                                      const unsigned int k) const;
+  double getVal_LeadLeadPoly(const unsigned int i,
+                                      const unsigned int j,
+                                      const unsigned int k) const;
 
   /// Get the Game::LCP object solved in the last iteration either to solve the
   /// problem or to prove non-existence of Nash equilibrium. Object is returned
