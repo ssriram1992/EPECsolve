@@ -280,16 +280,8 @@ public: // Constructors
                     arma::sp_mat MC, arma::vec MCRHS,
                     unsigned int n_LeadVar = 0, arma::sp_mat LeadA = {},
                     arma::vec LeadRHS = {});
-  /*
-NashGame(GRBEnv *e, unsigned int Nplayers, unsigned int n_LeadVar = 0,
-     arma::sp_mat LeadA = {}, arma::vec LeadRHS = {})
-: env{e}, LeaderConstraints{LeadA},
-  LeaderConsRHS{LeadRHS}, Nplayers{Nplayers}, n_LeadVar{n_LeadVar} {
-Players.resize(this->Nplayers);
-primal_position.resize(this->Nplayers);
-dual_position.resize(this->Nplayers);
-}
-  */
+  // Copy constructor
+  NashGame(const NashGame &N);
   ~NashGame(){};
 
   // Verbose declaration
@@ -638,8 +630,7 @@ public:                  // functions
                              const unsigned int k) const;
   double getVal_LeadLeadPoly(const unsigned int i, const unsigned int j,
                              const unsigned int k) const;
-  double getVal_Probab(const unsigned int i,
-                                  const unsigned int k) const;
+  double getVal_Probab(const unsigned int i, const unsigned int k) const;
 
   // The following checks if the returned strategy leader is a pure strategy
   // for a leader or appropriately retrieve mixed-strategies

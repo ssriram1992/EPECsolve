@@ -589,10 +589,20 @@ Game::NashGame::NashGame(GRBEnv *e, vector<shared_ptr<QP_Param>> Players,
 {
   // Setting the class variables
   this->n_LeadVar = n_LeadVar;
-  this->Players = Players;
   this->Nplayers = Players.size();
+  this->Players = Players;
   this->MarketClearing = MC;
   this->MCRHS = MCRHS;
+  // Setting the size of class variable vectors
+  this->primal_position.resize(this->Nplayers + 1);
+  this->dual_position.resize(this->Nplayers + 1);
+  this->set_positions();
+}
+
+Game::NashGame::NashGame(const NashGame &N)
+    : env{N.env}, LeaderConstraints{N.LeaderConstraints},
+      LeaderConsRHS{N.LeaderConsRHS}, Nplayers{N.Nplayers}, Players{N.Players},
+      MarketClearing{N.MarketClearing}, MCRHS{N.MCRHS}, n_LeadVar{N.n_LeadVar} {
   // Setting the size of class variable vectors
   this->primal_position.resize(this->Nplayers + 1);
   this->dual_position.resize(this->Nplayers + 1);
@@ -2000,7 +2010,7 @@ unsigned int Game::EPEC::getPosition_LeadFollPoly(const unsigned int i,
    * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNPoly_Lead(i)
    */
   const auto LeaderStart = this->nashgame->getPrimalLoc(i);
- const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(k);
+  const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(k);
   return LeaderStart + FollPoly + j;
 }
 
@@ -2070,7 +2080,7 @@ std::vector<unsigned int> Game::EPEC::mixedStratPoly(const unsigned int i,
 }
 
 double Game::EPEC::getVal_Probab(const unsigned int i,
-                                       const unsigned int k) const {
+                                 const unsigned int k) const {
   return this->lcpmodel
       ->getVarByName("x_" + std::to_string(this->getPosition_Probab(i, k)))
       .get(GRB_DoubleAttr_X);
@@ -2104,8 +2114,10 @@ double Game::EPEC::getVal_LeadFollPoly(const unsigned int i,
                       "Game::EPEC::lcpmodel not made and solved");
   const double probab = this->getVal_Probab(i, k);
   return this->lcpmodel
-      ->getVarByName("x_" + to_string(this->getPosition_LeadFollPoly(i, j, k)))
-      .get(GRB_DoubleAttr_X) / probab;
+             ->getVarByName("x_" +
+                            to_string(this->getPosition_LeadFollPoly(i, j, k)))
+             .get(GRB_DoubleAttr_X) /
+         probab;
 }
 
 double Game::EPEC::getVal_LeadLeadPoly(const unsigned int i,
@@ -2116,8 +2128,10 @@ double Game::EPEC::getVal_LeadLeadPoly(const unsigned int i,
                       "Game::EPEC::lcpmodel not made and solved");
   const double probab = this->getVal_Probab(i, k);
   return this->lcpmodel
-      ->getVarByName("x_" + to_string(this->getPosition_LeadLeadPoly(i, j, k)))
-      .get(GRB_DoubleAttr_X) / probab;
+             ->getVarByName("x_" +
+                            to_string(this->getPosition_LeadLeadPoly(i, j, k)))
+             .get(GRB_DoubleAttr_X) /
+         probab;
 }
 
 std::string std::to_string(const Game::EPECsolveStatus st) {
