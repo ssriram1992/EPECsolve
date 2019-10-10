@@ -35,6 +35,8 @@ make docDetailed
 
 # Compiling
 - Download the [project](https://github.com/ssriram1992/EPECsolve/). If you do not have access, please email [sriram.sankaranarayanan@polymtl.ca](mailto:sriram.sankaranarayanan@polymtl.ca).
+
+## Makefile
 - Open `Makefile`. 
 - Enter the path where you downladed in `EPEC_HOME`. This folder should contain folders like `docs/`, `src/`, `test/` etc.
 - Enter the path to Boost in `BOOST_HOME`. Ensure that the path to corresponding include files and boost libraries are correct.
@@ -45,6 +47,12 @@ make docDetailed
 - Optionally run `make EPECtest` to run the set of unit tests. It should all succeed without a problem.
 - Run `make` to create the binary.
 - Run `./bin/EPEC -h` to get a list of command line options with which you can run the executable.
+
+## CMake
+- Open `CMakeList.txt`. 
+- You will find two configurations. `ROSSOBIANCO` represents the remote server one, while the other is the local one.
+- Set `BOOST_ROOT`, `ARMA_ROOT`, and `ARMA_LIB` to your customized folders. 
+- Set `GUROBI_PATH_%OS` to your local gurobi path (and version). Note that %OS corresponds to your local (or remote) operatin system.
 
 # Maintenance
 [@ssriram1992](https://github.com/ssriram1992/) - Contact: [sriram.sankaranarayanan@polymtl.ca](mailto:sriram.sankaranarayanan@polymtl.ca)
