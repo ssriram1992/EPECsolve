@@ -69,52 +69,52 @@ public:
   MP_Param(const MP_Param &M) = default;
 
   // Getters and setters
-  virtual inline arma::sp_mat getQ() const final {
+  arma::sp_mat getQ() const {
     return this->Q;
   } ///< Read-only access to the private variable Q
-  virtual inline arma::sp_mat getC() const final {
+  arma::sp_mat getC() const {
     return this->C;
   } ///< Read-only access to the private variable C
-  virtual inline arma::sp_mat getA() const final {
+  arma::sp_mat getA() const {
     return this->A;
   } ///< Read-only access to the private variable A
-  virtual inline arma::sp_mat getB() const final {
+  arma::sp_mat getB() const {
     return this->B;
   } ///< Read-only access to the private variable B
-  virtual inline arma::vec getc() const final {
+  arma::vec getc() const {
     return this->c;
   } ///< Read-only access to the private variable c
-  virtual inline arma::vec getb() const final {
+  arma::vec getb() const {
     return this->b;
   } ///< Read-only access to the private variable b
-  virtual inline unsigned int getNx() const final {
+  unsigned int getNx() const {
     return this->Nx;
   } ///< Read-only access to the private variable Nx
-  virtual inline unsigned int getNy() const final {
+  unsigned int getNy() const {
     return this->Ny;
   } ///< Read-only access to the private variable Ny
 
-  virtual inline MP_Param &setQ(const arma::sp_mat &Q) final {
+  MP_Param &setQ(const arma::sp_mat &Q) {
     this->Q = Q;
     return *this;
   } ///< Set the private variable Q
-  virtual inline MP_Param &setC(const arma::sp_mat &C) final {
+  MP_Param &setC(const arma::sp_mat &C) {
     this->C = C;
     return *this;
   } ///< Set the private variable C
-  virtual inline MP_Param &setA(const arma::sp_mat &A) final {
+  MP_Param &setA(const arma::sp_mat &A) {
     this->A = A;
     return *this;
   } ///< Set the private variable A
-  virtual inline MP_Param &setB(const arma::sp_mat &B) final {
+  MP_Param &setB(const arma::sp_mat &B) {
     this->B = B;
     return *this;
   } ///< Set the private variable B
-  virtual inline MP_Param &setc(const arma::vec &c) final {
+  MP_Param &setc(const arma::vec &c) {
     this->c = c;
     return *this;
   } ///< Set the private variable c
-  virtual inline MP_Param &setb(const arma::vec &b) final {
+  MP_Param &setb(const arma::vec &b) {
     this->b = b;
     return *this;
   } ///< Set the private variable b
@@ -501,15 +501,14 @@ protected: // Datafields
   bool warmstart(const arma::vec x); ///< Warmstarts EPEC with a solution
 
 private:
-  virtual void add_Dummy_Lead(
-      const unsigned int i) final; ///< Add Dummy variables for the leaders
-  virtual void make_country_QP(const unsigned int i) final;
-  virtual void make_country_QP() final;
-  virtual void make_country_LCP() final;
-  virtual void resetLCP() final;
-  virtual void iterativeNash() final;
-  virtual void
-  computeLeaderLocations(const unsigned int addSpaceForMC = 0) final;
+  void
+  add_Dummy_Lead(const unsigned int i); ///< Add Dummy variables for the leaders
+  void make_country_QP(const unsigned int i);
+  void make_country_QP();
+  void make_country_LCP();
+  void resetLCP();
+  void iterativeNash();
+  void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
   bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
                    const std::vector<arma::vec> &prevDev = {}) const;
@@ -517,7 +516,7 @@ private:
                                      bool &infeasCheck) const;
   void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
-  virtual bool computeNashEq(double localTimeLimit = -1.0) final;
+  bool computeNashEq(double localTimeLimit = -1.0);
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
                          bool stopOnSingleInfeasibility = false);
 
@@ -539,7 +538,7 @@ protected: // functions
     MC.zeros();
     RHS.zeros();
   };
-  virtual bool hasLCP() const final {
+  bool hasLCP() const {
     if (this->lcp)
       return true;
     else
@@ -551,8 +550,8 @@ public:                  // functions
   EPEC(EPEC &) = delete; // Abstract class - no copy constructor
   ~EPEC() {}             // Destructor to free data
 
-  virtual void finalize() final;
-  virtual void findNashEq() final;
+  void finalize();
+  void findNashEq();
 
   std::unique_ptr<GRBModel> Respond(const unsigned int i,
                                     const arma::vec &x) const;
@@ -561,49 +560,43 @@ public:                  // functions
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
                 double tol = 1e-4) const;
 
-  virtual const arma::vec getx() const final { return this->sol_x; }
+  const arma::vec getx() const { return this->sol_x; }
   void reset() { this->sol_x.ones(); }
-  virtual const arma::vec getz() const final { return this->sol_z; }
+  const arma::vec getz() const { return this->sol_z; }
   ///@brief Get the EPECStatistics object for the current instance
-  virtual const EPECStatistics getStatistics() const final {
-    return this->Stats;
-  }
-  virtual unsigned int getnVarinEPEC() const final { return this->nVarinEPEC; }
+  const EPECStatistics getStatistics() const { return this->Stats; }
+  unsigned int getnVarinEPEC() const { return this->nVarinEPEC; }
   void setAlgorithm(Game::EPECalgorithm algorithm);
-  virtual Game::EPECalgorithm getAlgorithm() const final {
+  Game::EPECalgorithm getAlgorithm() const {
     return this->Stats.AlgorithmParam.algorithm;
   }
   void setAggressiveness(unsigned int a) {
     this->Stats.AlgorithmParam.aggressiveness = a;
   }
-  virtual unsigned int getAggressiveness() const final {
+  unsigned int getAggressiveness() const {
     return this->Stats.AlgorithmParam.aggressiveness;
   }
   void setNumThreads(unsigned int t) {
     this->Stats.AlgorithmParam.threads = t;
     this->env->set(GRB_IntParam_Threads, t);
   }
-  virtual unsigned int getNumThreads() const final {
+  unsigned int getNumThreads() const {
     return this->Stats.AlgorithmParam.threads;
   }
   void setAddPolyMethodSeed(unsigned int t) {
     this->Stats.AlgorithmParam.addPolyMethodSeed = t;
   }
-  virtual unsigned int getAddPolyMethodSeed() const final {
+  unsigned int getAddPolyMethodSeed() const {
     return this->Stats.AlgorithmParam.addPolyMethodSeed;
   }
   void setIndicators(bool val) { this->Stats.AlgorithmParam.indicators = val; }
-  virtual bool getIndicators() const final {
-    return this->Stats.AlgorithmParam.indicators;
-  }
+  bool getIndicators() const { return this->Stats.AlgorithmParam.indicators; }
   void setTimeLimit(double val) { this->Stats.AlgorithmParam.timeLimit = val; }
-  virtual double getTimeLimit() const final {
-    return this->Stats.AlgorithmParam.timeLimit;
-  }
+  double getTimeLimit() const { return this->Stats.AlgorithmParam.timeLimit; }
   void setAddPolyMethod(Game::EPECAddPolyMethod add) {
     this->Stats.AlgorithmParam.addPolyMethod = add;
   }
-  virtual Game::EPECAddPolyMethod getAddPolyMethod() const final {
+  Game::EPECAddPolyMethod getAddPolyMethod() const {
     return this->Stats.AlgorithmParam.addPolyMethod;
   }
 
