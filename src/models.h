@@ -190,6 +190,9 @@ private:
 
   std::map<std::string, unsigned int> name2nos = {};
   unsigned int taxVars = {0};
+  std::vector<arma::sp_mat>
+      LeadConses{};                   ///< Stores each leader's constraint LHS
+  std::vector<arma::vec> LeadRHSes{}; ///< Stores each leader's constraint RHS
 
   bool dataCheck(const bool chkAllLeadPars = true,
                  const bool chkcountriesLL = true, const bool chkMC_QP = true,
@@ -231,8 +234,6 @@ private:
                      const std::string filename, const arma::vec x) const;
 
 public: // Attributes
-  const unsigned int &nCountries{
-      nCountr}; ///< Constant attribute for number of leaders in the EPEC
   const unsigned int nVarEPEC{
       this->getnVarinEPEC()}; ///< Constant attribute for number of variables in
                               ///< the EPEC

@@ -4,22 +4,17 @@
 class My_EPEC_Prob : public EPEC {
 public:
   My_EPEC_Prob(GRBEnv *e) : EPEC(e) {
-    nCountr = 0;
     n_MCVar = 0;
   }
   void addLeader(std::shared_ptr<Game::NashGame> N, const unsigned int i) {
     this->countries_LL.push_back(N);
-    this->convexHullVariables.push_back(0);
-    this->convexHullVarAddn.push_back(0);
-    this->LeadConses.push_back(N->RewriteLeadCons());
     ends[i] = N->getNprimals();
     this->LocEnds.push_back(&ends[i]);
-    this->nCountr++;
   }
   void printEnds() {
     std::cout << ends[0] << " " << ends[1] << "\n";
 
-    for (unsigned int i = 0; i < this->nCountr; ++i) {
+    for (unsigned int i = 0; i < this->getNcountries(); ++i) {
       std::cout << "Country variables starts for i = " << i << " at "
                 << this->nashgame->getPrimalLoc(i) << '\n';
     }

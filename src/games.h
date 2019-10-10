@@ -462,14 +462,11 @@ private:
   std::unique_ptr<GRBModel>
       lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
   unsigned int nVarinEPEC{0};
+  unsigned int nCountr{0};
 
 protected: // Datafields
   std::vector<std::shared_ptr<Game::NashGame>> countries_LL{};
   std::vector<std::unique_ptr<Game::LCP>> countries_LCP{};
-
-  std::vector<arma::sp_mat>
-      LeadConses{};                   ///< Stores each leader's constraint LHS
-  std::vector<arma::vec> LeadRHSes{}; ///< Stores each leader's constraint RHS
 
   std::vector<std::shared_ptr<Game::QP_Param>>
       country_QP{}; ///< The QP corresponding to each player
@@ -487,14 +484,12 @@ protected: // Datafields
   /// Game::EPEC has the responsibility to keep this correct by implementing an
   /// override of Game::EPEC::updateLocs.
   std::vector<const unsigned int *> LocEnds{};
-  std::vector<unsigned int> convexHullVarAddn{};
   std::vector<unsigned int> convexHullVariables{};
   unsigned int n_MCVar{0};
 
   GRBEnv *env;
   bool finalized{false};
   bool nashEq{false};
-  unsigned int nCountr{0};
   EPECStatistics Stats{};            ///< Store run time information
   arma::vec sol_z,                   ///< Solution equation values
       sol_x;                         ///< Solution variable values
@@ -565,7 +560,6 @@ public:                  // functions
   const arma::vec getz() const { return this->sol_z; }
   ///@brief Get the EPECStatistics object for the current instance
   const EPECStatistics getStatistics() const { return this->Stats; }
-  unsigned int getnVarinEPEC() const { return this->nVarinEPEC; }
   void setAlgorithm(Game::EPECalgorithm algorithm);
   Game::EPECalgorithm getAlgorithm() const {
     return this->Stats.AlgorithmParam.algorithm;
@@ -602,6 +596,8 @@ public:                  // functions
 
   // Methods to get positions of variables
   // The below are all const functions which return an unsigned int.
+  unsigned int getnVarinEPEC() const noexcept { return this->nVarinEPEC; }
+  unsigned int getNcountries() const noexcept { return this->countries_LL.size(); }
   unsigned int getPosition_LeadFoll(const unsigned int i,
                                     const unsigned int j) const;
   unsigned int getPosition_LeadLead(const unsigned int i,

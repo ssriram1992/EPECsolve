@@ -630,12 +630,10 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   this->Locations.push_back(Loc);
 
   this->EPEC::LocEnds.push_back(&this->Locations.back().at(LeaderVars::End));
-  this->EPEC::convexHullVarAddn.push_back(0);
   this->EPEC::convexHullVariables.push_back(0);
 
-  this->LeadConses.push_back(N->RewriteLeadCons());
+  this->LeadConses.push_back(N->RewriteLeadCons()); // Not mandatory!
   this->AllLeadPars.push_back(Params);
-  this->nCountr++;
   this->Game::EPEC::n_MCVar++;
   return *this;
 }
@@ -655,7 +653,7 @@ Models::EPEC &Models::EPEC::addTranspCosts(
         "Error in Models::EPEC::addTranspCosts: EPEC object finalized. Call "
         "EPEC::unlock() to unlock this object first and then edit.");
   try {
-    if (this->nCountr != costs.n_rows || this->nCountr != costs.n_cols)
+    if (this->getNcountries() != costs.n_rows || this->getNcountries() != costs.n_cols)
       throw string("Error in EPEC::addTranspCosts. Invalid size of Q");
     else
       this->TranspCosts = arma::sp_mat(costs);
@@ -692,8 +690,8 @@ void Models::EPEC::prefinalize() {
      * Below for loop adds space for each country's quantity imported from
      * variable
      */
-    this->nImportMarkets = vector<unsigned int>(this->nCountr);
-    for (unsigned int i = 0; i < this->nCountr; i++)
+    this->nImportMarkets = vector<unsigned int>(this->getNcountries());
+    for (unsigned int i = 0; i < this->getNcountries(); i++)
       this->add_Leaders_tradebalance_constraints(i);
   } catch (const char *e) {
     cerr << e << '\n';
@@ -722,7 +720,7 @@ void Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
  * Models::EPEC::Locations.at(i)
  */
 {
-  if (i >= this->nCountr)
+  if (i >= this->countries_LL.size())
     throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. "
                  "Bad argument");
   int nImp = 0;
@@ -774,11 +772,11 @@ void Models::EPEC::make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const
   // Transportation matrix
   const arma::sp_mat &TrCo = this->TranspCosts;
   // Output matrices
-  MCRHS.zeros(this->nCountr);
-  MCLHS.zeros(this->nCountr, this->getnVarinEPEC());
+  MCRHS.zeros(this->getNcountries());
+  MCLHS.zeros(this->getNcountries(), this->getnVarinEPEC());
   // The MC constraint for each leader country
-  if (this->nCountr > 1) {
-    for (unsigned int i = 0; i < this->nCountr; ++i) {
+  if (this->getNcountries() > 1) {
+    for (unsigned int i = 0; i < this->getNcountries(); ++i) {
       MCLHS(i, this->getPosition(i, LeaderVars::NetExport)) = 1;
       for (auto val = TrCo.begin_row(i); val != TrCo.end_row(i); ++val) {
         const unsigned int j =
@@ -808,7 +806,7 @@ void Models::EPEC::make_MC_leader(const unsigned int i)
  * it in Models::EPEC::MC_QP
  */
 {
-  if (i >= this->nCountr)
+  if (i >= this->getNcountries())
     throw string("Error in Models::EPEC::add_Leaders_tradebalance_constraints. "
                  "Bad argument");
   try {
@@ -888,25 +886,25 @@ bool Models::EPEC::dataCheck(
  * number of countries in the Models::EPEC object.
  */
 {
-  if (!chkAllLeadPars && AllLeadPars.size() != this->nCountr)
+  if (!chkAllLeadPars && AllLeadPars.size() != this->getNcountries())
     return false;
-  if (!chkcountries_LL && countries_LL.size() != this->nCountr)
+  if (!chkcountries_LL && countries_LL.size() != this->getNcountries())
     return false;
-  if (!chkMC_QP && MC_QP.size() != this->nCountr)
+  if (!chkMC_QP && MC_QP.size() != this->getNcountries())
     return false;
-  if (!chkLeadConses && LeadConses.size() != this->nCountr)
+  if (!chkLeadConses && LeadConses.size() != this->getNcountries())
     return false;
-  if (!chkLeadRHSes && LeadRHSes.size() != this->nCountr)
+  if (!chkLeadRHSes && LeadRHSes.size() != this->getNcountries())
     return false;
-  if (!chknImportMarkets && nImportMarkets.size() != this->nCountr)
+  if (!chknImportMarkets && nImportMarkets.size() != this->getNcountries())
     return false;
-  if (!chkLocations && Locations.size() != this->nCountr)
+  if (!chkLocations && Locations.size() != this->getNcountries())
     return false;
-  if (!chkLeaderLocations && LeaderLocations.size() != this->nCountr)
+  if (!chkLeaderLocations && LeaderLocations.size() != this->getNcountries())
     return false;
   if (!chkLeaderLocations && this->getnVarinEPEC() == 0)
     return false;
-  if (!chkLeadObjec && LeadObjec.size() != this->nCountr)
+  if (!chkLeadObjec && LeadObjec.size() != this->getNcountries())
     return false;
   return true;
 }
@@ -917,7 +915,7 @@ unsigned int Models::EPEC::getPosition(const unsigned int countryCount,
  * @brief Gets position of a variable in a country.
  */
 {
-  if (countryCount >= this->nCountr)
+  if (countryCount >= this->getNcountries())
     throw string("Error in Models::EPEC::getPosition: Bad Country Count");
   return this->LeaderLocations.at(countryCount) +
          this->Locations.at(countryCount).at(var);
@@ -987,13 +985,13 @@ void Models::EPEC::make_obj_leader(
       QP_obj.c.at(j) = 1;
   }
 
-  if (this->nCountr > 1) {
+  if (this->getNcountries() > 1) {
     // export revenue term
 
     QP_obj.C(Loc.at(Models::LeaderVars::NetExport),
              // this->getPosition(i, Models::LeaderVars::End) -
              // nThisCountryvars) = -1;
-             this->getPosition(this->nCountr - 1, Models::LeaderVars::End) -
+             this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) -
                  nThisCountryvars + i) = -1;
 
     // Import cost term.
@@ -1004,7 +1002,7 @@ void Models::EPEC::make_obj_leader(
       // \pi^I*q^{I\to A}_{imp} term
       QP_obj.C.at(
           Loc.at(Models::LeaderVars::CountryImport) + count,
-          this->getPosition(this->nCountr - 1, Models::LeaderVars::End) -
+          this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) -
               nThisCountryvars + val.row()) = 1;
       // this->Locations.at(val.row()).at(Models::LeaderVars::End)) = 1;
       // this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
@@ -1022,7 +1020,7 @@ void Models::EPEC::updateLocs()
  * This function is called after make_country_QP()
  */
 {
-  for (unsigned int i = 0; i < this->nCountr; ++i) {
+  for (unsigned int i = 0; i < this->getNcountries(); ++i) {
     LeadLocs &Loc = this->Locations.at(i);
     Models::decreaseVal(Loc, Models::LeaderVars::ConvHullDummy,
                         Loc[Models::LeaderVars::ConvHullDummy + 1] -
@@ -1117,7 +1115,7 @@ void Models::EPEC::write(const string filename, bool append) const {
     file << "############### COUNTRY PARAMETERS ###############\n";
     file << "##################################################\n";
   }
-  for (unsigned int i = 0; i < this->nCountr; ++i)
+  for (unsigned int i = 0; i < this->getNcountries(); ++i)
     this->write(filename, i, (append || i));
 }
 
@@ -1134,15 +1132,15 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x,
   writer.Key("Meta");
   writer.StartObject();
   writer.Key("nCountries");
-  writer.Uint(this->nCountr);
+  writer.Uint(this->getNcountries());
   writer.Key("nFollowers");
   writer.StartArray();
-  for (unsigned i = 0; i < this->nCountr; i++)
+  for (unsigned i = 0; i < this->getNcountries(); i++)
     writer.Uint(this->AllLeadPars.at(i).n_followers);
   writer.EndArray();
   writer.Key("Countries");
   writer.StartArray();
-  for (unsigned i = 0; i < this->nCountr; i++) {
+  for (unsigned i = 0; i < this->getNcountries(); i++) {
     writer.StartObject();
     writer.Key("FollowerStart");
     writer.Uint(this->getPosition(i, Models::LeaderVars::FollowerStart));
@@ -1167,7 +1165,7 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x,
     writer.Key("End");
     writer.Uint(this->getPosition(i, Models::LeaderVars::End));
     writer.Key("ShadowPrice");
-    writer.Uint(this->getPosition(this->nCountr - 1, Models::LeaderVars::End) +
+    writer.Uint(this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) +
                 i);
     writer.EndObject();
   }
@@ -1242,7 +1240,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
   if (this->Stats.status == Game::EPECsolveStatus::nashEqFound) {
     if (writeLevel == 1 || writeLevel == 2) {
       this->WriteCountry(0, filename + ".txt", this->sol_x, false);
-      for (unsigned int ell = 1; ell < this->nCountr; ++ell)
+      for (unsigned int ell = 1; ell < this->getNcountries(); ++ell)
         this->WriteCountry(ell, filename + ".txt", this->sol_x, true);
       this->write(filename + ".txt", true);
     }
@@ -1474,7 +1472,7 @@ void Models::EPEC::WriteCountry(const unsigned int i, const string filename,
   // Trade
   double Export{x.at(this->getPosition(i, Models::LeaderVars::NetExport))};
   double exportPrice{
-      x.at(this->getPosition(this->nCountr - 1, Models::LeaderVars::End) + i)};
+      x.at(this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) + i)};
   double import{0};
   for (unsigned int j = this->getPosition(i, Models::LeaderVars::CountryImport);
        j < this->getPosition(i, Models::LeaderVars::CountryImport + 1); ++j)

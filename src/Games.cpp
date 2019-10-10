@@ -1223,11 +1223,13 @@ void Game::EPEC::finalize()
   if (this->finalized)
     cerr << "Warning in Game::EPEC::finalize: Model already finalized\n";
 
+  this->nCountr = this->getNcountries();
   /// Game::EPEC::prefinalize() can be overridden, and that code will run before
   /// calling Game::EPEC::finalize()
   this->prefinalize();
 
   try {
+    this->convexHullVariables = std::vector<unsigned int>(this->nCountr, 0);
     this->Stats.feasiblePolyhedra = std::vector<unsigned int>(this->nCountr, 0);
     this->computeLeaderLocations(this->n_MCVar);
     // Initialize leader objective and country_QP
@@ -1519,7 +1521,6 @@ void Game::EPEC::make_country_QP()
  */
 {
   for (unsigned int i = 0; i < this->nCountr; ++i) {
-    this->convexHullVarAddn.at(i) = 0;
     this->Game::EPEC::make_country_QP(i);
   }
   for (unsigned int i = 0; i < this->nCountr; ++i) {
