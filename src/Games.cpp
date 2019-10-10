@@ -1133,12 +1133,14 @@ arma::vec Game::NashGame::ComputeQPObjvals(const arma::vec &x,
     arma::vec x_i, x_minus_i;
 
     x_minus_i.zeros(nVar - nEnd + nStart);
-    if (nStart > 0)
+    if (nStart > 0) {
       x_minus_i.subvec(0, nStart - 1) = x.subvec(0, nStart - 1);
-    if (nEnd < x.n_rows)
+    }
+    if (nEnd < x.n_rows) {
       x_minus_i.subvec(nStart, nVar + nStart - nEnd - 1) =
           x.subvec(nEnd,
                    nVar - 1); // Discard any dual variables in x
+    }
 
     x_i = x.subvec(nStart, nEnd - 1);
 
@@ -2056,8 +2058,8 @@ bool Game::EPEC::isPureStrategy(const unsigned int i, const double tol) const {
    */
   const unsigned int nPoly = this->getNPoly_Lead(i);
   for (unsigned int j = 0; j < nPoly; j++) {
-    const unsigned int probabPosn = this->getPosition_Probab(i, j);
-    if (probabPosn > 1 - tol) // Current Strategy is a pure strategy!
+    const double probab = this->getVal_Probab(i, j);
+    if (probab > 1 - tol) // Current Strategy is a pure strategy!
       return true;
   }
   return false;
