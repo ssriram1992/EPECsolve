@@ -214,7 +214,7 @@ void Game::LCP::makeRelaxed()
       if (_A.n_cols != nC || _A.n_rows != _b.n_rows) {
         BOOST_LOG_TRIVIAL(trace) << "(" << _A.n_rows << "," << _A.n_cols
                                  << ")\t" << _b.n_rows << " " << nC;
-        throw string("A and b are incompatible! Thrown from makeRelaxed()");
+        throw string("Game::LCP::makeRelaxed: A and b are incompatible! Thrown from makeRelaxed()");
       }
       for (unsigned int i = 0; i < _A.n_rows; i++) {
         GRBLinExpr expr = 0;
@@ -271,12 +271,12 @@ unique_ptr<GRBModel> Game::LCP::LCP_Polyhed_fixed(
   unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
   for (auto i : FixEq) {
     if (i >= nR)
-      throw "Element in FixEq is greater than nC";
+      throw "Game::LCP::LCP_Polyhed_fixed: Element in FixEq is greater than nC";
     model->getVarByName("z_" + to_string(i)).set(GRB_DoubleAttr_UB, 0);
   }
   for (auto i : FixVar) {
     if (i >= nC)
-      throw "Element in FixEq is greater than nC";
+      throw "Game::LCP::LCP_Polyhed_fixed: Element in FixEq is greater than nC";
     model->getVarByName("z_" + to_string(i)).set(GRB_DoubleAttr_UB, 0);
   }
   return model;
@@ -333,7 +333,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
  */
 {
   if (Fixes.size() != this->nR)
-    throw string("Bad size for Fixes in Game::LCP::LCPasMIP");
+    throw string("Game::LCP::LCPasMIP: Bad size for Fixes in Game::LCP::LCPasMIP");
   vector<unsigned int> FixVar, FixEq;
   for (unsigned int i = 0; i < nR; i++) {
     if (Fixes[i] == 1)
@@ -463,9 +463,9 @@ bool Game::LCP::errorCheck(
   const unsigned int nC = M.n_cols;
   if (throwErr) {
     if (nR != q.n_rows)
-      throw "M and q have unequal number of rows";
+      throw "Game::LCP::errorCheck: M and q have unequal number of rows";
     if (nR + nLeader != nC)
-      throw "Inconsistency between number of leader vars " +
+      throw "Game::LCP::errorCheck: Inconsistency between number of leader vars " +
           to_string(nLeader) + ", number of rows " + to_string(nR) +
           " and number of cols " + to_string(nC);
   }
@@ -545,29 +545,29 @@ unsigned int Game::ConvexHull(
   const unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
   // Error check
   if (nPoly == 0)
-    throw string("Empty vector of polyhedra given! Problem might be "
+    throw string("Game::ConvexHull: Empty vector of polyhedra given! Problem might be "
                  "infeasible."); // There should be at least 1 polyhedron to
                                  // consider
   const unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
   const unsigned int nComm{static_cast<unsigned int>(Acom.n_rows)};
 
   if (nComm > 0 && Acom.n_cols != nC)
-    throw string("Inconsistent number of variables in the common polyhedron");
+    throw string("Game::ConvexHull: Inconsistent number of variables in the common polyhedron");
   if (nComm > 0 && nComm != bcom.n_rows)
     throw string(
-        "Inconsistent number of rows in LHS and RHS in the common polyhedron");
+        "Game::ConvexHull: Inconsistent number of rows in LHS and RHS in the common polyhedron");
 
   // Count the number of variables in the convex hull.
   unsigned int nFinCons{0}, nFinVar{0};
   if (nPoly != bi->size())
-    throw string("Inconsistent number of LHS and RHS for polyhedra");
+    throw string("Game::ConvexHull: Inconsistent number of LHS and RHS for polyhedra");
   for (unsigned int i = 0; i != nPoly; i++) {
     if (Ai->at(i)->n_cols != nC)
-      throw string("Inconsistent number of variables in the polyhedra ") +
+      throw string("Game::ConvexHull: Inconsistent number of variables in the polyhedra ") +
           to_string(i) + "; " + to_string(Ai->at(i)->n_cols) +
           "!=" + to_string(nC);
     if (Ai->at(i)->n_rows != bi->at(i)->n_rows)
-      throw string("Inconsistent number of rows in LHS and RHS of polyhedra ") +
+      throw string("Game::ConvexHull: Inconsistent number of rows in LHS and RHS of polyhedra ") +
           to_string(i) + ";" + to_string(Ai->at(i)->n_rows) +
           "!=" + to_string(bi->at(i)->n_rows);
     nFinCons += Ai->at(i)->n_rows;
@@ -728,9 +728,9 @@ Game::LPSolve(const arma::sp_mat &A, ///< The constraint matrix
   nR = A.n_rows;
   nC = A.n_cols;
   if (c.n_rows != nC)
-    throw "Inconsistency in no of Vars in isFeas()";
+    throw "Game::LPSolve: Inconsistency in no of Vars in isFeas()";
   if (b.n_rows != nR)
-    throw "Inconsistency in no of Constr in isFeas()";
+    throw "Game::LPSolve: Inconsistency in no of Constr in isFeas()";
 
   arma::vec sol = arma::vec(c.n_rows, arma::fill::zeros);
   const double lb = Positivity ? 0 : -GRB_INFINITY;
@@ -1286,7 +1286,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
       int status = model->get(GRB_IntAttr_Status);
       if (status != GRB_OPTIMAL ||
           model->get(GRB_DoubleAttr_ObjVal) > this->eps)
-        throw "LCP infeasible";
+        throw "Game::LCP::LCPasQP: LCP infeasible";
     } catch (const char *e) {
       cerr << "Error in Game::LCP::LCPasQP: " << e << '\n';
       throw;
@@ -1336,9 +1336,9 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   // Reset the solution limit. We need to solve to optimality
   model->set(GRB_IntParam_SolutionLimit, GRB_MAXINT);
   if (C.n_cols != x_minus_i.n_rows)
-    throw string("Bad size of x_minus_i");
+    throw string("Game::LCP::LCPasMILP: Bad size of x_minus_i");
   if (c.n_rows != C.n_rows)
-    throw string("Bad size of c");
+    throw string("Game::LCP::LCPasMILP: Bad size of c");
   arma::vec Cx(c.n_rows, arma::fill::zeros);
   try {
     Cx = C * x_minus_i;

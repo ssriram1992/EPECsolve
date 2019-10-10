@@ -343,7 +343,7 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed(
   /// compatible with the
   /// Game::QP_Param definition.
   if (x.size() != this->Nx)
-    throw "Invalid argument size: " + to_string(x.size()) +
+    throw "Game::QP_Param::solveFixed: Invalid argument size: " + to_string(x.size()) +
         " != " + to_string(Nx);
   /// @warning Creates a GRBModel using dynamic memory. Should be freed by the
   /// caller.
@@ -429,7 +429,7 @@ unsigned int Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N,
  */
 {
   if (!this->dataCheck()) {
-    throw string("Inconsistent data for KKT of Game::QP_Param");
+    throw string("Inconsistent data for KKT of Game::QP_Param::KKT");
     return 0;
   }
   M = arma::join_cols( // In armadillo join_cols(A, B) is same as [A;B] in
