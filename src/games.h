@@ -597,7 +597,9 @@ public:                  // functions
   // Methods to get positions of variables
   // The below are all const functions which return an unsigned int.
   unsigned int getnVarinEPEC() const noexcept { return this->nVarinEPEC; }
-  unsigned int getNcountries() const noexcept { return this->countries_LL.size(); }
+  unsigned int getNcountries() const noexcept {
+    return this->countries_LL.size();
+  }
   unsigned int getPosition_LeadFoll(const unsigned int i,
                                     const unsigned int j) const;
   unsigned int getPosition_LeadLead(const unsigned int i,

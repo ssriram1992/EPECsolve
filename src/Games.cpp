@@ -340,13 +340,10 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed(
                  */
 {
   this->make_yQy(); /// @throws GRBException if argument vector size is not
-  /// compatible with the
-  /// Game::QP_Param definition.
+  /// compatible with the Game::QP_Param definition.
   if (x.size() != this->Nx)
     throw "Invalid argument size: " + to_string(x.size()) +
         " != " + to_string(Nx);
-  /// @warning Creates a GRBModel using dynamic memory. Should be freed by the
-  /// caller.
   unique_ptr<GRBModel> model(new GRBModel(this->QuadModel));
   try {
     GRBQuadExpr yQy = model->getObjective();
@@ -1066,7 +1063,7 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
     solOther.zeros(nVar - nEnd + nStart);
     if (nStart > 0)
       solOther.subvec(0, nStart - 1) = x.subvec(0, nStart - 1);
-    if (nEnd < x.n_rows)
+    if (nEnd < nVar)
       solOther.subvec(nStart, nVar + nStart - nEnd - 1) =
           x.subvec(nEnd,
                    nVar - 1); // Discard any dual variables in x
@@ -1136,7 +1133,7 @@ arma::vec Game::NashGame::ComputeQPObjvals(const arma::vec &x,
     if (nStart > 0) {
       x_minus_i.subvec(0, nStart - 1) = x.subvec(0, nStart - 1);
     }
-    if (nEnd < x.n_rows) {
+    if (nEnd < nVar) {
       x_minus_i.subvec(nStart, nVar + nStart - nEnd - 1) =
           x.subvec(nEnd,
                    nVar - 1); // Discard any dual variables in x

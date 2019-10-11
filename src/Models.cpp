@@ -653,7 +653,8 @@ Models::EPEC &Models::EPEC::addTranspCosts(
         "Error in Models::EPEC::addTranspCosts: EPEC object finalized. Call "
         "EPEC::unlock() to unlock this object first and then edit.");
   try {
-    if (this->getNcountries() != costs.n_rows || this->getNcountries() != costs.n_cols)
+    if (this->getNcountries() != costs.n_rows ||
+        this->getNcountries() != costs.n_cols)
       throw string("Error in EPEC::addTranspCosts. Invalid size of Q");
     else
       this->TranspCosts = arma::sp_mat(costs);
@@ -988,11 +989,12 @@ void Models::EPEC::make_obj_leader(
   if (this->getNcountries() > 1) {
     // export revenue term
 
-    QP_obj.C(Loc.at(Models::LeaderVars::NetExport),
-             // this->getPosition(i, Models::LeaderVars::End) -
-             // nThisCountryvars) = -1;
-             this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) -
-                 nThisCountryvars + i) = -1;
+    QP_obj.C(
+        Loc.at(Models::LeaderVars::NetExport),
+        // this->getPosition(i, Models::LeaderVars::End) -
+        // nThisCountryvars) = -1;
+        this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) -
+            nThisCountryvars + i) = -1;
 
     // Import cost term.
     unsigned int count{0};
@@ -1000,10 +1002,10 @@ void Models::EPEC::make_obj_leader(
       // C^{tr}_{IA}*q^{I\to A}_{imp} term
       QP_obj.c.at(Loc.at(Models::LeaderVars::CountryImport) + count) = (*val);
       // \pi^I*q^{I\to A}_{imp} term
-      QP_obj.C.at(
-          Loc.at(Models::LeaderVars::CountryImport) + count,
-          this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) -
-              nThisCountryvars + val.row()) = 1;
+      QP_obj.C.at(Loc.at(Models::LeaderVars::CountryImport) + count,
+                  this->getPosition(this->getNcountries() - 1,
+                                    Models::LeaderVars::End) -
+                      nThisCountryvars + val.row()) = 1;
       // this->Locations.at(val.row()).at(Models::LeaderVars::End)) = 1;
       // this->getPosition(val.row(), Models::LeaderVars::End)) = 1;
     }
@@ -1165,8 +1167,9 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x,
     writer.Key("End");
     writer.Uint(this->getPosition(i, Models::LeaderVars::End));
     writer.Key("ShadowPrice");
-    writer.Uint(this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) +
-                i);
+    writer.Uint(
+        this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) +
+        i);
     writer.EndObject();
   }
   writer.EndArray();
@@ -1471,8 +1474,9 @@ void Models::EPEC::WriteCountry(const unsigned int i, const string filename,
     prod += x.at(foll_prod + j);
   // Trade
   double Export{x.at(this->getPosition(i, Models::LeaderVars::NetExport))};
-  double exportPrice{
-      x.at(this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) + i)};
+  double exportPrice{x.at(
+      this->getPosition(this->getNcountries() - 1, Models::LeaderVars::End) +
+      i)};
   double import{0};
   for (unsigned int j = this->getPosition(i, Models::LeaderVars::CountryImport);
        j < this->getPosition(i, Models::LeaderVars::CountryImport + 1); ++j)
