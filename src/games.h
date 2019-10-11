@@ -618,9 +618,11 @@ public:                  // functions
   double getVal_LeadFoll(const unsigned int i, const unsigned int j) const;
   double getVal_LeadLead(const unsigned int i, const unsigned int j) const;
   double getVal_LeadFollPoly(const unsigned int i, const unsigned int j,
-                             const unsigned int k) const;
+                             const unsigned int k,
+                             const double tol = 1e-5) const;
   double getVal_LeadLeadPoly(const unsigned int i, const unsigned int j,
-                             const unsigned int k) const;
+                             const unsigned int k,
+                             const double tol = 1e-5) const;
   double getVal_Probab(const unsigned int i, const unsigned int k) const;
 
   // The following checks if the returned strategy leader is a pure strategy

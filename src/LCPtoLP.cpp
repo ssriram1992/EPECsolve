@@ -214,7 +214,8 @@ void Game::LCP::makeRelaxed()
       if (_A.n_cols != nC || _A.n_rows != _b.n_rows) {
         BOOST_LOG_TRIVIAL(trace) << "(" << _A.n_rows << "," << _A.n_cols
                                  << ")\t" << _b.n_rows << " " << nC;
-        throw string("Game::LCP::makeRelaxed: A and b are incompatible! Thrown from makeRelaxed()");
+        throw string("Game::LCP::makeRelaxed: A and b are incompatible! Thrown "
+                     "from makeRelaxed()");
       }
       for (unsigned int i = 0; i < _A.n_rows; i++) {
         GRBLinExpr expr = 0;
@@ -333,7 +334,8 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
  */
 {
   if (Fixes.size() != this->nR)
-    throw string("Game::LCP::LCPasMIP: Bad size for Fixes in Game::LCP::LCPasMIP");
+    throw string(
+        "Game::LCP::LCPasMIP: Bad size for Fixes in Game::LCP::LCPasMIP");
   vector<unsigned int> FixVar, FixEq;
   for (unsigned int i = 0; i < nR; i++) {
     if (Fixes[i] == 1)
@@ -465,7 +467,8 @@ bool Game::LCP::errorCheck(
     if (nR != q.n_rows)
       throw "Game::LCP::errorCheck: M and q have unequal number of rows";
     if (nR + nLeader != nC)
-      throw "Game::LCP::errorCheck: Inconsistency between number of leader vars " +
+      throw "Game::LCP::errorCheck: Inconsistency between number of leader "
+            "vars " +
           to_string(nLeader) + ", number of rows " + to_string(nR) +
           " and number of cols " + to_string(nC);
   }
@@ -545,29 +548,34 @@ unsigned int Game::ConvexHull(
   const unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
   // Error check
   if (nPoly == 0)
-    throw string("Game::ConvexHull: Empty vector of polyhedra given! Problem might be "
-                 "infeasible."); // There should be at least 1 polyhedron to
-                                 // consider
+    throw string(
+        "Game::ConvexHull: Empty vector of polyhedra given! Problem might be "
+        "infeasible."); // There should be at least 1 polyhedron to
+                        // consider
   const unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
   const unsigned int nComm{static_cast<unsigned int>(Acom.n_rows)};
 
   if (nComm > 0 && Acom.n_cols != nC)
-    throw string("Game::ConvexHull: Inconsistent number of variables in the common polyhedron");
+    throw string("Game::ConvexHull: Inconsistent number of variables in the "
+                 "common polyhedron");
   if (nComm > 0 && nComm != bcom.n_rows)
-    throw string(
-        "Game::ConvexHull: Inconsistent number of rows in LHS and RHS in the common polyhedron");
+    throw string("Game::ConvexHull: Inconsistent number of rows in LHS and RHS "
+                 "in the common polyhedron");
 
   // Count the number of variables in the convex hull.
   unsigned int nFinCons{0}, nFinVar{0};
   if (nPoly != bi->size())
-    throw string("Game::ConvexHull: Inconsistent number of LHS and RHS for polyhedra");
+    throw string(
+        "Game::ConvexHull: Inconsistent number of LHS and RHS for polyhedra");
   for (unsigned int i = 0; i != nPoly; i++) {
     if (Ai->at(i)->n_cols != nC)
-      throw string("Game::ConvexHull: Inconsistent number of variables in the polyhedra ") +
+      throw string("Game::ConvexHull: Inconsistent number of variables in the "
+                   "polyhedra ") +
           to_string(i) + "; " + to_string(Ai->at(i)->n_cols) +
           "!=" + to_string(nC);
     if (Ai->at(i)->n_rows != bi->at(i)->n_rows)
-      throw string("Game::ConvexHull: Inconsistent number of rows in LHS and RHS of polyhedra ") +
+      throw string("Game::ConvexHull: Inconsistent number of rows in LHS and "
+                   "RHS of polyhedra ") +
           to_string(i) + ";" + to_string(Ai->at(i)->n_rows) +
           "!=" + to_string(bi->at(i)->n_rows);
     nFinCons += Ai->at(i)->n_rows;
@@ -1510,17 +1518,19 @@ unsigned int Game::LCP::conv_PolyWt(const unsigned int i) const {
    * To be used in interaction with Game::LCP::ConvexHull.
    * Gives the position of the variable, which assigns the convex weight to the
    * i-th polyhedron.
+   *
+   * However, if the inner approximation has exactly one polyhedron,
+   * then returns 0.
    */
   const unsigned int nPoly = this->conv_Npoly();
+  if (nPoly <= 1) {
+    return 0;
+  }
   if (i > nPoly) {
-    BOOST_LOG_TRIVIAL(error) << "Error in Game::LCP::conv_PolyWt: "
-                                "Invalid argument. Out of bounds for i";
     throw std::string("Error in Game::LCP::conv_PolyWt: "
                       "Invalid argument. Out of bounds for i");
   }
   const unsigned int nC = this->M.n_cols;
 
   return nC + nPoly * nC + i;
-
-  return i;
 }

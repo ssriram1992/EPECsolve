@@ -342,8 +342,8 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed(
   this->make_yQy(); /// @throws GRBException if argument vector size is not
   /// compatible with the Game::QP_Param definition.
   if (x.size() != this->Nx)
-    throw "Game::QP_Param::solveFixed: Invalid argument size: " + to_string(x.size()) +
-        " != " + to_string(Nx);
+    throw "Game::QP_Param::solveFixed: Invalid argument size: " +
+        to_string(x.size()) + " != " + to_string(Nx);
   unique_ptr<GRBModel> model(new GRBModel(this->QuadModel));
   try {
     GRBQuadExpr yQy = model->getObjective();
@@ -2039,11 +2039,14 @@ unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
 unsigned int Game::EPEC::getPosition_Probab(const unsigned int i,
                                             const unsigned int k) const {
   /**
-   * Get the probability associated with the k-th polyhedron (k-th pure
-   * strategy) of the i-th leader.
+   * Get the position of the probability associated with the k-th polyhedron
+   * (k-th pure strategy) of the i-th leader. However, if the leader has an
+   * inner approximation with exactly 1 polyhedron, it returns 0;
    */
-  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
   const auto PolyProbab = this->countries_LCP.at(i)->conv_PolyWt(k);
+  if (PolyProbab == 0)
+    return 0;
+  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
   return LeaderStart + PolyProbab;
 }
 
@@ -2076,13 +2079,16 @@ std::vector<unsigned int> Game::EPEC::mixedStratPoly(const unsigned int i,
     if (probab > tol)
       polys.push_back(j);
   }
+  cout << "\n";
   return polys;
 }
 
 double Game::EPEC::getVal_Probab(const unsigned int i,
                                  const unsigned int k) const {
-  return this->lcpmodel
-      ->getVarByName("x_" + std::to_string(this->getPosition_Probab(i, k)))
+  const unsigned int varname{this->getPosition_Probab(i, k)};
+  if (varname == 0)
+    return 1;
+  return this->lcpmodel->getVarByName("x_" + std::to_string(varname))
       .get(GRB_DoubleAttr_X);
 }
 
@@ -2108,30 +2114,38 @@ double Game::EPEC::getVal_LeadLead(const unsigned int i,
 
 double Game::EPEC::getVal_LeadFollPoly(const unsigned int i,
                                        const unsigned int j,
-                                       const unsigned int k) const {
+                                       const unsigned int k,
+                                       const double tol) const {
   if (!this->lcpmodel)
     throw std::string("Error in Game::EPEC::getVal_LeadFollPoly: "
                       "Game::EPEC::lcpmodel not made and solved");
   const double probab = this->getVal_Probab(i, k);
-  return this->lcpmodel
-             ->getVarByName("x_" +
-                            to_string(this->getPosition_LeadFollPoly(i, j, k)))
-             .get(GRB_DoubleAttr_X) /
-         probab;
+  if (probab > 1 - tol)
+    return this->getVal_LeadFoll(i, j);
+  else
+    return this->lcpmodel
+               ->getVarByName(
+                   "x_" + to_string(this->getPosition_LeadFollPoly(i, j, k)))
+               .get(GRB_DoubleAttr_X) /
+           probab;
 }
 
 double Game::EPEC::getVal_LeadLeadPoly(const unsigned int i,
                                        const unsigned int j,
-                                       const unsigned int k) const {
+                                       const unsigned int k,
+                                       const double tol) const {
   if (!this->lcpmodel)
     throw std::string("Error in Game::EPEC::getVal_LeadLeadPoly: "
                       "Game::EPEC::lcpmodel not made and solved");
   const double probab = this->getVal_Probab(i, k);
-  return this->lcpmodel
-             ->getVarByName("x_" +
-                            to_string(this->getPosition_LeadLeadPoly(i, j, k)))
-             .get(GRB_DoubleAttr_X) /
-         probab;
+  if (probab > 1 - tol)
+    return this->getVal_LeadLead(i, j);
+  else
+    return this->lcpmodel
+               ->getVarByName(
+                   "x_" + to_string(this->getPosition_LeadLeadPoly(i, j, k)))
+               .get(GRB_DoubleAttr_X) /
+           probab;
 }
 
 std::string std::to_string(const Game::EPECsolveStatus st) {
