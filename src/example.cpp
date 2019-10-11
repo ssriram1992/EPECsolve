@@ -3,30 +3,20 @@
 
 class My_EPEC_Prob : public EPEC {
 public:
-  My_EPEC_Prob(GRBEnv *e) : EPEC(e) {
-    n_MCVar = 0;
-  }
+  My_EPEC_Prob(GRBEnv *e) : EPEC(e) { n_MCVar = 0; }
   void addLeader(std::shared_ptr<Game::NashGame> N, const unsigned int i) {
     this->countries_LL.push_back(N);
-    ends[i] = N->getNprimals();
+    ends[i] = N->getNprimals() + N->getNleaderVars();
+    cout << "Locations updated: " << ends[0] << " " << ends[1] << '\n';
     this->LocEnds.push_back(&ends[i]);
-  }
-  void printEnds() {
-    std::cout << ends[0] << " " << ends[1] << "\n";
-
-    for (unsigned int i = 0; i < this->getNcountries(); ++i) {
-      std::cout << "Country variables starts for i = " << i << " at "
-                << this->nashgame->getPrimalLoc(i) << '\n';
-    }
-
-    std::cout << '\n';
   }
 
 private:
   unsigned int ends[2];
   void updateLocs() override {
-    ends[0] = this->convexHullVariables.at(0);
-    ends[1] = this->convexHullVariables.at(1);
+    ends[0] = this->convexHullVariables.at(0) + 3;
+    ends[1] = this->convexHullVariables.at(1) + 5;
+    cout << "Locations updated: " << ends[0] << " " << ends[1] << '\n';
   }
   void make_obj_leader(const unsigned int i,
                        Game::QP_objective &QP_obj) override {
@@ -142,18 +132,18 @@ int main() {
   epec.addLeader(xy_lead, 1);
   // Finalize
   epec.finalize();
-  // epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
   // Solve
   try {
     epec.findNashEq();
   } catch (std::string &s) {
-    std::cerr << "Error: " << s << '\n';
+    std::cerr << "Error caught: " << s << '\n';
+    throw;
   }
   auto M = epec.getLcpModel();
   M.write("dat/ex_model.lp");
   M.optimize();
   M.write("dat/ex_sol.sol");
-  epec.printEnds();
 
   std::cout << "\nXY LEADER\n";
   std::cout << "x: " << epec.getVal_LeadLead(0, 0) << '\n';
