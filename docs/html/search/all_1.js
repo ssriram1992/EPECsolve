@@ -1,11 +1,11 @@
 var searchData=
 [
   ['a',['A',['../structGame_1_1QP__constraints.html#a08f80596adf7184b243f98c563a14fd2',1,'Game::QP_constraints::A()'],['../classGame_1_1MP__Param.html#aa0b31310fd4f138fe3e3771d2b077c3e',1,'Game::MP_Param::A()']]],
-  ['add_5fdummy_5flead',['add_Dummy_Lead',['../classGame_1_1EPEC.html#a7746f76d4ea0a8ef9f2e96259812a471',1,'Game::EPEC']]],
+  ['add_5fdummy_5flead',['add_Dummy_Lead',['../classGame_1_1EPEC.html#ab0eb808e36900404aed6d9253d13ad34',1,'Game::EPEC']]],
   ['add_5fleaders_5ftradebalance_5fconstraints',['add_Leaders_tradebalance_constraints',['../classModels_1_1EPEC.html#a926d12ae3829db9068a6ce813fbbdfce',1,'Models::EPEC']]],
   ['addapoly',['addAPoly',['../classGame_1_1LCP.html#a1a320735237ebe0055b70c873b48ce27',1,'Game::LCP']]],
   ['addcountry',['addCountry',['../classModels_1_1EPEC.html#a14962535c0ee6c0f2669508d850dbfe1',1,'Models::EPEC']]],
-  ['adddeviatedpolyhedron',['addDeviatedPolyhedron',['../classGame_1_1EPEC.html#a024f459536cc7b70930189de2a50ff08',1,'Game::EPEC']]],
+  ['adddeviatedpolyhedron',['addDeviatedPolyhedron',['../classGame_1_1EPEC.html#ac1a5b1a7a9b174667ce04e71bbb7f739',1,'Game::EPEC']]],
   ['adddummy',['addDummy',['../classGame_1_1MP__Param.html#adf8d38d835f6cb716b7ea661d2fd4a7d',1,'Game::MP_Param::addDummy()'],['../classGame_1_1QP__Param.html#a5313f28073ba60f90ca422e2da6a369a',1,'Game::QP_Param::addDummy()'],['../classGame_1_1NashGame.html#a7eb1ccdea694ca28f9b51c9def3458b3',1,'Game::NashGame::addDummy()']]],
   ['addleadcons',['addLeadCons',['../classGame_1_1NashGame.html#ab02ae78595c039ea0dae1807a685112d',1,'Game::NashGame']]],
   ['addleader',['addLeader',['../classMy__EPEC__Prob.html#ac6ab1a1debfe0fe9070d270388a18348',1,'My_EPEC_Prob']]],
@@ -18,7 +18,6 @@ var searchData=
   ['ai',['Ai',['../classGame_1_1LCP.html#a8f71d6ee194330de1441c3911b74bff6',1,'Game::LCP']]],
   ['algorithm',['algorithm',['../structGame_1_1EPECAlgorithmParams.html#a3b95f97a760d4d406599f3147084f8b1',1,'Game::EPECAlgorithmParams::algorithm()'],['../classGame_1_1EPEC.html#a06a5d23e649f778be8d984ed998de8da',1,'Game::EPEC::algorithm()']]],
   ['algorithmparam',['AlgorithmParam',['../structGame_1_1EPECStatistics.html#ad12b580fddf7f8b31363521ac46fd75c',1,'Game::EPECStatistics']]],
-  ['allalgo',['allAlgo',['../test_2EPEC_8cpp.html#a48110481840d0bed4f88a9743f39f916',1,'EPEC.cpp']]],
   ['allleadpars',['AllLeadPars',['../classModels_1_1EPEC.html#abf67fd852539ed21d238381efec1affa',1,'Models::EPEC']]],
   ['allpolyhedra',['AllPolyhedra',['../classGame_1_1LCP.html#afd13c8420e780d5d9a11ceb9e52ccb69',1,'Game::LCP']]],
   ['alpha',['alpha',['../structModels_1_1DemPar.html#a698f9479dec96509d9623d450e207d10',1,'Models::DemPar']]],

@@ -94,3 +94,19 @@
 \form#93:$u = 2.5$
 \form#94:$(v_1, v_2) = (0, 2.5)$
 \form#95:$x = 0$
+\form#96:$ j < $
+\form#97:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 \\ \text{s.t.}\\ u,v \quad&\ge\quad 0\\ u+v_1+v_2 \quad&\leq\quad 5\\ v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u; v_1 -2v_2 \leq -u \right \} \end{align*}
+\form#98:\begin{align*} \min_{x,y} \quad&:\quad -x + v_2y_1 + y_2\\ \text{s.t.}\\ x \quad&\ge\quad 0\\ x + y_1 + y_2 \quad&\le\quad 7\\ y_1 - y_2 \quad&\ge\quad 0\\ y\quad&\in\quad\arg\min_y \left\{ y_1 - y_2: y \ge 0; y_1 - y_2 \ge x-5; y_1 - y_2 \ge 3-x \right\} \end{align*}
+\form#99:\begin{align*} \min_{x,y} \quad&:\quad -x + v_2y_1 + y_2\\ \text{s.t.}\\ x \quad&\ge\quad 0\\ x + y_1 + y_2 \quad&\le\quad 7\\ -y_1 + y_2 \quad&\le\quad 0\\ y\quad&\in\quad\arg\min_y \left\{ y_1 - y_2: y \ge 0; -y_1 + y_2 \le 5-x; -y_1 + y_2 \le x-3 \right\} \end{align*}
+\form#100:\begin{align*} min_{u,v} \quad&:\quad u + xv_1 - v_2 \\ \text{s.t.}\\ u,v \quad&\ge\quad 0\\ v_1+v_2+u \quad&\leq\quad 5\\ v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u; v_1 -2v_2 \leq -u \right \} \end{align*}
+\form#101:\begin{align*} \min_{x,y} \quad&:\quad -x + v_2y_1 + y_2\\ \text{s.t.}\\ x \quad&\ge\quad 0\\ y_1 + y_2 + x \quad&\le\quad 7\\ -y_1 + y_2 \quad&\le\quad 0\\ y\quad&\in\quad\arg\min_y \left\{ y_1 - y_2: y \ge 0; -y_1 + y_2 \le 5-x; -y_1 + y_2 \le x-3 \right\} \end{align*}
+\form#102:\begin{align*} min_{u,v} \quad&:\quad v_1 -u + y_1v_2 \text{s.t.}\\ u,v \quad&\ge\quad 0\\ v_1+v_2+u \quad&\leq\quad 5\\ v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u; v_1 -2v_2 \leq -u \right \} \end{align*}
+\form#103:\begin{align*} \min_{x,y} \quad&:\quad y_1 - x + uy_2 \text{s.t.}\\ x \quad&\ge\quad 0\\ y_1 + y_2 + x \quad&\le\quad 7\\ -y_1 + y_2 \quad&\le\quad 0\\ y\quad&\in\quad\arg\min_y \left\{ y_1 - y_2: y \ge 0; -y_1 + y_2 \le 5-x; -y_1 + y_2 \le x-3 \right\} \end{align*}
+\form#104:\begin{align*} min_{u,v} \quad&:\quad v_1 -u + y_1v_2 \text{s.t.}\\ u \quad&\ge\quad 0\\ v_1+v_2+u \quad&\leq\quad 5\\ v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u; v_1 -2v_2 \leq -u \right \} \end{align*}
+\form#105:\begin{align*} min_{u,v} \quad&:\quad v_1 -u + y_1v_2&\qquad \text{s.t.}\\ u \quad&\ge\quad 0\\ v_1+v_2+u \quad&\leq\quad 5\\ v \quad&\in\quad \arg \min _v \left \{ -v_1+v_2 : v \ge 0; 2v_1+v_2 \leq u; v_1 -2v_2 \leq -u \right \} \end{align*}
+\form#106:\begin{align*} \min_{x,y} \quad&:\quad y_1 - x + uy_2&\qquad \text{s.t.}\\ x \quad&\ge\quad 0\\ y_1 + y_2 + x \quad&\le\quad 7\\ -y_1 + y_2 \quad&\le\quad 0\\ y\quad&\in\quad\arg\min_y \left\{ y_1 - y_2: y \ge 0; -y_1 + y_2 \le 5-x; -y_1 + y_2 \le x-3 \right\} \end{align*}
+\form#107:$ (u, v_1, v_2) = (2.78, 0.56, 1.67) $
+\form#108:$ (x, y_1, y_2) = (1.67, 1.33, 0) $
+\form#109:$ c^Tx + (Cx)^Tx^{oth} $
+\form#110:$ x $
+\form#111:$x^{oth} $
