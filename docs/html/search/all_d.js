@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['n_5fc',['n_c',['../test_2EPEC_8cpp.html#a0503b83259815c94a76163bf173b0b9d',1,'EPEC.cpp']]],
   ['n_5ffollowers',['n_followers',['../structModels_1_1LeadAllPar.html#a50316bb42793ad51f81470ec2c75deaa',1,'Models::LeadAllPar']]],
   ['n_5fleadvar',['n_LeadVar',['../classGame_1_1NashGame.html#a03ffba78fc6b3e5ecd5147afd706ff68',1,'Game::NashGame']]],
   ['n_5fmcvar',['n_MCVar',['../classGame_1_1EPEC.html#ae792ec168132c8ea17faa92ccb6d9793',1,'Game::EPEC']]],
@@ -10,11 +9,11 @@ var searchData=
   ['nasheq',['nashEq',['../classGame_1_1EPEC.html#a4cbc64319ce479f56e6598b32345c202',1,'Game::EPEC']]],
   ['nasheqfound',['nashEqFound',['../namespaceGame.html#a53e08a4809a9d264b892591653a15374a3d41ceb0ffb14bb079987398f227ba8f',1,'Game']]],
   ['nasheqnotfound',['nashEqNotFound',['../namespaceGame.html#a53e08a4809a9d264b892591653a15374a777f05e4c4c9f31f1ed70158b9ee416c',1,'Game']]],
-  ['nashgame',['NashGame',['../classGame_1_1NashGame.html',1,'Game::NashGame'],['../classGame_1_1NashGame.html#aacdedcbc71d5ed952f81afad5bca50be',1,'Game::NashGame::NashGame(GRBEnv *e) noexcept'],['../classGame_1_1NashGame.html#ae2026382eb69737159cfef043f4966b5',1,'Game::NashGame::NashGame(GRBEnv *e, std::vector&lt; std::shared_ptr&lt; QP_Param &gt;&gt; Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={})'],['../classGame_1_1EPEC.html#afef137c94bc3bb60fd951d63c754a76e',1,'Game::EPEC::nashgame()']]],
+  ['nashgame',['NashGame',['../classGame_1_1NashGame.html',1,'Game::NashGame'],['../classGame_1_1NashGame.html#aacdedcbc71d5ed952f81afad5bca50be',1,'Game::NashGame::NashGame(GRBEnv *e) noexcept'],['../classGame_1_1NashGame.html#ae2026382eb69737159cfef043f4966b5',1,'Game::NashGame::NashGame(GRBEnv *e, std::vector&lt; std::shared_ptr&lt; QP_Param &gt;&gt; Players, arma::sp_mat MC, arma::vec MCRHS, unsigned int n_LeadVar=0, arma::sp_mat LeadA={}, arma::vec LeadRHS={})'],['../classGame_1_1NashGame.html#ac2aa48fd0039afc8d593b4bda813f60d',1,'Game::NashGame::NashGame(const NashGame &amp;N)'],['../classGame_1_1EPEC.html#afef137c94bc3bb60fd951d63c754a76e',1,'Game::EPEC::nashgame()']]],
+  ['nashlcp_2edoc',['NashLCP.doc',['../NashLCP_8doc.html',1,'']]],
   ['nc',['nC',['../classGame_1_1LCP.html#abeaadbce4a891d3575dddae796592c72',1,'Game::LCP']]],
   ['ncons',['Ncons',['../classGame_1_1MP__Param.html#a786341129b4f7a0501ab1784cac70c9e',1,'Game::MP_Param']]],
   ['ncountr',['nCountr',['../classGame_1_1EPEC.html#a8538df938145692b6171ee386865fa44',1,'Game::EPEC']]],
-  ['ncountries',['nCountries',['../classModels_1_1EPEC.html#ab393e65ef5be6c9e3c5129f8866dbc49',1,'Models::EPEC']]],
   ['netexport',['NetExport',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eab352c19b5ee483451acb8039d5b92edd',1,'Models']]],
   ['netimport',['NetImport',['../namespaceModels.html#a64b758b38a6e4004b84630ec087bf76eabd2f8eff3cf4fc193002ef846a45c155',1,'Models']]],
   ['nimportmarkets',['nImportMarkets',['../classModels_1_1EPEC.html#a4de4147addd36ee7df8e0944bfa017ea',1,'Models::EPEC']]],
