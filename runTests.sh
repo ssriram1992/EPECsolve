@@ -1,6 +1,6 @@
 dataFolder="dat"
-instanceFolder=${dataFolder}/Instance_345_Harder
-resultsFolder=${dataFolder}/results_Instance_345_Harder
+instanceFolder=${dataFolder}/Instances_345
+resultsFolder=${dataFolder}/results_Instances_345_Harder_2
 logFile=${resultsFolder}/results.csv
 numThreads=8
 mkdir ${resultsFolder}
@@ -16,7 +16,7 @@ for ex in $(ls ${instanceFolder}/*.json); do
       for aggressiveness in {1,3,5}; do
         for addPolyMethod in {0,1,2}; do
           echo "--------Inner Approximation"
-          ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_Inner_${instanceNumber}_${aggressiveness}_${addPolyMethod} --timelimit 1800 -a 1 --aggr $aggressiveness --add $addPolyMethod
+          ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_Inner_${instanceNumber}_aggr${aggressiveness}_method${addPolyMethod} --timelimit 1800 -a 1 --aggr $aggressiveness --add $addPolyMethod
         done
       done
       printf "\n\n"
