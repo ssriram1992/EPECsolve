@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
   string resFile, instanceFile = "", logFile;
   int writeLevel, nThreads, verbosity, bigM, algorithm, aggressiveness, add{0};
   double timeLimit;
+  bool bound;
 
   po::options_description desc("EPEC: Allowed options");
   desc.add_options()("help,h", "Shows this help message")("version,v",
@@ -45,6 +46,8 @@ int main(int argc, char **argv) {
       "Sets the number of Threads for Gurobi. (int): number of threads. 0: "
       "auto (number of processors)")(
       "aggr,ag", po::value<int>(&aggressiveness)->default_value(1),
+      "Decides whether QP param should be bounded or not")(
+      "b,bound", po::value<bool>(&bound)->default_value(false),
       "Sets the aggressiveness for the innerApproximation, namely the number "
       "of random polyhedra added if no deviation is found. (int).")(
       "add,ad", po::value<int>(&add)->default_value(0),
@@ -127,6 +130,10 @@ int main(int argc, char **argv) {
     epec.setNumThreads(nThreads);
   // timeLimit
   epec.setTimeLimit(timeLimit);
+  // bound QPs
+  if (bound)
+    epec.setBoundQPs(true);
+
   // Algorithm
 
   switch (algorithm) {

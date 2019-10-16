@@ -67,6 +67,7 @@ public:
   MP_Param() = default;
 
   MP_Param(const MP_Param &M) = default;
+  void bound();
 
   // Getters and setters
   arma::sp_mat getQ() const {
@@ -414,6 +415,7 @@ enum class EPECalgorithm {
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
+  bool boundQPs{false}; ///< If true, each QP param is bounded with an arbitrary large bigM constant
   long int addPolyMethodSeed{
       -1}; ///< Random seed for the random selection of polyhedra. If -1, a
            ///< default computed value will seeded.
@@ -585,6 +587,8 @@ public:                  // functions
   }
   void setIndicators(bool val) { this->Stats.AlgorithmParam.indicators = val; }
   bool getIndicators() const { return this->Stats.AlgorithmParam.indicators; }
+  void setBoundQPs(bool val) { this->Stats.AlgorithmParam.boundQPs = val; }
+  bool geBoundQPs() const { return this->Stats.AlgorithmParam.boundQPs; }
   void setTimeLimit(double val) { this->Stats.AlgorithmParam.timeLimit = val; }
   double getTimeLimit() const { return this->Stats.AlgorithmParam.timeLimit; }
   void setAddPolyMethod(Game::EPECAddPolyMethod add) {

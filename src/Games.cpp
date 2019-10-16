@@ -689,6 +689,28 @@ long int Game::NashGame::load(string filename, long int pos) {
   return pos;
 }
 
+void Game::MP_Param::bound()
+/**
+ * Bounds each MP with an arbitraty large bigM constant
+ */
+{
+  arma::sp_mat A_new, B_new;
+  arma::vec b_new(1);
+  b_new(0) = 1e9;
+  A_new.zeros(1, this->Nx);
+  B_new.zeros(this->Nx, this->Ny);
+  for (unsigned int i = 0; i < this->Nx; ++i) {
+    A_new(0, i) = 1;
+    this->A = arma::join_cols(this->A, A_new);
+    this->b = arma::join_cols(this->b, b_new);
+    A_new(0, i) = 0;
+  }
+  this->B = arma::join_cols(this->B, B_new);
+  this->size();
+  BOOST_LOG_TRIVIAL(debug)
+      << "Game::MP_Param::bound: primal variables are bounded";
+}
+
 void Game::NashGame::set_positions()
 /**
  * Stores the position of each players' primal and dual variables. Also
@@ -1494,7 +1516,6 @@ void Game::EPEC::make_country_QP(const unsigned int i)
   // if (!this->country_QP.at(i).get())
   {
     this->country_QP.at(i) = std::make_shared<Game::QP_Param>(this->env);
-
     const auto &origLeadObjec = *this->LeadObjec.at(i).get();
 
     this->LeadObjec_ConvexHull.at(i).reset(new Game::QP_objective{
@@ -1502,7 +1523,8 @@ void Game::EPEC::make_country_QP(const unsigned int i)
 
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get());
-
+    if (this->Stats.AlgorithmParam.boundQPs)
+      this->country_QP.at(i)->bound();
     this->Stats.feasiblePolyhedra.at(i) =
         this->countries_LCP.at(i)->getFeasiblePolyhedra();
   }
@@ -1706,6 +1728,8 @@ void Game::EPEC::iterativeNash() {
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Iteration "
                             << to_string(this->Stats.numIteration);
     if (addRandPoly) {
+      BOOST_LOG_TRIVIAL(info)
+          << "Game::EPEC::iterativeNash: using heuristical polyhedra selection";
       bool success =
           this->addRandomPoly2All(this->Stats.AlgorithmParam.aggressiveness,
                                   this->Stats.numIteration == 1);
