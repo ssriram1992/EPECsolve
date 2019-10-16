@@ -3,7 +3,7 @@
 # EPECsolve
 Code to compute mixed-equilibrium in linear EPECs. [Code](https://github.com/ssriram1992/EPECsolve/) and [Instances](https://github.com/ds4dm/EPECInstances) are available on GitHub.
 
-*Manuscript in preparation. Link will be shared once ready*
+Pre-print is available on [arXiv](https://arxiv.org/abs/1910.06452).
 
 # Prerequisites
 
