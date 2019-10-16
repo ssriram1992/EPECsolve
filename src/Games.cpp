@@ -1656,7 +1656,7 @@ bool Game::EPEC::addRandomPoly2All(unsigned int aggressiveLevel,
  */
 {
   BOOST_LOG_TRIVIAL(trace) << "Adding random polyhedra to countries";
-  bool infeasDetect{false};
+  bool infeasible{true};
   for (unsigned int i = 0; i < this->nCountr; i++) {
     auto addedPolySet = this->countries_LCP.at(i)->addAPoly(
         aggressiveLevel, this->Stats.AlgorithmParam.addPolyMethod);
@@ -1665,13 +1665,12 @@ bool Game::EPEC::addRandomPoly2All(unsigned int aggressiveLevel,
           << "Game::EPEC::addRandomPoly2All: No Nash equilibrium. due to "
              "infeasibility of country "
           << i;
-      infeasDetect = true;
-      break;
+      return false;
     }
     if (!addedPolySet.empty())
-      infeasDetect = false;
+      infeasible = false;
   }
-  return !infeasDetect;
+  return !infeasible;
 }
 
 void Game::EPEC::iterativeNash() {
@@ -1706,6 +1705,8 @@ void Game::EPEC::iterativeNash() {
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Iteration "
                             << to_string(this->Stats.numIteration);
     if (addRandPoly) {
+      BOOST_LOG_TRIVIAL(info)
+          << "Game::EPEC::iterativeNash: Using heuristical polyhedra selection";
       bool success =
           this->addRandomPoly2All(this->Stats.AlgorithmParam.aggressiveness,
                                   this->Stats.numIteration == 1);
@@ -1727,6 +1728,8 @@ void Game::EPEC::iterativeNash() {
       this->getAllDevns(devns, this->sol_x, prevDevns);
       prevDevns = devns;
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns, infeasCheck);
+      BOOST_LOG_TRIVIAL(error) << " In Game::EPEC::iterativeNash: Added "
+                               << addedPoly << " polyhedra.";
       if (addedPoly == 0 && this->Stats.numIteration > 1) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Not "
@@ -1735,7 +1738,7 @@ void Game::EPEC::iterativeNash() {
         this->Stats.status = EPECsolveStatus::numerical;
         solved = true;
       }
-      if (infeasCheck == true && this->Stats.numIteration == 1) {
+      if (infeasCheck && this->Stats.numIteration == 1) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Problem is infeasible";
         this->Stats.status = EPECsolveStatus::nashEqNotFound;
