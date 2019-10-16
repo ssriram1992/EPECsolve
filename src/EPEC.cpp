@@ -17,7 +17,7 @@ namespace po = boost::program_options;
 int main(int argc, char **argv) {
   string resFile, instanceFile = "", logFile;
   int writeLevel, nThreads, verbosity, bigM, algorithm, aggressiveness, add{0};
-  double timeLimit;
+  double timeLimit, boundBigM;
   bool bound;
 
   po::options_description desc("EPEC: Allowed options");
@@ -46,10 +46,12 @@ int main(int argc, char **argv) {
       "Sets the number of Threads for Gurobi. (int): number of threads. 0: "
       "auto (number of processors)")(
       "aggr,ag", po::value<int>(&aggressiveness)->default_value(1),
-      "Decides whether QP param should be bounded or not")(
-      "b,bound", po::value<bool>(&bound)->default_value(false),
       "Sets the aggressiveness for the innerApproximation, namely the number "
-      "of random polyhedra added if no deviation is found. (int).")(
+      "of random polyhedra added if no deviation is found. (int)")(
+      "b,bound", po::value<bool>(&bound)->default_value(false),
+      "Decides whether QP param should be bounded or not.")(
+      "boundBigM", po::value<double>(&boundBigM)->default_value(1e5),
+      "Set the bounding bigM related to the parameter --bound")(
       "add,ad", po::value<int>(&add)->default_value(0),
       "Sets the EPECAddPolyMethod for the innerApproximation. 0: sequential. "
       "1: reverse_sequential. 2:random.");
@@ -131,8 +133,10 @@ int main(int argc, char **argv) {
   // timeLimit
   epec.setTimeLimit(timeLimit);
   // bound QPs
-  if (bound)
+  if (bound) {
     epec.setBoundQPs(true);
+    epec.setBoundBigM(boundBigM);
+  }
 
   // Algorithm
 
@@ -193,7 +197,7 @@ int main(int argc, char **argv) {
            "numVar;numConstraints;numNonZero;ClockTime"
            "(s);Threads;Indicators;numInnerIterations;lostIntermediateEq;"
            "Aggressiveness;"
-           "AddPolyMethod;numericalIssuesEncountered\n";
+           "AddPolyMethod;numericalIssuesEncountered;bound;boundBigM\n";
   }
   existCheck.close();
 
@@ -215,9 +219,10 @@ int main(int argc, char **argv) {
             << epec.getStatistics().lostIntermediateEq << ";"
             << epec.getAggressiveness() << ";"
             << to_string(epec.getAddPolyMethod()) << ";"
-            << epec.getStatistics().numericalIssuesEncountered;
+            << epec.getStatistics().numericalIssuesEncountered << ";"
+            << to_string(epec.getBoundQPs()) << ";" << epec.getBoundBigM();
   } else {
-    results << ";-;-;-;-;-";
+    results << ";-;-;-;-;-;-;-";
   }
   results << "\n";
   results.close();

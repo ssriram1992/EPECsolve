@@ -689,14 +689,14 @@ long int Game::NashGame::load(string filename, long int pos) {
   return pos;
 }
 
-void Game::MP_Param::bound()
+void Game::MP_Param::bound(double bigM = 1e5)
 /**
  * Bounds each MP with an arbitraty large bigM constant
  */
 {
   arma::sp_mat A_new, B_new;
   arma::vec b_new(1);
-  b_new(0) = 1e9;
+  b_new(0) = bigM;
   A_new.zeros(1, this->Nx);
   B_new.zeros(this->Nx, this->Ny);
   for (unsigned int i = 0; i < this->Nx; ++i) {
@@ -708,7 +708,7 @@ void Game::MP_Param::bound()
   this->B = arma::join_cols(this->B, B_new);
   this->size();
   BOOST_LOG_TRIVIAL(debug)
-      << "Game::MP_Param::bound: primal variables are bounded";
+      << "Game::MP_Param::bound: primal variables are bounded by " << bigM;
 }
 
 void Game::NashGame::set_positions()
@@ -1524,7 +1524,7 @@ void Game::EPEC::make_country_QP(const unsigned int i)
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get());
     if (this->Stats.AlgorithmParam.boundQPs)
-      this->country_QP.at(i)->bound();
+      this->country_QP.at(i)->bound(this->Stats.AlgorithmParam.boundBigM);
     this->Stats.feasiblePolyhedra.at(i) =
         this->countries_LCP.at(i)->getFeasiblePolyhedra();
   }
