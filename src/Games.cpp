@@ -1678,7 +1678,7 @@ bool Game::EPEC::addRandomPoly2All(unsigned int aggressiveLevel,
  */
 {
   BOOST_LOG_TRIVIAL(trace) << "Adding random polyhedra to countries";
-  bool infeasDetect{false};
+  bool infeasible{true};
   for (unsigned int i = 0; i < this->nCountr; i++) {
     auto addedPolySet = this->countries_LCP.at(i)->addAPoly(
         aggressiveLevel, this->Stats.AlgorithmParam.addPolyMethod);
@@ -1687,13 +1687,12 @@ bool Game::EPEC::addRandomPoly2All(unsigned int aggressiveLevel,
           << "Game::EPEC::addRandomPoly2All: No Nash equilibrium. due to "
              "infeasibility of country "
           << i;
-      infeasDetect = true;
-      break;
+      return false;
     }
     if (!addedPolySet.empty())
-      infeasDetect = false;
+      infeasible = false;
   }
-  return !infeasDetect;
+  return !infeasible;
 }
 
 void Game::EPEC::iterativeNash() {
