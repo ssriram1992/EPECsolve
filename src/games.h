@@ -488,6 +488,8 @@ protected: // Datafields
   /// Game::EPEC has the responsibility to keep this correct by implementing an
   /// override of Game::EPEC::updateLocs.
   std::vector<const unsigned int *> LocEnds{};
+  std::vector<unsigned int> LocPrimals{};///< Keeps track of real primal variables of each laeder. the inheritor of
+  /// Game::EPEC has the responsibility to initialize this object.
   std::vector<unsigned int> convexHullVariables{};
   unsigned int n_MCVar{0};
 

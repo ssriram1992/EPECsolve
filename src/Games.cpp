@@ -1544,9 +1544,10 @@ void Game::EPEC::make_country_QP(const unsigned int i)
 
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get());
-    if (this->Stats.AlgorithmParam.boundQPs)
+    if (this->Stats.AlgorithmParam.boundQPs){
       this->country_QP.at(i)->bound(this->Stats.AlgorithmParam.boundBigM,
-                                    origLeadObjec.c.size());
+                                    this->LocPrimals.at(i));
+    }
 
     this->Stats.feasiblePolyhedra.at(i) =
         this->countries_LCP.at(i)->getFeasiblePolyhedra();
