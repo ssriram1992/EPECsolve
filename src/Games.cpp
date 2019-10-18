@@ -689,26 +689,47 @@ long int Game::NashGame::load(string filename, long int pos) {
   return pos;
 }
 
-void Game::MP_Param::bound(double bigM = 1e5)
+void Game::MP_Param::bound(double bigM = 1e5, unsigned int nVars = 0)
 /**
- * Bounds each MP with an arbitraty large bigM constant
+ * @brief
+ * Bounds nVars (over Nx) primal variables in the selected MP_Param object
+ * @p nVars is the number of variables to be bounded by @p bigM
+ * @details
+ * All the variables in the interval [0,nVars) will be bounded by a factor @p
+ * bigM
+ *
  */
 {
+  if (nVars > this->getNx()) {
+    BOOST_LOG_TRIVIAL(error)
+        << "Game::MP_Param::bound:  number of nVars (" << nVars
+        << ") exceeds primal variables " << this->Nx;
+    throw string(
+        "Game::MP_Param::bound:  number of nVars  exceeds primal variables");
+  }
+
   arma::sp_mat A_new, B_new;
   arma::vec b_new(1);
   b_new(0) = bigM;
   A_new.zeros(1, this->Nx);
-  B_new.zeros(this->Nx, this->Ny);
-  for (unsigned int i = 0; i < this->Nx; ++i) {
+  for (unsigned int i = 0; i < nVars; ++i) {
+    // The primal at i-th place
     A_new(0, i) = 1;
+    // Join with the matrix A
     this->A = arma::join_cols(this->A, A_new);
+    // Join with the RHS
     this->b = arma::join_cols(this->b, b_new);
+    // Reset
     A_new(0, i) = 0;
   }
+  // Add empty rows for the new primal constraints
+  B_new.zeros(nVars, this->Ny);
   this->B = arma::join_cols(this->B, B_new);
+  // Update the size of the problem
   this->size();
-  BOOST_LOG_TRIVIAL(debug)
-      << "Game::MP_Param::bound: primal variables are bounded by " << bigM;
+  BOOST_LOG_TRIVIAL(info) << "Game::MP_Param::bound: Bounding " << nVars
+                          << " primal variables (over " << this->Nx
+                          << ") to bigM:" << bigM;
 }
 
 void Game::NashGame::set_positions()
@@ -1524,7 +1545,9 @@ void Game::EPEC::make_country_QP(const unsigned int i)
     this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
                                       *this->country_QP.at(i).get());
     if (this->Stats.AlgorithmParam.boundQPs)
-      this->country_QP.at(i)->bound(this->Stats.AlgorithmParam.boundBigM);
+      this->country_QP.at(i)->bound(this->Stats.AlgorithmParam.boundBigM,
+                                    origLeadObjec.c.size());
+
     this->Stats.feasiblePolyhedra.at(i) =
         this->countries_LCP.at(i)->getFeasiblePolyhedra();
   }

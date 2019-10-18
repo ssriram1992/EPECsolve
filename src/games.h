@@ -67,7 +67,7 @@ public:
   MP_Param() = default;
 
   MP_Param(const MP_Param &M) = default;
-  void bound(double bigM);
+  void bound(double bigM, unsigned int primals);
 
   // Getters and setters
   arma::sp_mat getQ() const {
