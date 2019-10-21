@@ -1759,8 +1759,11 @@ void Game::EPEC::iterativeNash() {
       // No Time Limit
       addRandPoly = !this->computeNashEq();
     }
+
+    if (addRandPoly)
+      this->Stats.lostIntermediateEq++;
     // this->lcp->save("dat/LCP_alg.dat");
-    //this->lcpmodel->write("dat/lcpmodel_alg.lp");
+    // this->lcpmodel->write("dat/lcpmodel_alg.lp");
     for (unsigned int i = 0; i < this->nCountr; ++i) {
       BOOST_LOG_TRIVIAL(info)
           << "Country " << i << this->countries_LCP.at(i)->feas_detail_str();
