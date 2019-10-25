@@ -1840,7 +1840,6 @@ bool Game::EPEC::computeNashEq(
   }
 
   this->lcpmodel->optimize();
-  this->lcpmodel->write("dat/anLCP.lp");
   this->Stats.wallClockTime += this->lcpmodel->get(GRB_DoubleAttr_Runtime);
 
   // Search just for a feasible point
