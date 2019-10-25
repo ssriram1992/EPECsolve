@@ -1,7 +1,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # EPECsolve
-Code to compute mixed-equilibrium in linear EPECs. Code available on [Github](https://github.com/ssriram1992/EPECsolve/).
+Code to compute mixed-equilibrium in linear EPECs. [Code](https://github.com/ssriram1992/EPECsolve/) and [Instances](https://github.com/ds4dm/EPECInstances) are available on GitHub.
 
 *Manuscript in preparation. Link will be shared once ready*
 
