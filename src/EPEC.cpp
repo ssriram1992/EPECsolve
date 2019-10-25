@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
       "Sets the aggressiveness for the innerApproximation, namely the number "
       "of random polyhedra added if no deviation is found. (int)")(
       "b,bound", po::value<bool>(&bound)->default_value(false),
-      "Decides whether QP param should be bounded or not.")(
+      "Decides whether primal variables should be bounded or not.")(
       "boundBigM", po::value<double>(&boundBigM)->default_value(1e5),
       "Set the bounding bigM related to the parameter --bound")(
       "add,ad", po::value<int>(&add)->default_value(0),
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
   epec.setTimeLimit(timeLimit);
   // bound QPs
   if (bound) {
-    epec.setBoundQPs(true);
+    epec.setBoundPrimals(true);
     epec.setBoundBigM(boundBigM);
   }
 
@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
             << epec.getAggressiveness() << ";"
             << to_string(epec.getAddPolyMethod()) << ";"
             << epec.getStatistics().numericalIssuesEncountered << ";"
-            << to_string(epec.getBoundQPs()) << ";" << epec.getBoundBigM();
+            << to_string(epec.getBoundPrimals()) << ";" << epec.getBoundBigM();
   } else {
     results << ";-;-;-;-;-;-;-";
   }

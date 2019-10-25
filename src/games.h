@@ -415,9 +415,9 @@ enum class EPECalgorithm {
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
-  bool boundQPs{false}; ///< If true, each QP param is bounded with an arbitrary
+  bool boundPrimals{false}; ///< If true, each QP param is bounded with an arbitrary
                         ///< large bigM constant
-  double boundBigM{1e5}; ///< Bounding upper value if @package BoundQPs is true.
+  double boundBigM{1e5}; ///< Bounding upper value if @p BoundPrimals is true.
   long int addPolyMethodSeed{
       -1}; ///< Random seed for the random selection of polyhedra. If -1, a
            ///< default computed value will seeded.
@@ -488,8 +488,6 @@ protected: // Datafields
   /// Game::EPEC has the responsibility to keep this correct by implementing an
   /// override of Game::EPEC::updateLocs.
   std::vector<const unsigned int *> LocEnds{};
-  std::vector<unsigned int> LocPrimals{};///< Keeps track of real primal variables of each laeder. the inheritor of
-  /// Game::EPEC has the responsibility to initialize this object.
   std::vector<unsigned int> convexHullVariables{};
   unsigned int n_MCVar{0};
 
@@ -591,8 +589,8 @@ public:                  // functions
   }
   void setIndicators(bool val) { this->Stats.AlgorithmParam.indicators = val; }
   bool getIndicators() const { return this->Stats.AlgorithmParam.indicators; }
-  void setBoundQPs(bool val) { this->Stats.AlgorithmParam.boundQPs = val; }
-  bool getBoundQPs() const { return this->Stats.AlgorithmParam.boundQPs; }
+  void setBoundPrimals(bool val) { this->Stats.AlgorithmParam.boundPrimals = val; }
+  bool getBoundPrimals() const { return this->Stats.AlgorithmParam.boundPrimals; }
   void setBoundBigM(double val) { this->Stats.AlgorithmParam.boundBigM = val; }
   double getBoundBigM() const { return this->Stats.AlgorithmParam.boundBigM; }
   void setTimeLimit(double val) { this->Stats.AlgorithmParam.timeLimit = val; }

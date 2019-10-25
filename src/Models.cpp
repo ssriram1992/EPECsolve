@@ -538,9 +538,6 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
         << "Country " << Params.name << " has tax revenue in the objective.";
     Models::increaseVal(Loc, LeaderVars::TaxQuad, Params.n_followers);
   }
-  this->EPEC::LocPrimals.push_back((2 + Params.LeaderParam.tax_revenue) *
-                                       Params.n_followers +
-                                   2 + taxVars + addnlLeadVars);
 
   // Leader Constraints
   short int import_lim_cons{0}, export_lim_cons{0}, price_lim_cons{0};
@@ -735,7 +732,6 @@ void Models::EPEC::add_Leaders_tradebalance_constraints(const unsigned int i)
   this->nImportMarkets.at(i) = (nImp);
   if (nImp > 0) {
     Models::increaseVal(Loc, LeaderVars::CountryImport, nImp);
-    this->EPEC::LocPrimals.at(i) += nImp;
 
     Game::NashGame &LL_Nash = *this->countries_LL.at(i).get();
 
