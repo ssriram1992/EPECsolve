@@ -1916,15 +1916,16 @@ void Game::EPEC::findPureNashEq() {
 
   this->lcpmodel_pure = std::unique_ptr<GRBModel>(new GRBModel(*lcpmodel));
 
-  const std::vector<const unsigned int> nPolyLead = [this]() {
-    std::vector<unsigned int> nPolyLead{};
+  const unsigned int nPolyLead = [this]() {
+	  unsigned int ell = 0;
     for (unsigned int i = 0; i < this->getNcountries(); ++i)
-      nPolyLead.push_back(this->getNPoly_Lead(i));
-    return nPolyLead;
+ell += (this->getNPoly_Lead(i));
+    return ell;
   }();
 
   // Add a binary variable for each polyhedon of each leader
-  GRBVar pure_bin[std::accumulate(std::begin(nPolyLead), std::end(nPolyLead))];
+  GRBVar pure_bin[nPolyLead];
+  GRBLinExpr objectiveTerm {0};
   unsigned int count{0}, i, j;
   for (i = 0; i < this->getNcountries(); i++) {
     for (j = 0; j < this->getNPoly_Lead(i); ++j) {
@@ -1934,8 +1935,10 @@ void Game::EPEC::findPureNashEq() {
           lcpmodel_pure->getVarByName("x_" + to_string(this->getPosition_Probab(
                                                  i, j))) <= pure_bin[count]);
       count++;
+	  objectiveTerm += pure_bin[count];
     }
   }
+  lcpmodel_pure->setObjective(objectiveTerm, GRB_MINIMIZE);
 
   lcpmodel_pure->optimize();
 
