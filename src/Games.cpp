@@ -1907,6 +1907,41 @@ bool Game::EPEC::warmstart(const arma::vec x) {
   return true;
 }
 
+void Game::EPEC::findPureNashEq() {
+  const auto alg = this->Stats.AlgorithmParam.algorithm;
+  for (unsigned int i = 0; i < this->nCountr; ++i)
+    this->countries_LCP.at(i)->EnumerateAll(true);
+  this->make_country_QP();
+  this->make_country_LCP();
+
+  this->lcpmodel_pure = std::unique_ptr<GRBModel>(new GRBModel(*lcpmodel));
+
+  const std::vector<const unsigned int> nPolyLead = [this]() {
+    std::vector<unsigned int> nPolyLead{};
+    for (unsigned int i = 0; i < this->getNcountries(); ++i)
+      nPolyLead.push_back(this->getNPoly_Lead(i));
+    return nPolyLead;
+  }();
+
+  // Add a binary variable for each polyhedon of each leader
+  GRBVar pure_bin[std::accumulate(std::begin(nPolyLead), std::end(nPolyLead))];
+  unsigned int count{0}, i, j;
+  for (i = 0; i < this->getNcountries(); i++) {
+    for (j = 0; j < this->getNPoly_Lead(i); ++j) {
+      pure_bin[count] = lcpmodel_pure->addVar(
+          0, 1, 0, GRB_BINARY, "pureBin_" + to_string(i) + "_" + to_string(j));
+      lcpmodel_pure->addConstr(
+          lcpmodel_pure->getVarByName("x_" + to_string(this->getPosition_Probab(
+                                                 i, j))) <= pure_bin[count]);
+      count++;
+    }
+  }
+
+  lcpmodel_pure->optimize();
+
+  this->Stats.AlgorithmParam.algorithm = alg;
+}
+
 void Game::EPEC::findNashEq() {
   /**
    * @brief Computes Nash equilibrium using the algorithm set in
@@ -2056,6 +2091,19 @@ unsigned int Game::EPEC::getPosition_Probab(const unsigned int i,
     return 0;
   const auto LeaderStart = this->nashgame->getPrimalLoc(i);
   return LeaderStart + PolyProbab;
+}
+
+bool Game::EPEC::isPureStrategy(const double tol) const {
+  /**
+   * Checks if the returned strategy leader is a pure strategy for the leader i.
+   * The strategy is considered a pure strategy, if it is played with a
+   * probability greater than 1 - tol;
+   */
+  for (unsigned int i = 0; i < this->getNcountries(); ++i) {
+    if (!isPureStrategy(i, tol))
+      return false;
+  }
+  return true;
 }
 
 bool Game::EPEC::isPureStrategy(const unsigned int i, const double tol) const {

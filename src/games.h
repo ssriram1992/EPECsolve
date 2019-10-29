@@ -415,12 +415,12 @@ enum class EPECalgorithm {
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
-  bool boundPrimals{false}; ///< If true, each QP param is bounded with an arbitrary
-                        ///< large bigM constant
+  bool boundPrimals{false}; ///< If true, each QP param is bounded with an
+                            ///< arbitrary large bigM constant
   double boundBigM{1e5}; ///< Bounding upper value if @p BoundPrimals is true.
   long int addPolyMethodSeed{
       -1}; ///< Random seed for the random selection of polyhedra. If -1, a
-           ///< default computed value will seeded.
+           ///< default computed value will be seeded.
   bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
   ///< Uses @p bigM if @p false.
   double timeLimit{
@@ -465,6 +465,8 @@ private:
   std::unique_ptr<Game::LCP> lcp; ///< The EPEC nash game written as an LCP
   std::unique_ptr<GRBModel>
       lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
+  std::unique_ptr<GRBModel>
+      lcpmodel_pure; ///< A Gurobi mode object of the LCP form of EPEC
   unsigned int nVarinEPEC{0};
   unsigned int nCountr{0};
 
@@ -551,6 +553,7 @@ public:                  // functions
 
   void finalize();
   void findNashEq();
+  void findPureNashEq();
 
   std::unique_ptr<GRBModel> Respond(const unsigned int i,
                                     const arma::vec &x) const;
@@ -589,8 +592,12 @@ public:                  // functions
   }
   void setIndicators(bool val) { this->Stats.AlgorithmParam.indicators = val; }
   bool getIndicators() const { return this->Stats.AlgorithmParam.indicators; }
-  void setBoundPrimals(bool val) { this->Stats.AlgorithmParam.boundPrimals = val; }
-  bool getBoundPrimals() const { return this->Stats.AlgorithmParam.boundPrimals; }
+  void setBoundPrimals(bool val) {
+    this->Stats.AlgorithmParam.boundPrimals = val;
+  }
+  bool getBoundPrimals() const {
+    return this->Stats.AlgorithmParam.boundPrimals;
+  }
   void setBoundBigM(double val) { this->Stats.AlgorithmParam.boundBigM = val; }
   double getBoundBigM() const { return this->Stats.AlgorithmParam.boundBigM; }
   void setTimeLimit(double val) { this->Stats.AlgorithmParam.timeLimit = val; }
@@ -636,6 +643,7 @@ public:                  // functions
   // The following checks if the returned strategy leader is a pure strategy
   // for a leader or appropriately retrieve mixed-strategies
   bool isPureStrategy(const unsigned int i, const double tol = 1e-5) const;
+  bool isPureStrategy(const double tol = 1e-5) const;
   std::vector<unsigned int> mixedStratPoly(const unsigned int i,
                                            const double tol = 1e-5) const;
 
