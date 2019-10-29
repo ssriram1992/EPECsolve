@@ -430,6 +430,8 @@ struct EPECAlgorithmParams {
   unsigned int aggressiveness{
       1}; ///< Controls the number of random polyhedra added at each iteration
   ///< in EPEC::iterativeNash
+  bool pureNE{false}; ///< If true, the algorithm will tend to search for pure
+  ///< NE. If none exists, it will return a MNE (if exists)
 };
 
 /// @brief Stores statistics for a (solved) EPEC instance
@@ -450,6 +452,7 @@ struct EPECStatistics {
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
           ///< leader (country)
   double wallClockTime = {0};
+  bool pureNE{false}; ///< True if the equilibrium is a pure NE.
   EPECAlgorithmParams AlgorithmParam =
       {}; ///< Stores the configuration for the EPEC algorithm employed in the
           ///< instance.
@@ -509,6 +512,7 @@ private:
   void make_country_LCP();
   void resetLCP();
   void iterativeNash();
+  void make_pure_LCP();
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
   bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
@@ -553,7 +557,6 @@ public:                  // functions
 
   void finalize();
   void findNashEq();
-  void findPureNashEq();
 
   std::unique_ptr<GRBModel> Respond(const unsigned int i,
                                     const arma::vec &x) const;
@@ -592,6 +595,8 @@ public:                  // functions
   }
   void setIndicators(bool val) { this->Stats.AlgorithmParam.indicators = val; }
   bool getIndicators() const { return this->Stats.AlgorithmParam.indicators; }
+  void setPureNE(bool val) { this->Stats.AlgorithmParam.pureNE = val; }
+  bool getPureNE() const { return this->Stats.AlgorithmParam.pureNE; }
   void setBoundPrimals(bool val) {
     this->Stats.AlgorithmParam.boundPrimals = val;
   }
@@ -654,11 +659,19 @@ public:                  // functions
   /// Get the GRBModel solved in the last iteration to solve the problem or to
   /// prove non-existence of Nash equilibrium. Object is returned using constant
   /// reference.
-  const GRBModel &getLcpModel() const { return *this->lcpmodel.get(); }
+  const GRBModel &getLcpModel() const {
+    if (this->Stats.AlgorithmParam.pureNE)
+      return *this->lcpmodel_pure.get();
+    else
+      return *this->lcpmodel.get();
+  }
   /// Writes the GRBModel solved in the last iteration to solve the problem or
   /// to prove non-existence of Nash equilibrium to a file.
   void writeLcpModel(std::string filename) const {
-    this->lcpmodel->write(filename);
+    if (this->Stats.AlgorithmParam.pureNE)
+      this->lcpmodel_pure->write(filename);
+    else
+      this->lcpmodel->write(filename);
   }
 };
 } // namespace Game

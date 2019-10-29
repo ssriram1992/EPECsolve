@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
   string resFile, instanceFile = "", logFile;
   int writeLevel, nThreads, verbosity, bigM, algorithm, aggressiveness, add{0};
   double timeLimit, boundBigM;
-  bool bound;
+  bool bound, pure;
 
   po::options_description desc("EPEC: Allowed options");
   desc.add_options()("help,h", "Shows this help message")("version,v",
@@ -26,6 +26,8 @@ int main(int argc, char **argv) {
       "input,i", po::value<string>(&instanceFile),
       "Sets the input path/filename of the instance file (.json appended "
       "automatically)")(
+      "p,pure", po::value<bool>(&pure)->default_value(false),
+      "Controls whether the algorithm should seek for a pure NE or not.")(
       "algorithm,a", po::value<int>(&algorithm),
       "Sets the algorithm. 0: fullEnumeration, 1:innerApproximation")(
       "solution,s", po::value<string>(&resFile)->default_value("dat/Solution"),
@@ -130,6 +132,9 @@ int main(int argc, char **argv) {
   // Num Threads
   if (nThreads != 0)
     epec.setNumThreads(nThreads);
+  // Pure NE
+  if (pure)
+    epec.setPureNE(true);
   // timeLimit
   epec.setTimeLimit(timeLimit);
   // bound QPs

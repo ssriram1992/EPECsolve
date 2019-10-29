@@ -1838,14 +1838,23 @@ bool Game::EPEC::computeNashEq(
           .set(GRB_DoubleAttr_UB, this->Stats.AlgorithmParam.boundBigM);
     }
   }
+  // Local pointer to the LCP. Used to manage the switch between pureNE and
+  // generic one.
+  GRBModel *localLCP{this->lcpmodel.get()};
 
-  this->lcpmodel->optimize();
-  this->Stats.wallClockTime += this->lcpmodel->get(GRB_DoubleAttr_Runtime);
+  if (this->Stats.AlgorithmParam.pureNE) {
+    BOOST_LOG_TRIVIAL(debug) << " Game::EPEC::computeNashEq: (pureNE flag is "
+                                "true) Searching for a pure NE.";
+    this->make_pure_LCP();
+    localLCP = this->lcpmodel_pure.get();
+  }
+
+  localLCP->optimize();
+  this->Stats.wallClockTime += localLCP->get(GRB_DoubleAttr_Runtime);
 
   // Search just for a feasible point
   try { // Try finding a Nash equilibrium for the approximation
-    foundNash =
-        this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
+    foundNash = this->lcp->extractSols(localLCP, sol_z, sol_x, true);
   } catch (GRBException &e) {
     BOOST_LOG_TRIVIAL(error)
         << "GRBException in Game::EPEC::computeNashEq : " << e.getErrorCode()
@@ -1856,11 +1865,20 @@ bool Game::EPEC::computeNashEq(
         << "Game::EPEC::computeNashEq: an equilibrium has been found.";
     this->nashEq = true;
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
+    if (this->isPureStrategy()) {
+      BOOST_LOG_TRIVIAL(debug)
+          << "Game::EPEC::computeNashEq: the equilibrium is a pure strategy.";
+      this->Stats.pureNE = true;
+    } else {
+      if (this->Stats.AlgorithmParam.pureNE)
+        BOOST_LOG_TRIVIAL(warning)
+            << "Game::EPEC::computeNashEq: Found a MNE, not a PNE.";
+    }
 
   } else { // If not, then update accordingly
     BOOST_LOG_TRIVIAL(info)
         << "Game::EPEC::computeNashEq: no equilibrium has been found.";
-    int status = this->lcpmodel->get(GRB_IntAttr_Status);
+    int status = localLCP->get(GRB_IntAttr_Status);
     if (status == GRB_TIME_LIMIT)
       this->Stats.status = Game::EPECsolveStatus::timeLimit;
     else
@@ -1907,42 +1925,46 @@ bool Game::EPEC::warmstart(const arma::vec x) {
   return true;
 }
 
-void Game::EPEC::findPureNashEq() {
-  const auto alg = this->Stats.AlgorithmParam.algorithm;
-  for (unsigned int i = 0; i < this->nCountr; ++i)
-    this->countries_LCP.at(i)->EnumerateAll(true);
-  this->make_country_QP();
-  this->make_country_LCP();
+void Game::EPEC::make_pure_LCP() {
+  /**
+   * Given that Game::EPEC::lcpmodel is filled with the final LCP,
+   * directs the search toward a pure nash EQ. If such an equilibrium does not
+   * exist, then the modell will return anyway a MNE. The new lcp is saved in
+   * the object Game::EPEC::lcpmodel_pure
+   */
+  try {
+    this->lcpmodel->write("dat/LCPlala.lp");
+    this->lcpmodel_pure = std::unique_ptr<GRBModel>(new GRBModel(*lcpmodel));
+    const unsigned int nPolyLead = [this]() {
+      unsigned int ell = 0;
+      for (unsigned int i = 0; i < this->getNcountries(); ++i)
+        ell += (this->getNPoly_Lead(i));
+      return ell;
+    }();
 
-  this->lcpmodel_pure = std::unique_ptr<GRBModel>(new GRBModel(*lcpmodel));
-
-  const unsigned int nPolyLead = [this]() {
-	  unsigned int ell = 0;
-    for (unsigned int i = 0; i < this->getNcountries(); ++i)
-ell += (this->getNPoly_Lead(i));
-    return ell;
-  }();
-
-  // Add a binary variable for each polyhedon of each leader
-  GRBVar pure_bin[nPolyLead];
-  GRBLinExpr objectiveTerm {0};
-  unsigned int count{0}, i, j;
-  for (i = 0; i < this->getNcountries(); i++) {
-    for (j = 0; j < this->getNPoly_Lead(i); ++j) {
-      pure_bin[count] = lcpmodel_pure->addVar(
-          0, 1, 0, GRB_BINARY, "pureBin_" + to_string(i) + "_" + to_string(j));
-      lcpmodel_pure->addConstr(
-          lcpmodel_pure->getVarByName("x_" + to_string(this->getPosition_Probab(
-                                                 i, j))) <= pure_bin[count]);
-      count++;
-	  objectiveTerm += pure_bin[count];
+    // Add a binary variable for each polyhedron of each leader
+    GRBVar pure_bin[nPolyLead];
+    GRBLinExpr objectiveTerm{0};
+    unsigned int count{0}, i, j;
+    for (i = 0; i < this->getNcountries(); i++) {
+      for (j = 0; j < this->getNPoly_Lead(i); ++j) {
+        pure_bin[count] = this->lcpmodel_pure->addVar(
+            0, 1, 0, GRB_BINARY,
+            "pureBin_" + to_string(i) + "_" + to_string(j));
+        this->lcpmodel_pure->addConstr(
+            this->lcpmodel_pure->getVarByName(
+                "x_" + to_string(this->getPosition_Probab(i, j))),
+            GRB_GREATER_EQUAL, pure_bin[count]);
+        objectiveTerm += pure_bin[count];
+        count++;
+      }
     }
+    this->lcpmodel_pure->setObjective(objectiveTerm, GRB_MINIMIZE);
+  } catch (GRBException &e) {
+    cerr << "GRBException in Game::EPEC::make_pure_LCP : " << e.getErrorCode()
+         << ": " << e.getMessage() << '\n';
+    throw;
   }
-  lcpmodel_pure->setObjective(objectiveTerm, GRB_MINIMIZE);
-
-  lcpmodel_pure->optimize();
-
-  this->Stats.AlgorithmParam.algorithm = alg;
 }
 
 void Game::EPEC::findNashEq() {
@@ -1982,8 +2004,6 @@ void Game::EPEC::findNashEq() {
     BOOST_LOG_TRIVIAL(trace)
         << "Game::EPEC::findNashEq: Starting fullEnumeration search";
     this->computeNashEq(this->Stats.AlgorithmParam.timeLimit);
-    this->lcp->save("dat/LCP_enum.dat");
-    this->lcpmodel->write("dat/lcpmodel_enum.lp");
     break;
   }
   // Handing EPECStatistics object to track performance of algorithm
