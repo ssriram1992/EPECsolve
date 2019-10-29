@@ -469,7 +469,10 @@ private:
   std::unique_ptr<GRBModel>
       lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
   std::unique_ptr<GRBModel>
-      lcpmodel_pure; ///< A Gurobi mode object of the LCP form of EPEC
+      lcpmodel_base; ///< A Gurobi mode object of the LCP form of EPEC. If
+                     ///< we are searching for a pure NE,
+  ///< the LCP which is indifferent to pure or mixed NE is stored in this
+  ///< object.
   unsigned int nVarinEPEC{0};
   unsigned int nCountr{0};
 
@@ -659,19 +662,11 @@ public:                  // functions
   /// Get the GRBModel solved in the last iteration to solve the problem or to
   /// prove non-existence of Nash equilibrium. Object is returned using constant
   /// reference.
-  const GRBModel &getLcpModel() const {
-    if (this->Stats.AlgorithmParam.pureNE)
-      return *this->lcpmodel_pure.get();
-    else
-      return *this->lcpmodel.get();
-  }
+  const GRBModel &getLcpModel() const { return *this->lcpmodel.get(); }
   /// Writes the GRBModel solved in the last iteration to solve the problem or
   /// to prove non-existence of Nash equilibrium to a file.
   void writeLcpModel(std::string filename) const {
-    if (this->Stats.AlgorithmParam.pureNE)
-      this->lcpmodel_pure->write(filename);
-    else
-      this->lcpmodel->write(filename);
+    this->lcpmodel->write(filename);
   }
 };
 } // namespace Game
