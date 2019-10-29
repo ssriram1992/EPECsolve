@@ -1,3 +1,16 @@
+/* Emission costs
+These are values that we have. They come the IPCC report estimates (a bit old, but from a really good source)
+
+Fuel in Kg CO2/MMBTU (ton CO2/Mwh)  
+Petroleum: 77.20 Kg CO2/ MMBTU (0.26 ton CO2/Mwh)  
+Coal 97.60 Kg CO2/ MMBTU (0.33 ton CO2/Mwh)  
+Gasoline 72.20 Kg CO2/ MMBTU (0.24 ton CO2/Mwh)  
+LPG 65.80 Kg CO2/ MMBTU (0.22 ton CO2/Mwh)  
+Natural gas 58.80 Kg CO2/ MMBTU (0.20 ton CO2/Mwh)  
+
+ */
+
+
 #include "models.h"
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
@@ -44,7 +57,7 @@ Models::EPECInstance ChileArgentinaInstance() {
   Arg.tax_caps = Arg.costs_lin;
 
   Arg.tax_caps = {0.5, 0.5};
-  Chi.tax_caps = {0.65, 0, 0, 0};
+  Chi.tax_caps = {0.65, 0.65, 0.65, 0.65};
 
   Models::LeadAllPar Argentina(Arg.capacities.size(), "Argentina", Arg,
                                {800, 3.11}, {100, 100, -1, false, 2});

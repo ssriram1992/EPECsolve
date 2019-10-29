@@ -135,10 +135,10 @@ chile: $(BIN)/ChileArgentina
 
 $(BIN)/example: $(FILEEPEC) $(OBJ)/example.o 
 	@echo Linking...
-	$(GCC) $(FILEEPEC) $(OBJ)/example.o  $(OPTS) $(LINKOPTS) -o $(BIN)/example
+	@$(GCC) $(FILEEPEC) $(OBJ)/example.o  $(OPTS) $(LINKOPTS) -o $(BIN)/example
 
 $(OBJ)/example.o: $(SRC)/epecsolve.h $(SRC)/models.h $(SRC)/example.cpp
-	$(GCC) -c $(SRC)/example.cpp $(OPTS) -o $(OBJ)/example.o
+	@$(GCC) -c $(SRC)/example.cpp $(OPTS) -o $(OBJ)/example.o
 
 example: $(BIN)/example
-	$(BIN)/example
+	@$(BIN)/example
