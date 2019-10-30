@@ -1922,7 +1922,7 @@ bool Game::EPEC::warmstart(const arma::vec x) {
   return true;
 }
 
-void Game::EPEC::make_pure_LCP() {
+void Game::EPEC::make_pure_LCP(bool indicators) {
   /**
    * Given that Game::EPEC::lcpmodel is filled with the final LCP,
    * directs the search toward a pure nash EQ. If such an equilibrium does not
@@ -1949,7 +1949,7 @@ void Game::EPEC::make_pure_LCP() {
         pure_bin[count] = this->lcpmodel->addVar(0, 1, 0, GRB_BINARY,
                                                  "pureBin_" + to_string(i) +
                                                      "_" + to_string(j));
-        if (this->Stats.AlgorithmParam.indicators) {
+        if (indicators) {
           this->lcpmodel->addGenConstrIndicator(
               pure_bin[count], 1,
               this->lcpmodel->getVarByName(
@@ -1965,7 +1965,7 @@ void Game::EPEC::make_pure_LCP() {
         count++;
       }
     }
-    if (this->Stats.AlgorithmParam.indicators) {
+    if (indicators) {
       this->lcpmodel->setObjective(objectiveTerm, GRB_MAXIMIZE);
       BOOST_LOG_TRIVIAL(trace)
           << "Game::EPEC::make_pure_LCP: using indicator constraints.";
@@ -2029,10 +2029,11 @@ void Game::EPEC::findNashEq() {
 
   switch (this->Stats.status) {
   case Game::EPECsolveStatus::nashEqNotFound:
-    final_msg << "No Nash equilibrium exists. ";
+    final_msg << "No Nash equilibrium exists.";
     break;
   case Game::EPECsolveStatus::nashEqFound:
-    final_msg << "Found a Nash equilibrium. ";
+    final_msg << "Found a Nash equilibrium ("
+              << (this->Stats.pureNE == 0 ? "MNE" : "PNE") << ").";
 
     break;
   case Game::EPECsolveStatus::timeLimit:

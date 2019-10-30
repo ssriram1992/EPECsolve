@@ -515,7 +515,7 @@ private:
   void make_country_LCP();
   void resetLCP();
   void iterativeNash();
-  void make_pure_LCP();
+  void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
   bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
