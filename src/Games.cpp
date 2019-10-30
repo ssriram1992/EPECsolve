@@ -1926,8 +1926,11 @@ void Game::EPEC::make_pure_LCP(bool indicators) {
   /**
    * Given that Game::EPEC::lcpmodel is filled with the final LCP,
    * directs the search toward a pure nash EQ. If such an equilibrium does not
-   * exist, then the modell will return anyway a MNE. The new lcp is saved in
-   * the object Game::EPEC::lcpmodel_pure
+   * exist, then the model will return anyway a MNE. The original LCP is stored
+   * in the field Game::EPEC::lcpmodel_base. @p indicators dictates whether the
+   * resulting LCP should use indicator constraints instead of general binaries.
+   * In general, there are advantages in using the binary variables instead of
+   * such constraints, since there is no bigM involved in the formulation.
    */
   try {
     BOOST_LOG_TRIVIAL(trace)
