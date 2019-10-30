@@ -1930,6 +1930,8 @@ void Game::EPEC::make_pure_LCP() {
    * the object Game::EPEC::lcpmodel_pure
    */
   try {
+    BOOST_LOG_TRIVIAL(trace)
+        << "Game::EPEC::make_pure_LCP: editing the LCP model.";
     this->lcpmodel_base = std::unique_ptr<GRBModel>(new GRBModel(*lcpmodel));
     const unsigned int nPolyLead = [this]() {
       unsigned int ell = 0;
@@ -1963,10 +1965,15 @@ void Game::EPEC::make_pure_LCP() {
         count++;
       }
     }
-    if (this->Stats.AlgorithmParam.indicators)
+    if (this->Stats.AlgorithmParam.indicators) {
       this->lcpmodel->setObjective(objectiveTerm, GRB_MAXIMIZE);
-    else
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::make_pure_LCP: using indicator constraints.";
+    } else {
       this->lcpmodel->setObjective(objectiveTerm, GRB_MINIMIZE);
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::make_pure_LCP: using indicator constraints.";
+    }
   } catch (GRBException &e) {
     cerr << "GRBException in Game::EPEC::make_pure_LCP : " << e.getErrorCode()
          << ": " << e.getMessage() << '\n';
