@@ -524,7 +524,7 @@ private:
                                      bool &infeasCheck) const;
   void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
-  bool computeNashEq(double localTimeLimit = -1.0);
+  bool computeNashEq(bool pureNE=false,double localTimeLimit = -1.0);
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
                          bool stopOnSingleInfeasibility = false);
 

@@ -1679,6 +1679,11 @@ void Game::EPEC::iterativeNash() {
   bool solved = {false};
   bool addRandPoly{false};
   bool infeasCheck{false};
+  // When true, a MNE has been found. The algorithm now tries to find a PNE, at
+  // the cost of incrementally enumerating the remaining polyhedra, up to the
+  // TimeLimit (if any) : W(hatever) I(t) T(akes)
+  bool WIT{false};
+
   std::vector<arma::vec> prevDevns(this->nCountr);
   this->Stats.numIteration = 0;
   if (this->Stats.AlgorithmParam.addPolyMethod == EPECAddPolyMethod::random) {
@@ -1702,9 +1707,10 @@ void Game::EPEC::iterativeNash() {
     ++this->Stats.numIteration;
     BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Iteration "
                             << to_string(this->Stats.numIteration);
+
     if (addRandPoly) {
-      BOOST_LOG_TRIVIAL(info)
-          << "Game::EPEC::iterativeNash: using heuristical polyhedra selection";
+      BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: using "
+                                 "heuristical polyhedra selection";
       bool success =
           this->addRandomPoly2All(this->Stats.AlgorithmParam.aggressiveness,
                                   this->Stats.numIteration == 1);
@@ -1718,15 +1724,22 @@ void Game::EPEC::iterativeNash() {
       arma::vec countryDeviation{};
       if (this->isSolved(&deviatedCountry, &countryDeviation)) {
         this->Stats.status = Game::EPECsolveStatus::nashEqFound;
-        solved = true;
-        return;
+        if ((this->Stats.AlgorithmParam.pureNE && !this->isPureStrategy())) {
+          BOOST_LOG_TRIVIAL(info)
+              << "Game::EPEC::iterativeNash: found a MNE. Enabling WIT mode "
+                 "and trying to find a PNE.";
+          WIT = true;
+        } else {
+          solved = true;
+          return;
+        }
       }
       // Vector of deviations for the countries
       std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
       this->getAllDevns(devns, this->sol_x, prevDevns);
       prevDevns = devns;
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns, infeasCheck);
-      if (addedPoly == 0 && this->Stats.numIteration > 1) {
+      if (addedPoly == 0 && this->Stats.numIteration > 1 && !WIT) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Not "
                "Solved, but no deviation? Error!\n This might be due to "
@@ -1750,15 +1763,13 @@ void Game::EPEC::iterativeNash() {
           std::chrono::high_resolution_clock::now() - initTime;
       const double timeRemaining =
           this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
-      addRandPoly = !this->computeNashEq(timeRemaining);
+      addRandPoly = !this->computeNashEq(WIT, timeRemaining) && !WIT;
     } else {
       // No Time Limit
-      addRandPoly = !this->computeNashEq();
+      addRandPoly = !this->computeNashEq(WIT) && !WIT;
     }
     if (addRandPoly)
       this->Stats.lostIntermediateEq++;
-    // this->lcp->save("dat/LCP_alg.dat");
-    // this->lcpmodel->write("dat/lcpmodel_alg.lp");
     for (unsigned int i = 0; i < this->nCountr; ++i) {
       BOOST_LOG_TRIVIAL(info)
           << "Country " << i << this->countries_LCP.at(i)->feas_detail_str();
@@ -1772,7 +1783,8 @@ void Game::EPEC::iterativeNash() {
           this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
       if (timeRemaining <= 0) {
         solved = false;
-        this->Stats.status = Game::EPECsolveStatus::timeLimit;
+        if (!WIT)
+          this->Stats.status = Game::EPECsolveStatus::timeLimit;
         return;
       }
     }
@@ -1815,6 +1827,7 @@ void ::Game::EPEC::make_country_LCP() {
 }
 
 bool Game::EPEC::computeNashEq(
+    bool pureNE,          ///< True if we search for a NE
     double localTimeLimit ///< Allowed time limit to run this function
 ) {
   /**
@@ -1839,12 +1852,13 @@ bool Game::EPEC::computeNashEq(
     }
   }
 
-  if (this->Stats.AlgorithmParam.pureNE) {
+  if (pureNE) {
     BOOST_LOG_TRIVIAL(info) << " Game::EPEC::computeNashEq: (pureNE flag is "
                                "true) Searching for a pure NE.";
     this->make_pure_LCP();
   }
 
+  // this->lcpmodel->set(GRB_IntParam_OutputFlag, 1);
   this->lcpmodel->optimize();
   this->Stats.wallClockTime += this->lcpmodel->get(GRB_DoubleAttr_Runtime);
 
@@ -2020,7 +2034,8 @@ void Game::EPEC::findNashEq() {
     this->make_country_QP();
     BOOST_LOG_TRIVIAL(trace)
         << "Game::EPEC::findNashEq: Starting fullEnumeration search";
-    this->computeNashEq(this->Stats.AlgorithmParam.timeLimit);
+    this->computeNashEq(this->Stats.AlgorithmParam.pureNE,
+                        this->Stats.AlgorithmParam.timeLimit);
     break;
   }
   // Handing EPECStatistics object to track performance of algorithm
