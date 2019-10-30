@@ -1840,8 +1840,8 @@ bool Game::EPEC::computeNashEq(
   }
 
   if (this->Stats.AlgorithmParam.pureNE) {
-    BOOST_LOG_TRIVIAL(debug) << " Game::EPEC::computeNashEq: (pureNE flag is "
-                                "true) Searching for a pure NE.";
+    BOOST_LOG_TRIVIAL(info) << " Game::EPEC::computeNashEq: (pureNE flag is "
+                               "true) Searching for a pure NE.";
     this->make_pure_LCP();
   }
 
@@ -1850,7 +1850,8 @@ bool Game::EPEC::computeNashEq(
 
   // Search just for a feasible point
   try { // Try finding a Nash equilibrium for the approximation
-    foundNash = this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
+    foundNash =
+        this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
   } catch (GRBException &e) {
     BOOST_LOG_TRIVIAL(error)
         << "GRBException in Game::EPEC::computeNashEq : " << e.getErrorCode()
@@ -1862,7 +1863,7 @@ bool Game::EPEC::computeNashEq(
     this->nashEq = true;
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
     if (this->isPureStrategy()) {
-      BOOST_LOG_TRIVIAL(debug)
+      BOOST_LOG_TRIVIAL(info)
           << "Game::EPEC::computeNashEq: the equilibrium is a pure strategy.";
       this->Stats.pureNE = true;
     } else {
@@ -1946,15 +1947,26 @@ void Game::EPEC::make_pure_LCP() {
         pure_bin[count] = this->lcpmodel->addVar(0, 1, 0, GRB_BINARY,
                                                  "pureBin_" + to_string(i) +
                                                      "_" + to_string(j));
-        this->lcpmodel->addConstr(
-            this->lcpmodel->getVarByName(
-                "x_" + to_string(this->getPosition_Probab(i, j))),
-            GRB_GREATER_EQUAL, pure_bin[count]);
+        if (this->Stats.AlgorithmParam.indicators) {
+          this->lcpmodel->addGenConstrIndicator(
+              pure_bin[count], 1,
+              this->lcpmodel->getVarByName(
+                  "x_" + to_string(this->getPosition_Probab(i, j))),
+              GRB_EQUAL, 0, "Indicator_PNE_" + to_string(count));
+        } else {
+          this->lcpmodel->addConstr(
+              this->lcpmodel->getVarByName(
+                  "x_" + to_string(this->getPosition_Probab(i, j))),
+              GRB_GREATER_EQUAL, pure_bin[count]);
+        }
         objectiveTerm += pure_bin[count];
         count++;
       }
     }
-    this->lcpmodel->setObjective(objectiveTerm, GRB_MINIMIZE);
+    if (this->Stats.AlgorithmParam.indicators)
+      this->lcpmodel->setObjective(objectiveTerm, GRB_MAXIMIZE);
+    else
+      this->lcpmodel->setObjective(objectiveTerm, GRB_MINIMIZE);
   } catch (GRBException &e) {
     cerr << "GRBException in Game::EPEC::make_pure_LCP : " << e.getErrorCode()
          << ": " << e.getMessage() << '\n';

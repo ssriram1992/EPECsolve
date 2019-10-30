@@ -1131,6 +1131,8 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x,
   writer.StartObject();
   writer.Key("Meta");
   writer.StartObject();
+  writer.Key("isPureEquilibrium");
+  writer.Bool(this->isPureStrategy());
   writer.Key("nCountries");
   writer.Uint(this->getNcountries());
   writer.Key("nFollowers");
@@ -1480,6 +1482,7 @@ void Models::EPEC::WriteCountry(const unsigned int i, const string filename,
        j < this->getPosition(i, Models::LeaderVars::CountryImport + 1); ++j)
     import += x.at(j);
   // Writing national level details
+  file << "PureStrategy:" << this->isPureStrategy(i) << "\n";
   file << Models::prn::label << "Domestic production"
        << ":" << Models::prn::val << prod << "\n";
   if (Export >= import)
