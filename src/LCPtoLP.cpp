@@ -1206,6 +1206,29 @@ Game::LCP::addAPoly(unsigned int nPoly, Game::EPECAddPolyMethod method,
   }
   return Polys;
 }
+bool Game::LCP::addThePoly(unsigned long int decimalEncoding) {
+  if (this->maxTheoreticalPoly < decimalEncoding) {
+    // This polyhedron does not exist
+    BOOST_LOG_TRIVIAL(warning)
+        << "Warning in Game::LCP::addThePoly: Cannot add " << decimalEncoding
+        << " polyhedra, since it does not exist!";
+    return false;
+  }
+  const unsigned int nCompl = this->Compl.size();
+  auto num_to_vec = [nCompl](unsigned int number) {
+    std::vector<short int> binary{};
+    for (unsigned int vv = 0; vv < nCompl; vv++) {
+      binary.push_back(number % 2);
+      number /= 2;
+    }
+    std::for_each(binary.begin(), binary.end(),
+                  [](short int &vv) { vv = (vv == 0 ? -1 : 1); });
+    std::reverse(binary.begin(), binary.end());
+    return binary;
+  };
+  const std::vector<short int> choice = num_to_vec(decimalEncoding);
+  return this->FixToPoly(choice, true);
+}
 
 Game::LCP &Game::LCP::EnumerateAll(
     const bool
