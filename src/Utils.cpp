@@ -354,3 +354,32 @@ long int Utils::appendRead(string &v, const string in, long int pos) {
 
   return pos;
 }
+
+std::vector<std::set<unsigned long int>>
+Utils::combinations(const std::vector<std::set<unsigned long int>> &Set,
+                    const std::set<unsigned long int> &B) {
+  /**
+   * Generate all the combinations of a set B with all the combination present
+   * in Set
+   * @returns a vector of vectors of unsigned long ints
+   */
+  std::vector<std::set<unsigned long int>> res;
+  std::set<unsigned long int> el;
+
+  if (Set.empty()) {
+    for (const auto &j : B) {
+      el.clear();
+      el.insert(j);
+      res.push_back(el);
+    }
+    return res;
+  }
+  for (auto &i : Set) {
+    for (const auto &j : B) {
+      el = i;
+      el.insert(j);
+      res.push_back(el);
+    }
+  }
+  return res;
+}

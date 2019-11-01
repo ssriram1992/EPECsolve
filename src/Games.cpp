@@ -1681,8 +1681,9 @@ void Game::EPEC::iterativeNash() {
   bool infeasCheck{false};
   // When true, a MNE has been found. The algorithm now tries to find a PNE, at
   // the cost of incrementally enumerating the remaining polyhedra, up to the
-  // TimeLimit (if any) : W(hatever) I(t) T(akes)
-  bool WIT{false};
+  // TimeLimit (if any).
+  //
+  bool incrementalEnumeration{false};
 
   std::vector<arma::vec> prevDevns(this->nCountr);
   this->Stats.numIteration = 0;
@@ -1725,10 +1726,22 @@ void Game::EPEC::iterativeNash() {
       if (this->isSolved(&deviatedCountry, &countryDeviation)) {
         this->Stats.status = Game::EPECsolveStatus::nashEqFound;
         if ((this->Stats.AlgorithmParam.pureNE && !this->isPureStrategy())) {
-          BOOST_LOG_TRIVIAL(info)
-              << "Game::EPEC::iterativeNash: found a MNE. Enabling WIT mode "
-                 "and trying to find a PNE.";
-          WIT = true;
+          // We are seeking for a pure strategy. Then, here we switch between an
+          // incremental
+          // enumeration or combinations of pure strategies.
+          if (this->Stats.AlgorithmParam.PNEalgorithm ==
+              Game::EPECalgorithmPNE::incrementalEnumeration) {
+            BOOST_LOG_TRIVIAL(info)
+                << "Game::EPEC::iterativeNash: found a MNE. Enabling WIT mode "
+                   "and trying to find a PNE.";
+            incrementalEnumeration = true;
+          } else {
+            // In this case, we want to try all the combinations of pure
+            // strategies.
+            this->combinatorialPNE();
+            return;
+          }
+
         } else {
           solved = true;
           return;
@@ -1739,7 +1752,7 @@ void Game::EPEC::iterativeNash() {
       this->getAllDevns(devns, this->sol_x, prevDevns);
       prevDevns = devns;
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns, infeasCheck);
-      if (addedPoly == 0 && this->Stats.numIteration > 1 && !WIT) {
+      if (addedPoly == 0 && this->Stats.numIteration > 1 && !incrementalEnumeration) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Not "
                "Solved, but no deviation? Error!\n This might be due to "
@@ -1763,10 +1776,13 @@ void Game::EPEC::iterativeNash() {
           std::chrono::high_resolution_clock::now() - initTime;
       const double timeRemaining =
           this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
-      addRandPoly = !this->computeNashEq(WIT, timeRemaining) && !WIT;
+      addRandPoly =
+          !this->computeNashEq(incrementalEnumeration, timeRemaining) &&
+          !incrementalEnumeration;
     } else {
       // No Time Limit
-      addRandPoly = !this->computeNashEq(WIT) && !WIT;
+      addRandPoly = !this->computeNashEq(incrementalEnumeration) &&
+                    !incrementalEnumeration;
     }
     if (addRandPoly)
       this->Stats.lostIntermediateEq++;
@@ -1788,6 +1804,23 @@ void Game::EPEC::iterativeNash() {
         return;
       }
     }
+  }
+}
+
+void Game::EPEC::combinatorialPNE() {
+  std::vector<std::set<unsigned long int>> processedCombinations;
+
+  // Fetch the polyhedra present (at this point) for each leader
+  std::vector<std::set<unsigned long int>> AllPolyhedra = [this]() {
+    std::vector<std::set<unsigned long int>> allPoly;
+    for (unsigned int i = 0; i < this->getNcountries(); ++i)
+      allPoly.push_back(this->countries_LCP.at(i)->getAllPolyhedra());
+    return allPoly;
+  }();
+
+  for (unsigned int i = 0; i < this->nCountr; ++i) {
+    processedCombinations =
+        Utils::combinations(processedCombinations, AllPolyhedra.at(i));
   }
 }
 

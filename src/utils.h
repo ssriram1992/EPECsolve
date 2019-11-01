@@ -7,6 +7,7 @@
 #include "epecsolve.h"
 #include <armadillo>
 #include <fstream>
+#include <set>
 
 using namespace arma;
 
@@ -58,5 +59,9 @@ void appendSave(const unsigned int v, const std::string out,
 
 long int appendRead(unsigned int &v, const std::string in, long int pos,
                     const std::string header = "");
+
+std::vector<std::set<unsigned long int>>
+combinations(const std::vector<std::set<unsigned long int>> &Set,
+             const std::set<unsigned long int> &B);
 
 } // namespace Utils

@@ -185,6 +185,13 @@ public:
   unsigned int conv_PolyPosition(const unsigned int i) const;
   unsigned int conv_PolyWt(const unsigned int i) const;
 
+  std::set<unsigned long int> getAllPolyhedra() const {
+    return this->AllPolyhedra;
+  };
+  std::set<unsigned long int> getnotProcessed() const {
+    return this->notProcessed;
+  };
+
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
 
   std::set<std::vector<short int>>

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <set>
 
 using namespace Game;
 
@@ -406,14 +407,20 @@ enum class EPECsolveStatus {
 
 enum class EPECalgorithm {
   fullEnumeration,   ///< Completely enumerate the set of polyhedra for all
-                     ///< followers
-  innerApproximation ///< Perfrorm increasingly better inner approximations in
-                     ///< iterations
+  ///< followers
+      innerApproximation ///< Perfrorm increasingly better inner approximations in
+  ///< iterations
+};
+
+enum class EPECalgorithmPNE {
+  incrementalEnumeration,   ///< Add random polyhedra in each iteration
+      combinatorial ///< Test combinations of pure strategies
 };
 
 /// @brief Stores the configuration for EPEC algorithms
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
+  Game::EPECalgorithmPNE PNEalgorithm = Game::EPECalgorithmPNE::incrementalEnumeration;
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
   bool boundPrimals{false}; ///< If true, each QP param is bounded with an
                             ///< arbitrary large bigM constant
@@ -515,6 +522,7 @@ private:
   void make_country_LCP();
   void resetLCP();
   void iterativeNash();
+  void combinatorialPNE();
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
