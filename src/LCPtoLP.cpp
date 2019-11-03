@@ -979,6 +979,7 @@ bool Game::LCP::FixToPoly(
       custbi->push_back(std::move(bii));
     } else {
       AllPolyhedra.insert(FixNumber);
+      notProcessed.erase(FixNumber);
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }
