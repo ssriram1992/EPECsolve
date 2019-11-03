@@ -60,8 +60,11 @@ void appendSave(const unsigned int v, const std::string out,
 long int appendRead(unsigned int &v, const std::string in, long int pos,
                     const std::string header = "");
 
-std::vector<std::set<unsigned long int>>
-combinations(const std::vector<std::set<unsigned long int>> &Set,
-             const std::set<unsigned long int> &B);
+// Binary encoding functions for the LCP class
+unsigned long int vec_to_num(std::vector<short int> binary);
 
+std::vector<short int> num_to_vec(unsigned long int number,
+                                  const unsigned int &nCompl);
 } // namespace Utils
+
+// namespace Utils

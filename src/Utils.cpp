@@ -354,32 +354,27 @@ long int Utils::appendRead(string &v, const string in, long int pos) {
 
   return pos;
 }
-
-std::vector<std::set<unsigned long int>>
-Utils::combinations(const std::vector<std::set<unsigned long int>> &Set,
-                    const std::set<unsigned long int> &B) {
-  /**
-   * Generate all the combinations of a set B with all the combination present
-   * in Set
-   * @returns a vector of vectors of unsigned long ints
-   */
-  std::vector<std::set<unsigned long int>> res;
-  std::set<unsigned long int> el;
-
-  if (Set.empty()) {
-    for (const auto &j : B) {
-      el.clear();
-      el.insert(j);
-      res.push_back(el);
-    }
-    return res;
+unsigned long int Utils::vec_to_num(std::vector<short int> binary) {
+  unsigned long int number = 0;
+  unsigned int posn = 1;
+  while (!binary.empty()) {
+    short int bit = (binary.back() + 1) / 2; // The least significant bit
+    number += (bit * posn);
+    posn *= 2;         // Update place value
+    binary.pop_back(); // Remove that bit
   }
-  for (auto &i : Set) {
-    for (const auto &j : B) {
-      el = i;
-      el.insert(j);
-      res.push_back(el);
-    }
+  return number;
+}
+
+std::vector<short int> Utils::num_to_vec(unsigned long int number,
+                                         const unsigned int &nCompl) {
+  std::vector<short int> binary{};
+  for (unsigned int vv = 0; vv < nCompl; vv++) {
+    binary.push_back(number % 2);
+    number /= 2;
   }
-  return res;
+  std::for_each(binary.begin(), binary.end(),
+                [](short int &vv) { vv = (vv == 0 ? -1 : 1); });
+  std::reverse(binary.begin(), binary.end());
+  return binary;
 }
