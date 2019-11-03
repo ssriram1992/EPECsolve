@@ -989,7 +989,7 @@ bool Game::LCP::FixToPoly(
 
 bool Game::LCP::checkPolyFeas(
     const unsigned long int
-        decimalEncoding ///< Decimal encoding for the polyhedron
+        &decimalEncoding ///< Decimal encoding for the polyhedron
 ) {
   return this->checkPolyFeas(num_to_vec(decimalEncoding, this->Compl.size()));
 }
@@ -1204,7 +1204,7 @@ Game::LCP::addAPoly(unsigned long int nPoly, Game::EPECAddPolyMethod method,
   }
   return Polys;
 }
-bool Game::LCP::addThePoly(const unsigned long int decimalEncoding) {
+bool Game::LCP::addThePoly(const unsigned long int &decimalEncoding) {
   if (this->maxTheoreticalPoly < decimalEncoding) {
     // This polyhedron does not exist
     BOOST_LOG_TRIVIAL(warning)

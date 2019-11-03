@@ -203,8 +203,8 @@ public:
   addAPoly(unsigned long int nPoly = 1,
            Game::EPECAddPolyMethod method = Game::EPECAddPolyMethod::sequential,
            std::set<std::vector<short int>> Polys = {});
-  bool addThePoly(const unsigned long int decimalEncoding);
-  bool checkPolyFeas(const unsigned long int decimalEncoding);
+  bool addThePoly(const unsigned long int &decimalEncoding);
+  bool checkPolyFeas(const unsigned long int &decimalEncoding);
   bool checkPolyFeas(const std::vector<short int> &Fix);
   void clearPolyhedra() {
     this->Ai->clear();
