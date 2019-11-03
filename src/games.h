@@ -9,8 +9,8 @@
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
-#include <string>
 #include <set>
+#include <string>
 
 using namespace Game;
 
@@ -407,20 +407,24 @@ enum class EPECsolveStatus {
 
 enum class EPECalgorithm {
   fullEnumeration,   ///< Completely enumerate the set of polyhedra for all
-  ///< followers
-      innerApproximation ///< Perfrorm increasingly better inner approximations in
+                     ///< followers
+  innerApproximation, ///< Perfrorm increasingly better inner approximations in
   ///< iterations
+  combinatorialPNE ///< Perform a combinatorial-based search strategy to find a pure NE
 };
 
-enum class EPECalgorithmPNE {
-  incrementalEnumeration,   ///< Add random polyhedra in each iteration
-      combinatorial ///< Test combinations of pure strategies
+///< Recovery strategies for obtaining a PNE with innerApproximation
+enum class EPECRecoverStrategy {
+  incrementalEnumeration, ///< Add random polyhedra in each iteration
+  combinatorial           ///< Triggers the combinatorialPNE with additional information from innerApproximation
 };
 
 /// @brief Stores the configuration for EPEC algorithms
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
-  Game::EPECalgorithmPNE PNEalgorithm = Game::EPECalgorithmPNE::incrementalEnumeration;
+  Game::EPECRecoverStrategy recoverStrategy =
+      EPECRecoverStrategy::incrementalEnumeration;
+  ///< Specifies the method by which innerApproximation should seek for a PNE
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
   bool boundPrimals{false}; ///< If true, each QP param is bounded with an
                             ///< arbitrary large bigM constant
@@ -522,6 +526,9 @@ private:
   void make_country_LCP();
   void resetLCP();
   void iterativeNash();
+  void
+  combinatorialPNE(const std::vector<long int> combination,
+                   const std::vector<std::set<unsigned long int>> &excludeList);
   void combinatorialPNE();
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
@@ -532,7 +539,7 @@ private:
                                      bool &infeasCheck) const;
   void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
-  bool computeNashEq(bool pureNE=false,double localTimeLimit = -1.0);
+  bool computeNashEq(bool pureNE = false, double localTimeLimit = -1.0);
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
                          bool stopOnSingleInfeasibility = false);
 
@@ -576,6 +583,8 @@ public:                  // functions
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
                 double tol = 1e-4) const;
 
+  bool isSolved(double tol = 1e-4) const;
+
   const arma::vec getx() const { return this->sol_x; }
   void reset() { this->sol_x.ones(); }
   const arma::vec getz() const { return this->sol_z; }
@@ -584,6 +593,10 @@ public:                  // functions
   void setAlgorithm(Game::EPECalgorithm algorithm);
   Game::EPECalgorithm getAlgorithm() const {
     return this->Stats.AlgorithmParam.algorithm;
+  }
+  void setRecoverStrategy(Game::EPECRecoverStrategy strategy);
+  Game::EPECRecoverStrategy getRecoverStrategy() const {
+    return this->Stats.AlgorithmParam.recoverStrategy;
   }
   void setAggressiveness(unsigned int a) {
     this->Stats.AlgorithmParam.aggressiveness = a;
@@ -682,6 +695,7 @@ public:                  // functions
 namespace std {
 string to_string(const Game::EPECsolveStatus st);
 string to_string(const Game::EPECalgorithm al);
+string to_string(const Game::EPECRecoverStrategy st);
 string to_string(const Game::EPECAlgorithmParams al);
 string to_string(const Game::EPECAddPolyMethod add);
 }; // namespace std

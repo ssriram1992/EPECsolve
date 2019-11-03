@@ -16,7 +16,8 @@ namespace po = boost::program_options;
 
 int main(int argc, char **argv) {
   string resFile, instanceFile = "", logFile;
-  int writeLevel, nThreads, verbosity, bigM, algorithm, aggressiveness, add{0};
+  int writeLevel, nThreads, verbosity, bigM, algorithm, aggressiveness, add{0},
+      recover;
   double timeLimit, boundBigM;
   bool bound, pure;
 
@@ -27,9 +28,14 @@ int main(int argc, char **argv) {
       "Sets the input path/filename of the instance file (.json appended "
       "automatically)")(
       "p,pure", po::value<bool>(&pure)->default_value(false),
-      "Controls whether the algorithm should seek for a pure NE or not.")(
-      "algorithm,a", po::value<int>(&algorithm),
-      "Sets the algorithm. 0: fullEnumeration, 1:innerApproximation")(
+      "Controls whether the algorithm should seek for a pure NE or not. If "
+      "algorithm is combinatorialPNE, this is automatically true.")(
+      "r,recover", po::value<int>(&recover)->default_value(0),
+      "If innerApproximation is used along with pureNE, which strategy should "
+      "be used to retrive a pure NE. 0: incrementalEnumeration, "
+      "1:combinatorialPNE")("algorithm,a", po::value<int>(&algorithm),
+                            "Sets the algorithm. 0: fullEnumeration, "
+                            "1:innerApproximation, 2:combinatorialPNE")(
       "solution,s", po::value<string>(&resFile)->default_value("dat/Solution"),
       "Sets the output path/filename of the solution file (.json appended "
       "automatically)")(
@@ -153,19 +159,23 @@ int main(int argc, char **argv) {
     switch (add) {
     case 1:
       epec.setAddPolyMethod(EPECAddPolyMethod::reverse_sequential);
-      break;
     case 2:
       epec.setAddPolyMethod(EPECAddPolyMethod::random);
-      break;
     default:
       epec.setAddPolyMethod(EPECAddPolyMethod::sequential);
     }
-
+    if (recover != 0)
+      epec.setRecoverStrategy(EPECRecoverStrategy::combinatorial);
+    break;
+  }
+  case 2:{
+    epec.setAlgorithm(Game::EPECalgorithm::combinatorialPNE);
     break;
   }
   default:
     epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
   }
+
   //------------
 
   for (unsigned int j = 0; j < Instance.Countries.size(); ++j)
@@ -197,12 +207,13 @@ int main(int argc, char **argv) {
   std::ofstream results(logFile, ios::app);
 
   if (!existCheck.good()) {
-    results
-        << "Instance;Algorithm;Countries;Followers;Status;numFeasiblePolyhedra;"
-           "numVar;numConstraints;numNonZero;ClockTime"
-           "(s);Threads;Indicators;numInnerIterations;lostIntermediateEq;"
-           "Aggressiveness;"
-           "AddPolyMethod;numericalIssuesEncountered;bound;boundBigM\n";
+    results << "Instance;Algorithm;Countries;Followers;PureNE;Status;"
+               "numFeasiblePolyhedra;"
+               "numVar;numConstraints;numNonZero;ClockTime"
+               "(s);Threads;Indicators;numInnerIterations;lostIntermediateEq;"
+               "Aggressiveness;"
+               "AddPolyMethod;numericalIssuesEncountered;bound;boundBigM;"
+               "recoveryStrategy\n";
   }
   existCheck.close();
 
@@ -215,19 +226,20 @@ int main(int argc, char **argv) {
   for (auto &Countrie : Instance.Countries)
     results << " " << Countrie.n_followers;
 
-  results << " ];" << to_string(stat.status) << ";[ " << PolyT.str() << "];"
-          << stat.numVar << ";" << stat.numConstraints << ";" << stat.numNonZero
-          << ";" << WallClockTime << ";" << realThreads << ";"
-          << to_string(epec.getIndicators());
+  results << " ];" << to_string(pure) << ";" << to_string(stat.status) << ";[ "
+          << PolyT.str() << "];" << stat.numVar << ";" << stat.numConstraints
+          << ";" << stat.numNonZero << ";" << WallClockTime << ";"
+          << realThreads << ";" << to_string(epec.getIndicators());
   if (epec.getAlgorithm() == Game::EPECalgorithm::innerApproximation) {
     results << ";" << epec.getStatistics().numIteration << ";"
             << epec.getStatistics().lostIntermediateEq << ";"
             << epec.getAggressiveness() << ";"
             << to_string(epec.getAddPolyMethod()) << ";"
             << epec.getStatistics().numericalIssuesEncountered << ";"
-            << to_string(epec.getBoundPrimals()) << ";" << epec.getBoundBigM();
+            << to_string(epec.getBoundPrimals()) << ";" << epec.getBoundBigM()
+            << ";" << to_string(epec.getRecoverStrategy());
   } else {
-    results << ";-;-;-;-;-;-;-";
+    results << ";-;-;-;-;-;-;-;-";
   }
   results << "\n";
   results.close();

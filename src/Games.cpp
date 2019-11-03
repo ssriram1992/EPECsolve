@@ -1470,6 +1470,12 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
   return true;
 }
 
+bool Game::EPEC::isSolved(double tol) const {
+  unsigned int countryNumber;
+  arma::vec ProfDevn;
+  return this->isSolved(&countryNumber, &ProfDevn);
+}
+
 void Game::EPEC::make_country_QP(const unsigned int i)
 /**
  * @brief Makes the Game::QP_Param corresponding to the @p i-th country.
@@ -1729,16 +1735,26 @@ void Game::EPEC::iterativeNash() {
           // We are seeking for a pure strategy. Then, here we switch between an
           // incremental
           // enumeration or combinations of pure strategies.
-          if (this->Stats.AlgorithmParam.PNEalgorithm ==
-              Game::EPECalgorithmPNE::incrementalEnumeration) {
+          if (this->Stats.AlgorithmParam.recoverStrategy ==
+              Game::EPECRecoverStrategy::incrementalEnumeration) {
             BOOST_LOG_TRIVIAL(info)
-                << "Game::EPEC::iterativeNash: found a MNE. Enabling WIT mode "
-                   "and trying to find a PNE.";
+                << "Game::EPEC::iterativeNash: triggering recover strategy "
+                   "(incrementalEnumeration)";
             incrementalEnumeration = true;
-          } else {
+          } else if (this->Stats.AlgorithmParam.recoverStrategy ==
+                     Game::EPECRecoverStrategy::combinatorial) {
+            BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: triggering "
+                                       "recover strategy (combinatorial)";
             // In this case, we want to try all the combinations of pure
-            // strategies.
-            this->combinatorialPNE();
+            // strategies, except the ones between polyhedra we already tested.
+            std::vector<std::set<unsigned long int>> excludeList;
+            std::vector<long int> start;
+            for (int j = 0; j < this->nCountr; ++j) {
+              excludeList.push_back(
+                  this->countries_LCP.at(j)->getAllPolyhedra());
+              start.push_back(-1);
+            }
+            this->combinatorialPNE(start, excludeList);
             return;
           }
 
@@ -1752,7 +1768,8 @@ void Game::EPEC::iterativeNash() {
       this->getAllDevns(devns, this->sol_x, prevDevns);
       prevDevns = devns;
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns, infeasCheck);
-      if (addedPoly == 0 && this->Stats.numIteration > 1 && !incrementalEnumeration) {
+      if (addedPoly == 0 && this->Stats.numIteration > 1 &&
+          !incrementalEnumeration) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Not "
                "Solved, but no deviation? Error!\n This might be due to "
@@ -1799,7 +1816,7 @@ void Game::EPEC::iterativeNash() {
           this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
       if (timeRemaining <= 0) {
         solved = false;
-        if (!WIT)
+        if (!incrementalEnumeration)
           this->Stats.status = Game::EPECsolveStatus::timeLimit;
         return;
       }
@@ -1807,29 +1824,83 @@ void Game::EPEC::iterativeNash() {
   }
 }
 
-void Game::EPEC::combinatorialPNE() {
-  std::vector<std::set<unsigned long int>> processedCombinations;
+void Game::EPEC::combinatorialPNE(
+    const std::vector<long int> combination,
+    const std::vector<std::set<unsigned long int>> &excludeList) {
 
-  // Fetch the polyhedra present (at this point) for each leader
-  std::vector<std::set<unsigned long int>> AllPolyhedra = [this]() {
-    std::vector<std::set<unsigned long int>> allPoly;
-    for (unsigned int i = 0; i < this->getNcountries(); ++i)
-      allPoly.push_back(this->countries_LCP.at(i)->getAllPolyhedra());
-    return allPoly;
-  }();
+  if ((this->Stats.status == EPECsolveStatus::nashEqFound &&
+       this->Stats.pureNE == true) ||
+      this->Stats.status == EPECsolveStatus::timeLimit)
+    return;
 
-  for (unsigned int i = 0; i < this->nCountr; ++i) {
-    processedCombinations =
-        Utils::combinations(processedCombinations, AllPolyhedra.at(i));
+  std::vector<long int> childCombination(combination);
+  bool found{false};
+  unsigned int i{0};
+  for (i = 0; i < this->getNcountries(); i++) {
+    if (childCombination.at(i) == -1) {
+      found = true;
+      break;
+    }
+  }
+  if (found) {
+    for (unsigned int j = 0;
+         j < this->countries_LCP.at(i)->getNumTheoreticalPoly(); ++j) {
+      if (this->countries_LCP.at(i)->checkPolyFeas(j)) {
+        childCombination.at(i) = j;
+        this->combinatorialPNE(childCombination, excludeList);
+      }
+    }
+  } else {
+    // Combination is filled and ready!
+    // Check that this combination is not in the excuded list
+    BOOST_LOG_TRIVIAL(trace)
+        << "Game::EPEC::combinatorialPNE: considering a FULL combination";
+    bool excluded = false;
+    if (!excludeList.empty()) {
+      excluded = true;
+      for (unsigned int j = 0; j < this->nCountr; ++j) {
+        if (excludeList.at(j).find(childCombination.at(j)) ==
+            excludeList.at(j).end()) {
+          excluded = false;
+        }
+      }
+    }
+
+    if (!excluded) {
+      BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::combinatorialPNE: considering a "
+                                  "FEASIBLE combination of polyhedra.";
+      for (int j = 0; j < this->getNcountries(); ++j) {
+        this->countries_LCP.at(j)->clearPolyhedra();
+        this->countries_LCP.at(j)->addThePoly(childCombination.at(j));
+      }
+      this->make_country_QP();
+      bool res = this->computeNashEq(false);
+      if (this->computeNashEq(false)) {
+        if (this->isSolved()) {
+          // Check that the equilibrium is a pure strategy
+          if ((this->isPureStrategy())) {
+            BOOST_LOG_TRIVIAL(info)
+                << "Game::EPEC::combinatorialPNE: found a pure strategy.";
+            this->Stats.status = Game::EPECsolveStatus::nashEqFound;
+            this->Stats.pureNE = true;
+            return;
+          }
+        }
+      }
+    } else {
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::combinatorialPNE: configuration pruned.";
+      return;
+    }
   }
 }
 
 void ::Game::EPEC::make_country_LCP() {
   if (this->country_QP.front() == nullptr) {
-    BOOST_LOG_TRIVIAL(error)
-        << "Exception in Game::EPEC::make_country_LCP : no country QP has been "
-           "made."
-        << '\n';
+    BOOST_LOG_TRIVIAL(error) << "Exception in Game::EPEC::make_country_LCP : "
+                                "no country QP has been "
+                                "made."
+                             << '\n';
     throw;
   }
   // Preliminary set up to get the LCP ready
@@ -1904,7 +1975,8 @@ bool Game::EPEC::computeNashEq(
         << "GRBException in Game::EPEC::computeNashEq : " << e.getErrorCode()
         << ": " << e.getMessage() << " ";
   }
-  if (foundNash) { // If a Nash equilibrium is found, then update appropriately
+  if (foundNash) { // If a Nash equilibrium is found, then update
+                   // appropriately
     BOOST_LOG_TRIVIAL(info)
         << "Game::EPEC::computeNashEq: an equilibrium has been found.";
     this->nashEq = true;
@@ -1973,11 +2045,12 @@ void Game::EPEC::make_pure_LCP(bool indicators) {
   /**
    * Given that Game::EPEC::lcpmodel is filled with the final LCP,
    * directs the search toward a pure nash EQ. If such an equilibrium does not
-   * exist, then the model will return anyway a MNE. The original LCP is stored
-   * in the field Game::EPEC::lcpmodel_base. @p indicators dictates whether the
-   * resulting LCP should use indicator constraints instead of general binaries.
-   * In general, there are advantages in using the binary variables instead of
-   * such constraints, since there is no bigM involved in the formulation.
+   * exist, then the model will return anyway a MNE. The original LCP is
+   * stored in the field Game::EPEC::lcpmodel_base. @p indicators dictates
+   * whether the resulting LCP should use indicator constraints instead of
+   * general binaries. In general, there are advantages in using the binary
+   * variables instead of such constraints, since there is no bigM involved in
+   * the formulation.
    */
   try {
     BOOST_LOG_TRIVIAL(trace)
@@ -2031,6 +2104,16 @@ void Game::EPEC::make_pure_LCP(bool indicators) {
   }
 }
 
+void Game::EPEC::combinatorialPNE() {
+  std::vector<std::set<unsigned long int>> excludeList;
+  std::vector<long int> start;
+  for (int j = 0; j < this->nCountr; ++j) {
+    start.push_back(-1);
+  }
+  this->combinatorialPNE(start, excludeList);
+  return;
+}
+
 void Game::EPEC::findNashEq() {
   /**
    * @brief Computes Nash equilibrium using the algorithm set in
@@ -2056,12 +2139,17 @@ void Game::EPEC::findNashEq() {
   switch (this->Stats.AlgorithmParam.algorithm) {
 
   case Game::EPECalgorithm::innerApproximation:
-    final_msg << "Inner approximation algorithm complete. ";
+    final_msg << "Inner approximation algorithm completed. ";
     this->iterativeNash();
     break;
 
+  case Game::EPECalgorithm::combinatorialPNE:
+    final_msg << "CombinatorialPNE algorithm completed. ";
+    this->combinatorialPNE();
+    break;
+
   case Game::EPECalgorithm::fullEnumeration:
-    final_msg << "Full enumeration algorithm complete. ";
+    final_msg << "Full enumeration algorithm completed. ";
     for (unsigned int i = 0; i < this->nCountr; ++i)
       this->countries_LCP.at(i)->EnumerateAll(true);
     this->make_country_QP();
@@ -2108,6 +2196,14 @@ void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
  */
 {
   this->Stats.AlgorithmParam.algorithm = algorithm;
+}
+void Game::EPEC::setRecoverStrategy(Game::EPECRecoverStrategy strategy)
+/**
+ * Decides the algorithm to be used for recovering a PNE out of the
+ * innerApproximation procedure.
+ */
+{
+  this->Stats.AlgorithmParam.recoverStrategy = strategy;
 }
 
 unsigned int Game::EPEC::getPosition_LeadFoll(const unsigned int i,
@@ -2162,8 +2258,8 @@ unsigned int Game::EPEC::getPosition_LeadLeadPoly(const unsigned int i,
 
 unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
   /**
-   * Get the number of polyhedra used in the inner approximation of the feasible
-   * region of the i-th leader.*
+   * Get the number of polyhedra used in the inner approximation of the
+   * feasible region of the i-th leader.*
    */
   return this->countries_LCP.at(i)->conv_Npoly();
 }
@@ -2184,8 +2280,8 @@ unsigned int Game::EPEC::getPosition_Probab(const unsigned int i,
 
 bool Game::EPEC::isPureStrategy(const double tol) const {
   /**
-   * Checks if the returned strategy leader is a pure strategy for the leader i.
-   * The strategy is considered a pure strategy, if it is played with a
+   * Checks if the returned strategy leader is a pure strategy for the leader
+   * i. The strategy is considered a pure strategy, if it is played with a
    * probability greater than 1 - tol;
    */
   for (unsigned int i = 0; i < this->getNcountries(); ++i) {
@@ -2197,8 +2293,8 @@ bool Game::EPEC::isPureStrategy(const double tol) const {
 
 bool Game::EPEC::isPureStrategy(const unsigned int i, const double tol) const {
   /**
-   * Checks if the returned strategy leader is a pure strategy for the leader i.
-   * The strategy is considered a pure strategy, if it is played with a
+   * Checks if the returned strategy leader is a pure strategy for the leader
+   * i. The strategy is considered a pure strategy, if it is played with a
    * probability greater than 1 - tol;
    */
   const unsigned int nPoly = this->getNPoly_Lead(i);
@@ -2315,8 +2411,21 @@ std::string std::to_string(const Game::EPECalgorithm al) {
     return string("fullEnumeration");
   case EPECalgorithm::innerApproximation:
     return string("innerApproximation");
+  case EPECalgorithm::combinatorialPNE:
+    return string("combinatorialPNE");
   default:
     return string("UNKNOWN_ALGORITHM_") + to_string(static_cast<int>(al));
+  }
+}
+std::string std::to_string(const Game::EPECRecoverStrategy strategy) {
+  switch (strategy) {
+  case Game::EPECRecoverStrategy::incrementalEnumeration:
+    return string("incrementalEnumeration");
+  case Game::EPECRecoverStrategy::combinatorial:
+    return string("combinatorial");
+  default:
+    return string("UNKNOWN_RECOVER_STRATEGY_") +
+           to_string(static_cast<int>(strategy));
   }
 }
 std::string std::to_string(const Game::EPECAddPolyMethod add) {
