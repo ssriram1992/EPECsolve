@@ -1777,7 +1777,7 @@ void Game::EPEC::iterativeNash() {
         this->Stats.status = EPECsolveStatus::numerical;
         solved = true;
       }
-      if (infeasCheck == true && this->Stats.numIteration == 1) {
+      if (infeasCheck && this->Stats.numIteration == 1) {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Problem is infeasible";
         this->Stats.status = EPECsolveStatus::nashEqNotFound;
