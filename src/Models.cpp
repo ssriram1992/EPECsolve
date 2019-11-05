@@ -539,8 +539,6 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
     Models::increaseVal(Loc, LeaderVars::TaxQuad, Params.n_followers);
   }
 
-  // Loc[Models::LeaderVars::AddnVar] = 1;
-
   // Leader Constraints
   short int import_lim_cons{0}, export_lim_cons{0}, price_lim_cons{0};
   if (Params.LeaderParam.import_limit >= 0)
@@ -1133,6 +1131,8 @@ void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x,
   writer.StartObject();
   writer.Key("Meta");
   writer.StartObject();
+  writer.Key("isPureEquilibrium");
+  writer.Bool(this->isPureStrategy());
   writer.Key("nCountries");
   writer.Uint(this->getNcountries());
   writer.Key("nFollowers");
@@ -1482,6 +1482,7 @@ void Models::EPEC::WriteCountry(const unsigned int i, const string filename,
        j < this->getPosition(i, Models::LeaderVars::CountryImport + 1); ++j)
     import += x.at(j);
   // Writing national level details
+  file << "PureStrategy:" << this->isPureStrategy(i) << "\n";
   file << Models::prn::label << "Domestic production"
        << ":" << Models::prn::val << prod << "\n";
   if (Export >= import)

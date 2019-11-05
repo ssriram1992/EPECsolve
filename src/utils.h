@@ -7,6 +7,7 @@
 #include "epecsolve.h"
 #include <armadillo>
 #include <fstream>
+#include <set>
 
 using namespace arma;
 
@@ -59,4 +60,11 @@ void appendSave(const unsigned int v, const std::string out,
 long int appendRead(unsigned int &v, const std::string in, long int pos,
                     const std::string header = "");
 
+// Binary encoding functions for the LCP class
+unsigned long int vec_to_num(std::vector<short int> binary);
+
+std::vector<short int> num_to_vec(unsigned long int number,
+                                  const unsigned int &nCompl);
 } // namespace Utils
+
+// namespace Utils

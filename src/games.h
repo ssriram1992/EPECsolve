@@ -9,6 +9,7 @@
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <string>
 
 using namespace Game;
@@ -67,6 +68,7 @@ public:
   MP_Param() = default;
 
   MP_Param(const MP_Param &M) = default;
+  void bound(double bigM, unsigned int primals);
 
   // Getters and setters
   arma::sp_mat getQ() const {
@@ -404,19 +406,34 @@ enum class EPECsolveStatus {
 };
 
 enum class EPECalgorithm {
-  fullEnumeration,   ///< Completely enumerate the set of polyhedra for all
-                     ///< followers
-  innerApproximation ///< Perfrorm increasingly better inner approximations in
-                     ///< iterations
+  fullEnumeration,    ///< Completely enumerate the set of polyhedra for all
+                      ///< followers
+  innerApproximation, ///< Perfrorm increasingly better inner approximations in
+  ///< iterations
+  combinatorialPNE ///< Perform a combinatorial-based search strategy to find a
+                   ///< pure NE
+};
+
+///< Recovery strategies for obtaining a PNE with innerApproximation
+enum class EPECRecoverStrategy {
+  incrementalEnumeration, ///< Add random polyhedra in each iteration
+  combinatorial ///< Triggers the combinatorialPNE with additional information
+                ///< from innerApproximation
 };
 
 /// @brief Stores the configuration for EPEC algorithms
 struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
+  Game::EPECRecoverStrategy recoverStrategy =
+      EPECRecoverStrategy::incrementalEnumeration;
+  ///< Specifies the method by which innerApproximation should seek for a PNE
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
+  bool boundPrimals{false}; ///< If true, each QP param is bounded with an
+                            ///< arbitrary large bigM constant
+  double boundBigM{1e5}; ///< Bounding upper value if @p BoundPrimals is true.
   long int addPolyMethodSeed{
       -1}; ///< Random seed for the random selection of polyhedra. If -1, a
-           ///< default computed value will seeded.
+           ///< default computed value will be seeded.
   bool indicators{true}; ///< Controls the flag @p useIndicators in Game::LCP.
   ///< Uses @p bigM if @p false.
   double timeLimit{
@@ -426,6 +443,8 @@ struct EPECAlgorithmParams {
   unsigned int aggressiveness{
       1}; ///< Controls the number of random polyhedra added at each iteration
   ///< in EPEC::iterativeNash
+  bool pureNE{false}; ///< If true, the algorithm will tend to search for pure
+  ///< NE. If none exists, it will return a MNE (if exists)
 };
 
 /// @brief Stores statistics for a (solved) EPEC instance
@@ -446,6 +465,7 @@ struct EPECStatistics {
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
           ///< leader (country)
   double wallClockTime = {0};
+  bool pureNE{false}; ///< True if the equilibrium is a pure NE.
   EPECAlgorithmParams AlgorithmParam =
       {}; ///< Stores the configuration for the EPEC algorithm employed in the
           ///< instance.
@@ -461,6 +481,11 @@ private:
   std::unique_ptr<Game::LCP> lcp; ///< The EPEC nash game written as an LCP
   std::unique_ptr<GRBModel>
       lcpmodel; ///< A Gurobi mode object of the LCP form of EPEC
+  std::unique_ptr<GRBModel>
+      lcpmodel_base; ///< A Gurobi mode object of the LCP form of EPEC. If
+                     ///< we are searching for a pure NE,
+  ///< the LCP which is indifferent to pure or mixed NE is stored in this
+  ///< object.
   unsigned int nVarinEPEC{0};
   unsigned int nCountr{0};
 
@@ -490,6 +515,7 @@ protected: // Datafields
   GRBEnv *env;
   bool finalized{false};
   bool nashEq{false};
+  std::chrono::high_resolution_clock::time_point initTime;
   EPECStatistics Stats{};            ///< Store run time information
   arma::vec sol_z,                   ///< Solution equation values
       sol_x;                         ///< Solution variable values
@@ -503,6 +529,12 @@ private:
   void make_country_LCP();
   void resetLCP();
   void iterativeNash();
+  void combinatorial_pure_NE(const std::vector<long int> combination,
+                        const std::vector<std::set<unsigned long int>> &excludeList);
+  void
+  combinatorialPNE(const std::vector<long int> combination = {},
+                   const std::vector<std::set<unsigned long int>> &excludeList = {});
+  void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
   bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
@@ -511,7 +543,7 @@ private:
                                      bool &infeasCheck) const;
   void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
-  bool computeNashEq(double localTimeLimit = -1.0);
+  bool computeNashEq(bool pureNE = false, double localTimeLimit = -1.0);
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
                          bool stopOnSingleInfeasibility = false);
 
@@ -555,6 +587,8 @@ public:                  // functions
   bool isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
                 double tol = 1e-4) const;
 
+  bool isSolved(double tol = 1e-4) const;
+
   const arma::vec getx() const { return this->sol_x; }
   void reset() { this->sol_x.ones(); }
   const arma::vec getz() const { return this->sol_z; }
@@ -563,6 +597,10 @@ public:                  // functions
   void setAlgorithm(Game::EPECalgorithm algorithm);
   Game::EPECalgorithm getAlgorithm() const {
     return this->Stats.AlgorithmParam.algorithm;
+  }
+  void setRecoverStrategy(Game::EPECRecoverStrategy strategy);
+  Game::EPECRecoverStrategy getRecoverStrategy() const {
+    return this->Stats.AlgorithmParam.recoverStrategy;
   }
   void setAggressiveness(unsigned int a) {
     this->Stats.AlgorithmParam.aggressiveness = a;
@@ -585,6 +623,16 @@ public:                  // functions
   }
   void setIndicators(bool val) { this->Stats.AlgorithmParam.indicators = val; }
   bool getIndicators() const { return this->Stats.AlgorithmParam.indicators; }
+  void setPureNE(bool val) { this->Stats.AlgorithmParam.pureNE = val; }
+  bool getPureNE() const { return this->Stats.AlgorithmParam.pureNE; }
+  void setBoundPrimals(bool val) {
+    this->Stats.AlgorithmParam.boundPrimals = val;
+  }
+  bool getBoundPrimals() const {
+    return this->Stats.AlgorithmParam.boundPrimals;
+  }
+  void setBoundBigM(double val) { this->Stats.AlgorithmParam.boundBigM = val; }
+  double getBoundBigM() const { return this->Stats.AlgorithmParam.boundBigM; }
   void setTimeLimit(double val) { this->Stats.AlgorithmParam.timeLimit = val; }
   double getTimeLimit() const { return this->Stats.AlgorithmParam.timeLimit; }
   void setAddPolyMethod(Game::EPECAddPolyMethod add) {
@@ -628,6 +676,7 @@ public:                  // functions
   // The following checks if the returned strategy leader is a pure strategy
   // for a leader or appropriately retrieve mixed-strategies
   bool isPureStrategy(const unsigned int i, const double tol = 1e-5) const;
+  bool isPureStrategy(const double tol = 1e-5) const;
   std::vector<unsigned int> mixedStratPoly(const unsigned int i,
                                            const double tol = 1e-5) const;
 
@@ -650,6 +699,7 @@ public:                  // functions
 namespace std {
 string to_string(const Game::EPECsolveStatus st);
 string to_string(const Game::EPECalgorithm al);
+string to_string(const Game::EPECRecoverStrategy st);
 string to_string(const Game::EPECAlgorithmParams al);
 string to_string(const Game::EPECAddPolyMethod add);
 }; // namespace std

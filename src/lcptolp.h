@@ -61,11 +61,13 @@ private:
   /// inequalities are fixed to equality to get the individual polyhedra
   std::set<unsigned long int> AllPolyhedra =
       {}; ///< Decimal encoding of polyhedra that have been enumerated
+  std::set<unsigned long int> feasiblePoly =
+      {}; ///< Decimal encoding of polyhedra that have been enumerated
   std::set<unsigned long int> knownInfeas =
       {}; ///< Decimal encoding of polyhedra known to be infeasible
   std::set<unsigned long int> notProcessed =
       {}; ///< Decimal encoding of polyhedra to be processed
-  unsigned int maxTheoreticalPoly{0};
+  unsigned long int maxTheoreticalPoly{0};
   std::unique_ptr<spmat_Vec>
       Ai; ///< Vector to contain the LHS of inner approx polyhedra
   std::unique_ptr<vec_Vec>
@@ -79,8 +81,8 @@ private:
   void initializeNotProcessed() {
     const unsigned int nCompl = this->Compl.size();
     // 2^n - the number of polyhedra theoretically
-    this->maxTheoreticalPoly = static_cast<unsigned int>(pow(2, nCompl));
-    for (unsigned int i = 0; i < this->maxTheoreticalPoly; ++i)
+    this->maxTheoreticalPoly = static_cast<unsigned long int>(pow(2, nCompl));
+    for (unsigned long int i = 0; i < this->maxTheoreticalPoly; ++i)
       this->notProcessed.insert(i);
   }
   /* Solving relaxations and restrictions */
@@ -106,7 +108,7 @@ private:
   LCP &FixToPolies(const std::vector<short int> Fix, bool checkFeas = false,
                    bool custom = false, spmat_Vec *custAi = {},
                    vec_Vec *custbi = {});
-  unsigned int getNextPoly(Game::EPECAddPolyMethod method) const;
+  unsigned long int getNextPoly(Game::EPECAddPolyMethod method) const;
 
 public:
   // Fudgible data
@@ -182,15 +184,33 @@ public:
   /* Convex hull computation */
   unsigned int ConvexHull(arma::sp_mat &A, arma::vec &b);
   unsigned int conv_Npoly() const;
-  unsigned int conv_PolyPosition(const unsigned int i) const;
-  unsigned int conv_PolyWt(const unsigned int i) const;
+  unsigned int conv_PolyPosition(const unsigned long int i) const;
+  unsigned int conv_PolyWt(const unsigned long int i) const;
+
+  std::set<unsigned long int> getAllPolyhedra() const {
+    return this->AllPolyhedra;
+  };
+  std::set<unsigned long int> getnotProcessed() const {
+    return this->notProcessed;
+  };
+  unsigned long int getNumTheoreticalPoly() const noexcept {
+    return this->maxTheoreticalPoly;
+  }
 
   LCP &makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP);
 
   std::set<std::vector<short int>>
-  addAPoly(unsigned int nPoly = 1,
+  addAPoly(unsigned long int nPoly = 1,
            Game::EPECAddPolyMethod method = Game::EPECAddPolyMethod::sequential,
            std::set<std::vector<short int>> Polys = {});
+  bool addThePoly(const unsigned long int &decimalEncoding);
+  bool checkPolyFeas(const unsigned long int &decimalEncoding);
+  bool checkPolyFeas(const std::vector<short int> &Fix);
+  void clearPolyhedra() {
+    this->Ai->clear();
+    this->bi->clear();
+    this->AllPolyhedra.clear();
+  }
   LCP &addPolyFromX(const arma::vec &x, bool &ret);
   LCP &EnumerateAll(bool solveLP = true);
   std::string feas_detail_str() const;
