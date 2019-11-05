@@ -1704,9 +1704,8 @@ void Game::EPEC::iterativeNash() {
       this->countries_LCP.at(i)->addPolyMethodSeed = seed;
     }
   }
-  std::chrono::high_resolution_clock::time_point initTime;
   if (this->Stats.AlgorithmParam.timeLimit > 0)
-    initTime = std::chrono::high_resolution_clock::now();
+    this->initTime = std::chrono::high_resolution_clock::now();
 
   // Stay in this loop, till you find a Nash equilibrium or prove that there
   // does not exist a Nash equilibrium or you run out of time.
@@ -1790,7 +1789,7 @@ void Game::EPEC::iterativeNash() {
     // TimeLimit
     if (this->Stats.AlgorithmParam.timeLimit > 0) {
       const std::chrono::duration<double> timeElapsed =
-          std::chrono::high_resolution_clock::now() - initTime;
+          std::chrono::high_resolution_clock::now() - this->initTime;
       const double timeRemaining =
           this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
       addRandPoly =
@@ -1811,7 +1810,7 @@ void Game::EPEC::iterativeNash() {
     // Anyway, we are over the timeLimit and we should stop
     if (this->Stats.AlgorithmParam.timeLimit > 0) {
       const std::chrono::duration<double> timeElapsed =
-          std::chrono::high_resolution_clock::now() - initTime;
+          std::chrono::high_resolution_clock::now() - this->initTime;
       const double timeRemaining =
           this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
       if (timeRemaining <= 0) {
@@ -1824,7 +1823,7 @@ void Game::EPEC::iterativeNash() {
   }
 }
 
-void Game::EPEC::combinatorialPNE(
+void Game::EPEC::combinatorial_pure_NE(
     const std::vector<long int> combination,
     const std::vector<std::set<unsigned long int>> &excludeList) {
 
@@ -1832,6 +1831,17 @@ void Game::EPEC::combinatorialPNE(
        this->Stats.pureNE == true) ||
       this->Stats.status == EPECsolveStatus::timeLimit)
     return;
+
+  if (this->Stats.AlgorithmParam.timeLimit > 0) {
+    const std::chrono::duration<double> timeElapsed =
+        std::chrono::high_resolution_clock::now() - this->initTime;
+    const double timeRemaining =
+        this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
+    if (timeRemaining <= 0) {
+      this->Stats.status = Game::EPECsolveStatus::timeLimit;
+      return;
+    }
+  }
 
   std::vector<long int> childCombination(combination);
   bool found{false};
@@ -1847,14 +1857,14 @@ void Game::EPEC::combinatorialPNE(
          j < this->countries_LCP.at(i)->getNumTheoreticalPoly(); ++j) {
       if (this->countries_LCP.at(i)->checkPolyFeas(j)) {
         childCombination.at(i) = j;
-        this->combinatorialPNE(childCombination, excludeList);
+        this->combinatorial_pure_NE(childCombination, excludeList);
       }
     }
   } else {
     // Combination is filled and ready!
     // Check that this combination is not in the excuded list
     BOOST_LOG_TRIVIAL(trace)
-        << "Game::EPEC::combinatorialPNE: considering a FULL combination";
+        << "Game::EPEC::combinatorial_pure_NE: considering a FULL combination";
     bool excluded = false;
     if (!excludeList.empty()) {
       excluded = true;
@@ -1867,20 +1877,30 @@ void Game::EPEC::combinatorialPNE(
     }
 
     if (!excluded) {
-      BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::combinatorialPNE: considering a "
-                                  "FEASIBLE combination of polyhedra.";
+      BOOST_LOG_TRIVIAL(trace)
+          << "Game::EPEC::combinatorial_pure_NE: considering a "
+             "FEASIBLE combination of polyhedra.";
       for (int j = 0; j < this->getNcountries(); ++j) {
         this->countries_LCP.at(j)->clearPolyhedra();
         this->countries_LCP.at(j)->addThePoly(childCombination.at(j));
       }
       this->make_country_QP();
-      bool res = this->computeNashEq(false);
-      if (this->computeNashEq(false)) {
+      bool res = false;
+      if (this->Stats.AlgorithmParam.timeLimit > 0) {
+        const std::chrono::duration<double> timeElapsed =
+            std::chrono::high_resolution_clock::now() - this->initTime;
+        const double timeRemaining =
+            this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
+        res = this->computeNashEq(false, timeRemaining);
+      } else
+        res = this->computeNashEq(false);
+
+      if (res) {
         if (this->isSolved()) {
           // Check that the equilibrium is a pure strategy
           if ((this->isPureStrategy())) {
             BOOST_LOG_TRIVIAL(info)
-                << "Game::EPEC::combinatorialPNE: found a pure strategy.";
+                << "Game::EPEC::combinatorial_pure_NE: found a pure strategy.";
             this->Stats.status = Game::EPECsolveStatus::nashEqFound;
             this->Stats.pureNE = true;
             return;
@@ -1889,7 +1909,7 @@ void Game::EPEC::combinatorialPNE(
       }
     } else {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::combinatorialPNE: configuration pruned.";
+          << "Game::EPEC::combinatorial_pure_NE: configuration pruned.";
       return;
     }
   }
@@ -2104,13 +2124,20 @@ void Game::EPEC::make_pure_LCP(bool indicators) {
   }
 }
 
-void Game::EPEC::combinatorialPNE() {
-  std::vector<std::set<unsigned long int>> excludeList;
-  std::vector<long int> start;
-  for (int j = 0; j < this->nCountr; ++j) {
-    start.push_back(-1);
-  }
-  this->combinatorialPNE(start, excludeList);
+void Game::EPEC::combinatorialPNE(
+    const std::vector<long int> combination,
+    const std::vector<std::set<unsigned long int>> &excludeList) {
+
+  if (this->Stats.AlgorithmParam.timeLimit > 0)
+    this->initTime = std::chrono::high_resolution_clock::now();
+  if (combination.empty()) {
+    std::vector<long int> start;
+    for (int j = 0; j < this->nCountr; ++j)
+      start.push_back(-1);
+    this->combinatorial_pure_NE(start, excludeList);
+  } else
+    this->combinatorial_pure_NE(combination, excludeList);
+
   return;
 }
 

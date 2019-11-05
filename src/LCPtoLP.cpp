@@ -1036,8 +1036,7 @@ bool Game::LCP::checkPolyFeas(
       feasiblePoly.insert(FixNumber);
       notProcessed.erase(FixNumber);
       return true;
-    }
-    else {
+    } else {
       BOOST_LOG_TRIVIAL(trace)
           << "Game::LCP::checkPolyFeas: Detected infeasibility of " << FixNumber
           << " (GRB_STATUS=" << model.get(GRB_IntAttr_Status) << ")";

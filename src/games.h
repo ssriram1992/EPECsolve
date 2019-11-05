@@ -406,17 +406,19 @@ enum class EPECsolveStatus {
 };
 
 enum class EPECalgorithm {
-  fullEnumeration,   ///< Completely enumerate the set of polyhedra for all
-                     ///< followers
+  fullEnumeration,    ///< Completely enumerate the set of polyhedra for all
+                      ///< followers
   innerApproximation, ///< Perfrorm increasingly better inner approximations in
   ///< iterations
-  combinatorialPNE ///< Perform a combinatorial-based search strategy to find a pure NE
+  combinatorialPNE ///< Perform a combinatorial-based search strategy to find a
+                   ///< pure NE
 };
 
 ///< Recovery strategies for obtaining a PNE with innerApproximation
 enum class EPECRecoverStrategy {
   incrementalEnumeration, ///< Add random polyhedra in each iteration
-  combinatorial           ///< Triggers the combinatorialPNE with additional information from innerApproximation
+  combinatorial ///< Triggers the combinatorialPNE with additional information
+                ///< from innerApproximation
 };
 
 /// @brief Stores the configuration for EPEC algorithms
@@ -513,6 +515,7 @@ protected: // Datafields
   GRBEnv *env;
   bool finalized{false};
   bool nashEq{false};
+  std::chrono::high_resolution_clock::time_point initTime;
   EPECStatistics Stats{};            ///< Store run time information
   arma::vec sol_z,                   ///< Solution equation values
       sol_x;                         ///< Solution variable values
@@ -526,10 +529,11 @@ private:
   void make_country_LCP();
   void resetLCP();
   void iterativeNash();
+  void combinatorial_pure_NE(const std::vector<long int> combination,
+                        const std::vector<std::set<unsigned long int>> &excludeList);
   void
-  combinatorialPNE(const std::vector<long int> combination,
-                   const std::vector<std::set<unsigned long int>> &excludeList);
-  void combinatorialPNE();
+  combinatorialPNE(const std::vector<long int> combination = {},
+                   const std::vector<std::set<unsigned long int>> &excludeList = {});
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
