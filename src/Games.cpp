@@ -2128,8 +2128,12 @@ void Game::EPEC::combinatorialPNE(
     const std::vector<long int> combination,
     const std::vector<std::set<unsigned long int>> &excludeList) {
 
-  if (this->Stats.AlgorithmParam.timeLimit > 0)
-    this->initTime = std::chrono::high_resolution_clock::now();
+  if (this->Stats.AlgorithmParam.timeLimit > 0) {
+    // Checking the function hasn't been called from innerApproximation
+    if (this->Stats.numIteration <= 0) {
+      this->initTime = std::chrono::high_resolution_clock::now();
+    }
+  }
   if (combination.empty()) {
     std::vector<long int> start;
     for (int j = 0; j < this->nCountr; ++j)
