@@ -2,9 +2,9 @@
 
 # EPECsolve
 Code to compute mixed-equilibrium in linear EPECs.
-	* [Code](https://github.com/ssriram1992/EPECsolve/)
-	* [Instances](https://github.com/ds4dm/EPECInstances)
-	* [arXiv](https://arxiv.org/abs/1910.06452) pre-print
+	- [Code](https://github.com/ssriram1992/EPECsolve/)
+	- [Instances](https://github.com/ds4dm/EPECInstances)
+	- [arXiv](https://arxiv.org/abs/1910.06452) pre-print
 
 # Prerequisites
 
