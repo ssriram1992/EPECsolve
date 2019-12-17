@@ -727,7 +727,7 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
     bool writeToFile, ///< If  true, writes  M and  q to file.k
     string M_name,    ///< File name to be used to write  M
     string q_name     ///< File name to be used to write  M
-    ) const {
+) const {
   /// @brief Formulates the LCP corresponding to the Nash game.
   /// @warning Does not return the leader constraints. Use
   /// NashGame::RewriteLeadCons() to handle them
@@ -1039,7 +1039,7 @@ unique_ptr<GRBModel> Game::NashGame::Respond(
     ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
                  ///< player)
-    ) const
+) const
 /**
  * @brief Given the decision of other players, find the optimal response for
  * player in position @p player
@@ -1083,7 +1083,7 @@ double Game::NashGame::RespondSol(
     ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
                  ///< player)
-    ) const {
+) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
    * player @p player given the decision @p x of all other players.
@@ -1364,7 +1364,7 @@ double Game::EPEC::RespondSol(
     ///< or all other players
     const arma::vec &prevDev = {}
     //< [in] if any, the vector of previous deviations.
-    ) const {
+) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
    * player @p player given the decision @p x of all other players.
@@ -1457,10 +1457,6 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
     if (val == GRB_INFINITY)
       return false;
     if (abs(val - objvals.at(i)) > tol) {
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::isSolved: found a deviation ("
-          << abs(val - objvals.at(i)) << ")for player " << i
-          << ".\nActual: " << objvals.at(i) << "\tOptimized: " << val;
       *countryNumber = i;
       // cout << "Proof - deviation: "<<*ProfDevn; //Sane
       // cout << "Current soln: "<<this->sol_x;
@@ -1473,7 +1469,8 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
 bool Game::EPEC::isSolved(double tol) const {
   unsigned int countryNumber;
   arma::vec ProfDevn;
-  return this->isSolved(&countryNumber, &ProfDevn);
+  bool ret = this->isSolved(&countryNumber, &ProfDevn);
+  return ret;
 }
 
 void Game::EPEC::make_country_QP(const unsigned int i)
@@ -1579,7 +1576,7 @@ bool Game::EPEC::getAllDevns(
     const arma::vec &guessSol, ///< [in] The guess for the solution vector
     const std::vector<arma::vec>
         &prevDev //<[in] The previous vecrtor of deviations, if any exist.
-    ) const
+) const
 /**
  * @brief Given a potential solution vector, returns a profitable deviation (if
  * it exists) for all players. @param
@@ -1609,7 +1606,7 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
                       ///< true, at least one player has no polyhedron that can
                       ///< be added. In the first iteration, this translates to
                       ///< infeasability
-    ) const {
+) const {
   /**
    * Given a profitable deviation for each country, adds <i>a</i> polyhedron in
    * the feasible region of each country to the corresponding country's
@@ -1891,9 +1888,9 @@ void Game::EPEC::combinatorial_pure_NE(
             std::chrono::high_resolution_clock::now() - this->initTime;
         const double timeRemaining =
             this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
-        res = this->computeNashEq(false, timeRemaining);
+        res = this->computeNashEq(false, timeRemaining, true);
       } else
-        res = this->computeNashEq(false);
+        res = this->computeNashEq(false, -1.0, true);
 
       if (res) {
         if (this->isSolved()) {
@@ -1951,8 +1948,11 @@ void ::Game::EPEC::make_country_LCP() {
 }
 
 bool Game::EPEC::computeNashEq(
-    bool pureNE,          ///< True if we search for a NE
-    double localTimeLimit ///< Allowed time limit to run this function
+    bool pureNE,           ///< True if we search for a PNE
+    double localTimeLimit, ///< Allowed time limit to run this function
+    bool check ///< If true, the algorithm will seek for the maximum number of
+               ///< NE. Then, it will check they are equilibria for the original
+               ///< problem
 ) {
   /**
    * Given that Game::EPEC::country_QP are all filled with a each country's
@@ -1960,8 +1960,8 @@ bool Game::EPEC::computeNashEq(
    * equilibrium.
    * @returns true if a Nash equilibrium is found
    */
-  bool foundNash{false};
   // Make the Nash Game between countries
+  this->nashEq = false;
   BOOST_LOG_TRIVIAL(trace)
       << " Game::EPEC::computeNashEq: Making the Master LCP";
   this->make_country_LCP();
@@ -1983,32 +1983,40 @@ bool Game::EPEC::computeNashEq(
   }
 
   // this->lcpmodel->set(GRB_IntParam_OutputFlag, 1);
+  if (check)
+    this->lcpmodel->set(GRB_IntParam_SolutionLimit, GRB_MAXINT);
   this->lcpmodel->optimize();
   this->Stats.wallClockTime += this->lcpmodel->get(GRB_DoubleAttr_Runtime);
 
   // Search just for a feasible point
   try { // Try finding a Nash equilibrium for the approximation
-    foundNash =
+    this->nashEq =
         this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
   } catch (GRBException &e) {
     BOOST_LOG_TRIVIAL(error)
         << "GRBException in Game::EPEC::computeNashEq : " << e.getErrorCode()
         << ": " << e.getMessage() << " ";
   }
-  if (foundNash) { // If a Nash equilibrium is found, then update
-                   // appropriately
-    BOOST_LOG_TRIVIAL(info)
-        << "Game::EPEC::computeNashEq: an equilibrium has been found.";
-    this->nashEq = true;
-    this->Stats.status = Game::EPECsolveStatus::nashEqFound;
-    if (this->isPureStrategy()) {
+  if (this->nashEq) { // If a Nash equilibrium is found, then update
+                      // appropriately
+    if (check) {
+      int scount = this->lcpmodel->get(GRB_IntAttr_SolCount);
       BOOST_LOG_TRIVIAL(info)
-          << "Game::EPEC::computeNashEq: the equilibrium is a pure strategy.";
-      this->Stats.pureNE = true;
+          << "Game::EPEC::computeNashEq: number of equilibria is " << scount;
+      for (int k = 0, stop = 0; k < scount && stop == 0; ++k) {
+        this->lcpmodel->getEnv().set(GRB_IntParam_SolutionNumber, k);
+        this->nashEq =
+            this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
+        if (this->isSolved()) {
+          BOOST_LOG_TRIVIAL(info)
+              << "Game::EPEC::computeNashEq: an Equilibrium has been found";
+          stop = 1;
+        }
+      }
     } else {
-      if (this->Stats.AlgorithmParam.pureNE)
-        BOOST_LOG_TRIVIAL(warning)
-            << "Game::EPEC::computeNashEq: Found a MNE, not a PNE.";
+      this->nashEq = true;
+      BOOST_LOG_TRIVIAL(info)
+          << "Game::EPEC::computeNashEq: an Equilibrium has been found";
     }
 
   } else { // If not, then update accordingly
@@ -2020,7 +2028,7 @@ bool Game::EPEC::computeNashEq(
     else
       this->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
   }
-  return foundNash;
+  return this->nashEq;
 }
 
 bool Game::EPEC::warmstart(const arma::vec x) {
@@ -2181,13 +2189,7 @@ void Game::EPEC::findNashEq() {
 
   case Game::EPECalgorithm::fullEnumeration:
     final_msg << "Full enumeration algorithm completed. ";
-    for (unsigned int i = 0; i < this->nCountr; ++i)
-      this->countries_LCP.at(i)->EnumerateAll(true);
-    this->make_country_QP();
-    BOOST_LOG_TRIVIAL(trace)
-        << "Game::EPEC::findNashEq: Starting fullEnumeration search";
-    this->computeNashEq(this->Stats.AlgorithmParam.pureNE,
-                        this->Stats.AlgorithmParam.timeLimit);
+    this->fullEnumerationNash();
     break;
   }
   // Handing EPECStatistics object to track performance of algorithm
@@ -2201,11 +2203,10 @@ void Game::EPEC::findNashEq() {
   case Game::EPECsolveStatus::nashEqNotFound:
     final_msg << "No Nash equilibrium exists.";
     break;
-  case Game::EPECsolveStatus::nashEqFound:
+  case Game::EPECsolveStatus::nashEqFound: {
     final_msg << "Found a Nash equilibrium ("
               << (this->Stats.pureNE == 0 ? "MNE" : "PNE") << ").";
-
-    break;
+  } break;
   case Game::EPECsolveStatus::timeLimit:
     final_msg << "Nash equilibrium not found. Time limit attained";
     break;
@@ -2218,6 +2219,20 @@ void Game::EPEC::findNashEq() {
     break;
   }
   BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: " << final_msg.str();
+}
+void Game::EPEC::fullEnumerationNash() {
+  for (unsigned int i = 0; i < this->nCountr; ++i)
+    this->countries_LCP.at(i)->EnumerateAll(true);
+  this->make_country_QP();
+  BOOST_LOG_TRIVIAL(trace)
+      << "Game::EPEC::findNashEq: Starting fullEnumeration search";
+  this->computeNashEq(this->Stats.AlgorithmParam.pureNE,
+                      this->Stats.AlgorithmParam.timeLimit);
+  if (this->isSolved()) {
+    this->Stats.status = Game::EPECsolveStatus::nashEqFound;
+    if (this->isPureStrategy())
+      this->Stats.pureNE = true;
+  }
 }
 
 void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
