@@ -1727,7 +1727,8 @@ void Game::EPEC::iterativeNash() {
       arma::vec countryDeviation{};
       if (this->isSolved(&deviatedCountry, &countryDeviation)) {
         this->Stats.status = Game::EPECsolveStatus::nashEqFound;
-        if ((this->Stats.AlgorithmParam.pureNE && !this->isPureStrategy())) {
+        this->Stats.pureNE = this->isPureStrategy();
+        if ((this->Stats.AlgorithmParam.pureNE && !this->Stats.pureNE)) {
           // We are seeking for a pure strategy. Then, here we switch between an
           // incremental
           // enumeration or combinations of pure strategies.
