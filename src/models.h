@@ -234,9 +234,6 @@ private:
                      const std::string filename, const arma::vec x) const;
 
 public: // Attributes
-  const unsigned int nVarEPEC{
-      this->getnVarinEPEC()}; ///< Constant attribute for number of variables in
-                              ///< the EPEC
   bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax
                                ///< is added to each leader objective
 
