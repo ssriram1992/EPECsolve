@@ -233,7 +233,7 @@ private:
   void WriteFollower(const unsigned int i, const unsigned int j,
                      const std::string filename, const arma::vec x) const;
 
-public: // Attributes
+public:                        // Attributes
   bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax
                                ///< is added to each leader objective
 

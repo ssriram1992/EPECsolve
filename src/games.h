@@ -529,11 +529,12 @@ private:
   void make_country_LCP();
   void resetLCP();
   void iterativeNash();
-  void combinatorial_pure_NE(const std::vector<long int> combination,
-                        const std::vector<std::set<unsigned long int>> &excludeList);
-  void
-  combinatorialPNE(const std::vector<long int> combination = {},
-                   const std::vector<std::set<unsigned long int>> &excludeList = {});
+  void combinatorial_pure_NE(
+      const std::vector<long int> combination,
+      const std::vector<std::set<unsigned long int>> &excludeList);
+  void combinatorialPNE(
+      const std::vector<long int> combination = {},
+      const std::vector<std::set<unsigned long int>> &excludeList = {});
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
