@@ -79,12 +79,21 @@ private:
   void defConst(GRBEnv *env);
   void makeRelaxed();
   void initializeNotProcessed() {
-    const unsigned int nCompl = this->Compl.size();
-    // 2^n - the number of polyhedra theoretically
-    this->maxTheoreticalPoly = static_cast<unsigned long int>(pow(2, nCompl));
-    for (unsigned long int i = 0; i < this->maxTheoreticalPoly; ++i)
-      this->notProcessed.insert(i);
+    // const unsigned int nCompl = this->Compl.size();
+    // // 2^n - the number of polyhedra theoretically
+    // this->maxTheoreticalPoly = static_cast<unsigned long int>(pow(2, nCompl));
+    // for (unsigned long int i = 0; i < this->maxTheoreticalPoly; ++i)
+		// {
+			// if(i% 10000000 == 0)
+				// std::cout << "Game::LCP::initializeNotProcessed: "<< i <<" out of "<<this->maxTheoreticalPoly <<" initialized which is "<< static_cast<double>(i)/this->maxTheoreticalPoly * 100  <<" percent \n";
+      // this->notProcessed.insert(i);
+		// }
+  const unsigned int nCompl = this->Compl.size();
+  this->maxTheoreticalPoly = static_cast<unsigned long int>(pow(2, nCompl));
+	this->highest_unprocessed = this->maxTheoreticalPoly-1;
   }
+	mutable unsigned long int lowest_unprocessed {0};
+	mutable unsigned long int highest_unprocessed {0};
   /* Solving relaxations and restrictions */
   std::unique_ptr<GRBModel> LCPasMIP(std::vector<unsigned int> FixEq = {},
                                      std::vector<unsigned int> FixVar = {},

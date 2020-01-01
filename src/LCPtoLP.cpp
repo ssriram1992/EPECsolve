@@ -979,7 +979,7 @@ bool Game::LCP::FixToPoly(
       custbi->push_back(std::move(bii));
     } else {
       AllPolyhedra.insert(FixNumber);
-      notProcessed.erase(FixNumber);
+      // notProcessed.erase(FixNumber);
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }
@@ -1033,15 +1033,15 @@ bool Game::LCP::checkPolyFeas(
     model.set(GRB_IntParam_OutputFlag, VERBOSE);
     model.optimize();
     if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL) {
-      feasiblePoly.insert(FixNumber);
-      notProcessed.erase(FixNumber);
+      // feasiblePoly.insert(FixNumber);
+      // notProcessed.erase(FixNumber);
       return true;
     } else {
       BOOST_LOG_TRIVIAL(trace)
           << "Game::LCP::checkPolyFeas: Detected infeasibility of " << FixNumber
           << " (GRB_STATUS=" << model.get(GRB_IntAttr_Status) << ")";
-      knownInfeas.insert(FixNumber);
-      notProcessed.erase(FixNumber);
+      // knownInfeas.insert(FixNumber);
+      // notProcessed.erase(FixNumber);
       return false;
     }
   } catch (const char *e) {
@@ -1115,30 +1115,41 @@ unsigned long int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
    * known to be infeasible, nor already added in the inner approximation
    * representation.
    */
+	if(this->lowest_unprocessed > this->highest_unprocessed)
+		return this->maxTheoreticalPoly;
   switch (method) {
   case Game::EPECAddPolyMethod::sequential: {
-    if (!notProcessed.empty())
-      return *notProcessed.begin();
-    else
-      return this->maxTheoreticalPoly;
+    // if (!notProcessed.empty())
+      // return *notProcessed.begin();
+    // else
+      // return this->maxTheoreticalPoly;
+	  return this->lowest_unprocessed++;
   } break;
   case Game::EPECAddPolyMethod::reverse_sequential: {
-    if (!notProcessed.empty())
-      return *--notProcessed.end();
-    else
-      return this->maxTheoreticalPoly;
+    // if (!notProcessed.empty())
+      // return *--notProcessed.end();
+    // else
+      // return this->maxTheoreticalPoly;
+		return this->highest_unprocessed--;
   } break;
   case Game::EPECAddPolyMethod::random: {
-    if (!notProcessed.empty()) {
+    // if (!notProcessed.empty()) {
+      // static std::mt19937 engine{this->addPolyMethodSeed};
+      // std::uniform_int_distribution<unsigned long int> dist(
+          // 0, this->notProcessed.size() - 1);
+      // unsigned long int gotIt = dist(engine);
+      // return *(std::next(this->notProcessed.begin(), gotIt));
+    // } else {
+      // return this->maxTheoreticalPoly;
+    // }
       static std::mt19937 engine{this->addPolyMethodSeed};
-      std::uniform_int_distribution<unsigned long int> dist(
-          0, this->notProcessed.size() - 1);
+      std::uniform_int_distribution<unsigned long int> dist( 0, 1);
       unsigned long int gotIt = dist(engine);
-      return *(std::next(this->notProcessed.begin(), gotIt));
-    } else {
-      return this->maxTheoreticalPoly;
-    }
-  }
+			if(gotIt) 
+				return this->lowest_unprocessed++;
+			else
+				return this->highest_unprocessed--;
+  } break;
   default: {
     BOOST_LOG_TRIVIAL(error)
         << "Error in Game::LCP::getNextPoly: unrecognized method "

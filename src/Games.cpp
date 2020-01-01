@@ -175,17 +175,17 @@ unsigned int Game::MP_Param::size()
 }
 
 Game::MP_Param &
-Game::MP_Param::set(const arma::sp_mat &Q, const arma::sp_mat &C,
-                    const arma::sp_mat &A, const arma::sp_mat &B,
-                    const arma::vec &c, const arma::vec &b)
+Game::MP_Param::set(const arma::sp_mat &Qq, const arma::sp_mat &Cc,
+                    const arma::sp_mat &Aa, const arma::sp_mat &Bb,
+                    const arma::vec &cc, const arma::vec &bb)
 /// Setting the data, while keeping the input objects intact
 {
-  this->Q = (Q);
-  this->C = (C);
-  this->A = (A);
-  this->B = (B);
-  this->c = (c);
-  this->b = (b);
+  this->Q = Qq;
+  this->C = Cc;
+  this->A = Aa;
+  this->B = Bb;
+  this->c = cc;
+  this->b = bb;
   if (!finalize())
     throw string("Error in MP_Param::set: Invalid data");
   return *this;
@@ -1260,6 +1260,7 @@ void Game::EPEC::finalize()
       this->make_obj_leader(i, *this->LeadObjec.at(i).get());
       this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
           new LCP(this->env, *this->countries_LL.at(i).get()));
+			BOOST_LOG_TRIVIAL(debug)<<"LCP success";
       this->SizesWithoutHull.at(i) = *this->LocEnds.at(i);
     }
 
