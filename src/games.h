@@ -559,6 +559,7 @@ protected: // functions
   // virtual function to be optionally implemented by the inheritor.
   virtual void prefinalize();
   virtual void postfinalize();
+	virtual void initializeSoln(arma::vec &init_x) const;
   virtual void
   updateLocs() = 0; // If any location tracking system is implemented, that can
                     // be called from in here.

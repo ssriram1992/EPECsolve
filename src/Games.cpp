@@ -1190,6 +1190,16 @@ bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
 }
 
 // EPEC stuff
+void Game::EPEC::initializeSoln(arma::vec &init_x) const
+/**
+  @brief Empty function - optionally reimplementable in derived class
+@details This function can be optionally implemented by
+ the derived class. Code in this class will be run to determine
+ the initial point before iterativeNash.
+*/
+{
+	init_x.zeros();
+}
 
 void Game::EPEC::prefinalize()
 /**
@@ -1697,6 +1707,7 @@ void Game::EPEC::iterativeNash() {
 
   // Set the initial point for all countries as 0 and solve the respective LCPs?
   this->sol_x.zeros(this->nVarinEPEC);
+	this->initializeSoln(this->sol_x);
 
   bool solved = {false};
   bool addRandPoly{false};
@@ -1917,6 +1928,12 @@ void Game::EPEC::combinatorial_pure_NE(
           if ((this->isPureStrategy())) {
             BOOST_LOG_TRIVIAL(info)
                 << "Game::EPEC::combinatorial_pure_NE: found a pure strategy.";
+						BOOST_LOG_TRIVIAL(info) << "Game::EPEC::combinatorial_pure_NE: Successful combination: "<< [combination](){
+							std::stringstream foo;
+							for(auto a:combination)
+								foo<<a<<" ";
+							return foo.str(); 
+						}();
             this->Stats.status = Game::EPECsolveStatus::nashEqFound;
             this->Stats.pureNE = true;
             return;
@@ -2028,8 +2045,14 @@ bool Game::EPEC::computeNashEq(
     }
 
   } else { // If not, then update accordingly
-    BOOST_LOG_TRIVIAL(info)
-        << "Game::EPEC::computeNashEq: no equilibrium has been found.";
+		static int output_counter{0}, iter_counter{0};
+		if(output_counter++ == 1000)
+		{
+			iter_counter++;
+			BOOST_LOG_TRIVIAL(info)
+					<< "Game::EPEC::computeNashEq: no equilibrium has been found." <<iter_counter;
+			output_counter = 0;
+		}
     int status = this->lcpmodel->get(GRB_IntAttr_Status);
     if (status == GRB_TIME_LIMIT)
       this->Stats.status = Game::EPECsolveStatus::timeLimit;
