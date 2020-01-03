@@ -55,8 +55,11 @@ private:
   // Temporary data
   bool madeRlxdModel{false}; ///< Keep track if LCP::RlxdModel is made
   unsigned int nR, nC;
+
   int polyCounter{0};
   unsigned int feasiblePolyhedra{0};
+  unsigned int sequentialPolyCounter{0};
+  int reverseSequentialPolyCounter{0};
   /// LCP feasible region is a union of polyhedra. Keeps track which of those
   /// inequalities are fixed to equality to get the individual polyhedra
   std::set<unsigned long int> AllPolyhedra =
@@ -82,8 +85,8 @@ private:
     const unsigned int nCompl = this->Compl.size();
     // 2^n - the number of polyhedra theoretically
     this->maxTheoreticalPoly = static_cast<unsigned long int>(pow(2, nCompl));
-    for (unsigned long int i = 0; i < this->maxTheoreticalPoly; ++i)
-      this->notProcessed.insert(i);
+    sequentialPolyCounter = 0;
+    reverseSequentialPolyCounter = this->maxTheoreticalPoly - 1;
   }
   /* Solving relaxations and restrictions */
   std::unique_ptr<GRBModel> LCPasMIP(std::vector<unsigned int> FixEq = {},
@@ -108,7 +111,7 @@ private:
   LCP &FixToPolies(const std::vector<short int> Fix, bool checkFeas = false,
                    bool custom = false, spmat_Vec *custAi = {},
                    vec_Vec *custbi = {});
-  unsigned long int getNextPoly(Game::EPECAddPolyMethod method) const;
+  unsigned long int getNextPoly(Game::EPECAddPolyMethod method);
 
 public:
   // Fudgible data
