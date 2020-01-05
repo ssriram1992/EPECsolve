@@ -1112,7 +1112,7 @@ unsigned long int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) {
    * known to be infeasible, nor already added in the inner approximation
    * representation.
    */
-   
+
   switch (method) {
   case Game::EPECAddPolyMethod::sequential: {
     while (this->sequentialPolyCounter < this->maxTheoreticalPoly) {
@@ -1120,7 +1120,7 @@ unsigned long int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) {
           AllPolyhedra.find(this->sequentialPolyCounter) != AllPolyhedra.end();
       const bool isInfeas =
           knownInfeas.find(this->sequentialPolyCounter) != knownInfeas.end();
-      this->sequentialPolyCounter = this->sequentialPolyCounter + 1;
+      this->sequentialPolyCounter++;
       if (!isAll && !isInfeas) {
         return this->sequentialPolyCounter - 1;
       }
@@ -1135,8 +1135,7 @@ unsigned long int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) {
       const bool isInfeas =
           knownInfeas.find(this->reverseSequentialPolyCounter) !=
           knownInfeas.end();
-      this->reverseSequentialPolyCounter =
-          this->reverseSequentialPolyCounter - 1;
+      this->reverseSequentialPolyCounter--;
       if (!isAll && !isInfeas) {
         return this->reverseSequentialPolyCounter + 1;
       }
