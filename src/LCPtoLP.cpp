@@ -1146,19 +1146,14 @@ unsigned long int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) {
     static std::mt19937 engine{this->addPolyMethodSeed};
     std::uniform_int_distribution<unsigned long int> dist(
         0, this->maxTheoreticalPoly - 1);
-    unsigned long int gotIt = dist(engine);
     if ((knownInfeas.size() + AllPolyhedra.size()) == this->maxTheoreticalPoly)
       return this->maxTheoreticalPoly;
     while (true) {
-      const bool isAll =
-          AllPolyhedra.find(*(std::next(this->notProcessed.begin(), gotIt))) !=
-          AllPolyhedra.end();
-      const bool isInfeas =
-          knownInfeas.find(*(std::next(this->notProcessed.begin(), gotIt))) !=
-          knownInfeas.end();
-      if (!isAll && !isInfeas) {
-        return *(std::next(this->notProcessed.begin(), gotIt));
-      }
+      unsigned long int randomPolyId = dist(engine);
+      const bool isAll = AllPolyhedra.find(randomPolyId) != AllPolyhedra.end();
+      const bool isInfeas = knownInfeas.find(randomPolyId) != knownInfeas.end();
+      if (!isAll && !isInfeas)
+        return randomPolyId;
     }
   }
   default: {

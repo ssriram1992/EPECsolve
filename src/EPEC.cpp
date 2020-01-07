@@ -159,8 +159,10 @@ int main(int argc, char **argv) {
     switch (add) {
     case 1:
       epec.setAddPolyMethod(EPECAddPolyMethod::reverse_sequential);
+      break;
     case 2:
       epec.setAddPolyMethod(EPECAddPolyMethod::random);
+      break;
     default:
       epec.setAddPolyMethod(EPECAddPolyMethod::sequential);
     }

@@ -68,8 +68,6 @@ private:
       {}; ///< Decimal encoding of polyhedra that have been enumerated
   std::set<unsigned long int> knownInfeas =
       {}; ///< Decimal encoding of polyhedra known to be infeasible
-  std::set<unsigned long int> notProcessed =
-      {}; ///< Decimal encoding of polyhedra to be processed
   unsigned long int maxTheoreticalPoly{0};
   std::unique_ptr<spmat_Vec>
       Ai; ///< Vector to contain the LHS of inner approx polyhedra
@@ -192,9 +190,6 @@ public:
 
   std::set<unsigned long int> getAllPolyhedra() const {
     return this->AllPolyhedra;
-  };
-  std::set<unsigned long int> getnotProcessed() const {
-    return this->notProcessed;
   };
   unsigned long int getNumTheoreticalPoly() const noexcept {
     return this->maxTheoreticalPoly;
