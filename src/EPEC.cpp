@@ -107,8 +107,8 @@ int main(int argc, char **argv) {
     arma::arma_version ver;
     int major, minor, technical;
     GRBversion(&major, &minor, &technical);
-    BOOST_LOG_TRIVIAL(info)
-        << "Dependencies:\n\tARMAdillo: " << ver.as_string();
+    BOOST_LOG_TRIVIAL(info) << "Dependencies:";
+    BOOST_LOG_TRIVIAL(info) << "\tARMAdillo: " << ver.as_string();
     BOOST_LOG_TRIVIAL(info)
         << "\tGurobi: " << to_string(major) << "." << to_string(minor);
     BOOST_LOG_TRIVIAL(info) << "\tBoost: " << to_string(BOOST_VERSION / 100000)
