@@ -1534,8 +1534,6 @@ void Game::EPEC::make_country_QP()
  * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for
  * each valid @p i
  * @note Overloaded as EPEC::make_country_QP(unsigned int)
- * @todo manage removal of convexHull variables (eg,  convHullVarCount is
- * negative)
  */
 {
   for (unsigned int i = 0; i < this->nCountr; ++i) {
@@ -1601,7 +1599,6 @@ bool Game::EPEC::getAllDevns(
  * @return a vector of computed deviations, which empty if at least one
  * deviation cannot be computed
  * @param prevDev can be empty
- * @todo Handle unbounded case
  */
 {
   devns = std::vector<arma::vec>(this->nCountr);
@@ -1792,7 +1789,7 @@ void Game::EPEC::iterativeNash() {
         solved = true;
       }
       if (infeasCheck && this->Stats.numIteration == 1) {
-        BOOST_LOG_TRIVIAL(error)
+        BOOST_LOG_TRIVIAL(warning)
             << " In Game::EPEC::iterativeNash: Problem is infeasible";
         this->Stats.status = EPECsolveStatus::nashEqNotFound;
         solved = true;

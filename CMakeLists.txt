@@ -11,9 +11,9 @@ ELSE ()
     set(ARMA_PATH "/usr/local")
     set(ARMA_LIB "/usr/local/lib/libarmadillo.dylib")
 ENDIF ()
-set(GUROBI_PATH_LINUX "/home/gurobi/8.1.0/linux64")
-set(GUROBI_PATH_MAC "/Library/gurobi811/mac64")
-set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi811\\win64")
+set(GUROBI_PATH_LINUX "/home/gurobi/9.0.0/linux64")
+set(GUROBI_PATH_MAC "/Library/gurobi900/mac64")
+set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi900\\win64")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 
@@ -27,7 +27,7 @@ cmake_minimum_required(VERSION 3.10)
 project(EPECsolve)
 add_compile_options(-std=c++11)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_SHARED_LINKER_FLAGS "-lgurobi_c++ -lgurobi81 -lm -lpthread -O2 -lopenblas -llapack -lpthread")
+set(CMAKE_SHARED_LINKER_FLAGS "-lgurobi_c++ -lgurobi90 -lm -lpthread -O2 -lopenblas -llapack -lpthread")
 
 #From https://github.com/LiangliangNan/PolyFit/blob/master/cmake/FindGUROBI.cmake
 if (NOT GUROBI_FOUND)
@@ -41,7 +41,7 @@ if (NOT GUROBI_FOUND)
 
     set(SEARCH_PATHS_FOR_LIBRARIES
         "$ENV{GUROBI_HOME}/lib"
-		"/opt/gurobi811/linux64/lib"
+		"/opt/gurobi900/linux64/lib"
         "${GUROBI_PATH_MAC}/lib"
         "${GUROBI_PATH_LINUX}/lib"
         "${GUROBI_PATH_WINDOWS}/lib"
@@ -53,7 +53,7 @@ if (NOT GUROBI_FOUND)
 
 
     find_library(GUROBI_C_LIBRARY
-                 NAMES gurobi81
+                 NAMES gurobi90
                  PATHS ${SEARCH_PATHS_FOR_LIBRARIES}
                  )
 
