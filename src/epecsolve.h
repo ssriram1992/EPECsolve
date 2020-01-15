@@ -39,9 +39,9 @@ enum class EPECAddPolyMethod {
 };
 
 } // namespace Game
-namespace Models {
-class EPEC;
-}
+// namespace Models {
+// class EPEC;
+// }
 
 #include "games.h"
 #include "lcptolp.h"

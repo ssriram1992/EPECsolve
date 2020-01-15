@@ -748,6 +748,9 @@ const Game::NashGame &Game::NashGame::FormulateLCP(
   unsigned int NvarFollow{0}, NvarLead{0};
   NvarLead =
       this->dual_position.back(); // Number of Leader variables (all variables)
+  // Below is not strictly the follower variables,
+  // But the count of set of variables which dont have
+  // a matching complementarity eqn
   NvarFollow = NvarLead - this->n_LeadVar;
   M.zeros(NvarFollow, NvarLead);
   q.zeros(NvarFollow);
@@ -944,6 +947,18 @@ Game::NashGame &Game::NashGame::addDummy(unsigned int par, int position)
           arma::join_rows(lC, LeaderConstraints.cols(position, nnC - 1));
       break;
     };
+  }
+  if (this->MarketClearing.n_rows) {
+    auto nnR = this->MarketClearing.n_rows;
+    auto nnC = this->MarketClearing.n_cols;
+    switch (position) {
+    case -1:
+      this->MarketClearing = resize_patch(this->MarketClearing, nnR, nnC + par);
+      break;
+    default:
+      BOOST_LOG_TRIVIAL(error)
+          << "addDummy at non-final position not implemented";
+    }
   }
   this->set_positions();
   return *this;
@@ -1516,8 +1531,6 @@ void Game::EPEC::make_country_QP()
  * Calls are made to Models::EPEC::make_country_QP(const unsigned int i) for
  * each valid @p i
  * @note Overloaded as EPEC::make_country_QP(unsigned int)
- * @todo manage removal of convexHull variables (eg,  convHullVarCount is
- * negative)
  */
 {
   for (unsigned int i = 0; i < this->nCountr; ++i) {
@@ -1583,7 +1596,6 @@ bool Game::EPEC::getAllDevns(
  * @return a vector of computed deviations, which empty if at least one
  * deviation cannot be computed
  * @param prevDev can be empty
- * @todo Handle unbounded case
  */
 {
   devns = std::vector<arma::vec>(this->nCountr);
@@ -1775,7 +1787,7 @@ void Game::EPEC::iterativeNash() {
         solved = true;
       }
       if (infeasCheck && this->Stats.numIteration == 1) {
-        BOOST_LOG_TRIVIAL(error)
+        BOOST_LOG_TRIVIAL(warning)
             << " In Game::EPEC::iterativeNash: Problem is infeasible";
         this->Stats.status = EPECsolveStatus::nashEqNotFound;
         solved = true;

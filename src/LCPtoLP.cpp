@@ -455,7 +455,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
 bool Game::LCP::errorCheck(
     bool throwErr ///< If this is true, function throws an
                   ///< error, else, it just returns false
-    ) const
+) const
 /**
  * Checks if the `M` and `q` given to create the LCP object are of
  * compatible size, given the number of leader variables
@@ -774,7 +774,7 @@ bool Game::LCP::extractSols(
     arma::vec &z, ///< Output variable - where the equation values are stored
     arma::vec &x, ///< Output variable - where the variable values are stored
     bool extractZ ///< z values are filled only if this is true
-    ) const
+) const
 /** @brief Extracts variable and equation values from a solved Gurobi model for
    LCP */
 /** @warning This solves the model if the model is not already solve */
@@ -818,7 +818,7 @@ std::vector<short int> Game::LCP::solEncode(const arma::vec &x) const
 
 vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
                                        const arma::vec &x  ///< Variable values
-                                       ) const
+) const
 /// @brief Given variable values and equation values, encodes it in 0/+1/-1
 /// format and returns it.
 {
@@ -979,7 +979,6 @@ bool Game::LCP::FixToPoly(
       custbi->push_back(std::move(bii));
     } else {
       AllPolyhedra.insert(FixNumber);
-      notProcessed.erase(FixNumber);
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }
@@ -1034,14 +1033,12 @@ bool Game::LCP::checkPolyFeas(
     model.optimize();
     if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL) {
       feasiblePoly.insert(FixNumber);
-      notProcessed.erase(FixNumber);
       return true;
     } else {
       BOOST_LOG_TRIVIAL(trace)
           << "Game::LCP::checkPolyFeas: Detected infeasibility of " << FixNumber
           << " (GRB_STATUS=" << model.get(GRB_IntAttr_Status) << ")";
       knownInfeas.insert(FixNumber);
-      notProcessed.erase(FixNumber);
       return false;
     }
   } catch (const char *e) {
@@ -1109,34 +1106,54 @@ Game::LCP &Game::LCP::FixToPolies(
   return *this;
 }
 
-unsigned long int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) const {
+unsigned long int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) {
   /**
    * Returns a polyhedron (in its decimal encoding) that is neither already
    * known to be infeasible, nor already added in the inner approximation
    * representation.
    */
+
   switch (method) {
   case Game::EPECAddPolyMethod::sequential: {
-    if (!notProcessed.empty())
-      return *notProcessed.begin();
-    else
-      return this->maxTheoreticalPoly;
+    while (this->sequentialPolyCounter < this->maxTheoreticalPoly) {
+      const bool isAll =
+          AllPolyhedra.find(this->sequentialPolyCounter) != AllPolyhedra.end();
+      const bool isInfeas =
+          knownInfeas.find(this->sequentialPolyCounter) != knownInfeas.end();
+      this->sequentialPolyCounter++;
+      if (!isAll && !isInfeas) {
+        return this->sequentialPolyCounter - 1;
+      }
+    }
+    return this->maxTheoreticalPoly;
   } break;
   case Game::EPECAddPolyMethod::reverse_sequential: {
-    if (!notProcessed.empty())
-      return *--notProcessed.end();
-    else
-      return this->maxTheoreticalPoly;
+    while (this->reverseSequentialPolyCounter >= 0) {
+      const bool isAll =
+          AllPolyhedra.find(this->reverseSequentialPolyCounter) !=
+          AllPolyhedra.end();
+      const bool isInfeas =
+          knownInfeas.find(this->reverseSequentialPolyCounter) !=
+          knownInfeas.end();
+      this->reverseSequentialPolyCounter--;
+      if (!isAll && !isInfeas) {
+        return this->reverseSequentialPolyCounter + 1;
+      }
+    }
+    return this->maxTheoreticalPoly;
   } break;
   case Game::EPECAddPolyMethod::random: {
-    if (!notProcessed.empty()) {
-      static std::mt19937 engine{this->addPolyMethodSeed};
-      std::uniform_int_distribution<unsigned long int> dist(
-          0, this->notProcessed.size() - 1);
-      unsigned long int gotIt = dist(engine);
-      return *(std::next(this->notProcessed.begin(), gotIt));
-    } else {
+    static std::mt19937 engine{this->addPolyMethodSeed};
+    std::uniform_int_distribution<unsigned long int> dist(
+        0, this->maxTheoreticalPoly - 1);
+    if ((knownInfeas.size() + AllPolyhedra.size()) == this->maxTheoreticalPoly)
       return this->maxTheoreticalPoly;
+    while (true) {
+      unsigned long int randomPolyId = dist(engine);
+      const bool isAll = AllPolyhedra.find(randomPolyId) != AllPolyhedra.end();
+      const bool isInfeas = knownInfeas.find(randomPolyId) != knownInfeas.end();
+      if (!isAll && !isInfeas)
+        return randomPolyId;
     }
   }
   default: {
