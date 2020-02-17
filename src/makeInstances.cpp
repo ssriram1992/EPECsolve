@@ -6,15 +6,15 @@ using namespace std;
 vector<Models::FollPar> C, G,
     S; // Mnemonics for coal-like, gas-like and solar-like followers.
 
-vector<double> lincos = {150, 200, 220, 250, 275};
-vector<double> quadcos = {0, 0.1, 0.2, 0.3, 0.5};
+vector<double> lincos = {150, 200, 220, 250, 275, 290, 300};
+vector<double> quadcos = {0, 0.1, 0.2, 0.3, 0.5, 0.55, 0.6};
 
-vector<double> emmcos = {25, 50, 100, 200, 300, 500};
-vector<double> taxcaps = {0, 50, 100, 150, 200, 250};
-vector<double> capacities = {50, 100, 130, 170, 200, 1000};
+vector<double> emmcos = {25, 50, 100, 200, 300, 500, 550, 600};
+vector<double> taxcaps = {0, 50, 100, 150, 200, 250, 275, 300};
+vector<double> capacities = {50, 100, 130, 170, 200, 1000, 1050, 20000};
 
-vector<double> demand_a = {275, 300, 325, 350};
-vector<double> demand_b = {0.5, 0.6, 0.7, 0.9};
+vector<double> demand_a = {275, 300, 325, 350, 375, 450};
+vector<double> demand_b = {0.5, 0.6, 0.7, 0.75, 0.8, 0.9};
 
 vector<Models::LeadAllPar> LeadersVec;
 
@@ -134,7 +134,9 @@ price_limit = (price_limit < 0)? a*price_lim:price_limit;
   unsigned int tax_revenue = binaryRandom(give);
 
   Models::LeadAllPar Country(
-      F.capacities.size(), "Country_" + to_string(country++), F, {a, b},
+      F.capacities.size(),
+      "Country_" + to_string(country++) + "_rand" + to_string(intRandom(give)),
+      F, {a, b},
       {-1, -1, price_limit, static_cast<bool>(tax_revenue), tax_paradigm});
   LeadersVec.push_back(Country);
 
@@ -183,7 +185,7 @@ void MakeInstance(int nCountries = 2) {
         TrCo(i, j) = 0;
 
   Models::EPECInstance Inst(cVec, TrCo);
-  Inst.save("dat/new/Instance_" + to_string(count++));
+  Inst.save("dat/Instances_temp/Instance_H_" + to_string(count++));
 }
 
 void makeInstancesGreatAgain() {
@@ -192,7 +194,7 @@ void makeInstancesGreatAgain() {
     std::string line;
     while (getline(file, line)) {
       cout << "Processing " << line << endl;
-      Models::EPECInstance Instance("dat/Instances_345/" + line);
+      Models::EPECInstance Instance("dat/Instances_new/" + line);
       for (unsigned int i = 0; i < Instance.Countries.size(); ++i) {
         unsigned int tax_revenue = binaryRandom(give);
         Models::TaxType tax_type;
@@ -224,9 +226,9 @@ int main() {
   //  MakeInstance(3);
   // for (int i = 0; i < 50; ++i)
   //  MakeInstance(4);
-  // for (int i = 0; i < 50; ++i)
-  //  MakeInstance(5);
-  makeInstancesGreatAgain();
+  for (int i = 0; i < 50; ++i)
+    MakeInstance(7);
+  // makeInstancesGreatAgain();
 
   return 0;
 }
