@@ -1,5 +1,7 @@
 #include "models.h"
 #include <random>
+#define NUM_THREADS 8
+#define HARD_THRESHOLD 8
 using namespace std;
 
 // Global variables
@@ -17,6 +19,7 @@ vector<double> demand_a = {275, 300, 325, 350, 375, 450};
 vector<double> demand_b = {0.5, 0.6, 0.7, 0.75, 0.8, 0.9};
 
 vector<Models::LeadAllPar> LeadersVec;
+GRBEnv env = GRBEnv();
 
 std::default_random_engine give;
 std::uniform_int_distribution<int> binaryRandom(0, 1);
@@ -164,7 +167,7 @@ void MakeCountry() {
   }
 }
 
-void MakeInstance(int nCountries = 2) {
+bool MakeInstance(int nCountries = 2) {
   static int count{0};
   MakeCountry();
   int nNet = LeadersVec.size();
@@ -185,7 +188,29 @@ void MakeInstance(int nCountries = 2) {
         TrCo(i, j) = 0;
 
   Models::EPECInstance Inst(cVec, TrCo);
-  Inst.save("dat/Instances_temp/Instance_H_" + to_string(count++));
+  Models::EPEC epec(&env);
+  epec.setNumThreads(NUM_THREADS);
+  epec.setTimeLimit(HARD_THRESHOLD);
+  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
+  for (unsigned int j = 0; j < Inst.Countries.size(); ++j)
+    epec.addCountry(Inst.Countries.at(j));
+  epec.addTranspCosts(Inst.TransportationCosts);
+  epec.finalize();
+  try {
+    epec.findNashEq();
+  } catch (string &s) {
+    std::cerr << "Error while finding Nash equilibrium: " << s << '\n';
+    ;
+  } catch (exception &e) {
+    std::cerr << "Error while finding Nash equilibrium: " << e.what() << '\n';
+    ;
+  }
+  Game::EPECStatistics stat = epec.getStatistics();
+  if (stat.status == Game::EPECsolveStatus::timeLimit) {
+    Inst.save("dat/Instances_H/Instance_HS_" + to_string(count++));
+    return true;
+  }
+  return false;
 }
 
 void makeInstancesGreatAgain() {
@@ -226,8 +251,9 @@ int main() {
   //  MakeInstance(3);
   // for (int i = 0; i < 50; ++i)
   //  MakeInstance(4);
-  for (int i = 0; i < 50; ++i)
-    MakeInstance(7);
+  unsigned int count = 0;
+  while (count < 50)
+    count += MakeInstance(7);
   // makeInstancesGreatAgain();
 
   return 0;
