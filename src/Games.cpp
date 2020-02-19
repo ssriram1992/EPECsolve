@@ -1803,11 +1803,11 @@ void Game::EPEC::iterativeNash() {
       const double timeRemaining =
           this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
       addRandPoly =
-          !this->computeNashEq(incrementalEnumeration, timeRemaining) &&
+          !this->computeNashEq(this->Stats.AlgorithmParam.pureNE, timeRemaining) &&
           !incrementalEnumeration;
     } else {
       // No Time Limit
-      addRandPoly = !this->computeNashEq(incrementalEnumeration) &&
+      addRandPoly = !this->computeNashEq(this->Stats.AlgorithmParam.pureNE) &&
                     !incrementalEnumeration;
     }
     if (addRandPoly)
