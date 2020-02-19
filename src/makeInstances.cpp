@@ -1,5 +1,6 @@
 #include "models.h"
 #include <random>
+#include <chrono>
 #define NUM_THREADS 8
 #define HARD_THRESHOLD 8
 using namespace std;
@@ -17,6 +18,7 @@ vector<double> capacities = {50, 100, 130, 170, 200, 1000, 1050, 20000};
 
 vector<double> demand_a = {275, 300, 325, 350, 375, 450};
 vector<double> demand_b = {0.5, 0.6, 0.7, 0.75, 0.8, 0.9};
+vector<string> names = {"Blue", "Red", "Green", "Yellow", "Black", "White"};
 
 vector<Models::LeadAllPar> LeadersVec;
 GRBEnv env = GRBEnv();
@@ -135,10 +137,12 @@ price_limit = (price_limit < 0)? a*price_lim:price_limit;
   price_limit = price_lim * a;
   unsigned int tax_paradigm = intRandom(give) % 3;
   unsigned int tax_revenue = binaryRandom(give);
-
+  std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
   Models::LeadAllPar Country(
       F.capacities.size(),
-      "Country_" + to_string(country++) + "_rand" + to_string(intRandom(give)),
+      "Country_" + to_string(country++) + "_" +
+          names[intRandom(give) % names.size()] + "_" +
+          std::to_string(ms.count()),
       F, {a, b},
       {-1, -1, price_limit, static_cast<bool>(tax_revenue), tax_paradigm});
   LeadersVec.push_back(Country);
