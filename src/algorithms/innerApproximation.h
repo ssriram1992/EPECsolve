@@ -8,7 +8,7 @@
 #include <set>
 #include <string>
 
-namespace Game {
+namespace Algorithms {
 
 class innerApproximation {
 private:
@@ -16,10 +16,15 @@ private:
   EPEC *EPECObject;
 
 public:
-  friend class EPEC;
+  friend class Game::EPEC;
   innerApproximation(GRBEnv *env, EPEC *EpecObj)
-      : env{env}, EPECObject{EpecObj} {};
+      : env{env},
+        EPECObject{
+            EpecObj} {}; ///< Constructor requires a pointer to the Gurobi
+  ///< Environment and the calling EPEC object
   void solve();
+
+private:
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
                          bool stopOnSingleInfeasibility = false);
   bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
@@ -27,4 +32,4 @@ public:
   unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns,
                                      bool &infeasCheck) const;
 };
-} // namespace Game
+} // namespace Algorithms

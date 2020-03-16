@@ -1,6 +1,5 @@
 #include "games.h"
-#include "algorithms/innerApproximation.h"
-#include "algorithms/combinatorialPNE.h"
+#include "algorithms/algorithms.h"
 #include <algorithm>
 #include <armadillo>
 #include <array>
@@ -1726,13 +1725,12 @@ bool Game::EPEC::warmstart(const arma::vec x) {
   this->sol_x = x;
   std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
   std::vector<arma::vec> prevDevns = std::vector<arma::vec>(this->nCountr);
-  // this->getAllDevns(devns, this->sol_x, prevDevns);
   this->make_country_QP();
 
   unsigned int c;
   arma::vec devn;
 
-  if (this->isSolved(&c, &devn))
+  if (this->isSolved())
     BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::warmstart: "
                                   "The loaded solution is optimal.";
   else
@@ -1834,21 +1832,23 @@ void Game::EPEC::findNashEq() {
 
   case Game::EPECalgorithm::innerApproximation: {
     final_msg << "Inner approximation algorithm completed. ";
-    innerApproximation innerApp(this->env, this);
+    Algorithms::innerApproximation innerApp(this->env, this);
     innerApp.solve();
   }
     break;
 
   case Game::EPECalgorithm::combinatorialPNE: {
     final_msg << "CombinatorialPNE algorithm completed. ";
-    combinatorialPNE combPNE(this->env, this);
+    Algorithms::combinatorialPNE combPNE(this->env, this);
     combPNE.solve();
   }
     break;
 
-  case Game::EPECalgorithm::fullEnumeration:
+  case Game::EPECalgorithm::fullEnumeration: {
     final_msg << "Full enumeration algorithm completed. ";
-    this->fullEnumerationNash();
+    Algorithms::fullEnumeration fullEnum(this->env, this);
+    fullEnum.solve();
+  }
     break;
   }
   // Handing EPECStatistics object to track performance of algorithm
@@ -1878,20 +1878,6 @@ void Game::EPEC::findNashEq() {
     break;
   }
   BOOST_LOG_TRIVIAL(info) << "Game::EPEC::findNashEq: " << final_msg.str();
-}
-void Game::EPEC::fullEnumerationNash() {
-  for (unsigned int i = 0; i < this->nCountr; ++i)
-    this->countries_LCP.at(i)->EnumerateAll(true);
-  this->make_country_QP();
-  BOOST_LOG_TRIVIAL(trace)
-      << "Game::EPEC::findNashEq: Starting fullEnumeration search";
-  this->computeNashEq(this->Stats.AlgorithmParam.pureNE,
-                      this->Stats.AlgorithmParam.timeLimit);
-  if (this->isSolved()) {
-    this->Stats.status = Game::EPECsolveStatus::nashEqFound;
-    if (this->isPureStrategy())
-      this->Stats.pureNE = true;
-  }
 }
 
 void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)

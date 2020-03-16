@@ -3,6 +3,7 @@
 #include "../src/games.h"
 #include "../src/lcptolp.h"
 #include "../src/models.h"
+#include "../algorithms/algorithms.h"
 #include <armadillo>
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>

@@ -22,7 +22,9 @@ allAlgo(EPECAlgorithmParams common_params = {}, bool readCommonConfig = false) {
   Game::EPECAlgorithmParams alg;
   alg.threads = TEST_NUM_THREADS;
   alg.algorithm = Game::EPECalgorithm::fullEnumeration;
-  //algs.push_back(alg);
+  algs.push_back(alg);
+  alg.algorithm = Game::EPECalgorithm::combinatorialPNE;
+  algs.push_back(alg);
 
   for (int i = 0; i < 2; i++) {
     Game::EPECAlgorithmParams alg_in;
@@ -121,7 +123,7 @@ void testEPECInstance(const testInst inst,
     }
     }
 
-    ss << "\n Successfully completed running in time: " << timeElapsed.count();
+    ss << "\n Test completed. Running time: " << timeElapsed.count();
     BOOST_TEST_MESSAGE(ss.str());
   }
 }

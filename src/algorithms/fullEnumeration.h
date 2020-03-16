@@ -10,22 +10,19 @@
 
 namespace Algorithms {
 
-///@brief This class is responsible for the combinatorial pure-nash Equilibrium
-class combinatorialPNE {
+///@brief This class is responsible for the fully enumerative algorithm
+class fullEnumeration {
 private:
   GRBEnv *env;      ///< Stores the pointer to the Gurobi Environment
   EPEC *EPECObject; ///< Stores the pointer to the calling EPEC object
 
 public:
-  friend class Game::EPEC;
-  combinatorialPNE(GRBEnv *env, EPEC *EpecObj)
+  friend class EPEC;
+  fullEnumeration(GRBEnv *env, EPEC *EpecObj)
       : env{env},
         EPECObject{EpecObj} {}; ///< Constructor requires a pointer to the Gurobi
                                 ///< Environment and the calling EPEC object
-  void solve(const std::vector<std::set<unsigned long int>> &excludeList = {});
+  void solve();
 
-private:
-  void combPNE(const std::vector<long int> combination,
-               const std::vector<std::set<unsigned long int>> &excludeList);
 };
-} // namespace Algorithms
+} // namespace Game

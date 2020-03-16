@@ -528,7 +528,6 @@ private:
   void make_country_QP();
   void make_country_LCP();
   void resetLCP();
-  void fullEnumerationNash();
 
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
@@ -563,8 +562,11 @@ protected: // functions
   }
 
 public:                  // functions
-  friend class innerApproximation;
-  friend class combinatorialPNE;
+  //Friends algorithmic classes
+  friend class Algorithms::innerApproximation;
+  friend class Algorithms::combinatorialPNE;
+  friend class Algorithms::fullEnumeration;
+
   EPEC() = delete;       // No default constructor
   EPEC(EPEC &) = delete; // Abstract class - no copy constructor
   ~EPEC() {}             // Destructor to free data

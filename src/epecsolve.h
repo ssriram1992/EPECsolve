@@ -31,8 +31,7 @@ class QP_Param;
 class NashGame;
 class LCP;
 class EPEC;
-class innerApproximation;
-class combinatorialPNE;
+
 enum class EPECAddPolyMethod {
   sequential,         ///< Adds polyhedra by selecting them in order
   reverse_sequential, ///< Adds polyhedra by selecting them in reverse
@@ -41,9 +40,12 @@ enum class EPECAddPolyMethod {
 };
 
 } // namespace Game
-// namespace Models {
-// class EPEC;
-// }
+namespace Algorithms {
+// Forward declarations
+class fullEnumeration;
+class innerApproximation;
+class combinatorialPNE;
+} // namespace Algorithms
 
 #include "games.h"
 #include "lcptolp.h"
