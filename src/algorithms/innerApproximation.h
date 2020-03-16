@@ -1,8 +1,5 @@
 #pragma once
 
-/**
- * @file src/innerApproximation.h For innerApproximation
- */
 #include "lcptolp.h"
 #include <armadillo>
 #include <gurobi_c++.h>

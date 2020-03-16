@@ -99,7 +99,7 @@ add_executable(EPEC
                src/Models.cpp
                src/models.h
                src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h)
+               src/algorithms/innerApproximation.h src/algorithms/combinatorialPNE.cpp src/algorithms/combinatorialPNE.h)
 add_executable(EPECInstances
                instances/makeInstances.cpp
                src/epecsolve.h
@@ -112,7 +112,7 @@ add_executable(EPECInstances
                src/Models.cpp
                src/models.h
                src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h)
+               src/algorithms/innerApproximation.h src/algorithms/combinatorialPNE.cpp src/algorithms/combinatorialPNE.h)
 add_executable(EPECChileArgentina
                instances/ChileArgentina.cpp
                src/epecsolve.h
@@ -125,7 +125,7 @@ add_executable(EPECChileArgentina
                src/Models.cpp
                src/models.h
                src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h)
+               src/algorithms/innerApproximation.h src/algorithms/combinatorialPNE.cpp src/algorithms/combinatorialPNE.h)
 add_executable(EPECExample
                src/example.cpp
                src/epecsolve.h
@@ -138,7 +138,7 @@ add_executable(EPECExample
                src/Models.cpp
                src/models.h
                src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h)
+               src/algorithms/innerApproximation.h src/algorithms/combinatorialPNE.cpp src/algorithms/combinatorialPNE.h)
 add_executable(EPECtest
                src/Games.cpp
                src/games.h
@@ -150,7 +150,7 @@ add_executable(EPECtest
                src/models.h
                test/EPEC.cpp
                src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h)
+               src/algorithms/innerApproximation.h src/algorithms/combinatorialPNE.cpp src/algorithms/combinatorialPNE.h)
 target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECExample Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})

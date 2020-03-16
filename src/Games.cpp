@@ -1,5 +1,6 @@
 #include "games.h"
 #include "algorithms/innerApproximation.h"
+#include "algorithms/combinatorialPNE.h"
 #include <algorithm>
 #include <armadillo>
 #include <array>
@@ -1584,97 +1585,6 @@ void Game::EPEC::make_country_QP()
   this->computeLeaderLocations(this->n_MCVar);
 }
 
-void Game::EPEC::combinatorial_pure_NE(
-    const std::vector<long int> combination,
-    const std::vector<std::set<unsigned long int>> &excludeList) {
-
-  if ((this->Stats.status == EPECsolveStatus::nashEqFound &&
-       this->Stats.pureNE == true) ||
-      this->Stats.status == EPECsolveStatus::timeLimit)
-    return;
-
-  if (this->Stats.AlgorithmParam.timeLimit > 0) {
-    const std::chrono::duration<double> timeElapsed =
-        std::chrono::high_resolution_clock::now() - this->initTime;
-    const double timeRemaining =
-        this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
-    if (timeRemaining <= 0) {
-      this->Stats.status = Game::EPECsolveStatus::timeLimit;
-      return;
-    }
-  }
-
-  std::vector<long int> childCombination(combination);
-  bool found{false};
-  unsigned int i{0};
-  for (i = 0; i < this->getNcountries(); i++) {
-    if (childCombination.at(i) == -1) {
-      found = true;
-      break;
-    }
-  }
-  if (found) {
-    for (unsigned int j = 0;
-         j < this->countries_LCP.at(i)->getNumTheoreticalPoly(); ++j) {
-      if (this->countries_LCP.at(i)->checkPolyFeas(j)) {
-        childCombination.at(i) = j;
-        this->combinatorial_pure_NE(childCombination, excludeList);
-      }
-    }
-  } else {
-    // Combination is filled and ready!
-    // Check that this combination is not in the excuded list
-    BOOST_LOG_TRIVIAL(trace)
-        << "Game::EPEC::combinatorial_pure_NE: considering a FULL combination";
-    bool excluded = false;
-    if (!excludeList.empty()) {
-      excluded = true;
-      for (unsigned int j = 0; j < this->nCountr; ++j) {
-        if (excludeList.at(j).find(childCombination.at(j)) ==
-            excludeList.at(j).end()) {
-          excluded = false;
-        }
-      }
-    }
-
-    if (!excluded) {
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::combinatorial_pure_NE: considering a "
-             "FEASIBLE combination of polyhedra.";
-      for (int j = 0; j < this->getNcountries(); ++j) {
-        this->countries_LCP.at(j)->clearPolyhedra();
-        this->countries_LCP.at(j)->addThePoly(childCombination.at(j));
-      }
-      this->make_country_QP();
-      bool res = false;
-      if (this->Stats.AlgorithmParam.timeLimit > 0) {
-        const std::chrono::duration<double> timeElapsed =
-            std::chrono::high_resolution_clock::now() - this->initTime;
-        const double timeRemaining =
-            this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
-        res = this->computeNashEq(false, timeRemaining, true);
-      } else
-        res = this->computeNashEq(false, -1.0, true);
-
-      if (res) {
-        if (this->isSolved()) {
-          // Check that the equilibrium is a pure strategy
-          if ((this->isPureStrategy())) {
-            BOOST_LOG_TRIVIAL(info)
-                << "Game::EPEC::combinatorial_pure_NE: found a pure strategy.";
-            this->Stats.status = Game::EPECsolveStatus::nashEqFound;
-            this->Stats.pureNE = true;
-            return;
-          }
-        }
-      }
-    } else {
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::combinatorial_pure_NE: configuration pruned.";
-      return;
-    }
-  }
-}
 
 void ::Game::EPEC::make_country_LCP() {
   if (this->country_QP.front() == nullptr) {
@@ -1896,26 +1806,7 @@ void Game::EPEC::make_pure_LCP(bool indicators) {
   }
 }
 
-void Game::EPEC::combinatorialPNE(
-    const std::vector<long int> combination,
-    const std::vector<std::set<unsigned long int>> &excludeList) {
 
-  if (this->Stats.AlgorithmParam.timeLimit > 0) {
-    // Checking the function hasn't been called from innerApproximation
-    if (this->Stats.numIteration <= 0) {
-      this->initTime = std::chrono::high_resolution_clock::now();
-    }
-  }
-  if (combination.empty()) {
-    std::vector<long int> start;
-    for (int j = 0; j < this->nCountr; ++j)
-      start.push_back(-1);
-    this->combinatorial_pure_NE(start, excludeList);
-  } else
-    this->combinatorial_pure_NE(combination, excludeList);
-
-  return;
-}
 
 void Game::EPEC::findNashEq() {
   /**
@@ -1948,9 +1839,11 @@ void Game::EPEC::findNashEq() {
   }
     break;
 
-  case Game::EPECalgorithm::combinatorialPNE:
+  case Game::EPECalgorithm::combinatorialPNE: {
     final_msg << "CombinatorialPNE algorithm completed. ";
-    this->combinatorialPNE();
+    combinatorialPNE combPNE(this->env, this);
+    combPNE.solve();
+  }
     break;
 
   case Game::EPECalgorithm::fullEnumeration:

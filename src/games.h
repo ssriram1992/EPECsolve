@@ -529,11 +529,7 @@ private:
   void make_country_LCP();
   void resetLCP();
   void fullEnumerationNash();
-  void combinatorial_pure_NE(const std::vector<long int> combination,
-                        const std::vector<std::set<unsigned long int>> &excludeList);
-  void
-  combinatorialPNE(const std::vector<long int> combination = {},
-                   const std::vector<std::set<unsigned long int>> &excludeList = {});
+
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
@@ -568,6 +564,7 @@ protected: // functions
 
 public:                  // functions
   friend class innerApproximation;
+  friend class combinatorialPNE;
   EPEC() = delete;       // No default constructor
   EPEC(EPEC &) = delete; // Abstract class - no copy constructor
   ~EPEC() {}             // Destructor to free data

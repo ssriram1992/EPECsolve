@@ -1,4 +1,5 @@
 #include "innerApproximation.h"
+#include "combinatorialPNE.h"
 #include "games.h"
 #include <algorithm>
 #include <armadillo>
@@ -93,7 +94,8 @@ void Game::innerApproximation::solve() {
                   this->EPECObject->countries_LCP.at(j)->getAllPolyhedra());
               start.push_back(-1);
             }
-            this->EPECObject->combinatorialPNE(start, excludeList);
+            combinatorialPNE combPNE (this->env, this->EPECObject);
+            combPNE.solve(start, excludeList);
             return;
           }
 

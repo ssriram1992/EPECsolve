@@ -32,6 +32,7 @@ class NashGame;
 class LCP;
 class EPEC;
 class innerApproximation;
+class combinatorialPNE;
 enum class EPECAddPolyMethod {
   sequential,         ///< Adds polyhedra by selecting them in order
   reverse_sequential, ///< Adds polyhedra by selecting them in reverse
