@@ -33,7 +33,7 @@ allAlgo(EPECAlgorithmParams common_params = {}, bool readCommonConfig = false) {
       if (readCommonConfig) {
         alg_in.timeLimit = common_params.timeLimit;
         alg_in.indicators = common_params.indicators;
-        alg_in.threads = TEST_NUM_THREADS;
+        alg_in.threads = 4;
         alg_in.addPolyMethodSeed = common_params.addPolyMethodSeed;
       }
       algs.push_back(alg_in);
@@ -67,7 +67,7 @@ void testEPECInstance(const testInst inst,
     epec.setAggressiveness(algorithm.aggressiveness);
     epec.setAddPolyMethod(algorithm.addPolyMethod);
     epec.setIndicators(algorithm.indicators);
-    epec.setNumThreads(algorithm.threads);
+    epec.setNumThreads(TEST_NUM_THREADS );
     epec.setAddPolyMethodSeed(algorithm.addPolyMethodSeed);
 
     const std::chrono::high_resolution_clock::time_point initTime =
