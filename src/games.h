@@ -528,7 +528,6 @@ private:
   void make_country_QP();
   void make_country_LCP();
   void resetLCP();
-  void iterativeNash();
   void fullEnumerationNash();
   void combinatorial_pure_NE(const std::vector<long int> combination,
                         const std::vector<std::set<unsigned long int>> &excludeList);
@@ -538,15 +537,9 @@ private:
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
-  bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
-                   const std::vector<arma::vec> &prevDev = {}) const;
-  unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns,
-                                     bool &infeasCheck) const;
   void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
   bool computeNashEq(bool pureNE = false, double localTimeLimit = -1.0, bool check = false);
-  bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
-                         bool stopOnSingleInfeasibility = false);
 
 protected: // functions
   EPEC(GRBEnv *env)
@@ -574,6 +567,7 @@ protected: // functions
   }
 
 public:                  // functions
+  friend class innerApproximation;
   EPEC() = delete;       // No default constructor
   EPEC(EPEC &) = delete; // Abstract class - no copy constructor
   ~EPEC() {}             // Destructor to free data
