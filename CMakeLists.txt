@@ -97,9 +97,11 @@ add_executable(EPEC
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
-               src/models.h)
+               src/models.h
+               src/algorithms/innerApproximation.cpp
+               src/algorithms/innerApproximation.h)
 add_executable(EPECInstances
-               src/makeInstances.cpp
+               instances/makeInstances.cpp
                src/epecsolve.h
                src/Games.cpp
                src/games.h
@@ -108,9 +110,11 @@ add_executable(EPECInstances
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
-               src/models.h)
+               src/models.h
+               src/algorithms/innerApproximation.cpp
+               src/algorithms/innerApproximation.h)
 add_executable(EPECChileArgentina
-               src/ChileArgentina.cpp
+               instances/ChileArgentina.cpp
                src/epecsolve.h
                src/Games.cpp
                src/games.h
@@ -119,7 +123,9 @@ add_executable(EPECChileArgentina
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
-               src/models.h)
+               src/models.h
+               src/algorithms/innerApproximation.cpp
+               src/algorithms/innerApproximation.h)
 add_executable(EPECExample
                src/example.cpp
                src/epecsolve.h
@@ -130,7 +136,9 @@ add_executable(EPECExample
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
-               src/models.h)
+               src/models.h
+               src/algorithms/innerApproximation.cpp
+               src/algorithms/innerApproximation.h)
 add_executable(EPECtest
                src/Games.cpp
                src/games.h
@@ -140,7 +148,9 @@ add_executable(EPECtest
                src/Utils.cpp
                src/Models.cpp
                src/models.h
-               test/EPEC.cpp)
+               test/EPEC.cpp
+               src/algorithms/innerApproximation.cpp
+               src/algorithms/innerApproximation.h)
 target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECExample Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
