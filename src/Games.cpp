@@ -1,5 +1,5 @@
 #include "games.h"
-#include "innerApproximation.h"
+#include "algorithms/innerApproximation.h"
 #include <algorithm>
 #include <armadillo>
 #include <array>

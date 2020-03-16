@@ -672,10 +672,12 @@ BOOST_AUTO_TEST_CASE(HardToEnum1_test) {
   BOOST_TEST_MESSAGE("Testing HardToEnum1");
   testEPECInstance(HardToEnum_1(), allAlgo());
 }
+/*
 BOOST_AUTO_TEST_CASE(HardToEnum2_test) {
   BOOST_TEST_MESSAGE("Testing HardToEnum2");
   testEPECInstance(HardToEnum_2(), allAlgo());
 }
+*/
 
 BOOST_AUTO_TEST_SUITE_END()
 

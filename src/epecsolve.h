@@ -5,7 +5,7 @@
  */
 
 #define VERBOSE false
-#define EPECVERSION 0.1
+#define EPECVERSION 1.0
 
 #include <armadillo>
 #include <iostream>
