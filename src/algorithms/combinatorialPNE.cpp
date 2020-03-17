@@ -1,5 +1,5 @@
 #include "combinatorialPNE.h"
-#include "games.h"
+
 #include <algorithm>
 #include <armadillo>
 #include <boost/log/trivial.hpp>

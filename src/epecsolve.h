@@ -45,6 +45,7 @@ namespace Algorithms {
 class fullEnumeration;
 class innerApproximation;
 class combinatorialPNE;
+class outerApproximation;
 } // namespace Algorithms
 
 #include "games.h"

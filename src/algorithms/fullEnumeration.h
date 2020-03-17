@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lcptolp.h"
+#include "../src/games.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>

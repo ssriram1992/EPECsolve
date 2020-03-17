@@ -566,6 +566,7 @@ public:                  // functions
   friend class Algorithms::innerApproximation;
   friend class Algorithms::combinatorialPNE;
   friend class Algorithms::fullEnumeration;
+  friend class Algorithms::outerApproximation;
 
   EPEC() = delete;       // No default constructor
   EPEC(EPEC &) = delete; // Abstract class - no copy constructor
