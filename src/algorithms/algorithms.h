@@ -1,6 +1,7 @@
 #include "innerApproximation.h"
 #include "combinatorialPNE.h"
 #include "fullEnumeration.h"
+#include "outerApproximation.h"
 
 // Forward declarations
 namespace Game {
@@ -19,4 +20,5 @@ namespace Algorithms {
 class fullEnumeration;
 class innerApproximation;
 class combinatorialPNE;
+class outerApproximation;
 } // namespace Algorithms

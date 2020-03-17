@@ -104,6 +104,8 @@ add_executable(EPEC
                src/algorithms/combinatorialPNE.h
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
+               src/algorithms/outerApproximation.cpp
+               src/algorithms/outerApproximation.h
                src/algorithms/algorithms.h)
 add_executable(EPECInstances
                instances/makeInstances.cpp
@@ -122,6 +124,8 @@ add_executable(EPECInstances
                src/algorithms/combinatorialPNE.h
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
+               src/algorithms/outerApproximation.cpp
+               src/algorithms/outerApproximation.h
                src/algorithms/algorithms.h)
 add_executable(EPECChileArgentina
                instances/ChileArgentina.cpp
@@ -140,6 +144,8 @@ add_executable(EPECChileArgentina
                src/algorithms/combinatorialPNE.h
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
+               src/algorithms/outerApproximation.cpp
+               src/algorithms/outerApproximation.h
                src/algorithms/algorithms.h)
 add_executable(EPECExample
                examples/example.cpp
@@ -158,6 +164,8 @@ add_executable(EPECExample
                src/algorithms/combinatorialPNE.h
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
+               src/algorithms/outerApproximation.cpp
+               src/algorithms/outerApproximation.h
                src/algorithms/algorithms.h)
 add_executable(EPECtest
                src/Games.cpp
@@ -175,6 +183,8 @@ add_executable(EPECtest
                src/algorithms/combinatorialPNE.h
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
+               src/algorithms/outerApproximation.cpp
+               src/algorithms/outerApproximation.h
                src/algorithms/algorithms.h)
 target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})

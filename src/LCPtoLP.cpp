@@ -135,11 +135,11 @@ Game::LCP::LCP(
 Game::LCP::LCP(GRBEnv *env, const NashGame &N)
     : RlxdModel(*env)
 /**
- *	@brief Constructer given a NashGame
+ *	@brief Constructor given a NashGame
  *	@details Given a NashGame, computes the KKT of the lower levels, and
  *makes the appropriate LCP object.
  *
- *	This constructor is the most suited for highlevel usage.
+ *	This constructor is the most suited for high-level usage.
  *	@note Most preferred constructor for user interface.
  */
 {
