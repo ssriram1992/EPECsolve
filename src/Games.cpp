@@ -1584,7 +1584,6 @@ void Game::EPEC::make_country_QP()
   this->computeLeaderLocations(this->n_MCVar);
 }
 
-
 void ::Game::EPEC::make_country_LCP() {
   if (this->country_QP.front() == nullptr) {
     BOOST_LOG_TRIVIAL(error) << "Exception in Game::EPEC::make_country_LCP : "
@@ -1804,8 +1803,6 @@ void Game::EPEC::make_pure_LCP(bool indicators) {
   }
 }
 
-
-
 void Game::EPEC::findNashEq() {
   /**
    * @brief Computes Nash equilibrium using the algorithm set in
@@ -1834,22 +1831,25 @@ void Game::EPEC::findNashEq() {
     final_msg << "Inner approximation algorithm completed. ";
     Algorithms::innerApproximation innerApp(this->env, this);
     innerApp.solve();
-  }
-    break;
+  } break;
 
   case Game::EPECalgorithm::combinatorialPNE: {
     final_msg << "CombinatorialPNE algorithm completed. ";
     Algorithms::combinatorialPNE combPNE(this->env, this);
     combPNE.solve();
-  }
-    break;
+  } break;
+
+  case Game::EPECalgorithm::outerApproximation: {
+    final_msg << "Outer approximation algorithm completed. ";
+    Algorithms::outerApproximation outerApp(this->env, this);
+    outerApp.solve();
+  } break;
 
   case Game::EPECalgorithm::fullEnumeration: {
     final_msg << "Full enumeration algorithm completed. ";
     Algorithms::fullEnumeration fullEnum(this->env, this);
     fullEnum.solve();
-  }
-    break;
+  } break;
   }
   // Handing EPECStatistics object to track performance of algorithm
   if (this->lcpmodel) {

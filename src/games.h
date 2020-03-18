@@ -408,10 +408,11 @@ enum class EPECsolveStatus {
 enum class EPECalgorithm {
   fullEnumeration,    ///< Completely enumerate the set of polyhedra for all
                       ///< followers
-  innerApproximation, ///< Perfrorm increasingly better inner approximations in
+  innerApproximation, ///< Perform increasingly better inner approximations in
   ///< iterations
-  combinatorialPNE ///< Perform a combinatorial-based search strategy to find a
+  combinatorialPNE, ///< Perform a combinatorial-based search strategy to find a
                    ///< pure NE
+  outerApproximation ///< Perform an increasingly improving outer approximation of the feasible region of each leader
 };
 
 ///< Recovery strategies for obtaining a PNE with innerApproximation
