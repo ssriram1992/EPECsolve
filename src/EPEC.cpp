@@ -33,9 +33,10 @@ int main(int argc, char **argv) {
       "recover,r", po::value<int>(&recover)->default_value(0),
       "If innerApproximation is used along with pureNE, which strategy should "
       "be used to retrive a pure NE. 0: incrementalEnumeration, "
-      "1:combinatorialPNE")("algorithm,a", po::value<int>(&algorithm),
-                            "Sets the algorithm. 0: fullEnumeration, "
-                            "1:innerApproximation, 2:combinatorialPNE")(
+      "1:combinatorialPNE")(
+      "algorithm,a", po::value<int>(&algorithm),
+      "Sets the algorithm. 0:fullEnumeration, "
+      "1:innerApproximation, 2:combinatorialPNE, 3:outerApproximation")(
       "solution,s", po::value<string>(&resFile)->default_value("dat/Solution"),
       "Sets the output path/filename of the solution file (.json appended "
       "automatically)")(
@@ -127,126 +128,137 @@ int main(int argc, char **argv) {
   // TEST STARTS
   // --------------------------------
   auto time_start = std::chrono::high_resolution_clock::now();
-  GRBEnv env = GRBEnv();
-
-  // OPTIONS
-  //------------
-  Models::EPEC epec(&env);
-  // Indicator constraints
-  if (bigM == 1)
-    epec.setIndicators(false);
-  // Num Threads
-  if (nThreads != 0)
-    epec.setNumThreads(nThreads);
-  // Pure NE
-  if (pure)
-    epec.setPureNE(true);
-  // timeLimit
-  epec.setTimeLimit(timeLimit);
-  // bound QPs
-  if (bound) {
-    epec.setBoundPrimals(true);
-    epec.setBoundBigM(boundBigM);
-  }
-
-  // Algorithm
-
-  switch (algorithm) {
-  case 1: {
-    epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
-    if (aggressiveness != 1)
-      epec.setAggressiveness(aggressiveness);
-    switch (add) {
-    case 1:
-      epec.setAddPolyMethod(EPECAddPolyMethod::reverse_sequential);
-      break;
-    case 2:
-      epec.setAddPolyMethod(EPECAddPolyMethod::random);
-      break;
-    default:
-      epec.setAddPolyMethod(EPECAddPolyMethod::sequential);
-    }
-    if (recover != 0)
-      epec.setRecoverStrategy(EPECRecoverStrategy::combinatorial);
-    break;
-  }
-  case 2: {
-    epec.setAlgorithm(Game::EPECalgorithm::combinatorialPNE);
-    break;
-  }
-  default:
-    epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  }
-
-  //------------
-
-  for (unsigned int j = 0; j < Instance.Countries.size(); ++j)
-    epec.addCountry(Instance.Countries.at(j));
-  epec.addTranspCosts(Instance.TransportationCosts);
-  epec.finalize();
-  // epec.make_country_QP();
   try {
-    epec.findNashEq();
-  } catch (string &s) {
-    std::cerr << "Error while finding Nash equilibrium: " << s << '\n';
+    GRBEnv env = GRBEnv();
+
+    // OPTIONS
+    //------------
+    Models::EPEC epec(&env);
+    // Indicator constraints
+    if (bigM == 1)
+      epec.setIndicators(false);
+    // Num Threads
+    if (nThreads != 0)
+      epec.setNumThreads(nThreads);
+    // Pure NE
+    if (pure)
+      epec.setPureNE(true);
+    // timeLimit
+    epec.setTimeLimit(timeLimit);
+    // bound QPs
+    if (bound) {
+      epec.setBoundPrimals(true);
+      epec.setBoundBigM(boundBigM);
+    }
+
+    // Algorithm
+
+    switch (algorithm) {
+    case 1: {
+      epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+      if (aggressiveness != 1)
+        epec.setAggressiveness(aggressiveness);
+      switch (add) {
+      case 1:
+        epec.setAddPolyMethod(EPECAddPolyMethod::reverse_sequential);
+        break;
+      case 2:
+        epec.setAddPolyMethod(EPECAddPolyMethod::random);
+        break;
+      default:
+        epec.setAddPolyMethod(EPECAddPolyMethod::sequential);
+      }
+      if (recover != 0)
+        epec.setRecoverStrategy(EPECRecoverStrategy::combinatorial);
+      break;
+    }
+    case 2: {
+      epec.setAlgorithm(Game::EPECalgorithm::combinatorialPNE);
+      break;
+    }
+    case 3: {
+      epec.setAlgorithm(Game::EPECalgorithm::outerApproximation);
+      break;
+    }
+    default:
+      epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
+    }
+
+    //------------
+
+    for (unsigned int j = 0; j < Instance.Countries.size(); ++j)
+      epec.addCountry(Instance.Countries.at(j));
+    epec.addTranspCosts(Instance.TransportationCosts);
+    epec.finalize();
+    // epec.make_country_QP();
+    try {
+      epec.findNashEq();
+    } catch (string &s) {
+      std::cerr << "Error while finding Nash equilibrium: " << s << '\n';
+      ;
+    } catch (exception &e) {
+      std::cerr << "Error while finding Nash equilibrium: " << e.what() << '\n';
+      ;
+    }
+    auto time_stop = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> time_diff = time_stop - time_start;
+    double WallClockTime = time_diff.count();
+    int realThreads = nThreads > 0 ? env.get(GRB_IntParam_Threads) : nThreads;
+
+    // --------------------------------
+    // WRITING STATISTICS AND SOLUTION
+    // --------------------------------
+    Game::EPECStatistics stat = epec.getStatistics();
+    if (stat.status == Game::EPECsolveStatus::nashEqFound)
+      epec.writeSolution(writeLevel, resFile);
+    ifstream existCheck(logFile);
+    std::ofstream results(logFile, ios::app);
+
+    if (!existCheck.good()) {
+      results
+          << "Instance;Algorithm;Countries;Followers;isPureNE;RequiredPureNE;"
+             "Status;"
+             "numFeasiblePolyhedra;"
+             "numVar;numConstraints;numNonZero;ClockTime"
+             "(s);Threads;Indicators;numInnerIterations;lostIntermediateEq;"
+             "Aggressiveness;"
+             "AddPolyMethod;numericalIssuesEncountered;bound;boundBigM;"
+             "recoveryStrategy\n";
+    }
+    existCheck.close();
+
+    stringstream PolyT;
+    copy(stat.feasiblePolyhedra.begin(), stat.feasiblePolyhedra.end(),
+         ostream_iterator<int>(PolyT, " "));
+
+    results << instanceFile << ";" << to_string(epec.getAlgorithm()) << ";"
+            << Instance.Countries.size() << ";[";
+    for (auto &Countrie : Instance.Countries)
+      results << " " << Countrie.n_followers;
+
+    results << " ];" << to_string(epec.getStatistics().pureNE) << ";"
+            << to_string(pure) << ";" << to_string(stat.status) << ";[ "
+            << PolyT.str() << "];" << stat.numVar << ";" << stat.numConstraints
+            << ";" << stat.numNonZero << ";" << WallClockTime << ";"
+            << realThreads << ";" << to_string(epec.getIndicators());
+    if (epec.getAlgorithm() == Game::EPECalgorithm::innerApproximation) {
+      results << ";" << epec.getStatistics().numIteration << ";"
+              << epec.getStatistics().lostIntermediateEq << ";"
+              << epec.getAggressiveness() << ";"
+              << to_string(epec.getAddPolyMethod()) << ";"
+              << epec.getStatistics().numericalIssuesEncountered << ";"
+              << to_string(epec.getBoundPrimals()) << ";" << epec.getBoundBigM()
+              << ";" << to_string(epec.getRecoverStrategy());
+    } else {
+      results << ";-;-;-;-;-;-;-;-";
+    }
+    results << "\n";
+    results.close();
+  } catch (GRBException s) {
+    std::cerr << "EPEC: Gurobi Exception: Code " << s.getErrorCode() << " -- "
+              << s.getMessage() << '\n';
     ;
-  } catch (exception &e) {
-    std::cerr << "Error while finding Nash equilibrium: " << e.what() << '\n';
-    ;
   }
-  auto time_stop = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> time_diff = time_stop - time_start;
-  double WallClockTime = time_diff.count();
-  int realThreads = nThreads > 0 ? env.get(GRB_IntParam_Threads) : nThreads;
-
-  // --------------------------------
-  // WRITING STATISTICS AND SOLUTION
-  // --------------------------------
-  Game::EPECStatistics stat = epec.getStatistics();
-  if (stat.status == Game::EPECsolveStatus::nashEqFound)
-    epec.writeSolution(writeLevel, resFile);
-  ifstream existCheck(logFile);
-  std::ofstream results(logFile, ios::app);
-
-  if (!existCheck.good()) {
-    results << "Instance;Algorithm;Countries;Followers;isPureNE;RequiredPureNE;"
-               "Status;"
-               "numFeasiblePolyhedra;"
-               "numVar;numConstraints;numNonZero;ClockTime"
-               "(s);Threads;Indicators;numInnerIterations;lostIntermediateEq;"
-               "Aggressiveness;"
-               "AddPolyMethod;numericalIssuesEncountered;bound;boundBigM;"
-               "recoveryStrategy\n";
-  }
-  existCheck.close();
-
-  stringstream PolyT;
-  copy(stat.feasiblePolyhedra.begin(), stat.feasiblePolyhedra.end(),
-       ostream_iterator<int>(PolyT, " "));
-
-  results << instanceFile << ";" << to_string(epec.getAlgorithm()) << ";"
-          << Instance.Countries.size() << ";[";
-  for (auto &Countrie : Instance.Countries)
-    results << " " << Countrie.n_followers;
-
-  results << " ];" << to_string(epec.getStatistics().pureNE) << ";"
-          << to_string(pure) << ";" << to_string(stat.status) << ";[ "
-          << PolyT.str() << "];" << stat.numVar << ";" << stat.numConstraints
-          << ";" << stat.numNonZero << ";" << WallClockTime << ";"
-          << realThreads << ";" << to_string(epec.getIndicators());
-  if (epec.getAlgorithm() == Game::EPECalgorithm::innerApproximation) {
-    results << ";" << epec.getStatistics().numIteration << ";"
-            << epec.getStatistics().lostIntermediateEq << ";"
-            << epec.getAggressiveness() << ";"
-            << to_string(epec.getAddPolyMethod()) << ";"
-            << epec.getStatistics().numericalIssuesEncountered << ";"
-            << to_string(epec.getBoundPrimals()) << ";" << epec.getBoundBigM()
-            << ";" << to_string(epec.getRecoverStrategy());
-  } else {
-    results << ";-;-;-;-;-;-;-;-";
-  }
-  results << "\n";
-  results.close();
 
   return EXIT_SUCCESS;
 }
