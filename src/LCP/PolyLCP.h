@@ -9,7 +9,6 @@
 #include <string>
 
 namespace Game {
-class LCP;
 class polyLCP : public LCP {
   //using LCP::LCP;
   /**

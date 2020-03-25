@@ -35,3 +35,6 @@ style.clang-format
 tags
 test/Testdata
 *.txt
+*.srctrlprj
+*.srctrlbm
+*.srctrldb
