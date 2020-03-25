@@ -1,7 +1,6 @@
 #pragma once
 
-/** @file src/epecsolve.h Forward declaration and for EPEC solve algorithms
- * in https://github.com/ssriram1992/EPECsolve/
+/** @file src/epecsolve.h Forward declarations
  */
 
 #define VERBOSE false
@@ -10,6 +9,7 @@
 #include <armadillo>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <vector>
 
 using perps = std::vector<std::pair<unsigned int, unsigned int>>;
@@ -30,8 +30,8 @@ class MP_Param;
 class QP_Param;
 class NashGame;
 class LCP;
+class PolyLCP;
 class EPEC;
-
 enum class EPECAddPolyMethod {
   sequential,         ///< Adds polyhedra by selecting them in order
   reverse_sequential, ///< Adds polyhedra by selecting them in reverse
@@ -46,8 +46,9 @@ class fullEnumeration;
 class innerApproximation;
 class combinatorialPNE;
 class outerApproximation;
+class PolyBase;
 } // namespace Algorithms
 
+#include "LCP/LCP.h"
 #include "games.h"
-#include "lcptolp.h"
 #include "utils.h"

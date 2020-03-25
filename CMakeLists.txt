@@ -1,6 +1,6 @@
 ############################################
 ################ CONFIGURATION #############
-#### Here yoy can edit with your paths #####
+#### Here you can edit with your paths #####
 ############################################
 if (ROSSOBIANCO)
     set(BOOST_ROOT "/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0")
@@ -98,12 +98,15 @@ add_executable(EPEC
                src/epecsolve.h
                src/Games.cpp
                src/games.h
-               src/LCPtoLP.cpp
-               src/lcptolp.h
+               src/LCP/LCP.cpp
+               src/LCP/LCP.h
+               src/LCP/PolyLCP.cpp
+               src/LCP/PolyLCP.h
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
                src/models.h
+               src/algorithms/algorithms.h
                src/algorithms/innerApproximation.cpp
                src/algorithms/innerApproximation.h
                src/algorithms/combinatorialPNE.cpp
@@ -112,18 +115,21 @@ add_executable(EPEC
                src/algorithms/fullEnumeration.h
                src/algorithms/outerApproximation.cpp
                src/algorithms/outerApproximation.h
-               src/algorithms/algorithms.h)
+               )
 add_executable(EPECInstances
                instances/makeInstances.cpp
                src/epecsolve.h
                src/Games.cpp
                src/games.h
-               src/LCPtoLP.cpp
-               src/lcptolp.h
+               src/LCP/LCP.cpp
+               src/LCP/LCP.h
+               src/LCP/PolyLCP.cpp
+               src/LCP/PolyLCP.h
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
                src/models.h
+               src/algorithms/algorithms.h
                src/algorithms/innerApproximation.cpp
                src/algorithms/innerApproximation.h
                src/algorithms/combinatorialPNE.cpp
@@ -131,19 +137,21 @@ add_executable(EPECInstances
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
                src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h
-               src/algorithms/algorithms.h)
+               src/algorithms/outerApproximation.h)
 add_executable(EPECChileArgentina
                instances/ChileArgentina.cpp
                src/epecsolve.h
                src/Games.cpp
                src/games.h
-               src/LCPtoLP.cpp
-               src/lcptolp.h
+               src/LCP/LCP.cpp
+               src/LCP/LCP.h
+               src/LCP/PolyLCP.cpp
+               src/LCP/PolyLCP.h
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
                src/models.h
+               src/algorithms/algorithms.h
                src/algorithms/innerApproximation.cpp
                src/algorithms/innerApproximation.h
                src/algorithms/combinatorialPNE.cpp
@@ -151,19 +159,21 @@ add_executable(EPECChileArgentina
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
                src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h
-               src/algorithms/algorithms.h)
+               src/algorithms/outerApproximation.h)
 add_executable(EPECExample
                examples/example.cpp
                src/epecsolve.h
                src/Games.cpp
                src/games.h
-               src/LCPtoLP.cpp
-               src/lcptolp.h
+               src/LCP/LCP.cpp
+               src/LCP/LCP.h
+               src/LCP/PolyLCP.cpp
+               src/LCP/PolyLCP.h
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
                src/models.h
+               src/algorithms/algorithms.h
                src/algorithms/innerApproximation.cpp
                src/algorithms/innerApproximation.h
                src/algorithms/combinatorialPNE.cpp
@@ -171,18 +181,20 @@ add_executable(EPECExample
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
                src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h
-               src/algorithms/algorithms.h)
+               src/algorithms/outerApproximation.h)
 add_executable(EPECtest
                src/Games.cpp
                src/games.h
-               src/LCPtoLP.cpp
-               src/lcptolp.h
+               src/LCP/LCP.cpp
+               src/LCP/LCP.h
+               src/LCP/PolyLCP.cpp
+               src/LCP/PolyLCP.h
                src/utils.h
                src/Utils.cpp
                src/Models.cpp
                src/models.h
                test/EPEC.cpp
+               src/algorithms/algorithms.h
                src/algorithms/innerApproximation.cpp
                src/algorithms/innerApproximation.h
                src/algorithms/combinatorialPNE.cpp
@@ -190,8 +202,7 @@ add_executable(EPECtest
                src/algorithms/fullEnumeration.cpp
                src/algorithms/fullEnumeration.h
                src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h
-               src/algorithms/algorithms.h)
+               src/algorithms/outerApproximation.h)
 target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 target_link_libraries(EPECExample Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})

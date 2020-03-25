@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../src/games.h"
-#include "../src/lcptolp.h"
-#include "../src/models.h"
 #include "../src/algorithms/algorithms.h"
+#include "../src/games.h"
+#include "../src/models.h"
+#include "LCP/LCP.h"
 #include <armadillo>
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>

@@ -1,16 +1,266 @@
 #include "games.h"
-#include "algorithms/algorithms.h"
+#include "algorithms/combinatorialPNE.h"
+#include "algorithms/fullEnumeration.h"
+#include "algorithms/innerApproximation.h"
 #include <algorithm>
 #include <armadillo>
 #include <array>
 #include <boost/log/trivial.hpp>
-#include <boost/program_options.hpp>
 #include <chrono>
 #include <iostream>
 #include <memory>
 
 using namespace std;
 using namespace Utils;
+
+unsigned int Game::ConvexHull(
+    const vector<arma::sp_mat *>
+        *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
+    ///< hull is to be found
+    const vector<arma::vec *> *bi, ///< Inequality constraints RHS that define
+    ///< polyhedra whose convex hull is to be found
+    arma::sp_mat &A, ///< Pointer to store the output of the convex hull LHS
+    arma::vec &b,    ///< Pointer to store the output of the convex hull RHS
+    const arma::sp_mat
+        Acom,            ///< any common constraints to all the polyhedra - lhs.
+    const arma::vec bcom ///< Any common constraints to ALL the polyhedra - RHS.
+    )
+/** @brief Computing convex hull of finite unioon of polyhedra
+ * @details Computes the convex hull of a finite union of polyhedra where
+ * each polyhedra @f$P_i@f$ is of the form
+ * @f{eqnarray}{
+ * A^ix &\leq& b^i\\
+ * x &\geq& 0
+ * @f}
+ * This uses Balas' approach to compute the convex hull.
+ *
+ * <b>Cross reference:</b> Conforti, Michele; Cornuéjols, Gérard; and Zambelli,
+ * Giacomo. Integer programming. Vol. 271. Berlin: Springer, 2014. Refer:
+ * Eqn 4.31
+ */
+{
+  // Count number of polyhedra and the space we are in!
+  const unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
+  // Error check
+  if (nPoly == 0)
+    throw string(
+        "Game::ConvexHull: Empty vector of polyhedra given! Problem might be "
+        "infeasible."); // There should be at least 1 polyhedron to
+  // consider
+  const unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
+  const unsigned int nComm{static_cast<unsigned int>(Acom.n_rows)};
+
+  if (nComm > 0 && Acom.n_cols != nC)
+    throw string("Game::ConvexHull: Inconsistent number of variables in the "
+                 "common polyhedron");
+  if (nComm > 0 && nComm != bcom.n_rows)
+    throw string("Game::ConvexHull: Inconsistent number of rows in LHS and RHS "
+                 "in the common polyhedron");
+
+  // Count the number of variables in the convex hull.
+  unsigned int nFinCons{0}, nFinVar{0};
+  if (nPoly != bi->size())
+    throw string(
+        "Game::ConvexHull: Inconsistent number of LHS and RHS for polyhedra");
+  for (unsigned int i = 0; i != nPoly; i++) {
+    if (Ai->at(i)->n_cols != nC)
+      throw string("Game::ConvexHull: Inconsistent number of variables in the "
+                   "polyhedra ") +
+          to_string(i) + "; " + to_string(Ai->at(i)->n_cols) +
+          "!=" + to_string(nC);
+    if (Ai->at(i)->n_rows != bi->at(i)->n_rows)
+      throw string("Game::ConvexHull: Inconsistent number of rows in LHS and "
+                   "RHS of polyhedra ") +
+          to_string(i) + ";" + to_string(Ai->at(i)->n_rows) +
+          "!=" + to_string(bi->at(i)->n_rows);
+    nFinCons += Ai->at(i)->n_rows;
+  }
+  // For common constraint copy
+  nFinCons += nPoly * nComm;
+
+  const unsigned int FirstCons = nFinCons;
+
+  // 2nd constraint in Eqn 4.31 of Conforti - twice so we have 2 ineq instead of
+  // 1 eq constr
+  nFinCons += nC * 2;
+  // 3rd constr in Eqn 4.31. Again as two ineq constr.
+  nFinCons += 2;
+  // Common constraints
+  // nFinCons += Acom.n_rows;
+
+  nFinVar = nPoly * nC + nPoly +
+            nC; // All x^i variables + delta variables+ original x variables
+  A.zeros(nFinCons, nFinVar);
+  b.zeros(nFinCons);
+  // A.zeros(nFinCons, nFinVar); b.zeros(nFinCons);
+  // Implements the first constraint more efficiently using better constructors
+  // for sparse matrix
+  Game::compConvSize(A, nFinCons, nFinVar, Ai, bi, Acom, bcom);
+
+  // Counting rows completed
+  /****************** SLOW LOOP BEWARE *******************/
+  for (unsigned int i = 0; i < nPoly; i++) {
+    BOOST_LOG_TRIVIAL(trace) << "Game::ConvexHull: Handling Polyhedron "
+                             << i + 1 << " out of " << nPoly;
+    // First constraint in (4.31)
+    // A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) =
+    // *Ai->at(i); // Slowest line. Will arma improve this? First constraint RHS
+    // A.submat(complRow, nPoly*nC+i, complRow+nConsInPoly-1, nPoly*nC+i) =
+    // -*bi->at(i); Second constraint in (4.31)
+    for (unsigned int j = 0; j < nC; j++) {
+      A.at(FirstCons + 2 * j, nC + (i * nC) + j) = 1;
+      A.at(FirstCons + 2 * j + 1, nC + (i * nC) + j) = -1;
+    }
+    // Third constraint in (4.31)
+    A.at(FirstCons + nC * 2, nC + nPoly * nC + i) = 1;
+    A.at(FirstCons + nC * 2 + 1, nC + nPoly * nC + i) = -1;
+  }
+  /****************** SLOW LOOP BEWARE *******************/
+  // Second Constraint RHS
+  for (unsigned int j = 0; j < nC; j++) {
+    A.at(FirstCons + 2 * j, j) = -1;
+    A.at(FirstCons + 2 * j + 1, j) = 1;
+  }
+  // Third Constraint RHS
+  b.at(FirstCons + nC * 2) = 1;
+  b.at(FirstCons + nC * 2 + 1) = -1;
+  return nPoly; ///< Perfrorm increasingly better inner approximations in
+  ///< iterations
+}
+
+void Game::compConvSize(
+    arma::sp_mat &A,             ///< Output parameter
+    const unsigned int nFinCons, ///< Number of rows in final matrix A
+    const unsigned int nFinVar,  ///< Number of columns in the final matrix A
+    const vector<arma::sp_mat *>
+        *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
+    ///< hull is to be found
+    const vector<arma::vec *> *bi, ///< Inequality constraints RHS that define
+    ///< polyhedra whose convex hull is to be found
+    const arma::sp_mat
+        &Acom,            ///< LHS of the common constraints for all polyhedra
+    const arma::vec &bcom ///< RHS of the common constraints for all polyhedra
+    )
+/**
+ * @brief INTERNAL FUNCTION NOT FOR GENERAL USE.
+ * @warning INTERNAL FUNCTION NOT FOR GENERAL USE.
+ * @internal To generate the matrix "A" in Game::ConvexHull using batch
+ * insertion constructors. This is faster than the original line in the code:
+ * A.submat(complRow, i*nC, complRow+nConsInPoly-1, (i+1)*nC-1) = *Ai->at(i);
+ * Motivation behind this: Response from
+ * armadillo:-https://gitlab.com/conradsnicta/armadillo-code/issues/111
+ */
+{
+  const unsigned int nPoly{static_cast<unsigned int>(Ai->size())};
+  const unsigned int nC{static_cast<unsigned int>(Ai->front()->n_cols)};
+  unsigned int N{0}; // Total number of nonzero elements in the final matrix
+  const unsigned int nCommnz{
+      static_cast<unsigned int>(Acom.n_nonzero + bcom.n_rows)};
+  for (unsigned int i = 0; i < nPoly; i++) {
+    N += Ai->at(i)->n_nonzero;
+    N += bi->at(i)->n_rows;
+  }
+  N += nCommnz *
+       nPoly; // The common constraints have to be copied for each polyhedron.
+
+  // Now computed N which is the total number of nonzeros.
+  arma::umat locations; // location of nonzeros
+  arma::vec val;        // nonzero values
+  locations.zeros(2, N);
+  val.zeros(N);
+
+  unsigned int count{0}, rowCount{0}, colCount{nC};
+  for (unsigned int i = 0; i < nPoly; i++) {
+    for (auto it = Ai->at(i)->begin(); it != Ai->at(i)->end();
+         ++it) // First constraint
+    {
+      locations(0, count) = rowCount + it.row();
+      locations(1, count) = colCount + it.col();
+      val(count) = *it;
+      ++count;
+    }
+    for (unsigned int j = 0; j < bi->at(i)->n_rows;
+         ++j) // RHS of first constraint
+    {
+      locations(0, count) = rowCount + j;
+      locations(1, count) = nC + nC * nPoly + i;
+      val(count) = -bi->at(i)->at(j);
+      ++count;
+    }
+    rowCount += Ai->at(i)->n_rows;
+
+    // For common constraints
+    for (auto it = Acom.begin(); it != Acom.end(); ++it) // First constraint
+    {
+      locations(0, count) = rowCount + it.row();
+      locations(1, count) = colCount + it.col();
+      val(count) = *it;
+      ++count;
+    }
+    for (unsigned int j = 0; j < bcom.n_rows; ++j) // RHS of first constraint
+    {
+      locations(0, count) = rowCount + j;
+      locations(1, count) = nC + nC * nPoly + i;
+      val(count) = -bcom.at(j);
+      ++count;
+    }
+    rowCount += Acom.n_rows;
+
+    colCount += nC;
+  }
+  A = arma::sp_mat(locations, val, nFinCons, nFinVar);
+}
+
+arma::vec
+Game::LPSolve(const arma::sp_mat &A, ///< The constraint matrix
+              const arma::vec &b,    ///< RHS of the constraint matrix
+              const arma::vec &c,    ///< If feasible, returns a vector that
+                                     ///< minimizes along this direction
+              int &status, ///< Status of the optimization problem. If optimal,
+                           ///< this will be GRB_OPTIMAL
+              bool Positivity ///< Should @f$x\geq0@f$ be enforced?
+              )
+/**
+ Checks if the polyhedron given by @f$ Ax\leq b@f$ is feasible.
+ If yes, returns the point @f$x@f$ in the polyhedron that minimizes @f$c^Tx@f$
+ Positivity can be enforced on the variables easily.
+*/
+{
+  unsigned int nR, nC;
+  nR = A.n_rows;
+  nC = A.n_cols;
+  if (c.n_rows != nC)
+    throw "Game::LPSolve: Inconsistency in no of Vars in isFeas()";
+  if (b.n_rows != nR)
+    throw "Game::LPSolve: Inconsistency in no of Constr in isFeas()";
+
+  arma::vec sol = arma::vec(c.n_rows, arma::fill::zeros);
+  const double lb = Positivity ? 0 : -GRB_INFINITY;
+
+  GRBEnv env;
+  GRBModel model = GRBModel(env);
+  GRBVar x[nC];
+  GRBConstr a[nR];
+  // Adding Variables
+  for (unsigned int i = 0; i < nC; i++)
+    x[i] = model.addVar(lb, GRB_INFINITY, c.at(i), GRB_CONTINUOUS,
+                        "x_" + to_string(i));
+  // Adding constraints
+  for (unsigned int i = 0; i < nR; i++) {
+    GRBLinExpr lin{0};
+    for (auto j = A.begin_row(i); j != A.end_row(i); ++j)
+      lin += (*j) * x[j.col()];
+    a[i] = model.addConstr(lin, GRB_LESS_EQUAL, b.at(i));
+  }
+  model.set(GRB_IntParam_OutputFlag, VERBOSE);
+  model.set(GRB_IntParam_DualReductions, 0);
+  model.optimize();
+  status = model.get(GRB_IntAttr_Status);
+  if (status == GRB_OPTIMAL)
+    for (unsigned int i = 0; i < nC; i++)
+      sol.at(i) = x[i].get(GRB_DoubleAttr_X);
+  return sol;
+}
 
 bool Game::isZero(arma::mat M, double tol) noexcept {
   /**
@@ -1210,20 +1460,6 @@ void Game::EPEC::postfinalize()
 */
 {}
 
-void Game::EPEC::resetLCP() {
-  /**
-   * Resets the LCP objects to blank objects with no polyhedron added.
-   * Useful in testing, or resolving a problem with a different algorithm.
-   */
-  BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::resetLCP: resetting LCPs.";
-  for (unsigned int i = 0; i < this->nCountr; ++i) {
-    if (this->countries_LCP.at(i))
-      this->countries_LCP.at(i).reset();
-    this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
-        new LCP(this->env, *this->countries_LL.at(i).get()));
-  }
-}
-
 void Game::EPEC::finalize()
 /**
  * @brief Finalizes the creation of a Game::EPEC object.
@@ -1252,15 +1488,16 @@ void Game::EPEC::finalize()
     this->LeadObjec_ConvexHull =
         vector<shared_ptr<Game::QP_objective>>(nCountr);
     this->country_QP = vector<shared_ptr<Game::QP_Param>>(nCountr);
-    this->countries_LCP = vector<unique_ptr<Game::LCP>>(nCountr);
+    this->countries_LCP = vector<shared_ptr<Game::LCP>>(nCountr);
     this->SizesWithoutHull = vector<unsigned int>(nCountr, 0);
+
     for (unsigned int i = 0; i < this->nCountr; i++) {
       this->add_Dummy_Lead(i);
       this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
       this->LeadObjec_ConvexHull.at(i) = std::make_shared<Game::QP_objective>();
       this->make_obj_leader(i, *this->LeadObjec.at(i).get());
-      this->countries_LCP.at(i) = std::unique_ptr<Game::LCP>(
-          new LCP(this->env, *this->countries_LL.at(i).get()));
+      // this->countries_LCP.at(i) =std::shared_ptr<Game::polyLCP>(new
+      // polyLCP(this->env,*this->countries_LL.at(i).get()));
       this->SizesWithoutHull.at(i) = *this->LocEnds.at(i);
     }
 
@@ -1474,8 +1711,8 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
       return false;
     if (abs(val - objvals.at(i)) > tol) {
       *countryNumber = i;
-      // cout << "Proof - deviation: "<<*ProfDevn; //Sane
-      // cout << "Current soln: "<<this->sol_x;
+      BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::isSolved: deviation for player "
+                               << i << " -- of " << abs(val - objvals.at(i));
       return false;
     }
   }
@@ -1485,7 +1722,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
 bool Game::EPEC::isSolved(double tol) const {
   unsigned int countryNumber;
   arma::vec ProfDevn;
-  bool ret = this->isSolved(&countryNumber, &ProfDevn);
+  bool ret = this->isSolved(&countryNumber, &ProfDevn, tol);
   return ret;
 }
 
@@ -1517,11 +1754,13 @@ void Game::EPEC::make_country_QP(const unsigned int i)
 
     this->LeadObjec_ConvexHull.at(i).reset(new Game::QP_objective{
         origLeadObjec.Q, origLeadObjec.C, origLeadObjec.c});
-
-    this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
-                                      *this->country_QP.at(i).get());
-    this->Stats.feasiblePolyhedra.at(i) =
-        this->countries_LCP.at(i)->getFeasiblePolyhedra();
+    if (this->Stats.AlgorithmParam.polyLCP) {
+      this->countries_LCP.at(i)->makeQP(*this->LeadObjec_ConvexHull.at(i).get(),
+                                        *this->country_QP.at(i).get());
+    }
+    else{
+      //@todo
+    }
   }
 }
 
@@ -1821,7 +2060,6 @@ void Game::EPEC::findNashEq() {
     BOOST_LOG_TRIVIAL(error)
         << "Game::EPEC::findNashEq: a Nash Eq was "
            "already found. Calling this findNashEq might lead to errors!";
-    this->resetLCP();
   }
 
   // Choosing the appropriate algorithm
@@ -1928,9 +2166,18 @@ unsigned int Game::EPEC::getPosition_LeadFollPoly(const unsigned int i,
    *
    * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNPoly_Lead(i)
    */
-  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
-  const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(k);
-  return LeaderStart + FollPoly + j;
+  if (this->Stats.AlgorithmParam.polyLCP) {
+    const auto LeaderStart = this->nashgame->getPrimalLoc(i);
+    const auto FollPoly =
+        dynamic_cast<Game::polyLCP *>(this->countries_LCP.at(i).get())
+            ->conv_PolyPosition(k);
+    return LeaderStart + FollPoly + j;
+  } else {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Cannot use Game::EPEC::getPosition_LeadFollPoly with the current "
+           "algorithm. Returning 0";
+    return 0;
+  }
 }
 
 unsigned int Game::EPEC::getPosition_LeadLeadPoly(const unsigned int i,
@@ -1942,9 +2189,18 @@ unsigned int Game::EPEC::getPosition_LeadLeadPoly(const unsigned int i,
    *
    * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNPoly_Lead(i)
    */
-  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
-  const auto FollPoly = this->countries_LCP.at(i)->conv_PolyPosition(k);
-  return LeaderStart + FollPoly + this->countries_LCP.at(i)->getLStart() + j;
+  if (this->Stats.AlgorithmParam.polyLCP) {
+    const auto LeaderStart = this->nashgame->getPrimalLoc(i);
+    const auto FollPoly =
+        dynamic_cast<Game::polyLCP *>(this->countries_LCP.at(i).get())
+            ->conv_PolyPosition(k);
+    return LeaderStart + FollPoly + this->countries_LCP.at(i)->getLStart() + j;
+  } else {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Cannot use Game::EPEC::getPosition_LeadLeadPoly with the current "
+           "algorithm. Returning 0";
+    return 0;
+  }
 }
 
 unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
@@ -1952,7 +2208,15 @@ unsigned int Game::EPEC::getNPoly_Lead(const unsigned int i) const {
    * Get the number of polyhedra used in the inner approximation of the
    * feasible region of the i-th leader.*
    */
-  return this->countries_LCP.at(i)->conv_Npoly();
+  if (this->Stats.AlgorithmParam.polyLCP) {
+    return dynamic_cast<Game::polyLCP *>(this->countries_LCP.at(i).get())
+        ->conv_Npoly();
+  } else {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Cannot use Game::EPEC::getNPoly_Lead with the current "
+           "algorithm. Returning 0";
+    return 0;
+  }
 }
 
 unsigned int Game::EPEC::getPosition_Probab(const unsigned int i,
@@ -1962,11 +2226,20 @@ unsigned int Game::EPEC::getPosition_Probab(const unsigned int i,
    * (k-th pure strategy) of the i-th leader. However, if the leader has an
    * inner approximation with exactly 1 polyhedron, it returns 0;
    */
-  const auto PolyProbab = this->countries_LCP.at(i)->conv_PolyWt(k);
-  if (PolyProbab == 0)
+  if (this->Stats.AlgorithmParam.polyLCP) {
+    const auto PolyProbab =
+        dynamic_cast<Game::polyLCP *>(this->countries_LCP.at(i).get())
+            ->conv_PolyWt(k);
+    if (PolyProbab == 0)
+      return 0;
+    const auto LeaderStart = this->nashgame->getPrimalLoc(i);
+    return LeaderStart + PolyProbab;
+  } else {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Cannot use Game::EPEC::getNPoly_Lead with the current "
+           "algorithm. Returning 0";
     return 0;
-  const auto LeaderStart = this->nashgame->getPrimalLoc(i);
-  return LeaderStart + PolyProbab;
+  }
 }
 
 bool Game::EPEC::isPureStrategy(const double tol) const {
@@ -1988,13 +2261,20 @@ bool Game::EPEC::isPureStrategy(const unsigned int i, const double tol) const {
    * i. The strategy is considered a pure strategy, if it is played with a
    * probability greater than 1 - tol;
    */
-  const unsigned int nPoly = this->getNPoly_Lead(i);
-  for (unsigned int j = 0; j < nPoly; j++) {
-    const double probab = this->getVal_Probab(i, j);
-    if (probab > 1 - tol) // Current Strategy is a pure strategy!
-      return true;
+  if (this->Stats.AlgorithmParam.polyLCP) {
+    const unsigned int nPoly = this->getNPoly_Lead(i);
+    for (unsigned int j = 0; j < nPoly; j++) {
+      const double probab = this->getVal_Probab(i, j);
+      if (probab > 1 - tol) // Current Strategy is a pure strategy!
+        return true;
+    }
+    return false;
+  } else {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Cannot use Game::EPEC::isPureStrategy with the current "
+           "algorithm. Returning 0";
+    return 0;
   }
-  return false;
 }
 
 std::vector<unsigned int> Game::EPEC::mixedStratPoly(const unsigned int i,
@@ -2004,24 +2284,38 @@ std::vector<unsigned int> Game::EPEC::mixedStratPoly(const unsigned int i,
  * strategies are played with probability greater than tol.
  */
 {
-  std::vector<unsigned int> polys{};
-  const unsigned int nPoly = this->getNPoly_Lead(i);
-  for (unsigned int j = 0; j < nPoly; j++) {
-    const double probab = this->getVal_Probab(i, j);
-    if (probab > tol)
-      polys.push_back(j);
+  if (this->Stats.AlgorithmParam.polyLCP) {
+    std::vector<unsigned int> polys{};
+    const unsigned int nPoly = this->getNPoly_Lead(i);
+    for (unsigned int j = 0; j < nPoly; j++) {
+      const double probab = this->getVal_Probab(i, j);
+      if (probab > tol)
+        polys.push_back(j);
+    }
+    cout << "\n";
+    return polys;
+  } else {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Cannot use Game::EPEC::mixedStratPoly with the current "
+           "algorithm. Returning null";
+    return std::vector<unsigned int>{};
   }
-  cout << "\n";
-  return polys;
 }
 
 double Game::EPEC::getVal_Probab(const unsigned int i,
                                  const unsigned int k) const {
-  const unsigned int varname{this->getPosition_Probab(i, k)};
-  if (varname == 0)
-    return 1;
-  return this->lcpmodel->getVarByName("x_" + std::to_string(varname))
-      .get(GRB_DoubleAttr_X);
+  if (this->Stats.AlgorithmParam.polyLCP) {
+    const unsigned int varname{this->getPosition_Probab(i, k)};
+    if (varname == 0)
+      return 1;
+    return this->lcpmodel->getVarByName("x_" + std::to_string(varname))
+        .get(GRB_DoubleAttr_X);
+  } else {
+    BOOST_LOG_TRIVIAL(warning)
+        << "Cannot use Game::EPEC::mixedStratPoly with the current "
+           "algorithm. Returning 0";
+    return 0;
+  }
 }
 
 double Game::EPEC::getVal_LeadFoll(const unsigned int i,

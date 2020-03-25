@@ -1,10 +1,8 @@
 #pragma once
-
 /**
  * @file src/games.h For Game theory related algorithms
  */
-// #include"epecsolve.h"
-#include "lcptolp.h"
+#include "epecsolve.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>
@@ -29,6 +27,21 @@ std::ostream &operator<<(std::ostream &ost, std::pair<T, S> p) {
 }
 
 namespace Game {
+class polyLCP; // Forward declaration
+
+arma::vec LPSolve(const arma::sp_mat &A, const arma::vec &b, const arma::vec &c,
+                  int &status, bool Positivity = false);
+
+unsigned int ConvexHull(const std::vector<arma::sp_mat *> *Ai,
+                        const std::vector<arma::vec *> *bi, arma::sp_mat &A,
+                        arma::vec &b, const arma::sp_mat Acom = {},
+                        const arma::vec bcom = {});
+
+void compConvSize(arma::sp_mat &A, const unsigned int nFinCons,
+                  const unsigned int nFinVar,
+                  const std::vector<arma::sp_mat *> *Ai,
+                  const std::vector<arma::vec *> *bi, const arma::sp_mat &Acom,
+                  const arma::vec &bcom);
 bool isZero(arma::mat M, double tol = 1e-6) noexcept;
 
 bool isZero(arma::sp_mat M, double tol = 1e-6) noexcept;
@@ -411,8 +424,9 @@ enum class EPECalgorithm {
   innerApproximation, ///< Perform increasingly better inner approximations in
   ///< iterations
   combinatorialPNE, ///< Perform a combinatorial-based search strategy to find a
-                   ///< pure NE
-  outerApproximation ///< Perform an increasingly improving outer approximation of the feasible region of each leader
+                    ///< pure NE
+  outerApproximation ///< Perform an increasingly improving outer approximation
+                     ///< of the feasible region of each leader
 };
 
 ///< Recovery strategies for obtaining a PNE with innerApproximation
@@ -427,7 +441,8 @@ struct EPECAlgorithmParams {
   Game::EPECalgorithm algorithm = Game::EPECalgorithm::fullEnumeration;
   Game::EPECRecoverStrategy recoverStrategy =
       EPECRecoverStrategy::incrementalEnumeration;
-  ///< Specifies the method by which innerApproximation should seek for a PNE
+  bool polyLCP{
+      true}; ///< True if the algorithm extends the LCP to polyLCP. Namely, true if the algorithm uses the polyhedral class for the LCP
   Game::EPECAddPolyMethod addPolyMethod = Game::EPECAddPolyMethod::sequential;
   bool boundPrimals{false}; ///< If true, each QP param is bounded with an
                             ///< arbitrary large bigM constant
@@ -492,7 +507,7 @@ private:
 
 protected: // Datafields
   std::vector<std::shared_ptr<Game::NashGame>> countries_LL{};
-  std::vector<std::unique_ptr<Game::LCP>> countries_LCP{};
+  std::vector<std::shared_ptr<Game::LCP>> countries_LCP{};
 
   std::vector<std::shared_ptr<Game::QP_Param>>
       country_QP{}; ///< The QP corresponding to each player
@@ -528,14 +543,14 @@ private:
   void make_country_QP(const unsigned int i);
   void make_country_QP();
   void make_country_LCP();
-  void resetLCP();
 
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
   void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
-  bool computeNashEq(bool pureNE = false, double localTimeLimit = -1.0, bool check = false);
+  bool computeNashEq(bool pureNE = false, double localTimeLimit = -1.0,
+                     bool check = false);
 
 protected: // functions
   EPEC(GRBEnv *env)
@@ -562,13 +577,13 @@ protected: // functions
       return false;
   }
 
-public:                  // functions
-  //Friends algorithmic classes
+public: // functions
+  // Friends algorithmic classes
+  friend class Algorithms::PolyBase;
   friend class Algorithms::innerApproximation;
+  friend class Algorithms::outerApproximation;
   friend class Algorithms::combinatorialPNE;
   friend class Algorithms::fullEnumeration;
-  friend class Algorithms::outerApproximation;
-
   EPEC() = delete;       // No default constructor
   EPEC(EPEC &) = delete; // Abstract class - no copy constructor
   ~EPEC() {}             // Destructor to free data
@@ -640,8 +655,8 @@ public:                  // functions
 
   // Methods to get positions of variables
   // The below are all const functions which return an unsigned int.
-  unsigned int getnVarinEPEC() const noexcept { return this->nVarinEPEC; }
-  unsigned int getNcountries() const noexcept {
+  int getnVarinEPEC() const noexcept { return this->nVarinEPEC; }
+  int getNcountries() const noexcept {
     return this->countries_LL.size();
   }
   unsigned int getPosition_LeadFoll(const unsigned int i,

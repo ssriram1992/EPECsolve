@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../src/games.h"
+#include "algorithms/algorithms.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>
@@ -11,18 +10,9 @@
 namespace Algorithms {
 
 ///@brief This class is responsible for the fully enumerative algorithm
-class fullEnumeration {
-private:
-  GRBEnv *env;      ///< Stores the pointer to the Gurobi Environment
-  EPEC *EPECObject; ///< Stores the pointer to the calling EPEC object
-
+class fullEnumeration : public PolyBase {
 public:
-  friend class EPEC;
-  fullEnumeration(GRBEnv *env, EPEC *EpecObj)
-      : env{env},
-        EPECObject{EpecObj} {}; ///< Constructor requires a pointer to the Gurobi
-                                ///< Environment and the calling EPEC object
+  fullEnumeration(GRBEnv *env, EPEC *EPECObject): PolyBase(env, EPECObject){};
   void solve();
-
 };
-} // namespace Game
+} // namespace Algorithms

@@ -1,7 +1,7 @@
 #pragma once
-
-#include "../src/games.h"
+#include "algorithms/algorithms.h"
 #include <armadillo>
+#include <boost/log/trivial.hpp>
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
@@ -11,20 +11,16 @@
 namespace Algorithms {
 
 ///@brief This class is responsible for the combinatorial pure-nash Equilibrium
-class combinatorialPNE {
-private:
-  GRBEnv *env;      ///< Stores the pointer to the Gurobi Environment
-  EPEC *EPECObject; ///< Stores the pointer to the calling EPEC object
-
+class combinatorialPNE : public PolyBase {
 public:
-  friend class Game::EPEC;
-  combinatorialPNE(GRBEnv *env, EPEC *EpecObj)
-      : env{env},
-        EPECObject{EpecObj} {}; ///< Constructor requires a pointer to the Gurobi
-                                ///< Environment and the calling EPEC object
-  void solve(const std::vector<std::set<unsigned long int>> &excludeList = {});
+  combinatorialPNE(GRBEnv *env, EPEC *EPECObject, bool poly = true): PolyBase(env, EPECObject){};;
+  void solve() override {
+    this->solve(std::vector<std::set<unsigned long int>>{});
+  }
+  void solve(const std::vector<std::set<unsigned long int>> &excludeList);
 
 private:
+  // Making the method private
   void combPNE(const std::vector<long int> combination,
                const std::vector<std::set<unsigned long int>> &excludeList);
 };

@@ -1,5 +1,5 @@
 #include "fullEnumeration.h"
-
+#include "LCP/PolyLCP.h"
 #include <algorithm>
 #include <armadillo>
 #include <boost/log/trivial.hpp>
@@ -21,7 +21,7 @@ void Algorithms::fullEnumeration::solve() {
    * @p excludelist contains the set of excluded polyhedra combinations.
    */
   for (unsigned int i = 0; i < this->EPECObject->nCountr; ++i)
-    this->EPECObject->countries_LCP.at(i)->EnumerateAll(true);
+    this->poly_LCP.at(i)->EnumerateAll(true);
   this->EPECObject->make_country_QP();
   BOOST_LOG_TRIVIAL(trace)
     << "Algorithms::fullEnumeration::solve: Starting fullEnumeration search";

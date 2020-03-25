@@ -72,9 +72,9 @@ void Algorithms::combinatorialPNE::combPNE(
   }
   if (found) {
     for (unsigned int j = 0;
-         j < this->EPECObject->countries_LCP.at(i)->getNumTheoreticalPoly();
+         j < this->poly_LCP.at(i)->getNumTheoreticalPoly();
          ++j) {
-      if (this->EPECObject->countries_LCP.at(i)->checkPolyFeas(j)) {
+      if (this->poly_LCP.at(i)->checkPolyFeas(j)) {
         childCombination.at(i) = j;
         this->combPNE(childCombination, excludeList);
       }
@@ -100,8 +100,8 @@ void Algorithms::combinatorialPNE::combPNE(
           << "Algorithms::combinatorialPNE::combPNE: considering a "
              "FEASIBLE combination of polyhedra.";
       for (int j = 0; j < this->EPECObject->nCountr; ++j) {
-        this->EPECObject->countries_LCP.at(j)->clearPolyhedra();
-        this->EPECObject->countries_LCP.at(j)->addThePoly(
+        this->poly_LCP.at(j)->clearPolyhedra();
+        this->poly_LCP.at(j)->addThePoly(
             childCombination.at(j));
       }
       this->EPECObject->make_country_QP();

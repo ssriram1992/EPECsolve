@@ -1,6 +1,5 @@
 #pragma once
-
-#include "lcptolp.h"
+#include "algorithms/algorithms.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>
@@ -10,19 +9,13 @@
 
 namespace Algorithms {
 
-class innerApproximation {
-private:
-  GRBEnv *env;
-  EPEC *EPECObject;
+///@brief This class is responsible for the inner Approximation
+class innerApproximation : public PolyBase {
 
 public:
-  friend class Game::EPEC;
-  innerApproximation(GRBEnv *env, EPEC *EpecObj)
-      : env{env},
-        EPECObject{
-            EpecObj} {}; ///< Constructor requires a pointer to the Gurobi
-  ///< Environment and the calling EPEC object
-  void solve();
+  innerApproximation(GRBEnv *env, EPEC *EPECObject)
+      : PolyBase(env, EPECObject){};
+  void solve() override;
 
 private:
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
