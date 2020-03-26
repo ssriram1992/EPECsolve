@@ -5,7 +5,7 @@ namespace Algorithms {
 class PolyBase {
   /*
  *  @brief This is the abstract class of Algorithms for full enumeration, inner approximation, and combinatorial PNE.
-   *  It provides a constructor where the Gurobi environment and the EPEC is passed. An abstract
+   *  It provides a constructor where the Gurobi environment and the EPEC are passed. This is an abstract class.
  */
 protected:
   std::vector<std::shared_ptr<Game::polyLCP>> poly_LCP{};
@@ -39,6 +39,6 @@ public:
       EPECObject->countries_LCP.at(i) = this->poly_LCP.at(i);
     }
   }
-  virtual void solve(){};
+  virtual void solve()=0;
 };
 } // namespace Algorithms

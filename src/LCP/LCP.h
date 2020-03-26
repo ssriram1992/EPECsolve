@@ -89,7 +89,6 @@ public:
       arma::vec b = {}); // Constructor with M, q, compl pairs
   LCP(GRBEnv *env, const Game::NashGame &N);
   LCP(const LCP &) = default;
-  LCP &operator=(const LCP &) = default;
 
   /** Destructor - to delete the objects created with new operator */
   ~LCP();
