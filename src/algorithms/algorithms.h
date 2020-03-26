@@ -1,4 +1,5 @@
 #pragma once
+#include "epecsolve.h"
 #include "Base.h"
 #include "combinatorialPNE.h"
 #include "fullEnumeration.h"

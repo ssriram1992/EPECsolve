@@ -4,13 +4,15 @@
  */
 
 #define VERBOSE false
-#define EPECVERSION 1.0
+#define EPECVERSION 2.0
 
 #include <armadillo>
-#include <iostream>
-#include <map>
 #include <memory>
 #include <vector>
+#include <set>
+#include <string>
+#include <boost/log/trivial.hpp>
+#include <gurobi_c++.h>
 
 using perps = std::vector<std::pair<unsigned int, unsigned int>>;
 std::ostream &operator<<(std::ostream &ost, perps C);

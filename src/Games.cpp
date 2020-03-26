@@ -1,14 +1,5 @@
 #include "games.h"
-#include "algorithms/combinatorialPNE.h"
-#include "algorithms/fullEnumeration.h"
-#include "algorithms/innerApproximation.h"
-#include <algorithm>
-#include <armadillo>
-#include <array>
-#include <boost/log/trivial.hpp>
-#include <chrono>
-#include <iostream>
-#include <memory>
+#include "algorithms/algorithms.h"
 
 using namespace std;
 using namespace Utils;

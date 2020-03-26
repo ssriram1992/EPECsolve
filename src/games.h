@@ -3,12 +3,6 @@
  * @file src/games.h For Game theory related algorithms
  */
 #include "epecsolve.h"
-#include <armadillo>
-#include <gurobi_c++.h>
-#include <iostream>
-#include <memory>
-#include <set>
-#include <string>
 
 using namespace Game;
 

@@ -5,9 +5,7 @@
  */
 
 #include "epecsolve.h"
-#include <armadillo>
 #include <fstream>
-#include <set>
 
 using namespace arma;
 

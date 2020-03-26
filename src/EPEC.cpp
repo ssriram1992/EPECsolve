@@ -1,13 +1,8 @@
 #include "models.h"
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
-#include <chrono>
 #include <cstdlib>
-#include <gurobi_c++.h>
-#include <iostream>
-#include <iterator>
 
 using namespace std;
 namespace logging = boost::log;

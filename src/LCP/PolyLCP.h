@@ -1,19 +1,12 @@
 #pragma once
 
 #include "LCP.h"
-#include <armadillo>
-#include <gurobi_c++.h>
-#include <iostream>
-#include <memory>
-#include <set>
-#include <string>
 
 namespace Game {
 class polyLCP : public LCP {
-  //using LCP::LCP;
   /**
    * @brief Inheritor Class to handle the polyhedral aspects of the LCP class,
-   * and support algorithms.
+   * and to support algorithms.
    */
 
   using spmat_Vec = std::vector<std::unique_ptr<arma::sp_mat>>;

@@ -1,19 +1,4 @@
 #include "innerApproximation.h"
-#include "combinatorialPNE.h"
-#include "epecsolve.h"
-
-#include <algorithm>
-#include <armadillo>
-#include <boost/log/trivial.hpp>
-#include <boost/program_options.hpp>
-#include <chrono>
-#include <cmath>
-#include <gurobi_c++.h>
-#include <iostream>
-#include <memory>
-#include <random>
-#include <set>
-#include <string>
 
 using namespace std;
 void Algorithms::innerApproximation::solve() {

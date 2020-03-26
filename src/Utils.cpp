@@ -1,7 +1,4 @@
 #include "utils.h"
-#include <armadillo>
-#include <boost/log/trivial.hpp>
-#include <boost/program_options.hpp>
 #include <fstream>
 
 using namespace std;

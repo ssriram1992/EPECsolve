@@ -1,11 +1,5 @@
 #pragma once
 #include "algorithms/algorithms.h"
-#include <armadillo>
-#include <gurobi_c++.h>
-#include <iostream>
-#include <memory>
-#include <set>
-#include <string>
 
 namespace Algorithms {
 
