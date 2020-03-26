@@ -32,6 +32,8 @@ void Algorithms::combinatorialPNE::solve(
   for (int j = 0; j < this->EPECObject->nCountr; ++j)
     start.push_back(-1);
   this->combPNE(start, excludeList);
+  if (this->EPECObject->Stats.status==EPECsolveStatus::unInitialized)
+    this->EPECObject->Stats.status = EPECsolveStatus::nashEqNotFound;
   this->postSolving();
   return;
 }
