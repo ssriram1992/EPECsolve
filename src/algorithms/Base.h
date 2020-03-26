@@ -1,5 +1,5 @@
 #pragma once
-#include "algorithms.h"
+#include "epecsolve.h"
 
 namespace Algorithms {
 class PolyBase {

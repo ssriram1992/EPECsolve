@@ -7,6 +7,10 @@
  */
 
 #include "epecsolve.h"
+#include <armadillo>
+#include <gurobi_c++.h>
+#include <iostream>
+#include <memory>
 
 namespace Models {
 typedef struct FollPar FollPar;

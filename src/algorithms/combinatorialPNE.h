@@ -1,5 +1,12 @@
 #pragma once
 #include "algorithms/algorithms.h"
+#include <armadillo>
+#include <boost/log/trivial.hpp>
+#include <gurobi_c++.h>
+#include <iostream>
+#include <memory>
+#include <set>
+#include <string>
 
 namespace Algorithms {
 

@@ -1,10 +1,18 @@
 // #include "models.h"
 #include "models.h"
+#include <armadillo>
+#include <boost/log/trivial.hpp>
+#include <boost/program_options.hpp>
+#include <gurobi_c++.h>
 #include <iomanip>
+#include <iostream>
+#include <map>
+#include <memory>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
+#include <vector>
 
 using namespace rapidjson;
 using namespace std;

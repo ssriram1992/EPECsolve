@@ -5,6 +5,11 @@
  */
 
 #include "epecsolve.h"
+#include <armadillo>
+#include <gurobi_c++.h>
+#include <iostream>
+#include <memory>
+#include <set>
 
 // using namespace Game;
 
