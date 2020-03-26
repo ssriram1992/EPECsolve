@@ -14,8 +14,6 @@
 using namespace std;
 using namespace Utils;
 
-
-
 void Game::LCP::defConst(GRBEnv *env)
 /**
  * @brief Assign default values to LCP attributes
@@ -100,14 +98,15 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
  *	@note Most preferred constructor for user interface.
  */
 {
-  arma::sp_mat M;
-  arma::vec q;
-  perps Compl;
-  N.FormulateLCP(M, q, Compl);
+  arma::sp_mat M_local;
+  arma::vec q_local;
+  perps Compl_local;
+  N.FormulateLCP(M_local, q_local, Compl_local);
   // LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getMCLeadRHS());
 
-  this->M = M;
-  this->q = q;
+  this->M = M_local;
+  this->q = q_local;
+  this->Compl = Compl_local;
   this->_A = N.RewriteLeadCons();
   this->_b = N.getMCLeadRHS();
   defConst(env);
@@ -200,7 +199,6 @@ void Game::LCP::makeRelaxed()
     throw;
   }
 }
-
 
 unique_ptr<GRBModel> Game::LCP::LCPasMIP(
     vector<short int>
@@ -366,7 +364,6 @@ void Game::LCP::print(string end) {
   cout << "LCP with " << this->nR << " rows and " << this->nC << " columns."
        << end;
 }
-
 
 bool Game::LCP::extractSols(
     GRBModel *model, ///< The Gurobi Model that was solved (perhaps using
