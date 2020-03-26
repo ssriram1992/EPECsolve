@@ -15,9 +15,10 @@ class innerApproximation : public PolyBase {
 public:
   innerApproximation(GRBEnv *env, EPEC *EPECObject)
       : PolyBase(env, EPECObject){};
-  void solve() override;
+  void solve() override ;
 
 private:
+  void start();
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
                          bool stopOnSingleInfeasibility = false);
   bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,

@@ -32,7 +32,7 @@ void Algorithms::combinatorialPNE::solve(
   for (int j = 0; j < this->EPECObject->nCountr; ++j)
     start.push_back(-1);
   this->combPNE(start, excludeList);
-
+  this->postSolving();
   return;
 }
 

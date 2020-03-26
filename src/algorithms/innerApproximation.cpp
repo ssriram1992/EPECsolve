@@ -1,6 +1,6 @@
 #include "innerApproximation.h"
-#include "epecsolve.h"
 #include "combinatorialPNE.h"
+#include "epecsolve.h"
 
 #include <algorithm>
 #include <armadillo>
@@ -17,6 +17,14 @@
 
 using namespace std;
 void Algorithms::innerApproximation::solve() {
+  /**
+   * Wraps the algorithm with the postSolving operations
+   */
+  this->start();
+  this->postSolving();
+}
+
+void Algorithms::innerApproximation::start() {
   /**
    * Given the referenced EPEC instance, this method solves it through the inner
    * approximation algorithm.
@@ -37,6 +45,7 @@ void Algorithms::innerApproximation::solve() {
   if (this->EPECObject->Stats.AlgorithmParam.addPolyMethod ==
       EPECAddPolyMethod::random) {
     for (unsigned int i = 0; i < this->EPECObject->nCountr; ++i) {
+      // 42 is the answer, we all know
       long int seed =
           this->EPECObject->Stats.AlgorithmParam.addPolyMethodSeed < 0
               ? chrono::high_resolution_clock::now()

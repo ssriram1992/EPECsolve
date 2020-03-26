@@ -16,8 +16,7 @@
 using namespace std;
 
 void Algorithms::fullEnumeration::solve() {
-  /** @brief Solve the referenced EPEC instance with the combinatorial
-   *pure-equilibrium algorithm
+  /** @brief Solve the referenced EPEC instance with the full enumeration
    * @p excludelist contains the set of excluded polyhedra combinations.
    */
   for (unsigned int i = 0; i < this->EPECObject->nCountr; ++i)
@@ -32,4 +31,6 @@ void Algorithms::fullEnumeration::solve() {
     if (this->EPECObject->isPureStrategy())
       this->EPECObject->Stats.pureNE = true;
   }
+  //Post Solving
+  this->postSolving();
 }

@@ -3,11 +3,26 @@
 
 namespace Algorithms {
 class PolyBase {
+  /*
+ *  @brief This is the abstract class of Algorithms for full enumeration, inner approximation, and combinatorial PNE.
+   *  It provides a constructor where the Gurobi environment and the EPEC is passed. An abstract
+ */
 protected:
   std::vector<std::shared_ptr<Game::polyLCP>> poly_LCP{};
   GRBEnv *env;
   EPEC *EPECObject;
 
+  void postSolving() {
+    /**
+     * Perform postSolving operations.
+     * For instance, it updates the statistics associated with the feasible polyhedra.
+     * The responsability for calling this method is left to the
+     * inheritor
+     */
+    for (unsigned int i = 0; i < this->EPECObject->nCountr; i++)
+      this->EPECObject->Stats.feasiblePolyhedra.at(i) =
+          this->poly_LCP.at(i)->getFeasiblePolyhedra();
+  }
 public:
   PolyBase(GRBEnv *env, EPEC *EPECObject) {
     /*
@@ -24,11 +39,6 @@ public:
       EPECObject->countries_LCP.at(i) = this->poly_LCP.at(i);
     }
   }
-  void poly_updatePolyStats() {
-    for (unsigned int i = 0; i < this->EPECObject->nCountr; i++)
-      this->EPECObject->Stats.feasiblePolyhedra.at(i) =
-          this->poly_LCP.at(i)->getFeasiblePolyhedra();
-  }
-  virtual void solve() = 0;
+  virtual void solve(){};
 };
 } // namespace Algorithms

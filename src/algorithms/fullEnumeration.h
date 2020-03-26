@@ -13,6 +13,6 @@ namespace Algorithms {
 class fullEnumeration : public PolyBase {
 public:
   fullEnumeration(GRBEnv *env, EPEC *EPECObject): PolyBase(env, EPECObject){};
-  void solve();
+  void solve() override;
 };
 } // namespace Algorithms
