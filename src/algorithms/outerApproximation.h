@@ -1,11 +1,12 @@
-#include "lcptolp.h"
-
+#pragma once
+#include "algorithms.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
 #include <set>
 #include <string>
+
 class Tree {
 public:
   struct TreeNode {

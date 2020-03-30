@@ -1,8 +1,6 @@
-// #include "models.h"
 #include "models.h"
 #include <armadillo>
 #include <boost/log/trivial.hpp>
-#include <boost/program_options.hpp>
 #include <gurobi_c++.h>
 #include <iomanip>
 #include <iostream>

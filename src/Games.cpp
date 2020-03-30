@@ -6,7 +6,6 @@
 #include <armadillo>
 #include <array>
 #include <boost/log/trivial.hpp>
-#include <chrono>
 #include <iostream>
 #include <memory>
 
