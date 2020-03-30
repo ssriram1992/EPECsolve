@@ -24,8 +24,6 @@ namespace Game {
  */
 
 class LCP {
-  using spmat_Vec = std::vector<std::unique_ptr<arma::sp_mat>>;
-  using vec_Vec = std::vector<std::unique_ptr<arma::vec>>;
 
 protected:
   // Essential data ironment for MIP/LP solves
@@ -138,3 +136,4 @@ public:
 } // namespace Game
 
 #include "PolyLCP.h"
+#include "OuterLCP.h"
