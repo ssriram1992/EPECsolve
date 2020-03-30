@@ -45,5 +45,6 @@ private:
       {}; ///< Decimal encoding of polyhedra known to be infeasible
   bool isParent(const vector<short> &father, const vector<short> &child);
   void buildComponents(const vector<short> Encoding);
+  unsigned int ConvexHull(arma::sp_mat &A, arma::vec &b);
 };
 } // namespace Game
