@@ -16,9 +16,6 @@ class polyLCP : public LCP {
    * and support algorithms.
    */
 
-  using spmat_Vec = std::vector<std::unique_ptr<arma::sp_mat>>;
-  using vec_Vec = std::vector<std::unique_ptr<arma::vec>>;
-
 private:
   int polyCounter{0};
   unsigned int feasiblePolyhedra{0};

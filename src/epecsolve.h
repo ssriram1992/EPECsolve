@@ -21,6 +21,8 @@ template <class T>
 std::ostream &operator<<(std::ostream &ost, std::vector<T> v);
 template <class T, class S>
 std::ostream &operator<<(std::ostream &ost, std::pair<T, S> p);
+using spmat_Vec = std::vector<std::unique_ptr<arma::sp_mat>>;
+using vec_Vec = std::vector<std::unique_ptr<arma::vec>>;
 
 // Forward declarations
 namespace Game {
@@ -30,7 +32,8 @@ class MP_Param;
 class QP_Param;
 class NashGame;
 class LCP;
-class PolyLCP;
+class polyLCP;
+class outerLCP;
 class EPEC;
 enum class EPECAddPolyMethod {
   sequential,         ///< Adds polyhedra by selecting them in order

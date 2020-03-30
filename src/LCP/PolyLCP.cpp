@@ -160,52 +160,46 @@ bool Game::polyLCP::FixToPoly(
   BOOST_LOG_TRIVIAL(trace)
       << "Game::polyLCP::FixToPoly: Working on polyhedron #" << FixNumber;
 
-  if (knownInfeas.find(FixNumber) != knownInfeas.end()) {
-    BOOST_LOG_TRIVIAL(trace) << "Game::polyLCP::FixToPoly: Previously known "
-                                "infeasible polyhedron #"
-                             << FixNumber;
-    return false;
-  }
+  bool eval;
+  if (checkFeas)
+    eval = this->checkPolyFeas(Fix);
+  else
+    eval = true;
 
-  if (!custom && !AllPolyhedra.empty()) {
-    if (AllPolyhedra.find(FixNumber) != AllPolyhedra.end()) {
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::polyLCP::FixToPoly: Previously added polyhedron #"
-          << FixNumber;
-      return false;
+  if (eval) {
+    if (!custom && !AllPolyhedra.empty()) {
+      if (AllPolyhedra.find(FixNumber) != AllPolyhedra.end()) {
+        BOOST_LOG_TRIVIAL(trace)
+            << "Game::polyLCP::FixToPoly: Previously added polyhedron #"
+            << FixNumber;
+        return false;
+      }
     }
-  }
-
-  unique_ptr<arma::sp_mat> Aii =
-      unique_ptr<arma::sp_mat>(new arma::sp_mat(nR, nC));
-  Aii->zeros();
-  unique_ptr<arma::vec> bii =
-      unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
-  for (unsigned int i = 0; i < this->nR; i++) {
-    if (Fix.at(i) == 0) {
-      throw string("Error in Game::polyLCP::FixToPoly. 0s not allowed in "
-                   "argument vector");
+    unique_ptr<arma::sp_mat> Aii =
+        unique_ptr<arma::sp_mat>(new arma::sp_mat(nR, nC));
+    Aii->zeros();
+    unique_ptr<arma::vec> bii =
+        unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
+    for (unsigned int i = 0; i < this->nR; i++) {
+      if (Fix.at(i) == 0) {
+        throw string("Error in Game::polyLCP::FixToPoly. 0s not allowed in "
+                     "argument vector");
+      }
+      if (Fix.at(i) == 1) // Equation to be fixed top zero
+      {
+        for (auto j = this->M.begin_row(i); j != this->M.end_row(i); ++j)
+          if (!this->isZero((*j)))
+            Aii->at(i, j.col()) =
+                (*j); // Only mess with non-zero elements of a sparse matrix!
+        bii->at(i) = -this->q(i);
+      } else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be
+             // added
+      {
+        unsigned int varpos = (i >= this->LeadStart) ? i + this->nLeader : i;
+        Aii->at(i, varpos) = 1;
+        bii->at(i) = 0;
+      }
     }
-    if (Fix.at(i) == 1) // Equation to be fixed top zero
-    {
-      for (auto j = this->M.begin_row(i); j != this->M.end_row(i); ++j)
-        if (!this->isZero((*j)))
-          Aii->at(i, j.col()) =
-              (*j); // Only mess with non-zero elements of a sparse matrix!
-      bii->at(i) = -this->q(i);
-    } else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be
-           // added
-    {
-      unsigned int varpos = (i >= this->LeadStart) ? i + this->nLeader : i;
-      Aii->at(i, varpos) = 1;
-      bii->at(i) = 0;
-    }
-  }
-  bool add = !checkFeas;
-  if (checkFeas) {
-    add = this->checkPolyFeas(Fix);
-  }
-  if (add) {
     if (custom) {
       custAi->push_back(std::move(Aii));
       custbi->push_back(std::move(bii));
@@ -216,6 +210,9 @@ bool Game::polyLCP::FixToPoly(
     }
     return true; // Successfully added
   }
+  BOOST_LOG_TRIVIAL(trace)
+      << "Game::polyLCP::FixToPoly: Checkfeas + Infeasible polyhedron #"
+      << FixNumber;
   return false;
 }
 
@@ -524,6 +521,7 @@ bool Game::polyLCP::checkPolyFeas(
 ) {
 
   unsigned long int FixNumber = vec_to_num(Fix);
+
   if (knownInfeas.find(FixNumber) != knownInfeas.end()) {
     BOOST_LOG_TRIVIAL(trace)
         << "Game::polyLCP::checkPolyFeas: Previously known "
