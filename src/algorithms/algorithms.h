@@ -1,5 +1,5 @@
 #pragma once
-#include "Base.h"
+#include "PolyBase.h"
 #include "combinatorialPNE.h"
 #include "fullEnumeration.h"
 #include "innerApproximation.h"
