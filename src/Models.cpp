@@ -1086,7 +1086,7 @@ string to_string(const GRBVar &var) {
   return name.empty() ? "unNamedvar" : name;
 }
 
-void Models::EPEC::write(const string &filename, const unsigned int i,
+void Models::EPEC::write(const string filename, const unsigned int i,
                          bool append) const {
   ofstream file;
   file.open(filename, append ? ios::app : ios::out);
@@ -1099,7 +1099,7 @@ void Models::EPEC::write(const string &filename, const unsigned int i,
   file.close();
 }
 
-void Models::EPEC::write(const string &filename, bool append) const {
+void Models::EPEC::write(const string filename, bool append) const {
   if (append) {
     ofstream file;
     file.open(filename, ios::app);
@@ -1112,7 +1112,7 @@ void Models::EPEC::write(const string &filename, bool append) const {
     this->write(filename, i, (append || i));
 }
 
-void Models::EPEC::writeSolutionJSON(string &filename, const arma::vec x,
+void Models::EPEC::writeSolutionJSON(string filename, const arma::vec x,
                                      const arma::vec z) const {
   /**
    * @brief Writes the computed Nash Equilibrium in the standard JSON solution
@@ -1185,7 +1185,7 @@ void Models::EPEC::writeSolutionJSON(string &filename, const arma::vec x,
   file << s.GetString();
 }
 
-void Models::EPEC::readSolutionJSON(const string &filename) {
+void Models::EPEC::readSolutionJSON(const string filename) {
   /**
    * @brief Reads the solution file and load it in the current EPEC instance
    * **/
@@ -1227,7 +1227,7 @@ void Models::EPEC::readSolutionJSON(const string &filename) {
   }
 }
 
-void Models::EPEC::writeSolution(const int writeLevel, string &filename) const {
+void Models::EPEC::writeSolution(const int writeLevel, string filename) const {
   /**
    * @brief Writes the computed Nash Equilibrium in the EPEC instance
    * @p writeLevel is an integer representing the write configuration. 0: only
@@ -1248,7 +1248,7 @@ void Models::EPEC::writeSolution(const int writeLevel, string &filename) const {
   }
 }
 
-void Models::EPECInstance::save(string &filename) {
+void Models::EPECInstance::save(string filename) {
   /**
    * @brief Writes the current EPEC instance to the standard JSON instance file
    * @p filename dictates the name of the JSON instance file
@@ -1364,7 +1364,7 @@ void Models::EPECInstance::save(string &filename) {
   file.close();
 }
 
-void Models::EPECInstance::load(string &filename) {
+void Models::EPECInstance::load(string filename) {
   /**
    * @brief Reads an instance file and return a vector of @p LeadAllPar that can
    * be fed to the EPEC class
@@ -1446,7 +1446,7 @@ void Models::EPECInstance::load(string &filename) {
   }
 }
 
-void Models::EPEC::WriteCountry(const unsigned int i, const string &filename,
+void Models::EPEC::WriteCountry(const unsigned int i, const string filename,
                                 const arma::vec x, const bool append) const {
   // if (!TheLCP) return;
   // const LeadLocs& Loc = this->Locations.at(i);
@@ -1511,7 +1511,7 @@ void Models::EPEC::WriteCountry(const unsigned int i, const string &filename,
 }
 
 void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
-                                 const string &filename,
+                                 const string filename,
                                  const arma::vec x) const {
   ofstream file;
   file.open(filename, ios::app);

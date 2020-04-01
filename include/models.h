@@ -117,17 +117,17 @@ struct EPECInstance {
   std::vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
   arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
 
-  explicit EPECInstance(std::string &filename) {
+  explicit EPECInstance(std::string filename) {
     this->load(filename);
   } ///< Constructor from instance file
   EPECInstance(std::vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_)
       : Countries{Countries_}, TransportationCosts{Transp_} {}
   ///< Constructor from instance objects
 
-  void load(std::string &filename);
+  void load(std::string filename);
   ///< Reads the EPECInstance from a file
 
-  void save(std::string &filename);
+  void save(std::string filename);
   ///< Writes the EPECInstance from a file
 };
 
@@ -228,11 +228,11 @@ private:
 
   void makeMCConstraints(arma::sp_mat &MCLHS, arma::vec &MCRHS) const override;
 
-  void WriteCountry(const unsigned int i, const std::string &filename,
+  void WriteCountry(const unsigned int i, const std::string filename,
                     const arma::vec x, const bool append = true) const;
 
   void WriteFollower(const unsigned int i, const unsigned int j,
-                     const std::string &filename, const arma::vec x) const;
+                     const std::string filename, const arma::vec x) const;
 
 public:                        // Attributes
   bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax
@@ -274,17 +274,17 @@ public:                        // Attributes
   Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
 
   // Writing model files
-  void write(const std::string &filename, const unsigned int i,
+  void write(const std::string filename, const unsigned int i,
              bool append = true) const;
 
-  void write(const std::string &filename, bool append = true) const;
+  void write(const std::string filename, bool append = true) const;
 
-  void readSolutionJSON(const std::string &filename);
+  void readSolutionJSON(const std::string filename);
 
-  void writeSolutionJSON(std::string &filename, const arma::vec x,
+  void writeSolutionJSON(std::string filename, const arma::vec x,
                          const arma::vec z) const;
 
-  void writeSolution(const int writeLevel, std::string &filename) const;
+  void writeSolution(const int writeLevel, std::string filename) const;
 
   ///@brief Get the current EPECInstance loaded
   const EPECInstance getInstance() const {
