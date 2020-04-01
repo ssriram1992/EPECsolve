@@ -2,14 +2,13 @@
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/trivial.hpp>
-#include <string>
 
-Models::EPECInstance ChileArgentinaInstance() {
-  Models::FollPar Arg, Chi;
-  // steam groupped into geotherm
+Models::EPECInstance chileArgentinaInstance() {
+  Models::FollPar arg, Chi;
+  // steam grouped into geothermal
 
   Chi.names = {"Coal", "Wind", "Gas", "Hydro", "Solar", "Diesel"};
-  Arg.names = {"Wind", "Gas", "Hydro", "Solar", "Diesel"};
+  arg.names = {"Wind", "Gas", "Hydro", "Solar", "Diesel"};
 
   // In million dollars per terawatt-hour of energy
 
@@ -38,15 +37,15 @@ Models::EPECInstance ChileArgentinaInstance() {
   Models::FollPar Arg_Diesel{{115}, {0.1}, {2}, {180}, {115}, {"Diesel"}};
 
   Chi = Chi_Main;
-  Arg = Arg_Main;
+  arg = Arg_Main;
 
   Chi.tax_caps = Chi.costs_lin;
-  Arg.tax_caps = Arg.costs_lin;
+  arg.tax_caps = arg.costs_lin;
 
-  Arg.tax_caps = {0.5, 0.5};
+  arg.tax_caps = {0.5, 0.5};
   Chi.tax_caps = {0.65, 0, 0, 0};
 
-  Models::LeadAllPar Argentina(Arg.capacities.size(), "Argentina", Arg,
+  Models::LeadAllPar Argentina(arg.capacities.size(), "Argentina", arg,
                                {800, 3.11}, {100, 100, -1, false, 2});
   Models::LeadAllPar Chile(Chi.capacities.size(), "Chile", Chi, {150, 1},
                            {100, 100, 90, false, 2});
@@ -61,15 +60,15 @@ Models::EPECInstance ChileArgentinaInstance() {
 void solve(Models::EPECInstance instance) {
   GRBEnv env;
   Models::EPEC epec(&env);
-  const unsigned int nCountr = instance.Countries.size();
+  const unsigned int nCountr  = instance.Countries.size();
   for (unsigned int i = 0; i < nCountr; i++)
     epec.addCountry(instance.Countries.at(i));
   epec.addTranspCosts(instance.TransportationCosts);
   epec.finalize();
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::FullEnumeration);
+  epec.setAlgorithm(Game::EPECalgorithm::InnerApproximation);
   epec.setAggressiveness(1);
-  epec.setAddPolyMethod(Game::EPECAddPolyMethod::random);
+  epec.setAddPolyMethod(Game::EPECAddPolyMethod::Random);
   std::cout << "Starting to solve...\n";
   epec.setNumThreads(4);
   epec.findNashEq();
@@ -79,6 +78,6 @@ void solve(Models::EPECInstance instance) {
 int main() {
   boost::log::core::get()->set_filter(boost::log::trivial::severity >=
                                       boost::log::trivial::info);
-  solve(ChileArgentinaInstance());
+  solve(chileArgentinaInstance());
   return 0;
 }

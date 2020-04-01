@@ -1,15 +1,15 @@
 #pragma once
-#include "PolyBase.h"
-#include "combinatorialPNE.h"
-#include "fullEnumeration.h"
-#include "innerApproximation.h"
-#include "outerApproximation.h"
+#include "combinatorialpne.h"
+#include "fullenumeration.h"
+#include "innerapproximation.h"
+#include "outerapproximation.h"
+#include "polybase.h"
 
 namespace Algorithms {
 // Forward declarations
-class fullEnumeration;
-class innerApproximation;
-class combinatorialPNE;
-class outerApproximation;
+class FullEnumeration;
+class InnerApproximation;
+class CombinatorialPNE;
+class OuterApproximation;
 class PolyBase;
 } // namespace Algorithms

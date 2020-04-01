@@ -20,23 +20,23 @@ namespace Game {
  */
 /**
  * A class to handle linear complementarity problems (LCP)
- * especially as MIPs with bigM constraints
+ * especially as MIPs with BigM constraints
  */
 
 class LCP {
 
 protected:
   // Essential data ironment for MIP/LP solves
-  GRBEnv *env;    ///< Gurobi env
+  GRBEnv *Env;    ///< Gurobi Env
   arma::sp_mat M; ///< M in @f$Mx+q@f$ that defines the LCP
   arma::vec q;    ///< q in @f$Mx+q@f$ that defines the LCP
   perps Compl;    ///< Compl stores data in <Eqn, Var> form.
-  unsigned int LeadStart{1}, LeadEnd{0}, nLeader{0};
+  unsigned int LeadStart{1}, LeadEnd{0}, NumberLeader{0};
   arma::sp_mat _A = {};
   arma::vec _b = {}; ///< Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$
                      ///< Ax\le b@f$ too!
   // Temporary data
-  bool madeRlxdModel{false}; ///< Keep track if LCP::RlxdModel is made
+  bool MadeRlxdModel{false}; ///< Keep track if LCP::RlxdModel is made
   unsigned int nR, nC;
 
   GRBModel RlxdModel; ///< A gurobi model with all complementarity constraints
@@ -52,7 +52,7 @@ protected:
                                      bool solve = false);
   std::unique_ptr<GRBModel> LCPasMIP(std::vector<short int> Fixes, bool solve);
   template <class T> inline bool isZero(const T val) const {
-    return (val >= -eps && val <= eps);
+    return (val >= -Eps && val <= Eps);
   }
 
   inline std::vector<short int> solEncode(GRBModel *model) const;
@@ -61,13 +61,11 @@ protected:
                                    const arma::vec &x) const;
 
 public:
-  // Fudgible data
-  long double bigM{1e7}; ///< bigM used to rewrite the LCP as MIP
-  long double eps{
-      1e-6}; ///< The threshold for optimality and feasability tollerances
-  long double eps_int{1e-8}; ///< The threshold, below which a number would be
-                             ///< considered to be zero.
-  bool useIndicators{
+  long double BigM{1e7}; ///< BigM used to rewrite the LCP as MIP
+  double Eps{1e-6}; ///< The threshold for optimality and feasability tolerances
+  double EpsInt{1e-8}; ///< The threshold, below which a number would be
+                       ///< considered to be zero.
+  bool UseIndicators{
       true}; ///< If true, complementarities will be handled with indicator
   ///< constraints. BigM formulation otherwise
 
@@ -75,12 +73,12 @@ public:
   /// Class has no default constructors
   LCP() = delete;
 
-  LCP(GRBEnv *e)
-      : env{e},
+  explicit LCP(GRBEnv *e)
+      : Env{e},
         RlxdModel(*e){}; ///< This constructor flor loading LCP from a file
 
-  LCP(GRBEnv *env, arma::sp_mat M, arma::vec q, unsigned int LeadStart,
-      unsigned LeadEnd, arma::sp_mat A = {},
+  LCP(GRBEnv *env, arma::sp_mat M, arma::vec q, unsigned int leadStart,
+      unsigned leadEnd, arma::sp_mat A = {},
       arma::vec b = {}); // Constructor with M,q,leader posn
   LCP(GRBEnv *env, arma::sp_mat M, arma::vec q, perps Compl,
       arma::sp_mat A = {},
@@ -89,7 +87,7 @@ public:
   LCP(const LCP &) = default;
 
   /** Destructor - to delete the objects created with new operator */
-  ~LCP();
+  ~LCP() = default;
 
   /** Return data and address */
   inline arma::sp_mat getM() { return this->M; } ///< Read-only access to LCP::M
@@ -100,19 +98,19 @@ public:
   inline arma::vec *getqstar() {
     return &(this->q);
   } ///< Reference access to LCP::q
-  inline unsigned int getLStart() {
+  const inline unsigned int getLStart() {
     return LeadStart;
   } ///< Read-only access to LCP::LeadStart
-  inline unsigned int getLEnd() {
+  const inline unsigned int getLEnd() {
     return LeadEnd;
   } ///< Read-only access to LCP::LeadEnd
   inline perps getCompl() {
     return this->Compl;
   }                                   ///< Read-only access to LCP::Compl
   void print(std::string end = "\n"); ///< Print a summary of the LCP
-  inline unsigned int getNcol() { return this->M.n_cols; };
+  inline unsigned int getNumCols() { return this->M.n_cols; };
 
-  inline unsigned int getNrow() { return this->M.n_rows; };
+  inline unsigned int getNumRows() { return this->M.n_rows; };
 
   bool extractSols(GRBModel *model, arma::vec &z, arma::vec &x,
                    bool extractZ = false) const;
@@ -131,9 +129,9 @@ public:
   void write(std::string filename, bool append = true) const;
   void save(std::string filename, bool erase = true) const;
   long int load(std::string filename, long int pos = 0);
-  virtual void makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP) {}
+  virtual void makeQP(Game::QP_Objective &QP_obj, Game::QP_Param &QP) {}
 };
 } // namespace Game
 
-#include "PolyLCP.h"
-#include "OuterLCP.h"
+#include "outerlcp.h"
+#include "polylcp.h"

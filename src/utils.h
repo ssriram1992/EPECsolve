@@ -12,13 +12,13 @@
 using namespace arma;
 
 namespace Utils {
-arma::sp_mat resize_patch(const arma::sp_mat &Mat, const unsigned int nR,
-                          const unsigned int nC);
+arma::sp_mat resizePatch(const arma::sp_mat &mat, const unsigned int nR,
+                         const unsigned int nC);
 
-arma::mat resize_patch(const arma::mat &Mat, const unsigned int nR,
-                       const unsigned int nC);
+arma::mat resizePatch(const arma::mat &mat, const unsigned int nR,
+                      const unsigned int nC);
 
-arma::vec resize_patch(const arma::vec &Mat, const unsigned int nR);
+arma::vec resizePatch(const arma::vec &mat, const unsigned int nR);
 
 // Saving and retrieving an arma::vec
 void appendSave(const vec &matrix, const std::string out,
@@ -61,10 +61,10 @@ long int appendRead(unsigned int &v, const std::string in, long int pos,
                     const std::string header = "");
 
 // Binary encoding functions for the LCP class
-unsigned long int vec_to_num(std::vector<short int> binary);
+unsigned long int vecToNum(std::vector<short int> binary);
 
-std::vector<short int> num_to_vec(unsigned long int number,
-                                  const unsigned int &nCompl);
+std::vector<short int> numToVec(unsigned long int number,
+                                const unsigned long nCompl);
 } // namespace Utils
 
 // namespace Utils

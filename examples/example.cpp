@@ -6,26 +6,26 @@
 
 class My_EPEC_Prob : public EPEC {
 public:
-  My_EPEC_Prob(GRBEnv *e) : EPEC(e) {}
+  explicit My_EPEC_Prob(GRBEnv *e) : EPEC(e) {}
   void addLeader(std::shared_ptr<Game::NashGame> N, const unsigned int i) {
-    this->countries_LL.push_back(N);
-    ends[i] = N->getNprimals() + N->getNleaderVars();
+    this->PlayersLowerLevels.push_back(N);
+    ends[i] = N->getNprimals() + N->getNumLeaderVars();
     this->LocEnds.push_back(&ends[i]);
   }
 
 private:
   unsigned int ends[2];
-  void updateLocs() override {
-    ends[0] = this->convexHullVariables.at(0) + 3;
-    ends[1] = this->convexHullVariables.at(1) + 3;
+  void updateLocations() override {
+    ends[0] = this->ConvexHullVariables.at(0) + 3;
+    ends[1] = this->ConvexHullVariables.at(1) + 3;
   }
-  void make_obj_leader(const unsigned int i,
-                       Game::QP_objective &QP_obj) override {
+  void makeObjectivePlayer(const unsigned int i,
+                       Game::QP_Objective &QP_obj) override {
     QP_obj.Q.zeros(3, 3);
     QP_obj.C.zeros(3, 3);
     QP_obj.c.zeros(3);
     switch (i) {
-    case 0: // uv_leader's objective
+    case 0: // uvLeader's objective
       QP_obj.C(1, 0) = 1;
       QP_obj.c(0) = 1;
       QP_obj.c(2) = -1;
@@ -36,12 +36,12 @@ private:
       QP_obj.c(2) = 1;
       break;
     default:
-      throw std::string("Invalid make_obj_leader");
+      throw std::exception("Invalid makeObjectivePlayer");
     }
   }
 };
 
-std::shared_ptr<Game::NashGame> uv_leader(GRBEnv *env) {
+std::shared_ptr<Game::NashGame> uvLeader(GRBEnv *env) {
   // 2 variable and 2 constraints
   arma::sp_mat Q(2, 2), C(2, 1), A(2, 1), B(2, 2);
   arma::vec c(2, arma::fill::zeros);
@@ -128,15 +128,15 @@ int main() {
   boost::log::core::get()->set_filter(boost::log::trivial::severity >=
                                       boost::log::trivial::warning);
   My_EPEC_Prob epec(&env);
-  // Adding uv_leader
-  auto uv_lead = uv_leader(&env);
+  // Adding uvLeader
+  auto uv_lead = uvLeader(&env);
   epec.addLeader(uv_lead, 0);
   // Adding xy_leader
   auto xy_lead = xy_leader(&env);
   epec.addLeader(xy_lead, 1);
   // Finalize
   epec.finalize();
-  epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+  epec.setAlgorithm(Game::EPECalgorithm::InnerApproximation);
   // Solve
   try {
     epec.findNashEq();
@@ -150,31 +150,31 @@ int main() {
   // M.write("dat/ex_sol.sol");
 
   std::cout << "\nUV LEADER\n";
-  std::cout << "u: " << epec.getVal_LeadLead(0, 0) << '\n';
-  std::cout << "v_1: " << epec.getVal_LeadFoll(0, 0) << '\n';
-  std::cout << "v_2: " << epec.getVal_LeadFoll(0, 1) << '\n';
-  auto uv_strats = epec.mixedStratPoly(0);
+  std::cout << "u: " << epec.getValLeadLead(0, 0) << '\n';
+  std::cout << "v_1: " << epec.getValLeadFoll(0, 0) << '\n';
+  std::cout << "v_2: " << epec.getValLeadFoll(0, 1) << '\n';
+  auto uv_strats = epec.mixedStrategyPoly(0);
   std::for_each(std::begin(uv_strats), std::end(uv_strats),
                 [&epec](const unsigned int i) {
-                  std::cout << "With probability  " << epec.getVal_Probab(0, i)
+                  std::cout << "With probability  " << epec.getValProbab(0, i)
                             << '\n';
-                  std::cout << "(" << epec.getVal_LeadLeadPoly(0, 0, i) << ", "
-                            << epec.getVal_LeadFollPoly(0, 0, i) << ", "
-                            << epec.getVal_LeadFollPoly(0, 1, i) << ")\n";
+                  std::cout << "(" << epec.getValLeadLeadPoly(0, 0, i) << ", "
+                            << epec.getValLeadFollPoly(0, 0, i) << ", "
+                            << epec.getValLeadFollPoly(0, 1, i) << ")\n";
                 });
   std::cout << '\n';
   std::cout << "\nXY LEADER\n";
-  std::cout << "x: " << epec.getVal_LeadLead(1, 0) << '\n';
-  std::cout << "y_1: " << epec.getVal_LeadFoll(1, 0) << '\n';
-  std::cout << "y_2: " << epec.getVal_LeadFoll(1, 1) << '\n';
-  auto xy_strats = epec.mixedStratPoly(1);
+  std::cout << "x: " << epec.getValLeadLead(1, 0) << '\n';
+  std::cout << "y_1: " << epec.getValLeadFoll(1, 0) << '\n';
+  std::cout << "y_2: " << epec.getValLeadFoll(1, 1) << '\n';
+  auto xy_strats = epec.mixedStrategyPoly(1);
   std::for_each(std::begin(xy_strats), std::end(xy_strats),
                 [&epec](const unsigned int i) {
-                  std::cout << "With probability  " << epec.getVal_Probab(1, i)
+                  std::cout << "With probability  " << epec.getValProbab(1, i)
                             << '\n';
-                  std::cout << "(" << epec.getVal_LeadLeadPoly(1, 0, i) << ", "
-                            << epec.getVal_LeadFollPoly(1, 0, i) << ", "
-                            << epec.getVal_LeadFollPoly(1, 1, i) << ")\n";
+                  std::cout << "(" << epec.getValLeadLeadPoly(1, 0, i) << ", "
+                            << epec.getValLeadFollPoly(1, 0, i) << ", "
+                            << epec.getValLeadFollPoly(1, 1, i) << ")\n";
                 });
   std::cout << '\n';
   return 0;

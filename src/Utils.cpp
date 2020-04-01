@@ -6,70 +6,68 @@
 using namespace std;
 using namespace arma;
 
-arma::sp_mat Utils::resize_patch(const arma::sp_mat &Mat, const unsigned int nR,
-                                 const unsigned int nC) {
+arma::sp_mat Utils::resizePatch(const arma::sp_mat &mat, const unsigned int nR,
+                                const unsigned int nC) {
   /**
  @brief Armadillo patch for resizing sp_mat
  @details Armadillo sp_mat::resize() is not robust as it initializes garbage
  values to new columns. This fixes the problem by creating new columns with
  guaranteed zero values. For arma::sp_mat
  */
-  arma::sp_mat MMat(nR, nC);
-  MMat.zeros();
-  if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
-    if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
-      MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
+  arma::sp_mat mMat(nR, nC);
+  mMat.zeros();
+  if (nR >= mat.n_rows && nC >= mat.n_cols) {
+    if (mat.n_rows >= 1 && mat.n_cols >= 1)
+      mMat.submat(0, 0, mat.n_rows - 1, mat.n_cols - 1) = mat;
   } else {
-    if (nR <= Mat.n_rows && nC <= Mat.n_cols)
-      MMat = Mat.submat(0, 0, nR, nC);
+    if (nR <= mat.n_rows && nC <= mat.n_cols)
+      mMat = mat.submat(0, 0, nR, nC);
     else
-      throw string(
-          "Error in resize() - the patch for arma::resize. Either both "
-          "dimension should be larger or both should be smaller!");
+      throw("Error in resize() - the patch for arma::resize. Either both "
+            "dimension should be larger or both should be smaller!");
   }
-  return MMat;
+  return mMat;
 }
 
 // For arma::mat
-arma::mat Utils::resize_patch(const arma::mat &Mat, const unsigned int nR,
-                              const unsigned int nC) {
+arma::mat Utils::resizePatch(const arma::mat &mat, const unsigned int nR,
+                             const unsigned int nC) {
   /**
  @brief Armadillo patch for resizing mat
  @details Armadillo mat::resize() is not robust as it initializes garbage
  values to new columns. This fixes the problem by creating new columns with
  guaranteed zero values. For arma::mat
  */
-  arma::mat MMat(nR, nC);
-  MMat.zeros();
-  if (nR >= Mat.n_rows && nC >= Mat.n_cols) {
-    if (Mat.n_rows >= 1 && Mat.n_cols >= 1)
-      MMat.submat(0, 0, Mat.n_rows - 1, Mat.n_cols - 1) = Mat;
+  arma::mat mMat(nR, nC);
+  mMat.zeros();
+  if (nR >= mat.n_rows && nC >= mat.n_cols) {
+    if (mat.n_rows >= 1 && mat.n_cols >= 1)
+      mMat.submat(0, 0, mat.n_rows - 1, mat.n_cols - 1) = mat;
   } else {
-    if (nR <= Mat.n_rows && nC <= Mat.n_cols)
-      MMat = Mat.submat(0, 0, nR, nC);
+    if (nR <= mat.n_rows && nC <= mat.n_cols)
+      mMat = mat.submat(0, 0, nR, nC);
     else
-      throw string(
-          "Error in resize() - the patch for arma::resize. Either both "
-          "dimension should be larger or both should be smaller!");
+      throw("Error in resize() - the patch for arma::resize. Either both "
+            "dimension should be larger or both should be smaller!");
   }
-  return MMat;
+  return mMat;
 }
 
 // For arma::vec
-arma::vec Utils::resize_patch(const arma::vec &Mat, const unsigned int nR) {
+arma::vec Utils::resizePatch(const arma::vec &mat, const unsigned int nR) {
   /**
  @brief Armadillo patch for resizing vec
  @details Armadillo vec::resize() is not robust as it initializes garbage
  values to new columns. This fixes the problem by creating new columns with
  guaranteed zero values. For arma::vec
  */
-  arma::vec MMat(nR);
-  MMat.zeros();
-  if (nR > Mat.n_rows)
-    MMat.subvec(0, Mat.n_rows - 1) = Mat;
+  arma::vec mMat(nR);
+  mMat.zeros();
+  if (nR > mat.n_rows)
+    mMat.subvec(0, mat.n_rows - 1) = mat;
   else
-    MMat = Mat.subvec(0, nR);
-  return MMat;
+    mMat = mat.subvec(0, nR);
+  return mMat;
 }
 
 void Utils::appendSave(const sp_mat &matrix, ///< The arma::sp_mat to be saved
@@ -113,18 +111,17 @@ long int Utils::appendRead(
  * @returns The end position from which the next data object can be read.
  */
 {
-  unsigned int nR, nC, nnz;
+  unsigned int nR = 0, nC = 0, nnz = 0;
 
   ifstream infile(in, ios::in);
   infile.seekg(pos);
 
-  string header_checkwith;
-  infile >> header_checkwith;
+  string headerCheckwith;
+  infile >> headerCheckwith;
 
-  if (header != "" && header != header_checkwith)
-    throw string(
-        "Error in Utils::appendRead<sp_mat>. Wrong header. Expected: " +
-        header + " Found: " + header_checkwith);
+  if (header != "" && header != headerCheckwith)
+    throw("Error in Utils::appendRead<sp_mat>. Wrong header. Expected: " +
+          header + " Found: " + headerCheckwith);
 
   infile >> nR >> nC >> nnz;
   if (nR == 0 || nC == 0)
@@ -133,8 +130,8 @@ long int Utils::appendRead(
     arma::umat locations(2, nnz);
     arma::vec values(nnz);
 
-    unsigned int r, c;
-    double val;
+    unsigned int r = 0, c = 0;
+    double val = 0;
 
     for (unsigned int i = 0; i < nnz; ++i) {
       infile >> r >> c >> val;
@@ -165,7 +162,7 @@ void appendSave(const vector<double> v, const string out, const string header,
 
 long int appendRead(vector<double> &v, const string in, long int pos,
                     const string header) {
-  unsigned long int size;
+  unsigned long int size = 0;
   ifstream infile(in, ios::in);
   infile.seekg(pos);
   /**
@@ -173,13 +170,12 @@ long int appendRead(vector<double> &v, const string in, long int pos,
    * @returns The end position from which the next data object can be read.
    */
 
-  string header_checkwith;
-  infile >> header_checkwith;
+  string headerCheckwith;
+  infile >> headerCheckwith;
 
-  if (header != "" && header != header_checkwith)
-    throw string(
-        "Error in Utils::appendRead<sp_mat>. Wrong header. Expected: " +
-        header + " Found: " + header_checkwith);
+  if (header != "" && header != headerCheckwith)
+    throw("Error in Utils::appendRead<sp_mat>. Wrong header. Expected: " +
+          header + " Found: " + headerCheckwith);
 
   infile >> size;
 
@@ -231,23 +227,23 @@ long int Utils::appendRead(
   unsigned int nR;
   string buffers;
   string checkwith;
-  ifstream in_file(in, ios::in);
-  in_file.seekg(pos);
+  ifstream inFile(in, ios::in);
+  inFile.seekg(pos);
 
-  in_file >> checkwith;
+  inFile >> checkwith;
   if (header != "" && checkwith != header)
-    throw string("Error in Utils::appendRead<vec>. Wrong header. Expected: " +
-                 header + " Found: " + checkwith);
-  in_file >> nR;
+    throw("Error in Utils::appendRead<vec>. Wrong header. Expected: " + header +
+          " Found: " + checkwith);
+  inFile >> nR;
   matrix.zeros(nR);
   for (unsigned int i = 0; i < nR; ++i) {
     double val;
-    in_file >> val;
+    inFile >> val;
     matrix.at(i) = val;
   }
 
-  pos = in_file.tellg();
-  in_file.close();
+  pos = inFile.tellg();
+  inFile.close();
 
   return pos;
 }
@@ -273,13 +269,12 @@ long int Utils::appendRead(long int &v, const string in, long int pos,
   ifstream infile(in, ios::in);
   infile.seekg(pos);
 
-  string header_checkwith;
-  infile >> header_checkwith;
+  string headerCheckwith;
+  infile >> headerCheckwith;
 
-  if (header != "" && header != header_checkwith)
-    throw string(
-        "Error in Utils::appendRead<long int>. Wrong header. Expected: " +
-        header + " Found: " + header_checkwith);
+  if (header != "" && header != headerCheckwith)
+    throw("Error in Utils::appendRead<long int>. Wrong header. Expected: " +
+          header + " Found: " + headerCheckwith);
 
   long int val;
   infile >> val;
@@ -308,13 +303,12 @@ long int Utils::appendRead(unsigned int &v, const string in, long int pos,
   ifstream infile(in, ios::in);
   infile.seekg(pos);
 
-  string header_checkwith;
-  infile >> header_checkwith;
+  string headerCheckwith;
+  infile >> headerCheckwith;
 
-  if (header != "" && header != header_checkwith)
-    throw string(
-        "Error in Utils::appendRead<unsigned int>. Wrong header. Expected: " +
-        header + " Found: " + header_checkwith);
+  if (header != "" && header != headerCheckwith)
+    throw("Error in Utils::appendRead<unsigned int>. Wrong header. Expected: " +
+          header + " Found: " + headerCheckwith);
 
   unsigned int val;
   infile >> val;
@@ -353,7 +347,7 @@ long int Utils::appendRead(string &v, const string in, long int pos) {
 
   return pos;
 }
-unsigned long int Utils::vec_to_num(std::vector<short int> binary) {
+unsigned long int Utils::vecToNum(std::vector<short int> binary) {
   unsigned long int number = 0;
   unsigned int posn = 1;
   while (!binary.empty()) {
@@ -365,8 +359,8 @@ unsigned long int Utils::vec_to_num(std::vector<short int> binary) {
   return number;
 }
 
-std::vector<short int> Utils::num_to_vec(unsigned long int number,
-                                         const unsigned int &nCompl) {
+std::vector<short int> Utils::numToVec(unsigned long int number,
+                                       const unsigned long nCompl) {
   std::vector<short int> binary{};
   for (unsigned int vv = 0; vv < nCompl; vv++) {
     binary.push_back(number % 2);

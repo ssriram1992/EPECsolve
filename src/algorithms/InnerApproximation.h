@@ -10,20 +10,21 @@
 namespace Algorithms {
 
 ///@brief This class is responsible for the inner Approximation
-class innerApproximation : public PolyBase {
+class InnerApproximation : public PolyBase {
 
 public:
-  innerApproximation(GRBEnv *env, EPEC *EPECObject)
+  InnerApproximation(GRBEnv *env, EPEC *EPECObject)
       : PolyBase(env, EPECObject){};
-  void solve() override ;
+  void solve() override;
 
 private:
   void start();
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
                          bool stopOnSingleInfeasibility = false);
-  bool getAllDevns(std::vector<arma::vec> &devns, const arma::vec &guessSol,
-                   const std::vector<arma::vec> &prevDev = {}) const;
-  unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &devns,
+  bool getAllDeviations(std::vector<arma::vec> &deviations,
+                        const arma::vec &guessSol,
+                        const std::vector<arma::vec> &prevDev = {}) const;
+  unsigned int addDeviatedPolyhedron(const std::vector<arma::vec> &deviations,
                                      bool &infeasCheck) const;
 };
 } // namespace Algorithms

@@ -1,10 +1,10 @@
-#include "OuterLCP.h"
+#include "outerlcp.h"
 #include <boost/log/trivial.hpp>
 
 using namespace std;
 using namespace Utils;
 
-unsigned int Game::outerLCP::ConvexHull(
+unsigned int Game::OuterLCP::convexHull(
     arma::sp_mat &A, ///< Convex hull inequality description
     ///< LHS to be stored here
     arma::vec &b) ///< Convex hull inequality description RHS
@@ -19,7 +19,7 @@ unsigned int Game::outerLCP::ConvexHull(
       v.push_back(x.get());
     return v;
   }(*this->Ai);
-  const std::vector<arma::vec *> tempbi = [](vec_Vec &uv) {
+  const auto tempbi = [](vec_Vec &uv) {
     std::vector<arma::vec *> v{};
     std::for_each(uv.begin(), uv.end(),
                   [&v](const std::unique_ptr<arma::vec> &ptr) {
@@ -38,85 +38,90 @@ unsigned int Game::outerLCP::ConvexHull(
     b = arma::join_cols(*bi->at(0), b_common);
     return 1;
   } else
-    return Game::ConvexHull(&tempAi, &tempbi, A, b, A_common, b_common);
+    return Game::convexHull(&tempAi, &tempbi, A, b, A_common, b_common);
 }
 
-void outerLCP::makeQP(Game::QP_objective &QP_obj, Game::QP_Param &QP) {
+void OuterLCP::makeQP(Game::QP_Objective &QP_obj, Game::QP_Param &QP) {
 
   // Original sizes
   if (this->Ai->empty())
     return;
-  const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
+  const unsigned int oldNumVariablesX{
+      static_cast<unsigned int>(QP_obj.C.n_cols)};
 
-  Game::QP_constraints QP_cons;
-  int components = this->ConvexHull(QP_cons.B, QP_cons.b);
+  Game::QP_Constraints QP_cons;
+  int components = this->convexHull(QP_cons.B, QP_cons.b);
   BOOST_LOG_TRIVIAL(trace) << "PolyLCP::makeQP: No. components: " << components;
   // Updated size after convex hull has been computed.
-  const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
-  const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};
+  const unsigned int numConstraints{
+      static_cast<unsigned int>(QP_cons.B.n_rows)};
+  const unsigned int oldNumVariablesY{
+      static_cast<unsigned int>(QP_cons.B.n_cols)};
   // Resizing entities.
-  QP_cons.A.zeros(Ncons, Nx_old);
-  QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
-  QP_obj.C = resize_patch(QP_obj.C, Ny, Nx_old);
-  QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
+  QP_cons.A.zeros(numConstraints, oldNumVariablesX);
+  QP_obj.c = resizePatch(QP_obj.c, oldNumVariablesY, 1);
+  QP_obj.C = resizePatch(QP_obj.C, oldNumVariablesY, oldNumVariablesX);
+  QP_obj.Q = resizePatch(QP_obj.Q, oldNumVariablesY, oldNumVariablesY);
   // Setting the QP_Param object
   QP.set(QP_obj, QP_cons);
 }
 
-void outerLCP::outerApproximate(const std::vector<bool> Encoding) {
-  if (Encoding.size() != this->Compl.size()) {
+void OuterLCP::outerApproximate(const std::vector<bool> encoding) {
+  if (encoding.size() != this->Compl.size()) {
     BOOST_LOG_TRIVIAL(error)
-        << "Game::outerLCP::outerApproximate: wrong encoding size";
+        << "Game::OuterLCP::outerApproximate: wrong encoding size";
     throw;
   }
-  vector<short int> Fix;
-  for (bool i : Encoding) {
+  vector<short int> localEncoding = {};
+  // We push 2 for each complementary that has to be fixed either to +1 or -1
+  // And 0 for each one which is not processed (yet)
+  for (bool i : encoding) {
     if (i)
-      Fix.push_back(2);
+      localEncoding.push_back(2);
     else
-      Fix.push_back(0);
+      localEncoding.push_back(0);
   }
-  this->buildComponents(Fix);
+  this->addChildComponents(localEncoding);
 }
-void outerLCP::buildComponents(const std::vector<short int> Fix) {
-  vector<short int> MyFix(Fix);
-  unsigned int i;
+void OuterLCP::addChildComponents(const std::vector<short int> encoding) {
+  vector<short int> localEncoding(encoding);
+  unsigned int i = 0;
   bool flag = false;
   for (i = 0; i < this->nR; i++) {
-    if (Fix.at(i) == 2) {
+    if (encoding.at(i) == 2) {
       flag = true;
       break;
     }
   }
   if (flag) {
-    MyFix[i] = 1;
-    this->buildComponents(MyFix);
-    MyFix[i] = -1;
-    this->buildComponents(MyFix);
+    localEncoding[i] = 1;
+    this->addChildComponents(localEncoding);
+    localEncoding[i] = -1;
+    this->addChildComponents(localEncoding);
   } else
-    this->addComponent(Fix, true);
+    this->addComponent(encoding, true);
 }
 
-bool Game::outerLCP::addComponent(
+bool Game::OuterLCP::addComponent(
     const vector<short int>
-        fix, ///< A vector of +1,-1 and zeros referring to which
+        encoding, ///< A vector of +1,-1 and zeros referring to which
     ///< equations and variables are taking 0 value. +1 means equation set to
     ///< zero, -1 variable, and zero  none of the two
     bool checkFeas, ///< The component is added after ensuring feasibility, if
     ///< this is true
     bool custom, ///< Should the components be pushed into a custom vector of
-    ///< polyhedra as opposed to outerLCP::Ai and outerLCP::bi
+    ///< polyhedra as opposed to OuterLCP::Ai and OuterLCP::bi
     spmat_Vec *custAi, ///< If custom polyhedra vector is used, pointer to the
                        ///< LHS matrix
     vec_Vec *custbi ///< If custom polyhedra vector is used, pointer to the RHS
                     ///< vector
 ) {
-  unsigned int fixNumber = vec_to_num(fix);
+  unsigned long fixNumber = vecToNum(encoding);
   BOOST_LOG_TRIVIAL(trace)
-      << "Game::outerLCP::addComponent: Working on polyhedron #" << fixNumber;
+      << "Game::OuterLCP::addComponent: Working on polyhedron #" << fixNumber;
   bool eval;
   if (checkFeas)
-    eval = this->checkComponentFeas(fix);
+    eval = this->checkComponentFeas(encoding);
   else
     eval = true;
 
@@ -124,7 +129,7 @@ bool Game::outerLCP::addComponent(
     if (!custom && !Approximation.empty()) {
       if (Approximation.find(fixNumber) != Approximation.end()) {
         BOOST_LOG_TRIVIAL(trace)
-            << "Game::outerLCP::addComponent: Previously added polyhedron #"
+            << "Game::OuterLCP::addComponent: Previously added polyhedron #"
             << fixNumber;
         return false;
       }
@@ -135,19 +140,26 @@ bool Game::outerLCP::addComponent(
     unique_ptr<arma::vec> bii =
         unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
     for (unsigned int i = 0; i < this->nR; i++) {
-      if (fix.at(i) == 1) // Equation to be fixed top zero
-      {
+      switch (encoding.at(i)) {
+      case 1: {
         for (auto j = this->M.begin_row(i); j != this->M.end_row(i); ++j)
           if (!this->isZero((*j)))
             Aii->at(i, j.col()) =
                 (*j); // Only mess with non-zero elements of a sparse matrix!
         bii->at(i) = -this->q(i);
-      } else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be
-             // added
-      {
-        unsigned int varpos = (i >= this->LeadStart) ? i + this->nLeader : i;
-        Aii->at(i, varpos) = 1;
+      } break;
+      case -1: {
+        unsigned int variablePosition =
+            (i >= this->LeadStart) ? i + this->NumberLeader : i;
+        Aii->at(i, variablePosition) = 1;
         bii->at(i) = 0;
+      } break;
+      case 0:
+        break;
+      default:
+        BOOST_LOG_TRIVIAL(error)
+            << "Game::OuterLCP::addComponent: Non-allowed value in encoding: "
+            << encoding.at(i);
       }
     }
     if (custom) {
@@ -161,32 +173,32 @@ bool Game::outerLCP::addComponent(
     return true; // Successfully added
   }
   BOOST_LOG_TRIVIAL(trace)
-      << "Game::outerLCP::addComponent: Checkfeas + Infeasible polyhedron #"
+      << "Game::OuterLCP::addComponent: Checkfeas + Infeasible polyhedron #"
       << fixNumber;
   return false;
 }
 
-bool outerLCP::checkComponentFeas(const std::vector<short int> &Fix) {
-  unsigned long int fixNumber = vec_to_num(Fix);
-  if (knownInfeas.find(fixNumber) != knownInfeas.end()) {
+bool OuterLCP::checkComponentFeas(const std::vector<short int> &encoding) {
+  unsigned long int fixNumber = vecToNum(encoding);
+  if (InfeasibleComponents.find(fixNumber) != InfeasibleComponents.end()) {
     BOOST_LOG_TRIVIAL(trace)
-        << "Game::outerLCP::checkComponentFeas: Previously known "
+        << "Game::OuterLCP::checkComponentFeas: Previously known "
            "infeasible component #"
         << fixNumber;
     return false;
   }
 
-  if (knownFeasible.find(fixNumber) != knownFeasible.end()) {
+  if (FeasibleComponents.find(fixNumber) != FeasibleComponents.end()) {
     BOOST_LOG_TRIVIAL(trace)
-        << "Game::outerLCP::checkComponentFeas: Previously known "
+        << "Game::OuterLCP::checkComponentFeas: Previously known "
            "feasible polyhedron #"
         << fixNumber;
     return true;
   }
-  for (auto element : knownInfeas) {
-    if (this->isParent(num_to_vec(element, this->Compl.size()), Fix)) {
+  for (auto element : InfeasibleComponents) {
+    if (this->isParent(numToVec(element, this->Compl.size()), encoding)) {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::outerLCP::checkComponentFeas: #" << fixNumber
+          << "Game::OuterLCP::checkComponentFeas: #" << fixNumber
           << " is a child "
              "of an infeasible polyhedron";
       return true;
@@ -197,13 +209,13 @@ bool outerLCP::checkComponentFeas(const std::vector<short int> &Fix) {
   try {
     makeRelaxed();
     GRBModel model(this->RlxdModel);
-    for (auto i : Fix) {
+    for (auto i : encoding) {
       if (i > 0)
         model.getVarByName("z_" + to_string(count)).set(GRB_DoubleAttr_UB, 0);
       if (i < 0)
         model
             .getVarByName("x_" + to_string(count >= this->LeadStart
-                                               ? count + nLeader
+                                               ? count + NumberLeader
                                                : count))
             .set(GRB_DoubleAttr_UB, 0);
       count++;
@@ -211,38 +223,38 @@ bool outerLCP::checkComponentFeas(const std::vector<short int> &Fix) {
     model.set(GRB_IntParam_OutputFlag, VERBOSE);
     model.optimize();
     if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL) {
-      knownFeasible.insert(fixNumber);
+      FeasibleComponents.insert(fixNumber);
       return true;
     } else {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::outerLCP::checkComponentFeas: Detected infeasibility of #"
+          << "Game::OuterLCP::checkComponentFeas: Detected infeasibility of #"
           << fixNumber << " (GRB_STATUS=" << model.get(GRB_IntAttr_Status)
           << ")";
-      knownInfeas.insert(fixNumber);
+      InfeasibleComponents.insert(fixNumber);
       return false;
     }
   } catch (const char *e) {
-    cerr << "Error in Game::outerLCP::checkComponentFeas: " << e << '\n';
+    cerr << "Error in Game::OuterLCP::checkComponentFeas: " << e << '\n';
     throw;
-  } catch (string e) {
-    cerr << "String: Error in Game::outerLCP::checkComponentFeas: " << e
+  } catch (string &e) {
+    cerr << "String: Error in Game::OuterLCP::checkComponentFeas: " << e
          << '\n';
     throw;
   } catch (exception &e) {
-    cerr << "Exception: Error in Game::outerLCP::checkComponentFeas: "
+    cerr << "Exception: Error in Game::OuterLCP::checkComponentFeas: "
          << e.what() << '\n';
     throw;
   } catch (GRBException &e) {
-    cerr << "GRBException: Error in Game::outerLCP::checkComponentFeas: "
+    cerr << "GRBException: Error in Game::OuterLCP::checkComponentFeas: "
          << e.getErrorCode() << ": " << e.getMessage() << '\n';
     throw;
   }
   return false;
 }
 
-bool outerLCP::isParent(const vector<short int> &father,
+bool OuterLCP::isParent(const vector<short int> &father,
                         const vector<short int> &child) {
-  for (int i = 0; i < father.size(); ++i) {
+  for (unsigned long i = 0; i < father.size(); ++i) {
     if (father.at(i) != 0) {
       if (child.at(i) != father.at(i))
         return false;

@@ -20,23 +20,23 @@ std::vector<Game::EPECAlgorithmParams>
 allAlgo(EPECAlgorithmParams common_params = {}, bool readCommonConfig = false) {
   std::vector<Game::EPECAlgorithmParams> algs;
   Game::EPECAlgorithmParams alg;
-  alg.threads = TEST_NUM_THREADS;
-  alg.algorithm = Game::EPECalgorithm::fullEnumeration;
+  alg.Threads = TEST_NUM_THREADS;
+  alg.Algorithm = Game::EPECalgorithm::FullEnumeration;
   algs.push_back(alg);
-  alg.algorithm = Game::EPECalgorithm::combinatorialPNE;
+  alg.Algorithm = Game::EPECalgorithm::CombinatorialPne;
   algs.push_back(alg);
 
   for (int i = 0; i < 2; i++) {
     Game::EPECAlgorithmParams alg_in;
-    alg_in.algorithm = Game::EPECalgorithm::innerApproximation;
-    alg_in.addPolyMethod = static_cast<Game::EPECAddPolyMethod>(i);
+    alg_in.Algorithm = Game::EPECalgorithm::InnerApproximation;
+    alg_in.AddPolyMethod = static_cast<Game::EPECAddPolyMethod>(i);
     for (int j = 1; j < 10; j += 3) {
-      alg_in.aggressiveness = j;
+      alg_in.Aggressiveness = j;
       if (readCommonConfig) {
-        alg_in.timeLimit = common_params.timeLimit;
-        alg_in.indicators = common_params.indicators;
-        alg_in.threads = 4;
-        alg_in.addPolyMethodSeed = common_params.addPolyMethodSeed;
+        alg_in.TimeLimit = common_params.TimeLimit;
+        alg_in.Indicators = common_params.Indicators;
+        alg_in.Threads = 4;
+        alg_in.AddPolyMethodSeed = common_params.AddPolyMethodSeed;
       }
       algs.push_back(alg_in);
     }
@@ -50,27 +50,27 @@ void testEPECInstance(const testInst inst,
   BOOST_TEST_MESSAGE("*** NEW INSTANCE ***");
   for (auto const algorithm : algorithms) {
     std::stringstream ss;
-    ss << "Algorithm: " << std::to_string(algorithm.algorithm);
-    if (algorithm.algorithm == Game::EPECalgorithm::innerApproximation) {
-      ss << "\nAggressiveness: " << algorithm.aggressiveness;
+    ss << "Algorithm: " << std::to_string(algorithm.Algorithm);
+    if (algorithm.Algorithm == Game::EPECalgorithm::InnerApproximation) {
+      ss << "\nAggressiveness: " << algorithm.Aggressiveness;
       ss << "\nMethod to add polyhedra: "
-         << std::to_string(algorithm.addPolyMethod);
+         << std::to_string(algorithm.AddPolyMethod);
     }
     BOOST_TEST_MESSAGE(ss.str());
     GRBEnv env;
     Models::EPEC epec(&env);
-    const unsigned int nCountr = inst.instance.Countries.size();
+    unsigned long nCountr = inst.instance.Countries.size();
     for (unsigned int i = 0; i < nCountr; i++)
       epec.addCountry(inst.instance.Countries.at(i));
     epec.addTranspCosts(inst.instance.TransportationCosts);
     epec.finalize();
 
-    epec.setAlgorithm(algorithm.algorithm);
-    epec.setAggressiveness(algorithm.aggressiveness);
-    epec.setAddPolyMethod(algorithm.addPolyMethod);
-    epec.setIndicators(algorithm.indicators);
+    epec.setAlgorithm(algorithm.Algorithm);
+    epec.setAggressiveness(algorithm.Aggressiveness);
+    epec.setAddPolyMethod(algorithm.AddPolyMethod);
+    epec.setIndicators(algorithm.Indicators);
     epec.setNumThreads(TEST_NUM_THREADS );
-    epec.setAddPolyMethodSeed(algorithm.addPolyMethodSeed);
+    epec.setAddPolyMethodSeed(algorithm.AddPolyMethodSeed);
 
     const std::chrono::high_resolution_clock::time_point initTime =
         std::chrono::high_resolution_clock::now();
@@ -93,32 +93,31 @@ void testEPECInstance(const testInst inst,
         for (unsigned int j = 0; j < countryAns.foll_prod.size(); j++) {
           // Follower production
           BOOST_CHECK_CLOSE(
-              epec.getx().at(
+              epec.getX().at(
                   epec.getPosition(i, Models::LeaderVars::FollowerStart) + j),
               countryAns.foll_prod.at(j), 1);
           // Tax
           BOOST_WARN_CLOSE(
-              epec.getx().at(epec.getPosition(i, Models::LeaderVars::Tax) + j),
+              epec.getX().at(epec.getPosition(i, Models::LeaderVars::Tax) + j),
               countryAns.foll_tax.at(j), 1);
         }
         // Export
         BOOST_CHECK_CLOSE(
-            epec.getx().at(epec.getPosition(i, Models::LeaderVars::NetExport)),
+            epec.getX().at(epec.getPosition(i, Models::LeaderVars::NetExport)),
             countryAns.export_, 1);
         // Import
         BOOST_CHECK_CLOSE(
-            epec.getx().at(epec.getPosition(i, Models::LeaderVars::NetImport)),
+            epec.getX().at(epec.getPosition(i, Models::LeaderVars::NetImport)),
             countryAns.import, 1);
         // Export price
-        double exportPrice{epec.getx().at(
+        double exportPrice{epec.getX().at(
             epec.getPosition(nCountr - 1, Models::LeaderVars::End) + i)};
         BOOST_WARN_CLOSE(exportPrice, countryAns.export_price, 10);
       }
-      epec.writeSolution(2, "dat/Soluzione");
     } break;
     default: {
-      BOOST_CHECK_MESSAGE(epec.getStatistics().status ==
-                              Game::EPECsolveStatus::nashEqNotFound,
+      BOOST_CHECK_MESSAGE(epec.getStatistics().Status ==
+                              Game::EPECsolveStatus::NashEqNotFound,
                           "Checking for infeasability");
     }
     }
@@ -145,7 +144,7 @@ Models::FollPar OneSolar();
 arma::sp_mat TranspCost(unsigned int n);
 
 Models::LeadAllPar LAP_LowDem(Models::FollPar followers, Models::LeadPar leader,
-                              std::string a = "");
+                              const std::string& a = "");
 
 Models::LeadAllPar LAP_HiDem(Models::FollPar followers, Models::LeadPar leader,
-                             std::string a = "");
+                             const std::string& a = "");

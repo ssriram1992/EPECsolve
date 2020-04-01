@@ -18,7 +18,7 @@ Code to compute mixed-equilibrium in linear EPECs.
 - [GNU make](https://www.gnu.org/software/make/) `sudo apt install make` will install GNU make on an Ubuntu machine.
 - [Boost](https://www.boost.org/) Required for logging, commandline interface to solve files etc. Can produce a boost-free version if there is significant interest.
 
-## Recommended but not mandatory for the algorithm. (Some examples might have these dependancies)
+## Recommended but not mandatory for the Algorithm. (Some examples might have these dependencies)
 - [Rapid JSON](http://rapidjson.org/) To export results and save example problem instances.
 - [DOxygen](http://www.doxygen.nl) Only if you need documentation. `sudo apt install doxygen ` will install DOxygen on an Ubuntu machine.
 
@@ -70,19 +70,19 @@ The following I/O options are available:
 
 Algorithmic parameters:
 
-* `-a (--algorithm) intValue`: Specifies the type of algorithm employed to solve the instance. *0* is **fullEnumeration**, *1* is **innerApproximation**, *2* is **combinatorialPNE**. Note that the latter only works with pure equilibria.
-* `-p (--pure) intValue`: Specifies whether the algorithm should seek for a pure equilibrium or not (note that **combinatorialPNE** will always seek for a pure solution) . *0* no requirement (either pure or mixed), *1* only pure.
-* `-bigM intValue`: Specifies the whether LCP problems should be formulated with a LCP. *0* (default) for indicator constraints, *1* for bigM formulation.
-* `-b (--bound) intValue`: Specifies if the final LCP model should be bounded by a *bigM* constant (see option `-boundBigM`) in their primal variables. *0* no bounding, *1* bounding with *bigM*.
-* `-boundBigM intValue`: Specifies the *bigM* constant for the above param (see option `-b (--bound)`.
-* `-t (--threads) intValue`: Specifies the number of threads Gurobi uses.
-* `-tl (--timelimit) intValue`: Specifies the timeLimit (in seconds) for running the whole algorithmic procedure. 
+* `-a (--Algorithm) intValue`: Specifies the type of Algorithm employed to solve the instance. *0* is **FullEnumeration**, *1* is **InnerApproximation**, *2* is **CombinatorialPNE**. Note that the latter only works with pure equilibria.
+* `-p (--pure) intValue`: Specifies whether the Algorithm should seek for a pure equilibrium or not (note that **CombinatorialPNE** will always seek for a pure solution) . *0* no requirement (either pure or mixed), *1* only pure.
+* `-BigM intValue`: Specifies the whether LCP problems should be formulated with a LCP. *0* (default) for indicator constraints, *1* for BigM formulation.
+* `-b (--bound) intValue`: Specifies if the final LCP model should be bounded by a *BigM* constant (see option `-BoundBigM`) in their primal variables. *0* no bounding, *1* bounding with *BigM*.
+* `-BoundBigM intValue`: Specifies the *BigM* constant for the above param (see option `-b (--bound)`.
+* `-t (--Threads) intValue`: Specifies the number of Threads Gurobi uses.
+* `-tl (--timelimit) intValue`: Specifies the TimeLimit (in seconds) for running the whole algorithmic procedure.
 
-Algorithmic parameters tailored on **innerApproximation**:
+Algorithmic parameters tailored on **InnerApproximation**:
 
-* `-ad (--add) intValue`: Specifies the *EPECAddPolyMethod* strategy employed to expand the inner approximation when no information about deviations is available. *0* add polyhedra in lexographic order, *1* reverse lexographic, *2* random.
+* `-ad (--add) intValue`: Specifies the *EPECAddPolyMethod* strategy employed to expand the inner approximation when no information about deviations is available. *0* add polyhedra in lexographic order, *1* reverse lexographic, *2* Random.
 * `-ag (--aggr) intValue`: Specifies the *EPECAddPolyMethod* aggressivity (see option `-ad (--add)`). *int* specifies the number of lower-level polyhedra to be added to each Stackelberg leader at each iteration in which *EPECAddPolyMethod* is triggered.
-* `-r (--recover) intValue`: Specifies the recover stragegy for the **innerApproximation** method. When the algorithm finds a mixed equilibrium and the parameter `-p (--pure)` is set to *1*, the algorithm will search for a pure equilibrium either by randomly expanding the inner approximation (*EPECAddPolyMethod*) or by triggering a **combinatorialPNE** procedure warmstarted with the current information. *0* sets the recover strategy to *incrementalEnumeration*, *1* sets it to *combinatorial*.
+* `-r (--recover) intValue`: Specifies the recover stragegy for the **InnerApproximation** method. When the Algorithm finds a mixed equilibrium and the parameter `-p (--pure)` is set to *1*, the Algorithm will search for a pure equilibrium either by randomly expanding the inner approximation (*EPECAddPolyMethod*) or by triggering a **CombinatorialPNE** procedure warmstarted with the current information. *0* sets the recover strategy to *IncrementalEnumeration*, *1* sets it to *Combinatorial*.
 
 # Maintenance
 [@ssriram1992](https://github.com/ssriram1992/) - Contact: [sriram.sankaranarayanan@polymtl.ca](mailto:sriram.sankaranarayanan@polymtl.ca)

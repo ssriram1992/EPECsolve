@@ -3,6 +3,7 @@
 
 using namespace std;
 using namespace arma;
+using namespace Models;
 
 BOOST_AUTO_TEST_CASE(LoggingOff) {
   boost::log::core::get()->set_filter(boost::log::trivial::severity >=
@@ -12,7 +13,7 @@ BOOST_AUTO_TEST_CASE(LoggingOff) {
 BOOST_AUTO_TEST_SUITE(Core__Tests)
 
 /* This test suite perform basic unit tests for core components (eg, QP_Param,
- * NashGame, LCPs). Also, indicator constraints are being tested for numerical
+ * NashGame, LCPs). Also, indicator constraints are being tested for Numerical
  * stability purposes
  */
 
@@ -101,7 +102,7 @@ BOOST_AUTO_TEST_CASE(QPParam_test) {
   auto FixedModel = q2.solveFixed(x);
   arma::vec sol(3);
   sol << 0.5417 << endr << 5.9861 << endr
-      << 3.4722; // Hardcoding the solution as calculated outside
+      << 3.4722; // Hard-coding the solution as calculated outside
   for (unsigned int i = 0; i < Ny; i++)
     BOOST_WARN_CLOSE(sol(i), FixedModel->getVar(i).get(GRB_DoubleAttr_X), 0.01);
   BOOST_CHECK_CLOSE(FixedModel->get(GRB_DoubleAttr_ObjVal), -12.757, 0.01);
@@ -234,8 +235,8 @@ BOOST_AUTO_TEST_CASE(NashGame_test) {
   sp_mat MM, MM_ref;
   vec qq, qq_ref;
   perps Compl;
-  BOOST_TEST_MESSAGE("NashGame.FormulateLCP test");
-  BOOST_CHECK_NO_THROW(Nash.FormulateLCP(MM, qq, Compl));
+  BOOST_TEST_MESSAGE("NashGame.formulateLCP test");
+  BOOST_CHECK_NO_THROW(Nash.formulateLCP(MM, qq, Compl));
   BOOST_CHECK_MESSAGE(MM(0, 0) == 2.2,
                       "checking q1 coefficient in M-LCP (0,0)");
   BOOST_CHECK_MESSAGE(MM(0, 1) == 1, "checking q2 coefficient in M-LCP (0,1)");
@@ -249,8 +250,8 @@ BOOST_AUTO_TEST_CASE(NashGame_test) {
   Game::LCP lcp(&env, Nash);
   unique_ptr<GRBModel> lcpmodel = lcp.LCPasMIP(true);
 
-  // int Nvar = Nash.getNprimals() + Nash.getNduals() + Nash.getNshadow() +
-  // Nash.getNleaderVars();
+  // int Nvar = Nash.getNprimals() + Nash.getNumDualVars() + Nash.getNumShadow() +
+  // Nash.getNumLeaderVars();
   BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X));
   BOOST_CHECK_NO_THROW(lcpmodel->getVarByName("x_1").get(GRB_DoubleAttr_X));
   BOOST_CHECK_CLOSE(lcpmodel->getVarByName("x_0").get(GRB_DoubleAttr_X),
@@ -266,25 +267,25 @@ BOOST_AUTO_TEST_CASE(NashGame_test) {
   BOOST_CHECK_NO_THROW(N2.save("test/Nash2.dat"));
 
   BOOST_TEST_MESSAGE("LCP load/save test");
-  BOOST_CHECK_NO_THROW(lcp.save("test/lcp.dat"));
+  BOOST_CHECK_NO_THROW(lcp.save("test/TheLCP.dat"));
 
   LCP lcp2(&env);
-  BOOST_CHECK_NO_THROW(lcp2.load("test/lcp.dat"));
+  BOOST_CHECK_NO_THROW(lcp2.load("test/TheLCP.dat"));
   BOOST_CHECK_NO_THROW(lcp2.save("test/lcp2.dat"));
 
   arma::vec Nashsol(2);
   Nashsol(0) = 28.271028;
   Nashsol(1) = 27.803738;
 
-  auto nashResp1 = Nash.Respond(0, Nashsol);
-  auto nashResp2 = Nash.Respond(1, Nashsol);
+  auto nashResp1 = Nash.respond(0, Nashsol);
+  auto nashResp2 = Nash.respond(1, Nashsol);
 
   BOOST_CHECK_CLOSE(nashResp1->getVarByName("y_0").get(GRB_DoubleAttr_X),
                     Nashsol(0), 0.0001);
   BOOST_CHECK_CLOSE(nashResp2->getVarByName("y_0").get(GRB_DoubleAttr_X),
                     Nashsol(1), 0.0001);
 
-  unsigned int temp1;
+  unsigned int temp1 = 0;
   arma::vec temp2;
   BOOST_CHECK_MESSAGE(
       Nash.isSolved(Nashsol, temp1, temp2),
@@ -335,7 +336,7 @@ BOOST_AUTO_TEST_CASE(ConvexHull_test) {
    * function (maximaze sum of two dimensions)
    * **/
   BOOST_TEST_MESSAGE("\n\n");
-  BOOST_TEST_MESSAGE("Testing Game::ConvexHull");
+  BOOST_TEST_MESSAGE("Testing Game::convexHull");
 
   GRBEnv env;
   arma::sp_mat A1, A2, A3, A;
@@ -403,8 +404,8 @@ BOOST_AUTO_TEST_CASE(ConvexHull_test) {
 
   GRBModel model = GRBModel(env);
   BOOST_TEST_MESSAGE(
-      "Testing Game::ConvexHull with a two dimensional problem.");
-  Game::ConvexHull(&Ai, &bi, A, b);
+      "Testing Game::convexHull with a two dimensional problem.");
+  Game::convexHull(&Ai, &bi, A, b);
   GRBVar x[A.n_cols];
   GRBConstr a[A.n_rows];
   for (unsigned int i = 0; i < A.n_cols; i++)
@@ -426,7 +427,7 @@ BOOST_AUTO_TEST_CASE(ConvexHull_test) {
   model.write("dat/ConvexHullTest.sol");
   BOOST_TEST_MESSAGE("Comparing results:");
   BOOST_CHECK_MESSAGE(model.get(GRB_IntAttr_Status) == GRB_OPTIMAL,
-                      "checking optimization status");
+                      "checking optimization Status");
   BOOST_CHECK_MESSAGE(model.getObjective().getValue() == 4, "checking obj==4");
   BOOST_CHECK_MESSAGE(model.getVarByName("x_0").get(GRB_DoubleAttr_X) == 3,
                       "checking x0==3");
@@ -436,16 +437,16 @@ BOOST_AUTO_TEST_CASE(ConvexHull_test) {
 
 BOOST_AUTO_TEST_CASE(IndicatorConstraints_test) {
   /** Testing the indicator constraints switch
-   *  Two identical problems should have same solutions with bigM formulation
+   *  Two identical problems should have same solutions with BigM formulation
    *and indicator constraints one Numerical issues in some instances suggest
-   *that indicators are a safer choice for numerical stability issues.
+   *that Indicators are a safer choice for Numerical stability issues.
    * @warning the test might fail depending on the thresholds. please see
-   *lcptolp bigM, eps, eps_Int. For a better stability, indicators constraints
+   *lcptolp BigM, Eps, eps_Int. For a better stability, Indicators constraints
    *are suggested.
    **/
   BOOST_TEST_MESSAGE("Indicator constraints test");
   Game::EPECAlgorithmParams common;
-  common.indicators = false;
+  common.Indicators = false;
   testEPECInstance(SimpleBlu(), allAlgo(common, false));
   BOOST_TEST_MESSAGE("Disabling indicator constraints.");
   testEPECInstance(SimpleBlu(), allAlgo(common, true));
@@ -769,14 +770,14 @@ arma::sp_mat TranspCost(unsigned int n) {
 }
 
 Models::LeadAllPar LAP_LowDem(Models::FollPar followers, Models::LeadPar leader,
-                              std::string a) {
+                              const std::string& a) {
   return Models::LeadAllPar(followers.capacities.size(),
                             "Low demand country " + a, followers, {300, 0.7},
                             leader);
 }
 
 Models::LeadAllPar LAP_HiDem(Models::FollPar followers, Models::LeadPar leader,
-                             std::string a) {
+                             const std::string& a) {
   return Models::LeadAllPar(followers.capacities.size(),
                             "High demand country " + a, followers, {350, 0.5},
                             leader);

@@ -1,4 +1,4 @@
-#include "LCP.h"
+#include "lcp.h"
 #include <algorithm>
 #include <armadillo>
 #include <boost/log/trivial.hpp>
@@ -19,7 +19,7 @@ void Game::LCP::defConst(GRBEnv *env)
  */
 {
   this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
-  this->env = env;
+  this->Env = env;
   this->nR = this->M.n_rows;
   this->nC = this->M.n_cols;
 }
@@ -45,8 +45,8 @@ Game::LCP::LCP(
     if (p.first != p.second) {
       this->LeadStart = p.first;
       this->LeadEnd = p.second - 1;
-      this->nLeader = this->LeadEnd - this->LeadStart + 1;
-      this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
+      this->NumberLeader = this->LeadEnd - this->LeadStart + 1;
+      this->NumberLeader = this->NumberLeader > 0 ? this->NumberLeader : 0;
       break;
     }
 }
@@ -55,9 +55,9 @@ Game::LCP::LCP(
     GRBEnv *env,            ///< Gurobi environment required
     arma::sp_mat M,         ///< @p M in @f$Mx+q@f$
     arma::vec q,            ///< @p q in @f$Mx+q@f$
-    unsigned int LeadStart, ///< Position where variables which are not
+    unsigned int leadStart, ///< Position where variables which are not
                             ///< complementary to any equation starts
-    unsigned LeadEnd, ///< Position where variables which are not complementary
+    unsigned leadEnd, ///< Position where variables which are not complementary
                       ///< to any equation ends
     arma::sp_mat A,   ///< Any equations without a complemntarity variable
     arma::vec b       ///< RHS of equations without complementarity variables
@@ -70,12 +70,12 @@ Game::LCP::LCP(
  */
 {
   defConst(env);
-  this->LeadStart = LeadStart;
-  this->LeadEnd = LeadEnd;
-  this->nLeader = this->LeadEnd - this->LeadStart + 1;
-  this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
+  this->LeadStart = leadStart;
+  this->LeadEnd = leadEnd;
+  this->NumberLeader = this->LeadEnd - this->LeadStart + 1;
+  this->NumberLeader = this->NumberLeader > 0 ? this->NumberLeader : 0;
   for (unsigned int i = 0; i < M.n_rows; i++) {
-    unsigned int count = i < LeadStart ? i : i + nLeader;
+    unsigned int count = i < leadStart ? i : i + NumberLeader;
     this->Compl.push_back({i, count});
   }
   std::sort(
@@ -98,13 +98,13 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
   arma::sp_mat M_local;
   arma::vec q_local;
   perps Compl_local;
-  N.FormulateLCP(M_local, q_local, Compl_local);
-  // LCP(env, M, q, Compl, N.RewriteLeadCons(), N.getMCLeadRHS());
+  N.formulateLCP(M_local, q_local, Compl_local);
+  // LCP(Env, M, q, Compl, N.rewriteLeadCons(), N.getMCLeadRHS());
 
   this->M = M_local;
   this->q = q_local;
   this->Compl = Compl_local;
-  this->_A = N.RewriteLeadCons();
+  this->_A = N.rewriteLeadCons();
   this->_b = N.getMCLeadRHS();
   defConst(env);
   this->Compl = perps(Compl);
@@ -116,18 +116,12 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
     if (p.first != p.second) {
       this->LeadStart = p.first;
       this->LeadEnd = p.second - 1;
-      this->nLeader = this->LeadEnd - this->LeadStart + 1;
-      this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
+      this->NumberLeader = this->LeadEnd - this->LeadStart + 1;
+      this->NumberLeader = this->NumberLeader > 0 ? this->NumberLeader : 0;
       break;
     }
   }
 }
-
-Game::LCP::~LCP()
-/** @brief Destructor of LCP */
-/** LCP object owns the pointers to definitions of its polyhedra that it owns
- It has to be deleted and freed. */
-{}
 
 void Game::LCP::makeRelaxed()
 /** @brief Makes a Gurobi object that relaxes complementarity constraints in an
@@ -137,7 +131,7 @@ void Game::LCP::makeRelaxed()
  * member functions */
 {
   try {
-    if (this->madeRlxdModel)
+    if (this->MadeRlxdModel)
       return;
     BOOST_LOG_TRIVIAL(trace)
         << "Game::LCP::makeRelaxed: Creating a model with : " << nR
@@ -166,8 +160,8 @@ void Game::LCP::makeRelaxed()
       if (_A.n_cols != nC || _A.n_rows != _b.n_rows) {
         BOOST_LOG_TRIVIAL(trace) << "(" << _A.n_rows << "," << _A.n_cols
                                  << ")\t" << _b.n_rows << " " << nC;
-        throw string("Game::LCP::makeRelaxed: A and b are incompatible! Thrown "
-                     "from makeRelaxed()");
+        throw("Game::LCP::makeRelaxed: A and b are incompatible! Thrown "
+              "from makeRelaxed()");
       }
       for (unsigned int i = 0; i < _A.n_rows; i++) {
         GRBLinExpr expr = 0;
@@ -180,11 +174,11 @@ void Game::LCP::makeRelaxed()
           << "Game::LCP::makeRelaxed: Added common constraints";
     }
     RlxdModel.update();
-    this->madeRlxdModel = true;
+    this->MadeRlxdModel = true;
   } catch (const char *e) {
     cerr << "Error in Game::LCP::makeRelaxed: " << e << '\n';
     throw;
-  } catch (string e) {
+  } catch (string &e) {
     cerr << "String: Error in Game::LCP::makeRelaxed: " << e << '\n';
     throw;
   } catch (exception &e) {
@@ -216,14 +210,13 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
  */
 {
   if (Fixes.size() != this->nR)
-    throw string(
-        "Game::LCP::LCPasMIP: Bad size for Fixes in Game::LCP::LCPasMIP");
+    throw("Game::LCP::LCPasMIP: Bad size for Fixes in Game::LCP::LCPasMIP");
   vector<unsigned int> FixVar, FixEq;
   for (unsigned int i = 0; i < nR; i++) {
     if (Fixes[i] == 1)
       FixEq.push_back(i);
     if (Fixes[i] == -1)
-      FixVar.push_back(i > this->LeadStart ? i + this->nLeader : i);
+      FixVar.push_back(i > this->LeadStart ? i + this->NumberLeader : i);
   }
   return this->LCPasMIP(FixEq, FixVar, solve);
 }
@@ -236,7 +229,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
     )
 /**
  * Uses the big M method to solve the complementarity problem. The variables and
- * eqns to be set to equality can be given in FixVar and FixEq.
+ * equations to be set to equality can be given in FixVar and FixEq.
  * @note Returned model is \e always a restriction. For <tt>FixEq = FixVar =
  * {}</tt>, the returned model would solve the exact LCP.
  * @warning Note that the model returned by this function has to be explicitly
@@ -254,20 +247,20 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
       x[i] = model->getVarByName("x_" + to_string(i));
     for (unsigned int i = 0; i < nR; i++)
       z[i] = model->getVarByName("z_" + to_string(i));
-    // Define binary variables for bigM
+    // Define binary variables for BigM
     for (unsigned int i = 0; i < nR; i++)
       u[i] = model->addVar(0, 1, 0, GRB_BINARY, "u_" + to_string(i));
-    if (this->useIndicators)
+    if (this->UseIndicators)
       for (unsigned int i = 0; i < nR; i++)
         v[i] = model->addVar(0, 1, 0, GRB_BINARY, "v_" + to_string(i));
-    // Include ALL Complementarity constraints using bigM
+    // Include ALL Complementarity constraints using BigM
 
-    if (this->useIndicators) {
+    if (this->UseIndicators) {
       BOOST_LOG_TRIVIAL(trace)
           << "Using indicator constraints for complementarities.";
     } else {
       BOOST_LOG_TRIVIAL(trace)
-          << "Using bigM for complementarities with M=" << this->bigM;
+          << "Using BigM for complementarities with M=" << this->BigM;
     }
 
     GRBLinExpr expr = 0;
@@ -275,8 +268,8 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
       // z[i] <= Mu constraint
 
       // u[j]=0 --> z[i] <=0
-      if (!this->useIndicators) {
-        expr = bigM * u[p.first];
+      if (!this->UseIndicators) {
+        expr = BigM * u[p.first];
         model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first],
                          "z" + to_string(p.first) + "_L_Mu" +
                              to_string(p.first));
@@ -286,8 +279,8 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
             "z_ind_" + to_string(p.first) + "_L_Mu_" + to_string(p.first));
       }
       // x[i] <= M(1-u) constraint
-      if (!this->useIndicators) {
-        expr = bigM - bigM * u[p.first];
+      if (!this->UseIndicators) {
+        expr = BigM - BigM * u[p.first];
         model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second],
                          "x" + to_string(p.first) + "_L_MuDash" +
                              to_string(p.first));
@@ -297,7 +290,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
             "x_ind_" + to_string(p.first) + "_L_MuDash_" + to_string(p.first));
       }
 
-      if (this->useIndicators)
+      if (this->UseIndicators)
         model->addConstr(u[p.first] + v[p.first], GRB_EQUAL, 1,
                          "uv_sum_" + to_string(p.first));
     }
@@ -307,10 +300,10 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
     for (auto i : FixEq)
       model->addConstr(z[i], GRB_EQUAL, 0.0);
     model->update();
-    if (!this->useIndicators) {
-      model->set(GRB_DoubleParam_IntFeasTol, this->eps_int);
-      model->set(GRB_DoubleParam_FeasibilityTol, this->eps);
-      model->set(GRB_DoubleParam_OptimalityTol, this->eps);
+    if (!this->UseIndicators) {
+      model->set(GRB_DoubleParam_IntFeasTol, this->EpsInt);
+      model->set(GRB_DoubleParam_FeasibilityTol, this->Eps);
+      model->set(GRB_DoubleParam_OptimalityTol, this->Eps);
     }
     // Get first Equilibrium
     model->set(GRB_IntParam_SolutionLimit, 1);
@@ -320,7 +313,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
   } catch (const char *e) {
     cerr << "Error in Game::LCP::LCPasMIP: " << e << '\n';
     throw;
-  } catch (string e) {
+  } catch (string &e) {
     cerr << "String: Error in Game::LCP::LCPasMIP: " << e << '\n';
     throw;
   } catch (exception &e) {
@@ -348,16 +341,16 @@ bool Game::LCP::errorCheck(
   if (throwErr) {
     if (nR_t != q.n_rows)
       throw "Game::LCP::errorCheck: M and q have unequal number of rows";
-    if (nR_t + nLeader != nC)
+    if (nR_t + NumberLeader != nC)
       throw "Game::LCP::errorCheck: Inconsistency between number of leader "
             "vars " +
-          to_string(nLeader) + ", number of rows " + to_string(nR_t) +
+          to_string(NumberLeader) + ", number of rows " + to_string(nR_t) +
           " and number of cols " + to_string(nC);
   }
-  return (nR_t == q.n_rows && nR_t + nLeader == nC_t);
+  return (nR_t == q.n_rows && nR_t + NumberLeader == nC_t);
 }
 
-void Game::LCP::print(string end) {
+void Game::LCP::print(const std::string end) {
   cout << "LCP with " << this->nR << " rows and " << this->nC << " columns."
        << end;
 }
@@ -478,12 +471,12 @@ unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
       model->optimize();
       int status = model->get(GRB_IntAttr_Status);
       if (status != GRB_OPTIMAL ||
-          model->get(GRB_DoubleAttr_ObjVal) > this->eps)
+          model->get(GRB_DoubleAttr_ObjVal) > this->Eps)
         throw "Game::LCP::LCPasQP: LCP infeasible";
     } catch (const char *e) {
       cerr << "Error in Game::LCP::LCPasQP: " << e << '\n';
       throw;
-    } catch (string e) {
+    } catch (string &e) {
       cerr << "String: Error in Game::LCP::LCPasQP: " << e << '\n';
       throw;
     } catch (exception &e) {
@@ -500,10 +493,10 @@ unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
 
 unique_ptr<GRBModel> Game::LCP::LCPasMIP(bool solve)
 /**
- * @brief Helps solving an LCP as an MIP using bigM constraints
+ * @brief Helps solving an LCP as an MIP using BigM constraints
  * @returns A unique_ptr to GRBModel that has the equivalent MIP
  * @details The MIP problem that is returned by this function is equivalent to
- * the LCP problem provided the value of bigM is large enough.
+ * the LCP problem provided the value of BigM is large enough.
  * @note This solves just the feasibility problem. Should you need  a leader's
  * objective function, use LCP::MPECasMILP or LCP::MPECasMIQP
  */
@@ -529,9 +522,9 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   // Reset the solution limit. We need to solve to optimality
   model->set(GRB_IntParam_SolutionLimit, GRB_MAXINT);
   if (C.n_cols != x_minus_i.n_rows)
-    throw string("Game::LCP::LCPasMILP: Bad size of x_minus_i");
+    throw("Game::LCP::LCPasMILP: Bad size of x_minus_i");
   if (c.n_rows != C.n_rows)
-    throw string("Game::LCP::LCPasMILP: Bad size of c");
+    throw("Game::LCP::LCPasMILP: Bad size of c");
   arma::vec Cx(c.n_rows, arma::fill::zeros);
   try {
     Cx = C * x_minus_i;
@@ -561,7 +554,7 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
  * @brief Helps solving an LCP as an MIQPs.
  * @returns A unique_ptr to GRBModel that has the equivalent MIQP
  * @details The MIQP problem that is returned by this function is equivalent to
- * the LCP problem provided the value of bigM is large enough. The function
+ * the LCP problem provided the value of BigM is large enough. The function
  * differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader
  * objective, and returns an object with this objective. This allows quadratic
  * leader objective. If you are aware that the leader's objective is linear, use
@@ -591,7 +584,7 @@ void Game::LCP::write(string filename, bool append) const {
 
   outfile << nR << " rows and " << nC << " columns in the LCP\n";
   outfile << "LeadStart: " << LeadStart << " \nLeadEnd: " << LeadEnd
-          << " \nnLeader: " << nLeader << "\n\n";
+          << " \nnLeader: " << NumberLeader << "\n\n";
 
   outfile << "M: " << this->M;
   outfile << "q: " << this->q;
@@ -619,14 +612,14 @@ void Game::LCP::save(string filename, bool erase) const {
 }
 
 long int Game::LCP::load(string filename, long int pos) {
-  if (!this->env)
-    throw string("Error in LCP::load: To load LCP from file, it has to be "
-                 "constructed using LCP(GRBEnv*) constructor");
+  if (!this->Env)
+    throw("Error in LCP::load: To load LCP from file, it has to be "
+          "constructed using LCP(GRBEnv*) constructor");
 
   string headercheck;
   pos = Utils::appendRead(headercheck, filename, pos);
   if (headercheck != "LCP")
-    throw string("Error in LCP::load: In valid header - ") + headercheck;
+    throw("Error in LCP::load: In valid header - ") + headercheck;
 
   arma::sp_mat M_t, A;
   arma::vec q_t, b;
@@ -642,14 +635,14 @@ long int Game::LCP::load(string filename, long int pos) {
   this->q = q_t;
   this->_A = A;
   this->_b = b;
-  defConst(env);
+  defConst(Env);
   this->LeadStart = LeadStart_t;
   this->LeadEnd = LeadEnd_t;
 
-  this->nLeader = this->LeadEnd - this->LeadStart + 1;
-  this->nLeader = this->nLeader > 0 ? this->nLeader : 0;
+  this->NumberLeader = this->LeadEnd - this->LeadStart + 1;
+  this->NumberLeader = this->NumberLeader > 0 ? this->NumberLeader : 0;
   for (unsigned int i = 0; i < M.n_rows; i++) {
-    unsigned int count = i < LeadStart ? i : i + nLeader;
+    unsigned int count = i < LeadStart ? i : i + NumberLeader;
     Compl.push_back({i, count});
   }
   std::sort(Compl.begin(), Compl.end(),

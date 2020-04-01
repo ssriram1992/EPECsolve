@@ -1,4 +1,4 @@
-#include "PolyLCP.h"
+#include "polylcp.h"
 #include <algorithm>
 #include <armadillo>
 #include <boost/log/trivial.hpp>
@@ -12,48 +12,52 @@
 using namespace std;
 using namespace Utils;
 
-bool operator==(vector<short int> Fix1, vector<short int> Fix2)
+bool operator==(vector<short int> encoding1, vector<short int> encoding2)
 /**
  * @brief Checks if two vector<int> are of same size and hold same values in the
  * same order
  * @warning Might be deprecated, as it pollutes global namespaces
- * @returns @p true if Fix1 and Fix2 have the same elements else @p false
+ * @returns @p true if encoding1 and encoding2 have the same elements else @p
+ * false
  */
 {
-  if (Fix1.size() != Fix2.size())
+  if (encoding1.size() != encoding2.size())
     return false;
-  for (unsigned int i = 0; i < Fix1.size(); i++) {
-    if (Fix1.at(i) != Fix2.at(i))
+  for (unsigned int i = 0; i < encoding1.size(); i++) {
+    if (encoding1.at(i) != encoding2.at(i))
       return false;
   }
   return true;
 }
 
-bool operator<(vector<short int> Fix1, vector<short int> Fix2)
+bool operator<(vector<short int> encoding1, vector<short int> encoding2)
 /**
  * @details \b GrandParent:
  *  	Either the same value as the grand child, or has 0 in that location
  *
  *  \b Grandchild:
- *  	Same val as grand parent in every location, except any val allowed, if
- * grandparent is 0
+ *  	Same val as grand parent in every location, except anumVariablesY val
+ * allowed, if grandparent is 0
  * @warning Might be deprecated, as it pollutes global namespaces
- * @returns @p true if Fix1 is (grand) child of Fix2
+ * @returns @p true if encoding1 is (grand) child of encoding2
  */
 {
-  if (Fix1.size() != Fix2.size())
+  if (encoding1.size() != encoding2.size())
     return false;
-  for (unsigned int i = 0; i < Fix1.size(); i++) {
-    if (Fix1.at(i) != Fix2.at(i) && Fix1.at(i) * Fix2.at(i) != 0) {
-      return false; // Fix1 is not a child of Fix2
+  for (unsigned int i = 0; i < encoding1.size(); i++) {
+    if (encoding1.at(i) != encoding2.at(i) &&
+        encoding1.at(i) * encoding2.at(i) != 0) {
+      return false; // encoding1 is not a child of encoding2
     }
   }
-  return true; // Fix1 is a child of Fix2
+  return true; // encoding1 is a child of encoding2
 }
 
-bool operator>(vector<int> Fix1, vector<int> Fix2) { return (Fix2 < Fix1); }
+bool operator>(vector<int> encoding1, vector<int> encoding2) {
+  return (encoding2 < encoding1);
+}
 
-unsigned int Game::polyLCP::ConvexHull(
+unsigned int Game::PolyLCP::convexHull(
     arma::sp_mat &A, ///< Convex hull inequality description
                      ///< LHS to be stored here
     arma::vec &b)    ///< Convex hull inequality description RHS
@@ -87,29 +91,30 @@ unsigned int Game::polyLCP::ConvexHull(
     b = arma::join_cols(*bi->at(0), b_common);
     return 1;
   } else
-    return Game::ConvexHull(&tempAi, &tempbi, A, b, A_common, b_common);
+    return Game::convexHull(&tempAi, &tempbi, A, b, A_common, b_common);
 }
-Game::polyLCP &Game::polyLCP::addPolyFromX(const arma::vec &x, bool &ret)
+Game::PolyLCP &Game::PolyLCP::addPolyFromX(const arma::vec &x, bool &ret)
 /**
- * Given a <i> feasible </i> point @p x, checks if any polyhedron that contains
+ * Given a <i> feasible </i> point @p x, checks if anumVariablesY polyhedron
+ * that contains
  * @p x is already a part of this->Ai and this-> bi. If it is, then this does
  * nothing, except for printing a log message. If not, it adds a polyhedron
  * containing this vector.
  */
 {
-  const unsigned int nCompl = this->Compl.size();
-  vector<short int> encoding = this->solEncode(x);
-  std::stringstream enc_str;
+  const auto numCompl = this->Compl.size();
+  auto encoding = this->solEncode(x);
+  std::stringstream encStr;
   for (auto vv : encoding)
-    enc_str << vv << " ";
+    encStr << vv << " ";
   BOOST_LOG_TRIVIAL(trace)
-      << "Game::polyLCP::addPolyFromX: Handling deviation with encoding: "
-      << enc_str.str() << '\n';
+      << "Game::PolyLCP::addPolyFromX: Handling deviation with encoding: "
+      << encStr.str() << '\n';
   // Check if the encoding polyhedron is already in this->AllPolyhedra
   for (const auto &i : AllPolyhedra) {
-    std::vector<short int> bin = num_to_vec(i, nCompl);
+    std::vector<short int> bin = numToVec(i, numCompl);
     if (encoding < bin) {
-      BOOST_LOG_TRIVIAL(trace) << "Game::polyLCP::addPolyFromX: Encoding " << i
+      BOOST_LOG_TRIVIAL(trace) << "Game::PolyLCP::addPolyFromX: Encoding " << i
                                << " already in All Polyhedra! ";
       ret = false;
       return *this;
@@ -117,21 +122,22 @@ Game::polyLCP &Game::polyLCP::addPolyFromX(const arma::vec &x, bool &ret)
   }
 
   BOOST_LOG_TRIVIAL(trace)
-      << "Game::polyLCP::addPolyFromX: New encoding not in All Polyhedra! ";
+      << "Game::PolyLCP::addPolyFromX: New encoding not in All Polyhedra! ";
   // If it is not in AllPolyhedra
-  // First change any zero indices of encoding to 1
+  // First change anumVariablesY zero indices of encoding to 1
   for (short &i : encoding) {
     if (i == 0)
       ++i;
   }
   // And then add the relevant polyhedra
-  ret = this->FixToPoly(encoding, false);
+  ret = this->addPolyFromEncoding(encoding, false);
   // ret = true;
   return *this;
 }
 
-bool Game::polyLCP::FixToPoly(
-    const vector<short int> Fix, ///< A vector of +1 and -1 referring to which
+bool Game::PolyLCP::addPolyFromEncoding(
+    const vector<short int>
+        encoding, ///< A vector of +1 and -1 referring to which
     ///< equations and variables are taking 0 value.
     bool checkFeas, ///< The polyhedron is added after ensuring feasibility, if
     ///< this is true
@@ -143,7 +149,7 @@ bool Game::polyLCP::FixToPoly(
                     /// to vector of RHS of constraints
     )
 /** @brief Computes the equation of the feasibility polyhedron corresponding to
- *the given @p Fix
+ *the given @p encoding
  *	@details The computed polyhedron is always pushed into a vector of @p
  *arma::sp_mat and @p arma::vec If @p custom is false, this is the internal
  *attribute of LCP, which are LCP::Ai and LCP::bi. Otherwise, the vectors can be
@@ -151,27 +157,28 @@ bool Game::polyLCP::FixToPoly(
  *	@p true value to @p checkFeas ensures that the polyhedron is pushed @e
  *only if it is feasible.
  * @returns @p true if successfully added, else false
- *	@warning Does not entertain 0 in the elements of *Fix. Only +1/-1 are
- *allowed to not encounter undefined behavior. As a result, not meant for high
- *level code. Instead use LCP::FixToPolies.
+ *	@warning Does not entertain 0 in the elements of *encoding. Only +1/-1
+ *are allowed to not encounter undefined behavior. As a result, not meant for
+ *high level code. Instead use LCP::addPoliesFromEncoding.
  */
 {
-  unsigned int FixNumber = vec_to_num(Fix);
+  unsigned int encodingNumber = vecToNum(encoding);
   BOOST_LOG_TRIVIAL(trace)
-      << "Game::polyLCP::FixToPoly: Working on polyhedron #" << FixNumber;
+      << "Game::PolyLCP::addPolyFromEncoding: Working on polyhedron #"
+      << encodingNumber;
 
-  bool eval;
+  bool eval = false;
   if (checkFeas)
-    eval = this->checkPolyFeas(Fix);
+    eval = this->checkPolyFeas(encoding);
   else
     eval = true;
 
   if (eval) {
     if (!custom && !AllPolyhedra.empty()) {
-      if (AllPolyhedra.find(FixNumber) != AllPolyhedra.end()) {
-        BOOST_LOG_TRIVIAL(trace)
-            << "Game::polyLCP::FixToPoly: Previously added polyhedron #"
-            << FixNumber;
+      if (AllPolyhedra.find(encodingNumber) != AllPolyhedra.end()) {
+        BOOST_LOG_TRIVIAL(trace) << "Game::PolyLCP::addPolyFromEncoding: "
+                                    "Previously added polyhedron #"
+                                 << encodingNumber;
         return false;
       }
     }
@@ -181,11 +188,11 @@ bool Game::polyLCP::FixToPoly(
     unique_ptr<arma::vec> bii =
         unique_ptr<arma::vec>(new arma::vec(nR, arma::fill::zeros));
     for (unsigned int i = 0; i < this->nR; i++) {
-      if (Fix.at(i) == 0) {
-        throw string("Error in Game::polyLCP::FixToPoly. 0s not allowed in "
-                     "argument vector");
+      if (encoding.at(i) == 0) {
+        throw("Error in Game::PolyLCP::addPolyFromEncoding. 0s not allowed in "
+              "argument vector");
       }
-      if (Fix.at(i) == 1) // Equation to be fixed top zero
+      if (encoding.at(i) == 1) // Equation to be fixed top zero
       {
         for (auto j = this->M.begin_row(i); j != this->M.end_row(i); ++j)
           if (!this->isZero((*j)))
@@ -195,8 +202,9 @@ bool Game::polyLCP::FixToPoly(
       } else // Variable to be fixed to zero, i.e. x(j) <= 0 constraint to be
              // added
       {
-        unsigned int varpos = (i >= this->LeadStart) ? i + this->nLeader : i;
-        Aii->at(i, varpos) = 1;
+        unsigned int variablePosition =
+            (i >= this->LeadStart) ? i + this->NumberLeader : i;
+        Aii->at(i, variablePosition) = 1;
         bii->at(i) = 0;
       }
     }
@@ -204,21 +212,21 @@ bool Game::polyLCP::FixToPoly(
       custAi->push_back(std::move(Aii));
       custbi->push_back(std::move(bii));
     } else {
-      AllPolyhedra.insert(FixNumber);
+      AllPolyhedra.insert(encodingNumber);
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }
     return true; // Successfully added
   }
-  BOOST_LOG_TRIVIAL(trace)
-      << "Game::polyLCP::FixToPoly: Checkfeas + Infeasible polyhedron #"
-      << FixNumber;
+  BOOST_LOG_TRIVIAL(trace) << "Game::PolyLCP::addPolyFromEncoding: Checkfeas + "
+                              "Infeasible polyhedron #"
+                           << encodingNumber;
   return false;
 }
 
-Game::polyLCP &Game::polyLCP::FixToPolies(
+Game::PolyLCP &Game::PolyLCP::addPoliesFromEncoding(
     const vector<short int>
-        Fix, ///< A vector of +1, 0 and -1 referring to which
+        encoding, ///< A vector of +1, 0 and -1 referring to which
     ///< equations and variables are taking 0 value.
     bool checkFeas, ///< The polyhedron is added after ensuring feasibility, if
     ///< this is true
@@ -230,41 +238,43 @@ Game::polyLCP &Game::polyLCP::FixToPolies(
                     /// to vector of RHS of constraints
     )
 /** @brief Computes the equation of the feasibility polyhedron corresponding to
- *the given @p Fix
+ *the given @p encoding
  *	@details The computed polyhedron are always pushed into a vector of @p
  *arma::sp_mat and @p arma::vec If @p custom is false, this is the internal
  *attribute of LCP, which are LCP::Ai and LCP::bi. Otherwise, the vectors can be
  *provided as arguments.
  *	@p true value to @p checkFeas ensures that @e each polyhedron that is
  *pushed is feasible. not meant for high level code. Instead use
- *LCP::FixToPolies.
- *	@note A value of 0 in @p *Fix implies that polyhedron corresponding to
- *fixing the corresponding variable as well as the equation become candidates to
- *pushed into the vector. Hence this is preferred over LCP::FixToPoly for
- *high-level usage.
+ *LCP::addPoliesFromEncoding.
+ *	@note A value of 0 in @p *encoding implies that polyhedron corresponding
+ *to fixing the corresponding variable as well as the equation become candidates
+ *to pushed into the vector. Hence this is preferred over
+ *LCP::addPolyFromEncoding for high-level usage.
  */
 {
   bool flag = false; // flag that there may be multiple polyhedra, i.e. 0 in
-  // some Fix entry
-  vector<short int> MyFix(Fix);
-  unsigned int i;
+  // some encoding entry
+  vector<short int> encodingCopy(encoding);
+  unsigned int i = 0;
   for (i = 0; i < this->nR; i++) {
-    if (Fix.at(i) == 0) {
+    if (encoding.at(i) == 0) {
       flag = true;
       break;
     }
   }
   if (flag) {
-    MyFix[i] = 1;
-    this->FixToPolies(MyFix, checkFeas, custom, custAi, custbi);
-    MyFix[i] = -1;
-    this->FixToPolies(MyFix, checkFeas, custom, custAi, custbi);
+    encodingCopy[i] = 1;
+    this->addPoliesFromEncoding(encodingCopy, checkFeas, custom, custAi,
+                                custbi);
+    encodingCopy[i] = -1;
+    this->addPoliesFromEncoding(encodingCopy, checkFeas, custom, custAi,
+                                custbi);
   } else
-    this->FixToPoly(Fix, checkFeas, custom, custAi, custbi);
+    this->addPolyFromEncoding(encoding, checkFeas, custom, custAi, custbi);
   return *this;
 }
 
-unsigned long int Game::polyLCP::getNextPoly(Game::EPECAddPolyMethod method) {
+unsigned long int Game::PolyLCP::getNextPoly(Game::EPECAddPolyMethod method) {
   /**
    * Returns a polyhedron (in its decimal encoding) that is neither already
    * known to be infeasible, nor already added in the inner approximation
@@ -272,129 +282,123 @@ unsigned long int Game::polyLCP::getNextPoly(Game::EPECAddPolyMethod method) {
    */
 
   switch (method) {
-  case Game::EPECAddPolyMethod::sequential: {
-    while (this->sequentialPolyCounter < this->maxTheoreticalPoly) {
-      const bool isAll =
-          AllPolyhedra.find(this->sequentialPolyCounter) != AllPolyhedra.end();
-      const bool isInfeas =
-          knownInfeas.find(this->sequentialPolyCounter) != knownInfeas.end();
-      this->sequentialPolyCounter++;
+  case Game::EPECAddPolyMethod::Sequential: {
+    while (this->SequentialPolyCounter < this->MaxTheoreticalPoly) {
+      const auto isAll =
+          AllPolyhedra.find(this->SequentialPolyCounter) != AllPolyhedra.end();
+      const auto isInfeas = InfeasiblePoly.find(this->SequentialPolyCounter) !=
+                            InfeasiblePoly.end();
+      this->SequentialPolyCounter++;
       if (!isAll && !isInfeas) {
-        return this->sequentialPolyCounter - 1;
+        return this->SequentialPolyCounter - 1;
       }
     }
-    return this->maxTheoreticalPoly;
+    return this->MaxTheoreticalPoly;
   } break;
-  case Game::EPECAddPolyMethod::reverse_sequential: {
-    while (this->reverseSequentialPolyCounter >= 0) {
-      const bool isAll =
-          AllPolyhedra.find(this->reverseSequentialPolyCounter) !=
+  case Game::EPECAddPolyMethod::ReverseSequential: {
+    while (this->ReverseSequentialPolyCounter >= 0) {
+      const auto isAll =
+          AllPolyhedra.find(this->ReverseSequentialPolyCounter) !=
           AllPolyhedra.end();
-      const bool isInfeas =
-          knownInfeas.find(this->reverseSequentialPolyCounter) !=
-          knownInfeas.end();
-      this->reverseSequentialPolyCounter--;
+      const auto isInfeas =
+          InfeasiblePoly.find(this->ReverseSequentialPolyCounter) !=
+          InfeasiblePoly.end();
+      this->ReverseSequentialPolyCounter--;
       if (!isAll && !isInfeas) {
-        return this->reverseSequentialPolyCounter + 1;
+        return this->ReverseSequentialPolyCounter + 1;
       }
     }
-    return this->maxTheoreticalPoly;
+    return this->MaxTheoreticalPoly;
   } break;
-  case Game::EPECAddPolyMethod::random: {
-    static std::mt19937 engine{this->addPolyMethodSeed};
+  case Game::EPECAddPolyMethod::Random: {
+    static std::mt19937 engine{this->AddPolyMethodSeed};
     std::uniform_int_distribution<unsigned long int> dist(
-        0, this->maxTheoreticalPoly - 1);
-    if ((knownInfeas.size() + AllPolyhedra.size()) == this->maxTheoreticalPoly)
-      return this->maxTheoreticalPoly;
+        0, this->MaxTheoreticalPoly - 1);
+    if ((InfeasiblePoly.size() + AllPolyhedra.size()) ==
+        this->MaxTheoreticalPoly)
+      return this->MaxTheoreticalPoly;
     while (true) {
-      unsigned long int randomPolyId = dist(engine);
-      const bool isAll = AllPolyhedra.find(randomPolyId) != AllPolyhedra.end();
-      const bool isInfeas = knownInfeas.find(randomPolyId) != knownInfeas.end();
+      auto randomPolyId = dist(engine);
+      const auto isAll = AllPolyhedra.find(randomPolyId) != AllPolyhedra.end();
+      const auto isInfeas =
+          InfeasiblePoly.find(randomPolyId) != InfeasiblePoly.end();
       if (!isAll && !isInfeas)
         return randomPolyId;
     }
-  }
-  default: {
-    BOOST_LOG_TRIVIAL(error)
-        << "Error in Game::polyLCP::getNextPoly: unrecognized method "
-        << to_string(method);
-    throw;
   }
   }
 }
 
 std::set<std::vector<short int>>
-Game::polyLCP::addAPoly(unsigned long int nPoly, Game::EPECAddPolyMethod method,
-                        std::set<std::vector<short int>> Polys) {
+Game::PolyLCP::addAPoly(unsigned long int nPoly, Game::EPECAddPolyMethod method,
+                        std::set<std::vector<short int>> polyhedra) {
   /**
    * Tries to add at most @p nPoly number of polyhedra to the inner
    * approximation representation of the current LCP. The set of added polyhedra
-   * (+1/-1 encoding) is appended to  @p Polys and returned. The only reason
+   * (+1/-1 encoding) is appended to  @p polyhedra and returned. The only reason
    * fewer polyhedra might be added is that the fewer polyhedra already
    * represent the feasible region of the LCP.
    * @p method is casted from Game::EPEC::EPECAddPolyMethod
    */
 
-  // We already have polyhedrain AllPolyhedra and polyhedra in
-  // knownInfeas, that are known to be infeasible.
+  // We already have polyhedra AllPolyhedra and in
+  // InfeasiblePoly, that are known to be infeasible.
   // Effective maximum of number of polyhedra that can be added
   // at most
-  const unsigned int nCompl = this->Compl.size();
+  const auto numCompl = this->Compl.size();
 
-  if (this->maxTheoreticalPoly <
-      nPoly) {                 // If you cannot add that many polyhedra
+  if (this->MaxTheoreticalPoly <
+      nPoly) {                 // If you cannot add that numVariablesY polyhedra
     BOOST_LOG_TRIVIAL(warning) // Then issue a warning
-        << "Warning in Game::polyLCP::randomPoly: "
+        << "Warning in Game::PolyLCP::randomPoly: "
         << "Cannot add " << nPoly << " polyhedra. Promising a maximum of "
-        << this->maxTheoreticalPoly;
-    nPoly = this->maxTheoreticalPoly; // and update maximum possibly addable
+        << this->MaxTheoreticalPoly;
+    nPoly = this->MaxTheoreticalPoly; // and update maximum possibly addable
   }
 
   if (nPoly == 0) // If nothing to be added, then nothing to be done
-    return Polys;
+    return polyhedra;
 
   if (nPoly < 0) // There is no way that this can happen!
   {
     BOOST_LOG_TRIVIAL(error) << "nPoly can't be negative, i.e., " << nPoly;
-    throw string(
-        "Error in Game::polyLCP::addAPoly: nPoly reached a negative value!");
+    throw("Error in Game::PolyLCP::addAPoly: nPoly reached a negative value!");
   }
 
   bool complete{false};
   while (!complete) {
-    unsigned long int choice_decimal = this->getNextPoly(method);
-    if (choice_decimal >= this->maxTheoreticalPoly)
-      return Polys;
+    auto choiceDecimal = this->getNextPoly(method);
+    if (choiceDecimal >= this->MaxTheoreticalPoly)
+      return polyhedra;
 
-    const std::vector<short int> choice = num_to_vec(choice_decimal, nCompl);
-    auto added = this->FixToPoly(choice, true);
+    const std::vector<short int> choice = numToVec(choiceDecimal, numCompl);
+    auto added = this->addPolyFromEncoding(choice, true);
     if (added) // If choice is added to All Polyhedra
     {
-      Polys.insert(choice); // Add it to set of added polyhedra
-      if (Polys.size() == nPoly) {
-        complete = true;
-        return Polys;
+      polyhedra.insert(choice); // Add it to set of added polyhedra
+      if (polyhedra.size() == nPoly) {
+        return polyhedra;
       }
     }
   }
-  return Polys;
+  return polyhedra;
 }
-bool Game::polyLCP::addThePoly(const unsigned long int &decimalEncoding) {
-  if (this->maxTheoreticalPoly < decimalEncoding) {
+bool Game::PolyLCP::addThePoly(const unsigned long int &decimalEncoding) {
+  if (this->MaxTheoreticalPoly < decimalEncoding) {
     // This polyhedron does not exist
     BOOST_LOG_TRIVIAL(warning)
-        << "Warning in Game::polyLCP::addThePoly: Cannot add "
+        << "Warning in Game::PolyLCP::addThePoly: Cannot add "
         << decimalEncoding << " polyhedra, since it does not exist!";
     return false;
   }
-  const unsigned int nCompl = this->Compl.size();
-  const std::vector<short int> choice = num_to_vec(decimalEncoding, nCompl);
-  return this->FixToPoly(choice, true);
+  const unsigned int numCompl = this->Compl.size();
+  const std::vector<short int> choice = numToVec(decimalEncoding, numCompl);
+  return this->addPolyFromEncoding(choice, true);
 }
 
-Game::polyLCP &Game::polyLCP::EnumerateAll(
+Game::PolyLCP &Game::PolyLCP::enumerateAll(
     const bool
-        solveLP ///< Should the poyhedra added be checked for feasibility?
+        solveLP ///< Should the polyhedra added be checked for feasibility?
     )
 /**
  * @brief Brute force computation of LCP feasible region
@@ -402,10 +406,10 @@ Game::polyLCP &Game::polyLCP::EnumerateAll(
  * Th ese are always added to LCP::Ai and LCP::bi
  */
 {
-  vector<short int> Fix = vector<short int>(nR, 0);
+  vector<short int> encoding = vector<short int>(nR, 0);
   this->Ai->clear();
   this->bi->clear();
-  this->FixToPolies(Fix, solveLP);
+  this->addPoliesFromEncoding(encoding, solveLP);
   if (this->Ai->empty()) {
     BOOST_LOG_TRIVIAL(warning)
         << "Empty vector of polyhedra given! Problem might be infeasible."
@@ -420,8 +424,8 @@ Game::polyLCP &Game::polyLCP::EnumerateAll(
   return *this;
 }
 
-void Game::polyLCP::makeQP(
-    Game::QP_objective
+void Game::PolyLCP::makeQP(
+    Game::QP_Objective
         &QP_obj, ///< The objective function of the QP to be returned. @warning
     ///< Size of this parameter might change!
     Game::QP_Param &QP ///< The output parameter where the final Game::QP_Param
@@ -431,110 +435,113 @@ void Game::polyLCP::makeQP(
   // Original sizes
   if (this->Ai->empty())
     return;
-  const unsigned int Nx_old{static_cast<unsigned int>(QP_obj.C.n_cols)};
+  const unsigned int oldNumVariablesX{
+      static_cast<unsigned int>(QP_obj.C.n_cols)};
 
-  Game::QP_constraints QP_cons;
-  this->feasiblePolyhedra = this->ConvexHull(QP_cons.B, QP_cons.b);
+  Game::QP_Constraints QP_cons;
+  this->FeasiblePolyhedra = this->convexHull(QP_cons.B, QP_cons.b);
   BOOST_LOG_TRIVIAL(trace) << "PolyLCP::makeQP: No. feasible polyhedra: "
-                           << this->feasiblePolyhedra;
+                           << this->FeasiblePolyhedra;
   // Updated size after convex hull has been computed.
-  const unsigned int Ncons{static_cast<unsigned int>(QP_cons.B.n_rows)};
-  const unsigned int Ny{static_cast<unsigned int>(QP_cons.B.n_cols)};
+  const unsigned int numConstraints{
+      static_cast<unsigned int>(QP_cons.B.n_rows)};
+  const unsigned int numVariablesY{static_cast<unsigned int>(QP_cons.B.n_cols)};
   // Resizing entities.
-  QP_cons.A.zeros(Ncons, Nx_old);
-  QP_obj.c = resize_patch(QP_obj.c, Ny, 1);
-  QP_obj.C = resize_patch(QP_obj.C, Ny, Nx_old);
-  QP_obj.Q = resize_patch(QP_obj.Q, Ny, Ny);
+  QP_cons.A.zeros(numConstraints, oldNumVariablesX);
+  QP_obj.c = resizePatch(QP_obj.c, numVariablesY, 1);
+  QP_obj.C = resizePatch(QP_obj.C, numVariablesY, oldNumVariablesX);
+  QP_obj.Q = resizePatch(QP_obj.Q, numVariablesY, numVariablesY);
   // Setting the QP_Param object
   QP.set(QP_obj, QP_cons);
 }
 
-std::string Game::polyLCP::feas_detail_str() const {
+std::string Game::PolyLCP::feasabilityDetailString() const {
   std::stringstream ss;
   ss << "\tProven feasible: ";
   for (auto vv : this->AllPolyhedra)
     ss << vv << ' ';
   // ss << "\tProven infeasible: ";
-  // for (auto vv : this->knownInfeas)
+  // for (auto vv : this->InfeasiblePoly)
   // ss << vv << ' ';
 
   return ss.str();
 }
 
-unsigned int Game::polyLCP::conv_Npoly() const {
+unsigned long Game::PolyLCP::convNumPoly() const {
   /**
-   * To be used in interaction with Game::LCP::ConvexHull.
+   * To be used in interaction with Game::LCP::convexHull.
    * Gives the number of polyhedra in the current inner approximation of the LCP
    * feasible region.
    */
   return this->AllPolyhedra.size();
 }
 
-unsigned int Game::polyLCP::conv_PolyPosition(const unsigned long int i) const {
+unsigned int Game::PolyLCP::convPolyPosition(const unsigned long int i) const {
   /**
    * For the convex hull of the LCP feasible region computed, a bunch of
    * variables are added for extended formulation and the added variables c
    */
-  const unsigned int nPoly = this->conv_Npoly();
+  const unsigned int nPoly = this->convNumPoly();
   if (i > nPoly) {
-    BOOST_LOG_TRIVIAL(error) << "Error in Game::polyLCP::conv_PolyPosition: "
+    BOOST_LOG_TRIVIAL(error) << "Error in Game::PolyLCP::convPolyPosition: "
                                 "Invalid argument. Out of bounds for i";
-    throw std::string("Error in Game::polyLCP::conv_PolyPosition: Invalid "
-                      "argument. Out of bounds for i");
+    throw("Error in Game::PolyLCP::convPolyPosition: Invalid "
+          "argument. Out of bounds for i");
   }
   const unsigned int nC = this->M.n_cols;
   return nC + i * nC;
 }
 
-unsigned int Game::polyLCP::conv_PolyWt(const unsigned long int i) const {
+unsigned int Game::PolyLCP::convPolyWeight(const unsigned long int i) const {
   /**
-   * To be used in interaction with Game::LCP::ConvexHull.
+   * To be used in interaction with Game::LCP::convexHull.
    * Gives the position of the variable, which assigns the convex weight to the
    * i-th polyhedron.
    *
    * However, if the inner approximation has exactly one polyhedron,
    * then returns 0.
    */
-  const unsigned int nPoly = this->conv_Npoly();
+  const unsigned int nPoly = this->convNumPoly();
   if (nPoly <= 1) {
     return 0;
   }
   if (i > nPoly) {
-    throw std::string("Error in Game::polyLCP::conv_PolyWt: "
-                      "Invalid argument. Out of bounds for i");
+    throw("Error in Game::PolyLCP::convPolyWeight: "
+          "Invalid argument. Out of bounds for i");
   }
   const unsigned int nC = this->M.n_cols;
 
   return nC + nPoly * nC + i;
 }
 
-bool Game::polyLCP::checkPolyFeas(
+bool Game::PolyLCP::checkPolyFeas(
     const unsigned long int
         &decimalEncoding ///< Decimal encoding for the polyhedron
 ) {
-  return this->checkPolyFeas(num_to_vec(decimalEncoding, this->Compl.size()));
+  return this->checkPolyFeas(numToVec(decimalEncoding, this->Compl.size()));
 }
 
-bool Game::polyLCP::checkPolyFeas(
-    const vector<short int> &Fix ///< A vector of +1 and -1 referring to which
-    ///< equations and variables are taking 0 value.)
+bool Game::PolyLCP::checkPolyFeas(
+    const vector<short int>
+        &encoding ///< A vector of +1 and -1 referring to which
+                  ///< equations and variables are taking 0 value.)
 ) {
 
-  unsigned long int FixNumber = vec_to_num(Fix);
+  unsigned long int encodingNumber = vecToNum(encoding);
 
-  if (knownInfeas.find(FixNumber) != knownInfeas.end()) {
+  if (InfeasiblePoly.find(encodingNumber) != InfeasiblePoly.end()) {
     BOOST_LOG_TRIVIAL(trace)
-        << "Game::polyLCP::checkPolyFeas: Previously known "
+        << "Game::PolyLCP::checkPolyFeas: Previously known "
            "infeasible polyhedron. "
-        << FixNumber;
+        << encodingNumber;
     return false;
   }
 
-  if (feasiblePoly.find(FixNumber) != feasiblePoly.end()) {
+  if (FeasiblePoly.find(encodingNumber) != FeasiblePoly.end()) {
     BOOST_LOG_TRIVIAL(trace)
-        << "Game::polyLCP::checkPolyFeas: Previously known "
+        << "Game::PolyLCP::checkPolyFeas: Previously known "
            "feasible polyhedron."
-        << FixNumber;
+        << encodingNumber;
     return true;
   }
 
@@ -542,13 +549,13 @@ bool Game::polyLCP::checkPolyFeas(
   try {
     makeRelaxed();
     GRBModel model(this->RlxdModel);
-    for (auto i : Fix) {
+    for (auto i : encoding) {
       if (i > 0)
         model.getVarByName("z_" + to_string(count)).set(GRB_DoubleAttr_UB, 0);
       if (i < 0)
         model
             .getVarByName("x_" + to_string(count >= this->LeadStart
-                                               ? count + nLeader
+                                               ? count + NumberLeader
                                                : count))
             .set(GRB_DoubleAttr_UB, 0);
       count++;
@@ -556,28 +563,28 @@ bool Game::polyLCP::checkPolyFeas(
     model.set(GRB_IntParam_OutputFlag, VERBOSE);
     model.optimize();
     if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL) {
-      feasiblePoly.insert(FixNumber);
+      FeasiblePoly.insert(encodingNumber);
       return true;
     } else {
       BOOST_LOG_TRIVIAL(trace)
-          << "Game::polyLCP::checkPolyFeas: Detected infeasibility of "
-          << FixNumber << " (GRB_STATUS=" << model.get(GRB_IntAttr_Status)
+          << "Game::PolyLCP::checkPolyFeas: Detected infeasibility of "
+          << encodingNumber << " (GRB_STATUS=" << model.get(GRB_IntAttr_Status)
           << ")";
-      knownInfeas.insert(FixNumber);
+      InfeasiblePoly.insert(encodingNumber);
       return false;
     }
   } catch (const char *e) {
-    cerr << "Error in Game::polyLCP::checkPolyFeas: " << e << '\n';
+    cerr << "Error in Game::PolyLCP::checkPolyFeas: " << e << '\n';
     throw;
   } catch (string e) {
-    cerr << "String: Error in Game::polyLCP::checkPolyFeas: " << e << '\n';
+    cerr << "String: Error in Game::PolyLCP::checkPolyFeas: " << e << '\n';
     throw;
   } catch (exception &e) {
-    cerr << "Exception: Error in Game::polyLCP::checkPolyFeas: " << e.what()
+    cerr << "Exception: Error in Game::PolyLCP::checkPolyFeas: " << e.what()
          << '\n';
     throw;
   } catch (GRBException &e) {
-    cerr << "GRBException: Error in Game::polyLCP::checkPolyFeas: "
+    cerr << "GRBException: Error in Game::PolyLCP::checkPolyFeas: "
          << e.getErrorCode() << ": " << e.getMessage() << '\n';
     throw;
   }

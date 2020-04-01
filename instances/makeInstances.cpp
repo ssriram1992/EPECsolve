@@ -25,7 +25,7 @@ GRBEnv env = GRBEnv();
 
 std::default_random_engine give;
 std::uniform_int_distribution<int> binaryRandom(0, 1);
-std::uniform_int_distribution<int> intRandom(0, 1e5);
+std::uniform_int_distribution<int> intRandom(0, static_cast<int>(1e5));
 
 /*
 Models::FollPar operator+(Models::FollPar a, Models::FollPar b) {
@@ -61,7 +61,7 @@ Models::FollPar makeFollPar(int costParam = 0, int polluting = 0,
 
   FP_temp.capacities = {capacities[capac]};
 
-  int r;
+  int r = 0;
 
   switch (polluting) {
   case 0: // Solar type
@@ -88,6 +88,10 @@ Models::FollPar makeFollPar(int costParam = 0, int polluting = 0,
     FP_temp.names = {"C" + to_string(C.size())};
     C.push_back(FP_temp);
     break;
+  default: {
+    std::cerr << "Error in makeFollPar: unknown polluting id: " << polluting;
+    throw;
+  }
   };
   return FP_temp;
 }
@@ -116,7 +120,6 @@ Models::LeadAllPar makeLeader(bool cc, bool gg, bool ss, int cC = 5, int gC = 5,
     (madeFirst ? Ftemp : F) = makeFollPar(costParam, 0, sC);
     if (madeFirst)
       F = F + Ftemp;
-    madeFirst = true;
   }
 
   double a = demand_a[intRandom(give) % demand_a.size()];
@@ -195,7 +198,7 @@ bool MakeInstance(int nCountries = 2) {
   Models::EPEC epec(&env);
   epec.setNumThreads(NUM_THREADS);
   epec.setTimeLimit(HARD_THRESHOLD);
-  epec.setAlgorithm(Game::EPECalgorithm::fullEnumeration);
+  epec.setAlgorithm(Game::EPECalgorithm::FullEnumeration);
   for (unsigned int j = 0; j < Inst.Countries.size(); ++j)
     epec.addCountry(Inst.Countries.at(j));
   epec.addTranspCosts(Inst.TransportationCosts);
@@ -210,7 +213,7 @@ bool MakeInstance(int nCountries = 2) {
     ;
   }
   Game::EPECStatistics stat = epec.getStatistics();
-  if (stat.status == Game::EPECsolveStatus::timeLimit) {
+  if (stat.Status == Game::EPECsolveStatus::TimeLimit) {
     Inst.save("dat/Instances_H/Instance_HS_" + to_string(count++));
     return true;
   }

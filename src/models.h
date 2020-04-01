@@ -11,6 +11,7 @@
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
+#include <utility>
 
 namespace Models {
 typedef struct FollPar FollPar;
@@ -22,6 +23,7 @@ enum class TaxType { StandardTax, SingleTax, CarbonTax };
 
 /// @brief Stores the parameters of the follower in a country model
 struct FollPar {
+
   std::vector<double> costs_quad =
       {}; ///< Quadratic coefficient of i-th follower's cost. Size of this
           ///< std::vector should be equal to n_followers
@@ -45,6 +47,30 @@ struct FollPar {
       : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
         emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
 };
+FollPar operator+(const Models::FollPar &F1, const Models::FollPar &F2) {
+  std::vector<double> cq, cl, cap, ec, tc;
+  std::vector<std::string> nm;
+
+  cq.insert(cq.end(), F1.costs_quad.begin(), F1.costs_quad.end());
+  cq.insert(cq.end(), F2.costs_quad.begin(), F2.costs_quad.end());
+
+  cl.insert(cl.end(), F1.costs_lin.begin(), F1.costs_lin.end());
+  cl.insert(cl.end(), F2.costs_lin.begin(), F2.costs_lin.end());
+
+  cap.insert(cap.end(), F1.capacities.begin(), F1.capacities.end());
+  cap.insert(cap.end(), F2.capacities.begin(), F2.capacities.end());
+
+  ec.insert(ec.end(), F1.emission_costs.begin(), F1.emission_costs.end());
+  ec.insert(ec.end(), F2.emission_costs.begin(), F2.emission_costs.end());
+
+  tc.insert(tc.end(), F1.tax_caps.begin(), F1.tax_caps.end());
+  tc.insert(tc.end(), F2.tax_caps.begin(), F2.tax_caps.end());
+
+  nm.insert(nm.end(), F1.names.begin(), F1.names.end());
+  nm.insert(nm.end(), F2.names.begin(), F2.names.end());
+
+  return Models::FollPar(cq, cl, cap, ec, tc, nm);
+}
 
 /// @brief Stores the parameters of the demand curve in a country model
 struct DemPar {
@@ -103,8 +129,8 @@ struct LeadAllPar {
   Models::LeadPar LeaderParam = {};   ///< A struct to hold Leader Parameters
   LeadAllPar(unsigned int n_foll, std::string name, Models::FollPar FP = {},
              Models::DemPar DP = {}, Models::LeadPar LP = {})
-      : n_followers{n_foll}, name{name}, FollowerParam{FP}, DemandParam{DP},
-        LeaderParam{LP} {
+      : n_followers{n_foll}, name{std::move(name)}, FollowerParam{FP},
+        DemandParam{DP}, LeaderParam{LP} {
     // Nothing here
   }
 };
@@ -114,17 +140,17 @@ struct EPECInstance {
   std::vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
   arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
 
-  EPECInstance(std::string filename) {
+  explicit EPECInstance(std::string &filename) {
     this->load(filename);
   } ///< Constructor from instance file
   EPECInstance(std::vector<Models::LeadAllPar> Countries_, arma::sp_mat Transp_)
       : Countries{Countries_}, TransportationCosts{Transp_} {}
   ///< Constructor from instance objects
 
-  void load(std::string filename);
+  void load(std::string &filename);
   ///< Reads the EPECInstance from a file
 
-  void save(std::string filename);
+  void save(std::string &filename);
   ///< Writes the EPECInstance from a file
 };
 
@@ -167,10 +193,11 @@ LeaderVars operator+(Models::LeaderVars a, int b);
 class EPEC : public Game::EPEC {
   // Mandatory virtuals
 private:
-  void make_obj_leader(const unsigned int i, Game::QP_objective &QP_obj) final;
-  virtual void updateLocs() override;
-  virtual void prefinalize() override;
-  virtual void postfinalize() override{};
+  void makeObjectivePlayer(const unsigned int i,
+                           Game::QP_Objective &QP_obj) final;
+  void updateLocations() override;
+  void preFinalize() override;
+  void postFinalize() override{};
   // override;
 
 public:
@@ -194,14 +221,11 @@ private:
       LeadConses{};                   ///< Stores each leader's constraint LHS
   std::vector<arma::vec> LeadRHSes{}; ///< Stores each leader's constraint RHS
 
-  bool dataCheck(const bool chkAllLeadPars = true,
-                 const bool chkcountriesLL = true, const bool chkMC_QP = true,
-                 const bool chkLeadConses = true,
-                 const bool chkLeadRHSes = true,
-                 const bool chknImportMarkets = true,
-                 const bool chkLocations = true,
-                 const bool chkLeaderLocations = true,
-                 const bool chkLeadObjec = true) const;
+  bool dataCheck(bool chkAllLeadPars = true, bool chkcountriesLL = true,
+                 bool chkMC_QP = true, bool chkLeadConses = true,
+                 bool chkLeadRHSes = true, bool chknImportMarkets = true,
+                 bool chkLocations = true, bool chkLeaderLocations = true,
+                 bool chkLeadObjec = true) const;
 
   // Super low level
   /// Checks that the parameter given to add a country is valid. Does not have
@@ -210,7 +234,7 @@ private:
 
   /// Makes the lower level quadratic program object for each follower.
   void make_LL_QP(const LeadAllPar &Params, const unsigned int follower,
-                  Game::QP_Param *Foll, const LeadLocs &Loc) const noexcept;
+                  Game::QP_Param *Foll, const LeadLocs &Loc) noexcept;
 
   /// Makes the leader constraint matrix and RHS
   void make_LL_LeadCons(arma::sp_mat &LeadCons, arma::vec &LeadRHS,
@@ -225,19 +249,19 @@ private:
 
   void make_MC_leader(const unsigned int i);
 
-  void make_MC_cons(arma::sp_mat &MCLHS, arma::vec &MCRHS) const override;
+  void makeMCConstraints(arma::sp_mat &MCLHS, arma::vec &MCRHS) const override;
 
-  void WriteCountry(const unsigned int i, const std::string filename,
+  void WriteCountry(const unsigned int i, const std::string &filename,
                     const arma::vec x, const bool append = true) const;
 
   void WriteFollower(const unsigned int i, const unsigned int j,
-                     const std::string filename, const arma::vec x) const;
+                     const std::string &filename, const arma::vec x) const;
 
 public:                        // Attributes
   bool quadraticTax = {false}; ///< If set to true, a term for the quadratic tax
                                ///< is added to each leader objective
 
-  // double timeLimit = {-1}; ///< Controls the timeLimit (s) for findNashEq
+  // double TimeLimit = {-1}; ///< Controls the TimeLimit (s) for findNashEq
 
   EPEC() = delete;
 
@@ -262,7 +286,7 @@ public:                        // Attributes
               const LeaderVars var = LeaderVars::FollowerStart) const;
 
   unsigned int
-  getPosition(const std::string countryCount,
+  getPosition(const std::string &countryCount,
               const LeaderVars var = LeaderVars::FollowerStart) const;
 
   EPEC &unlock();
@@ -272,27 +296,26 @@ public:                        // Attributes
   // Data access methods
   Game::NashGame *get_LowerLevelNash(const unsigned int i) const;
 
-  Game::LCP *playCountry(std::vector<Game::LCP *> countries);
-
   // Writing model files
-  void write(const std::string filename, const unsigned int i,
+  void write(const std::string &filename, const unsigned int i,
              bool append = true) const;
 
-  void write(const std::string filename, bool append = true) const;
+  void write(const std::string &filename, bool append = true) const;
 
-  void readSolutionJSON(const std::string filename);
+  void readSolutionJSON(const std::string &filename);
 
-  void writeSolutionJSON(std::string filename, const arma::vec x,
+  void writeSolutionJSON(std::string &filename, const arma::vec x,
                          const arma::vec z) const;
 
-  void writeSolution(const int writeLevel, std::string filename) const;
+  void writeSolution(const int writeLevel, std::string &filename) const;
 
   ///@brief Get the current EPECInstance loaded
   const EPECInstance getInstance() const {
     return EPECInstance(this->AllLeadPars, this->TranspCosts);
   }
 };
-
+enum class prn { label, val };
+std::ostream &operator<<(std::ostream &ost, Models::prn l);
 } // namespace Models
 
 // Gurobi functions
@@ -300,12 +323,4 @@ std::string to_string(const GRBVar &var);
 
 std::string to_string(const GRBConstr &cons, const GRBModel &model);
 
-// ostream functions
-namespace Models {
-enum class prn { label, val };
-
-std::ostream &operator<<(std::ostream &ost, Models::prn l);
-} // namespace Models
-
-Models::FollPar operator+(const Models::FollPar &F1, const Models::FollPar &F2);
 /* Examples */

@@ -1,5 +1,5 @@
-#include "innerApproximation.h"
-#include "combinatorialPNE.h"
+#include "innerapproximation.h"
+#include "combinatorialpne.h"
 #include "epecsolve.h"
 
 #include <armadillo>
@@ -10,21 +10,21 @@
 #include <string>
 
 using namespace std;
-void Algorithms::innerApproximation::solve() {
+void Algorithms::InnerApproximation::solve() {
   /**
-   * Wraps the algorithm with the postSolving operations
+   * Wraps the Algorithm with the postSolving operations
    */
   this->start();
   this->postSolving();
 }
 
-void Algorithms::innerApproximation::start() {
+void Algorithms::InnerApproximation::start() {
   /**
    * Given the referenced EPEC instance, this method solves it through the inner
-   * approximation algorithm.
+   * approximation Algorithm.
    */
   // Set the initial point for all countries as 0 and solve the respective LCPs?
-  this->EPECObject->sol_x.zeros(this->EPECObject->nVarinEPEC);
+  this->EPECObject->SolutionX.zeros(this->EPECObject->NumVariables);
   bool solved = {false};
   bool addRandPoly{false};
   bool infeasCheck{false};
@@ -34,157 +34,155 @@ void Algorithms::innerApproximation::start() {
   //
   bool incrementalEnumeration{false};
 
-  std::vector<arma::vec> prevDevns(this->EPECObject->nCountr);
-  this->EPECObject->Stats.numIteration = 0;
-  if (this->EPECObject->Stats.AlgorithmParam.addPolyMethod ==
-      EPECAddPolyMethod::random) {
-    for (unsigned int i = 0; i < this->EPECObject->nCountr; ++i) {
+  std::vector<arma::vec> prevDevns(this->EPECObject->NumPlayers);
+  this->EPECObject->Stats.NumIterations = 0;
+  if (this->EPECObject->Stats.AlgorithmParam.AddPolyMethod ==
+      EPECAddPolyMethod::Random) {
+    for (unsigned int i = 0; i < this->EPECObject->NumPlayers; ++i) {
       // 42 is the answer, we all know
       long int seed =
-          this->EPECObject->Stats.AlgorithmParam.addPolyMethodSeed < 0
+          this->EPECObject->Stats.AlgorithmParam.AddPolyMethodSeed < 0
               ? chrono::high_resolution_clock::now()
                         .time_since_epoch()
                         .count() +
-                    42 + poly_LCP.at(i)->getNrow()
-              : this->EPECObject->Stats.AlgorithmParam.addPolyMethodSeed;
-      poly_LCP.at(i)->addPolyMethodSeed = seed;
+                    42 + PolyLCP.at(i)->getNumRows()
+              : this->EPECObject->Stats.AlgorithmParam.AddPolyMethodSeed;
+      PolyLCP.at(i)->AddPolyMethodSeed = seed;
     }
   }
-  if (this->EPECObject->Stats.AlgorithmParam.timeLimit > 0)
-    this->EPECObject->initTime = std::chrono::high_resolution_clock::now();
+  if (this->EPECObject->Stats.AlgorithmParam.TimeLimit > 0)
+    this->EPECObject->InitTime = std::chrono::high_resolution_clock::now();
 
   // Stay in this loop, till you find a Nash equilibrium or prove that there
   // does not exist a Nash equilibrium or you run out of time.
   while (!solved) {
-    ++this->EPECObject->Stats.numIteration;
+    ++this->EPECObject->Stats.NumIterations;
     BOOST_LOG_TRIVIAL(info)
-        << "Algorithms::innerApproximation::solve: Iteration "
-        << to_string(this->EPECObject->Stats.numIteration);
+        << "Algorithms::InnerApproximation::solve: Iteration "
+        << to_string(this->EPECObject->Stats.NumIterations);
 
     if (addRandPoly) {
-      BOOST_LOG_TRIVIAL(info) << "Algorithms::innerApproximation::solve: using "
+      BOOST_LOG_TRIVIAL(info) << "Algorithms::InnerApproximation::solve: using "
                                  "heuristical polyhedra selection";
       bool success = this->addRandomPoly2All(
-          this->EPECObject->Stats.AlgorithmParam.aggressiveness,
-          this->EPECObject->Stats.numIteration == 1);
+          this->EPECObject->Stats.AlgorithmParam.Aggressiveness,
+          this->EPECObject->Stats.NumIterations == 1);
       if (!success) {
-        this->EPECObject->Stats.status = Game::EPECsolveStatus::nashEqNotFound;
-        solved = true;
+        this->EPECObject->Stats.Status = Game::EPECsolveStatus::NashEqNotFound;
         return;
       }
     } else { // else we are in the case of finding deviations.
       unsigned int deviatedCountry{0};
       arma::vec countryDeviation{};
       if (this->EPECObject->isSolved(&deviatedCountry, &countryDeviation)) {
-        this->EPECObject->Stats.status = Game::EPECsolveStatus::nashEqFound;
-        this->EPECObject->Stats.pureNE = this->EPECObject->isPureStrategy();
-        if ((this->EPECObject->Stats.AlgorithmParam.pureNE &&
-             !this->EPECObject->Stats.pureNE)) {
+        this->EPECObject->Stats.Status = Game::EPECsolveStatus::NashEqFound;
+        this->EPECObject->Stats.PureNashEquilibrium =
+            this->EPECObject->isPureStrategy();
+        if ((this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium &&
+             !this->EPECObject->Stats.PureNashEquilibrium)) {
           // We are seeking for a pure strategy. Then, here we switch between an
           // incremental
           // enumeration or combinations of pure strategies.
-          if (this->EPECObject->Stats.AlgorithmParam.recoverStrategy ==
-              Game::EPECRecoverStrategy::incrementalEnumeration) {
-            BOOST_LOG_TRIVIAL(info) << "Algorithms::innerApproximation::solve: "
+          if (this->EPECObject->Stats.AlgorithmParam.RecoverStrategy ==
+              Game::EPECRecoverStrategy::IncrementalEnumeration) {
+            BOOST_LOG_TRIVIAL(info) << "Algorithms::InnerApproximation::solve: "
                                        "triggering recover strategy "
-                                       "(incrementalEnumeration)";
+                                       "(IncrementalEnumeration)";
             incrementalEnumeration = true;
-          } else if (this->EPECObject->Stats.AlgorithmParam.recoverStrategy ==
-                     Game::EPECRecoverStrategy::combinatorial) {
+          } else if (this->EPECObject->Stats.AlgorithmParam.RecoverStrategy ==
+                     Game::EPECRecoverStrategy::Combinatorial) {
             BOOST_LOG_TRIVIAL(info)
-                << "Algorithms::innerApproximation::solve: triggering "
-                   "recover strategy (combinatorial)";
+                << "Algorithms::InnerApproximation::solve: triggering "
+                   "recover strategy (Combinatorial)";
             // In this case, we want to try all the combinations of pure
             // strategies, except the ones between polyhedra we already tested.
             std::vector<std::set<unsigned long int>> excludeList;
-            for (int j = 0; j < this->EPECObject->nCountr; ++j) {
-              excludeList.push_back(poly_LCP.at(j)->getAllPolyhedra());
+            for (unsigned long j = 0; j < this->EPECObject->NumPlayers; ++j) {
+              excludeList.push_back(PolyLCP.at(j)->getAllPolyhedra());
             }
-            Algorithms::combinatorialPNE combPNE(this->env, this->EPECObject);
-            combPNE.solve(excludeList);
+            Algorithms::CombinatorialPNE combPNE(this->Env, this->EPECObject);
+            combPNE.solveWithExcluded(excludeList);
             return;
           }
 
-        } else {
-          solved = true;
+        } else
           return;
-        }
       }
       // Vector of deviations for the countries
       std::vector<arma::vec> devns =
-          std::vector<arma::vec>(this->EPECObject->nCountr);
-      this->getAllDevns(devns, this->EPECObject->sol_x, prevDevns);
+          std::vector<arma::vec>(this->EPECObject->NumPlayers);
+      this->getAllDeviations(devns, this->EPECObject->SolutionX, prevDevns);
       prevDevns = devns;
       unsigned int addedPoly = this->addDeviatedPolyhedron(devns, infeasCheck);
-      if (addedPoly == 0 && this->EPECObject->Stats.numIteration > 1 &&
+      if (addedPoly == 0 && this->EPECObject->Stats.NumIterations > 1 &&
           !incrementalEnumeration) {
         BOOST_LOG_TRIVIAL(error)
-            << " In Algorithms::innerApproximation::solve: Not "
+            << " In Algorithms::InnerApproximation::solve: Not "
                "Solved, but no deviation? Error!\n This might be due to "
-               "numerical issues (tollerances)";
-        this->EPECObject->Stats.status = EPECsolveStatus::numerical;
+               "Numerical issues (tolerances)";
+        this->EPECObject->Stats.Status = EPECsolveStatus::Numerical;
         solved = true;
       }
-      if (infeasCheck && this->EPECObject->Stats.numIteration == 1) {
+      if (infeasCheck && this->EPECObject->Stats.NumIterations == 1) {
         BOOST_LOG_TRIVIAL(warning)
-            << " In Algorithms::innerApproximation::solve: Problem is "
+            << " In Algorithms::InnerApproximation::solve: Problem is "
                "infeasible";
-        this->EPECObject->Stats.status = EPECsolveStatus::nashEqNotFound;
-        solved = true;
+        this->EPECObject->Stats.Status = EPECsolveStatus::NashEqNotFound;
         return;
       }
     }
 
-    this->EPECObject->make_country_QP();
+    this->EPECObject->makePlayersQPs();
 
     // TimeLimit
-    if (this->EPECObject->Stats.AlgorithmParam.timeLimit > 0) {
+    if (this->EPECObject->Stats.AlgorithmParam.TimeLimit > 0) {
       const std::chrono::duration<double> timeElapsed =
           std::chrono::high_resolution_clock::now() -
-          this->EPECObject->initTime;
+          this->EPECObject->InitTime;
       const double timeRemaining =
-          this->EPECObject->Stats.AlgorithmParam.timeLimit -
+          this->EPECObject->Stats.AlgorithmParam.TimeLimit -
           timeElapsed.count();
       addRandPoly =
           !this->EPECObject->computeNashEq(
-              this->EPECObject->Stats.AlgorithmParam.pureNE, timeRemaining) &&
+              this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium,
+              timeRemaining) &&
           !incrementalEnumeration;
     } else {
       // No Time Limit
-      addRandPoly = !this->EPECObject->computeNashEq(
-                        this->EPECObject->Stats.AlgorithmParam.pureNE) &&
-                    !incrementalEnumeration;
+      addRandPoly =
+          !this->EPECObject->computeNashEq(
+              this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium) &&
+          !incrementalEnumeration;
     }
     if (addRandPoly)
-      this->EPECObject->Stats.lostIntermediateEq++;
-    for (unsigned int i = 0; i < this->EPECObject->nCountr; ++i) {
+      this->EPECObject->Stats.LostIntermediateEq++;
+    for (unsigned int i = 0; i < this->EPECObject->NumPlayers; ++i) {
       BOOST_LOG_TRIVIAL(info)
-          << "Country " << i << poly_LCP.at(i)->feas_detail_str();
+          << "Country " << i << PolyLCP.at(i)->feasabilityDetailString();
     }
     // This might be reached when a NashEq is found, and need to be verified.
-    // Anyway, we are over the timeLimit and we should stop
-    if (this->EPECObject->Stats.AlgorithmParam.timeLimit > 0) {
+    // Anyway, we are over the TimeLimit and we should stop
+    if (this->EPECObject->Stats.AlgorithmParam.TimeLimit > 0) {
       const std::chrono::duration<double> timeElapsed =
           std::chrono::high_resolution_clock::now() -
-          this->EPECObject->initTime;
+          this->EPECObject->InitTime;
       const double timeRemaining =
-          this->EPECObject->Stats.AlgorithmParam.timeLimit -
+          this->EPECObject->Stats.AlgorithmParam.TimeLimit -
           timeElapsed.count();
       if (timeRemaining <= 0) {
-        solved = false;
         if (!incrementalEnumeration)
-          this->EPECObject->Stats.status = Game::EPECsolveStatus::timeLimit;
+          this->EPECObject->Stats.Status = Game::EPECsolveStatus::TimeLimit;
         return;
       }
     }
   }
 }
 
-bool Algorithms::innerApproximation::addRandomPoly2All(
+bool Algorithms::InnerApproximation::addRandomPoly2All(
     unsigned int aggressiveLevel, bool stopOnSingleInfeasibility)
 /**
  * Makes a call to to Game::LCP::addAPoly for each member in
- * Game::EPEC::countries_LCP and tries to add a polyhedron to get a better inner
+ * Game::EPEC::PlayersLCP and tries to add a polyhedron to get a better inner
  * approximation for the LCP. @p aggressiveLevel is the maximum number of
  * polyhedra it will try to add to each country. Setting it to an arbitrarily
  * high value will mimic complete enumeration.
@@ -198,14 +196,14 @@ bool Algorithms::innerApproximation::addRandomPoly2All(
  * not greater than aggressiveLevel.
  */
 {
-  BOOST_LOG_TRIVIAL(trace) << "Adding random polyhedra to countries";
+  BOOST_LOG_TRIVIAL(trace) << "Adding Random polyhedra to countries";
   bool infeasible{true};
-  for (unsigned int i = 0; i < this->EPECObject->nCountr; i++) {
-    auto addedPolySet = poly_LCP.at(i)->addAPoly(
-        aggressiveLevel, this->EPECObject->Stats.AlgorithmParam.addPolyMethod);
+  for (unsigned int i = 0; i < this->EPECObject->NumPlayers; i++) {
+    auto addedPolySet = PolyLCP.at(i)->addAPoly(
+        aggressiveLevel, this->EPECObject->Stats.AlgorithmParam.AddPolyMethod);
     if (stopOnSingleInfeasibility && addedPolySet.empty()) {
       BOOST_LOG_TRIVIAL(info)
-          << "Algorithms::innerApproximation::addRandomPoly2All: No Nash "
+          << "Algorithms::InnerApproximation::addRandomPoly2All: No Nash "
              "equilibrium. due to "
              "infeasibility of country "
           << i;
@@ -217,12 +215,12 @@ bool Algorithms::innerApproximation::addRandomPoly2All(
   return !infeasible;
 }
 
-bool Algorithms::innerApproximation::getAllDevns(
+bool Algorithms::InnerApproximation::getAllDeviations(
     std::vector<arma::vec>
-        &devns, ///< [out] The vector of deviations for all players
+        &deviations, ///< [out] The vector of deviations for all players
     const arma::vec &guessSol, ///< [in] The guess for the solution vector
     const std::vector<arma::vec>
-        &prevDev //<[in] The previous vecrtor of deviations, if any exist.
+        &prevDev //<[in] The previous vector of deviations, if any exist.
 ) const
 /**
  * @brief Given a potential solution vector, returns a profitable deviation (if
@@ -232,23 +230,24 @@ bool Algorithms::innerApproximation::getAllDevns(
  * @param prevDev can be empty
  */
 {
-  devns = std::vector<arma::vec>(this->EPECObject->nCountr);
+  deviations = std::vector<arma::vec>(this->EPECObject->NumPlayers);
 
-  for (unsigned int i = 0; i < this->EPECObject->nCountr;
+  for (unsigned int i = 0; i < this->EPECObject->NumPlayers;
        ++i) { // For each country
     // If we cannot compute a deviation, it means model is infeasible!
-    if (this->EPECObject->RespondSol(devns.at(i), i, guessSol, prevDev.at(i)) ==
-        GRB_INFINITY)
+    if (this->EPECObject->respondSol(deviations.at(i), i, guessSol,
+                                     prevDev.at(i)) == GRB_INFINITY)
       return false;
-    // cout << "Game::EPEC::getAllDevns: devns(i): " <<devns.at(i);
+    // cout << "Game::EPEC::getAllDeviations: deviations(i): "
+    // <<deviations.at(i);
   }
   return true;
 }
 
-unsigned int Algorithms::innerApproximation::addDeviatedPolyhedron(
+unsigned int Algorithms::InnerApproximation::addDeviatedPolyhedron(
     const std::vector<arma::vec>
-        &devns, ///< devns.at(i) is a profitable deviation
-    ///< for the i-th country from the current this->sol_x
+        &deviations, ///< devns.at(i) is a profitable deviation
+    ///< for the i-th country from the current this->SolutionX
     bool &infeasCheck ///< Useful for the first iteration of iterativeNash. If
                       ///< true, at least one player has no polyhedron that can
                       ///< be added. In the first iteration, this translates to
@@ -257,7 +256,7 @@ unsigned int Algorithms::innerApproximation::addDeviatedPolyhedron(
   /**
    * Given a profitable deviation for each country, adds <i>a</i> polyhedron in
    * the feasible region of each country to the corresponding country's
-   * Game::LCP object (this->countries_LCP.at(i)) 's vector of feasible
+   * Game::LCP object (this->PlayersLCP.at(i)) 's vector of feasible
    * polyhedra.
    *
    * Naturally, this makes the inner approximation of the Game::LCP better, by
@@ -266,21 +265,21 @@ unsigned int Algorithms::innerApproximation::addDeviatedPolyhedron(
 
   infeasCheck = false;
   unsigned int added = 0;
-  for (unsigned int i = 0; i < this->EPECObject->nCountr;
+  for (unsigned int i = 0; i < this->EPECObject->NumPlayers;
        ++i) { // For each country
     bool ret = false;
-    if (!devns.at(i).empty())
-      poly_LCP.at(i)->addPolyFromX(devns.at(i), ret);
+    if (!deviations.at(i).empty())
+      PolyLCP.at(i)->addPolyFromX(deviations.at(i), ret);
     if (ret) {
       BOOST_LOG_TRIVIAL(trace)
-          << "Algorithms::innerApproximation::addDeviatedPolyhedron: added "
+          << "Algorithms::InnerApproximation::addDeviatedPolyhedron: added "
              "polyhedron for player "
           << i;
       ++added;
     } else {
       infeasCheck = true;
       BOOST_LOG_TRIVIAL(trace)
-          << "Algorithms::innerApproximation::addDeviatedPolyhedron: NO "
+          << "Algorithms::InnerApproximation::addDeviatedPolyhedron: NO "
              "polyhedron added for player "
           << i;
     }

@@ -19,8 +19,6 @@ set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi900\\win64")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-############################################
-
 
 ############################################
 ################ DO NOT MODIFY #############
@@ -43,7 +41,7 @@ if (NOT GUROBI_FOUND)
 
     set(SEARCH_PATHS_FOR_LIBRARIES
         "$ENV{GUROBI_HOME}/lib"
-		"/opt/gurobi900/linux64/lib"
+        "/opt/gurobi900/linux64/lib"
         "${GUROBI_PATH_MAC}/lib"
         "${GUROBI_PATH_LINUX}/lib"
         "${GUROBI_PATH_WINDOWS}/lib"
@@ -70,7 +68,7 @@ if (NOT GUROBI_FOUND)
                  )
 
     # setup header file directories
-    set(GUROBI_INCLUDE_DIRS  ${GUROBI_INCLUDE_DIR})
+    set(GUROBI_INCLUDE_DIRS ${GUROBI_INCLUDE_DIR})
 
     # setup libraries files
     set(GUROBI_LIBRARIES ${GUROBI_C_LIBRARY}
@@ -82,7 +80,7 @@ include(FindPackageHandleStandardArgs)
 SET(Boost_USE_STATIC_LIBS ON)
 if (ROSSOBIANCO)
     find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options unit_test_framework log log_setup)
-else()
+else ()
     find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options unit_test_framework log log_setup)
 endif ()
 find_package_handle_standard_args(GUROBI DEFAULT_MSG GUROBI_INCLUDE_DIRS)
@@ -93,126 +91,51 @@ include_directories(${BOOST_ROOT}/include)
 include_directories(${ARMA_PATH}/include)
 include_directories("src")
 include_directories("include")
+add_library(EPECSolve SHARED
+            src/epecsolve.h
+            src/Games.cpp
+            src/games.h
+            src/LCP/LCP.cpp
+            src/LCP/lcp.h
+            src/LCP/PolyLCP.cpp
+            src/LCP/polylcp.h
+            src/utils.h
+            src/Utils.cpp
+            src/models.h
+            src/Models.cpp
+            src/algorithms/algorithms.h
+            src/algorithms/InnerApproximation.cpp
+            src/algorithms/innerapproximation.h
+            src/algorithms/CombinatorialPNE.cpp
+            src/algorithms/combinatorialpne.h
+            src/algorithms/FullEnumeration.cpp
+            src/algorithms/fullenumeration.h
+            src/algorithms/OuterApproximation.cpp
+            src/algorithms/outerapproximation.h
+            src/LCP/OuterLCP.cpp
+            src/LCP/outerlcp.h)
+target_include_directories(EPECSolve PRIVATE src)
+
 add_executable(EPEC
-               src/EPEC.cpp
-               src/epecsolve.h
-               src/Games.cpp
-               src/games.h
-               src/LCP/LCP.cpp
-               src/LCP/LCP.h
-               src/LCP/PolyLCP.cpp
-               src/LCP/PolyLCP.h
-               src/utils.h
-               src/Utils.cpp
-               src/Models.cpp
-               src/models.h
-               src/algorithms/algorithms.h
-               src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h
-               src/algorithms/combinatorialPNE.cpp
-               src/algorithms/combinatorialPNE.h
-               src/algorithms/fullEnumeration.cpp
-               src/algorithms/fullEnumeration.h
-               src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h
-               )
+               src/CommandLineInterface.cpp)
 add_executable(EPECInstances
-               instances/makeInstances.cpp
-               src/epecsolve.h
-               src/Games.cpp
-               src/games.h
-               src/LCP/LCP.cpp
-               src/LCP/LCP.h
-               src/LCP/PolyLCP.cpp
-               src/LCP/PolyLCP.h
-               src/utils.h
-               src/Utils.cpp
-               src/Models.cpp
-               src/models.h
-               src/algorithms/algorithms.h
-               src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h
-               src/algorithms/combinatorialPNE.cpp
-               src/algorithms/combinatorialPNE.h
-               src/algorithms/fullEnumeration.cpp
-               src/algorithms/fullEnumeration.h
-               src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h)
+               instances/makeInstances.cpp)
 add_executable(EPECChileArgentina
-               instances/ChileArgentina.cpp
-               src/epecsolve.h
-               src/Games.cpp
-               src/games.h
-               src/LCP/LCP.cpp
-               src/LCP/LCP.h
-               src/LCP/PolyLCP.cpp
-               src/LCP/PolyLCP.h
-               src/utils.h
-               src/Utils.cpp
-               src/Models.cpp
-               src/models.h
-               src/algorithms/algorithms.h
-               src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h
-               src/algorithms/combinatorialPNE.cpp
-               src/algorithms/combinatorialPNE.h
-               src/algorithms/fullEnumeration.cpp
-               src/algorithms/fullEnumeration.h
-               src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h)
+               instances/ChileArgentina.cpp)
 add_executable(EPECExample
-               examples/example.cpp
-               src/epecsolve.h
-               src/Games.cpp
-               src/games.h
-               src/LCP/LCP.cpp
-               src/LCP/LCP.h
-               src/LCP/PolyLCP.cpp
-               src/LCP/PolyLCP.h
-               src/utils.h
-               src/Utils.cpp
-               src/Models.cpp
-               src/models.h
-               src/algorithms/algorithms.h
-               src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h
-               src/algorithms/combinatorialPNE.cpp
-               src/algorithms/combinatorialPNE.h
-               src/algorithms/fullEnumeration.cpp
-               src/algorithms/fullEnumeration.h
-               src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h)
+               examples/example.cpp)
 add_executable(EPECtest
-               src/Games.cpp
-               src/games.h
-               src/LCP/LCP.cpp
-               src/LCP/LCP.h
-               src/LCP/PolyLCP.cpp
-               src/LCP/PolyLCP.h
-               src/utils.h
-               src/Utils.cpp
-               src/Models.cpp
-               src/models.h
-               test/EPEC.cpp
-               src/algorithms/algorithms.h
-               src/algorithms/innerApproximation.cpp
-               src/algorithms/innerApproximation.h
-               src/algorithms/combinatorialPNE.cpp
-               src/algorithms/combinatorialPNE.h
-               src/algorithms/fullEnumeration.cpp
-               src/algorithms/fullEnumeration.h
-               src/algorithms/outerApproximation.cpp
-               src/algorithms/outerApproximation.h)
-target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECExample Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPEC Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECtest Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+               test/EPEC.cpp)
+target_link_libraries(EPECInstances EPECSolve Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+target_link_libraries(EPECChileArgentina EPECSolve Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+target_link_libraries(EPECExample EPECSolve Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+target_link_libraries(EPEC EPECSolve Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+target_link_libraries(EPECtest EPECSolve Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
 message("\n\nEPEC Cmake configuration terminated:")
 message("\tWorking directory: ${CMAKE_CURRENT_SOURCE_DIR}")
-message("\tArmadillo (lib): ${ARMA_PATH}/include")
-message("\tArmadillo (include): ${ARMA_LIB}")
-message("\tGurobi (lib): ${GUROBI_LIBRARIES}")
-message("\tGurobi (include): ${GUROBI_INCLUDE_DIRS}")
-message("\tBoost (include): ${BOOST_ROOT}/include")
+message("\tArmadillo (lib) : ${ARMA_PATH}/include")
+message("\tArmadillo (include) : ${ARMA_LIB}")
+message("\tGurobi (lib) : ${GUROBI_LIBRARIES}")
+message("\tGurobi (include) : ${GUROBI_INCLUDE_DIRS}")
+message("\tBoost (include) : ${BOOST_ROOT}/include ")
 ############################################
