@@ -39,3 +39,5 @@ test/Testdata
 *.srctrlbm
 *.srctrldb
 docs/*
+runTests.sh
+runSelectiveTests.sh

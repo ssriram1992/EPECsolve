@@ -36,7 +36,7 @@ private:
       QP_obj.c(2) = 1;
       break;
     default:
-      throw std::exception("Invalid makeObjectivePlayer");
+      throw ("Invalid makeObjectivePlayer");
     }
   }
 };
