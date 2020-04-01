@@ -249,7 +249,7 @@ Game::LPSolve(const arma::sp_mat &A, ///< The constraint matrix
       lin += (*j) * x[j.col()];
     a[i] = model.addConstr(lin, GRB_LESS_EQUAL, b.at(i));
   }
-  model.set(GRB_IntParam_OutputFlag, VERBOSE);
+  model.set(GRB_IntParam_OutputFlag, 0);
   model.set(GRB_IntParam_DualReductions, 0);
   model.optimize();
   status = model.get(GRB_IntAttr_Status);

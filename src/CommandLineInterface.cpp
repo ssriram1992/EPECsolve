@@ -81,11 +81,12 @@ int main(int argc, char **argv) {
   if (vm.count("version") || verbosity >= 2) {
     arma::arma_version ver;
     int major = 0, minor = 0, technical = 0;
-    GRBversion(&major, &minor, &technical);
-    BOOST_LOG_TRIVIAL(info) << "EPEC Solve Version: " << EPECVERSION_MAJOR
-                            << "--" << EPECVERSION_MINOR;
+    string M, m, p;
+    EPECVersion(M, m, p);
+    BOOST_LOG_TRIVIAL(info) << "EPEC Solve Version: " << M << "." << m << "." << p;
     BOOST_LOG_TRIVIAL(info) << "Dependencies:";
     BOOST_LOG_TRIVIAL(info) << "\tARMAdillo: " << ver.as_string();
+    GRBversion(&major, &minor, &technical);
     BOOST_LOG_TRIVIAL(info)
         << "\tGurobi: " << to_string(major) << "." << to_string(minor);
     BOOST_LOG_TRIVIAL(info) << "\tBoost: " << to_string(BOOST_VERSION / 100000)

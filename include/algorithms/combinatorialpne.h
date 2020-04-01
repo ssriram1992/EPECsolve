@@ -1,5 +1,5 @@
 #pragma once
-#include "polybase.h"
+#include "algorithms/polybase.h"
 #include <armadillo>
 #include <boost/log/trivial.hpp>
 #include <gurobi_c++.h>

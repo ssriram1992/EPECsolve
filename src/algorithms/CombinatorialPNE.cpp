@@ -1,4 +1,4 @@
-#include "combinatorialpne.h"
+#include "algorithms/combinatorialpne.h"
 #include <boost/log/trivial.hpp>
 #include <chrono>
 #include <gurobi_c++.h>

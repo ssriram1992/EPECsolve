@@ -1,4 +1,4 @@
-#include "polylcp.h"
+#include "lcp/polylcp.h"
 #include <algorithm>
 #include <armadillo>
 #include <boost/log/trivial.hpp>
@@ -560,7 +560,7 @@ bool Game::PolyLCP::checkPolyFeas(
             .set(GRB_DoubleAttr_UB, 0);
       count++;
     }
-    model.set(GRB_IntParam_OutputFlag, VERBOSE);
+    model.set(GRB_IntParam_OutputFlag, 0);
     model.optimize();
     if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL) {
       FeasiblePoly.insert(encodingNumber);

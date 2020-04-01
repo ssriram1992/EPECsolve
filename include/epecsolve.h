@@ -3,15 +3,13 @@
 /** @file src/epecsolve.h Forward declarations
  */
 
-#define VERBOSE false
-#define EPECVERSION_MAJOR "2.0"
-#define EPECVERSION_MINOR "alpha"
-
 #include <armadillo>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <vector>
+
+
 
 using perps = std::vector<std::pair<unsigned int, unsigned int>>;
 std::ostream &operator<<(std::ostream &ost, perps C);
@@ -39,7 +37,6 @@ enum class EPECAddPolyMethod {
                      ///< Sequential order
   Random ///< Adds the next polyhedron by selecting Random feasible one
 };
-
 } // namespace Game
 namespace Algorithms {
 // Forward declarations
@@ -49,7 +46,7 @@ class CombinatorialPNE;
 class OuterApproximation;
 class PolyBase;
 } // namespace Algorithms
-
-#include "LCP/lcp.h"
 #include "games.h"
+#include "lcp/lcp.h"
 #include "utils.h"
+#include "version.h"

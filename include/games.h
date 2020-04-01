@@ -236,7 +236,7 @@ public: // Constructors
                      int position = -1) override;
   /// @brief  Writes a given parameterized Mathematical program to a set of
   /// files.
-  void write(const std::string &filename, bool append) const;
+  void write(const std::string &filename, bool append) const override;
   /// @brief Saves the @p Game::QP_Param object in a loadable file.
   void save(const std::string &filename, bool erase = true) const;
   /// @brief Loads the @p Game::QP_Param object stored in a file.

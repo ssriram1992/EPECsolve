@@ -1,9 +1,9 @@
 #pragma once
-#include "combinatorialpne.h"
-#include "fullenumeration.h"
-#include "innerapproximation.h"
-#include "outerapproximation.h"
-#include "polybase.h"
+#include "algorithms/combinatorialpne.h"
+#include "algorithms/fullenumeration.h"
+#include "algorithms/innerapproximation.h"
+#include "algorithms/outerapproximation.h"
+#include "algorithms/polybase.h"
 
 namespace Algorithms {
 // Forward declarations

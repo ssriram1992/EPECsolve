@@ -19,12 +19,16 @@ set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi900\\win64")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-
 ############################################
 ################ DO NOT MODIFY #############
 ############################################
 cmake_minimum_required(VERSION 3.10)
-project(EPECsolve)
+project(
+        EPECSolve
+        VERSION 2.0.1
+        LANGUAGES CXX
+        DESCRIPTION "Equilibrium Problems with Equilibrium Constraints solver"
+)
 add_compile_options(-std=c++11)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LINKER_FLAGS "-lgurobi_c++ -lgurobi90 -lm -O2 -lopenblas -llapack -lpthread")
@@ -89,33 +93,28 @@ mark_as_advanced(GUROBI_LIBRARIES GUROBI_INCLUDE_DIRS GUROBI_INCLUDE_DIR)
 include_directories(${GUROBI_INCLUDE_DIR})
 include_directories(${BOOST_ROOT}/include)
 include_directories(${ARMA_PATH}/include)
-include_directories("src")
-include_directories("include")
-add_library(EPECSolve SHARED
-            src/epecsolve.h
-            src/Games.cpp
-            src/games.h
-            src/LCP/LCP.cpp
-            src/LCP/lcp.h
-            src/LCP/PolyLCP.cpp
-            src/LCP/polylcp.h
-            src/utils.h
-            src/Utils.cpp
-            src/models.h
-            src/Models.cpp
-            src/algorithms/algorithms.h
-            src/algorithms/InnerApproximation.cpp
-            src/algorithms/innerapproximation.h
-            src/algorithms/CombinatorialPNE.cpp
-            src/algorithms/combinatorialpne.h
-            src/algorithms/FullEnumeration.cpp
-            src/algorithms/fullenumeration.h
-            src/algorithms/OuterApproximation.cpp
-            src/algorithms/outerapproximation.h
-            src/LCP/OuterLCP.cpp
-            src/LCP/outerlcp.h)
-target_include_directories(EPECSolve PRIVATE src)
 
+include_directories("src" "include")
+configure_file(src/CMakeConfig.h.in ${PROJECT_SOURCE_DIR}/include/version.h)
+add_library(EPECSolve
+            src/Games.cpp
+            src/lcp/LCP.cpp
+            src/lcp/PolyLCP.cpp
+            src/Utils.cpp
+            src/Models.cpp
+            src/algorithms/InnerApproximation.cpp
+            src/algorithms/CombinatorialPNE.cpp
+            src/algorithms/FullEnumeration.cpp
+            src/algorithms/OuterApproximation.cpp
+            src/lcp/OuterLCP.cpp)
+target_include_directories(EPECSolve PRIVATE src)
+set_target_properties(EPECSolve PROPERTIES
+                      POSITION_INDEPENDENT_CODE ON)
+target_link_libraries(EPECSolve
+                      Boost::program_options
+                      Boost::log Boost::log_setup
+                      ${GUROBI_LIBRARIES}
+                      ${ARMA_LIB})
 add_executable(EPEC
                src/CommandLineInterface.cpp)
 add_executable(EPECInstances
@@ -126,11 +125,11 @@ add_executable(EPECExample
                examples/example.cpp)
 add_executable(EPECtest
                test/EPEC.cpp)
-target_link_libraries(EPECInstances EPECSolve Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECChileArgentina EPECSolve Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECExample EPECSolve Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPEC EPECSolve Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECtest EPECSolve Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+target_link_libraries(EPECInstances EPECSolve)
+target_link_libraries(EPECChileArgentina EPECSolve)
+target_link_libraries(EPECExample EPECSolve)
+target_link_libraries(EPEC EPECSolve)
+target_link_libraries(EPECtest EPECSolve Boost::unit_test_framework)
 message("\n\nEPEC Cmake configuration terminated:")
 message("\tWorking directory: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("\tArmadillo (lib) : ${ARMA_PATH}/include")

@@ -1,4 +1,4 @@
-#include "outerlcp.h"
+#include "lcp/outerlcp.h"
 #include <boost/log/trivial.hpp>
 
 using namespace std;
@@ -220,7 +220,7 @@ bool OuterLCP::checkComponentFeas(const std::vector<short int> &encoding) {
             .set(GRB_DoubleAttr_UB, 0);
       count++;
     }
-    model.set(GRB_IntParam_OutputFlag, VERBOSE);
+    model.set(GRB_IntParam_OutputFlag, 0);
     model.optimize();
     if (model.get(GRB_IntAttr_Status) == GRB_OPTIMAL) {
       FeasibleComponents.insert(fixNumber);

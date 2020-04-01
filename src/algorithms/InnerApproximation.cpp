@@ -1,5 +1,5 @@
-#include "innerapproximation.h"
-#include "combinatorialpne.h"
+#include "algorithms/innerapproximation.h"
+#include "algorithms/combinatorialpne.h"
 #include "epecsolve.h"
 
 #include <armadillo>

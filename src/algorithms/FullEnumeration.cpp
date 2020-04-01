@@ -1,5 +1,5 @@
-#include "fullenumeration.h"
-#include "LCP/polylcp.h"
+#include "algorithms/fullenumeration.h"
+#include "lcp/polylcp.h"
 #include <boost/log/trivial.hpp>
 
 using namespace std;

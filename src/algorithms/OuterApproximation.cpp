@@ -1,4 +1,4 @@
-#include "outerapproximation.h"
+#include "algorithms/outerapproximation.h"
 
 #include <boost/log/trivial.hpp>
 #include <chrono>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lcp.h"
+#include "lcp/lcp.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>

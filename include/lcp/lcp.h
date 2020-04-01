@@ -4,12 +4,12 @@
  * @file src/lcptolp.h To handle Linear Complementarity Problems.
  */
 
-#include "epecsolve.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>
 #include <memory>
 #include <set>
+#include "epecsolve.h"
 
 // using namespace Game;
 
@@ -133,5 +133,5 @@ public:
 };
 } // namespace Game
 
-#include "outerlcp.h"
-#include "polylcp.h"
+#include "lcp/outerlcp.h"
+#include "lcp/polylcp.h"

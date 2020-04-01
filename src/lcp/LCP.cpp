@@ -1,4 +1,4 @@
-#include "lcp.h"
+#include "../include/lcp/lcp.h"
 #include <algorithm>
 #include <armadillo>
 #include <boost/log/trivial.hpp>
@@ -18,7 +18,7 @@ void Game::LCP::defConst(GRBEnv *env)
  * to assign default values to some attributes of the class.
  */
 {
-  this->RlxdModel.set(GRB_IntParam_OutputFlag, VERBOSE);
+  this->RlxdModel.set(GRB_IntParam_OutputFlag, 0);
   this->Env = env;
   this->nR = this->M.n_rows;
   this->nC = this->M.n_cols;
@@ -540,7 +540,7 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   for (unsigned int i = 0; i < obj.n_rows; i++)
     expr += obj.at(i) * model->getVarByName("x_" + to_string(i));
   model->setObjective(expr, GRB_MINIMIZE);
-  model->set(GRB_IntParam_OutputFlag, VERBOSE);
+  model->set(GRB_IntParam_OutputFlag, 0);
   if (solve)
     model->optimize();
   return model;

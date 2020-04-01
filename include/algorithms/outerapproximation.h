@@ -1,5 +1,5 @@
 #pragma once
-#include "algorithms.h"
+#include "algorithms/algorithms.h"
 #include "epecsolve.h"
 #include <armadillo>
 #include <gurobi_c++.h>

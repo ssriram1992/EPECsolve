@@ -47,30 +47,7 @@ struct FollPar {
       : costs_quad{costs_quad_}, costs_lin{costs_lin_}, capacities{capacities_},
         emission_costs{emission_costs_}, tax_caps(tax_caps_), names{names_} {}
 };
-FollPar operator+(const Models::FollPar &F1, const Models::FollPar &F2) {
-  std::vector<double> cq, cl, cap, ec, tc;
-  std::vector<std::string> nm;
-
-  cq.insert(cq.end(), F1.costs_quad.begin(), F1.costs_quad.end());
-  cq.insert(cq.end(), F2.costs_quad.begin(), F2.costs_quad.end());
-
-  cl.insert(cl.end(), F1.costs_lin.begin(), F1.costs_lin.end());
-  cl.insert(cl.end(), F2.costs_lin.begin(), F2.costs_lin.end());
-
-  cap.insert(cap.end(), F1.capacities.begin(), F1.capacities.end());
-  cap.insert(cap.end(), F2.capacities.begin(), F2.capacities.end());
-
-  ec.insert(ec.end(), F1.emission_costs.begin(), F1.emission_costs.end());
-  ec.insert(ec.end(), F2.emission_costs.begin(), F2.emission_costs.end());
-
-  tc.insert(tc.end(), F1.tax_caps.begin(), F1.tax_caps.end());
-  tc.insert(tc.end(), F2.tax_caps.begin(), F2.tax_caps.end());
-
-  nm.insert(nm.end(), F1.names.begin(), F1.names.end());
-  nm.insert(nm.end(), F2.names.begin(), F2.names.end());
-
-  return Models::FollPar(cq, cl, cap, ec, tc, nm);
-}
+FollPar operator+(const Models::FollPar &F1, const Models::FollPar &F2);
 
 /// @brief Stores the parameters of the demand curve in a country model
 struct DemPar {
