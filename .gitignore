@@ -41,3 +41,4 @@ test/Testdata
 docs/*
 runTests.sh
 runSelectiveTests.sh
+include/version.h

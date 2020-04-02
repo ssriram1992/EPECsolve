@@ -1034,7 +1034,9 @@ void Models::init(LeadLocs &L) {
     L[l] = 0;
   L[Models::LeaderVars::End] = 0;
 }
-Models::FollPar operator+(const Models::FollPar &F1, const Models::FollPar &F2) {
+
+Models::FollPar operator+(const Models::FollPar &F1,
+                          const Models::FollPar &F2) {
   std::vector<double> cq, cl, cap, ec, tc;
   std::vector<std::string> nm;
 
