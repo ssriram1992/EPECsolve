@@ -11,4 +11,7 @@ public:
     minor=EPECSOLVE_VERSION_MINOR;
     patch=EPECSOLVE_VERSION_PATCH;
   }
+	EPECVersion(std::string &version){
+		version=EPECSOLVE_VERSION;
+	}
 };
