@@ -1,3 +1,4 @@
+#pragma once
 #include "epectests.h"
 #define TEST_NUM_THREADS 4
 

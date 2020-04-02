@@ -1,5 +1,6 @@
 #pragma once
 
+#include "epecsolve.h"
 #include "algorithms/algorithms.h"
 #include "games.h"
 #include "lcp/lcp.h"
