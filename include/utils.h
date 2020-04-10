@@ -9,7 +9,6 @@
 #include <fstream>
 #include <set>
 
-using namespace arma;
 
 namespace Utils {
 arma::sp_mat resizePatch(const arma::sp_mat &mat, const unsigned int nR,
@@ -21,17 +20,17 @@ arma::mat resizePatch(const arma::mat &mat, const unsigned int nR,
 arma::vec resizePatch(const arma::vec &mat, const unsigned int nR);
 
 // Saving and retrieving an arma::vec
-void appendSave(const vec &matrix, const std::string out,
+void appendSave(const arma::vec &matrix, const std::string out,
                 const std::string header = "", bool erase = false);
 
-long int appendRead(vec &matrix, const std::string in, long int pos,
+long int appendRead(arma::vec &matrix, const std::string in, long int pos,
                     const std::string header = "");
 
 // Saving and retrieving an arma::sp_mat
-void appendSave(const sp_mat &matrix, const std::string out,
+void appendSave(const arma::sp_mat &matrix, const std::string out,
                 const std::string header = "", bool erase = false);
 
-long int appendRead(sp_mat &matrix, const std::string in, long int pos,
+long int appendRead(arma::sp_mat &matrix, const std::string in, long int pos,
                     const std::string header = "");
 
 // Saving and retrieving an std::vector<double>
@@ -66,5 +65,6 @@ unsigned long int vecToNum(std::vector<short int> binary);
 std::vector<short int> numToVec(unsigned long int number,
                                 const unsigned long nCompl);
 } // namespace Utils
+
 
 // namespace Utils

@@ -4,7 +4,6 @@
 #include <gurobi_c++.h>
 #include <set>
 
-using namespace std;
 
 void Algorithms::CombinatorialPNE::solveWithExcluded(
     const std::vector<std::set<unsigned long int>> &excludeList) {
@@ -22,8 +21,8 @@ void Algorithms::CombinatorialPNE::solveWithExcluded(
   for (int j = 0; j < this->EPECObject->NumPlayers; ++j)
     start.push_back(-1);
   this->combPNE(start, excludeList);
-  if (this->EPECObject->Stats.Status == EPECsolveStatus::Uninitialized)
-    this->EPECObject->Stats.Status = EPECsolveStatus::NashEqNotFound;
+  if (this->EPECObject->Stats.Status == Game::EPECsolveStatus::Uninitialized)
+    this->EPECObject->Stats.Status = Game::EPECsolveStatus::NashEqNotFound;
   this->postSolving();
 }
 
@@ -36,9 +35,9 @@ void Algorithms::CombinatorialPNE::combPNE(
    * terminates and  stores the solution  into the referenced EPEC object. @p
    * excludeList contains the excluded combinations of polyhedra.
    */
-  if ((this->EPECObject->Stats.Status == EPECsolveStatus::NashEqFound &&
+  if ((this->EPECObject->Stats.Status == Game::EPECsolveStatus::NashEqFound &&
        this->EPECObject->Stats.PureNashEquilibrium) ||
-      this->EPECObject->Stats.Status == EPECsolveStatus::TimeLimit)
+      this->EPECObject->Stats.Status == Game::EPECsolveStatus::TimeLimit)
     return;
 
   if (this->EPECObject->Stats.AlgorithmParam.TimeLimit > 0) {

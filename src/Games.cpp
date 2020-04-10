@@ -9,13 +9,11 @@
 #include <iostream>
 #include <memory>
 
-using namespace std;
-using namespace Utils;
 
 unsigned int
-Game::convexHull (const vector<arma::sp_mat *> *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
+Game::convexHull (const std::vector<arma::sp_mat *> *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
 		///< hull is to be found
-		          const vector<arma::vec *> *bi, ///< Inequality constraints RHS that define
+		          const std::vector<arma::vec *> *bi, ///< Inequality constraints RHS that define
 		///< polyhedra whose convex hull is to be found
 		          arma::sp_mat &A, ///< Pointer to store the output of the convex hull LHS
 		          arma::vec &b,    ///< Pointer to store the output of the convex hull RHS
@@ -40,7 +38,7 @@ Game::convexHull (const vector<arma::sp_mat *> *Ai, ///< Inequality constraints 
 	const unsigned int nPoly{static_cast<unsigned int>(Ai->size ())};
 	// Error check
 	if (nPoly == 0)
-		throw ("Game::convexHull: Empty vector of polyhedra given! Problem might be "
+		throw ("Game::convexHull: Empty std::vector of polyhedra given! Problem might be "
 		       "infeasible."); // There should be at least 1 polyhedron to
 	// consider
 	const unsigned int nC{static_cast<unsigned int>(Ai->front ()->n_cols)};
@@ -60,11 +58,11 @@ Game::convexHull (const vector<arma::sp_mat *> *Ai, ///< Inequality constraints 
 	for (unsigned int i = 0; i != nPoly; i++) {
 		if (Ai->at (i)->n_cols != nC)
 			throw ("Game::convexHull: Inconsistent number of variables in the "
-			       "polyhedra ") + to_string (i) + "; " + to_string (Ai->at (i)->n_cols) + "!=" + to_string (nC);
+			       "polyhedra ") + std::to_string (i) + "; " + std::to_string (Ai->at (i)->n_cols) + "!=" + std::to_string (nC);
 		if (Ai->at (i)->n_rows != bi->at (i)->n_rows)
 			throw ("Game::convexHull: Inconsistent number of rows in LHS and "
-			       "RHS of polyhedra ") + to_string (i) + ";" + to_string (Ai->at (i)->n_rows) + "!=" +
-			      to_string (bi->at (i)->n_rows);
+			       "RHS of polyhedra ") + std::to_string (i) + ";" + std::to_string (Ai->at (i)->n_rows) + "!=" +
+			      std::to_string (bi->at (i)->n_rows);
 		nFinCons += Ai->at (i)->n_rows;
 	}
 	// For common constraint copy
@@ -121,9 +119,9 @@ Game::convexHull (const vector<arma::sp_mat *> *Ai, ///< Inequality constraints 
 void Game::compConvSize (arma::sp_mat &A,             ///< Output parameter
                          const unsigned int nFinCons, ///< Number of rows in final matrix A
                          const unsigned int nFinVar,  ///< Number of columns in the final matrix A
-                         const vector<arma::sp_mat *> *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
+                         const std::vector<arma::sp_mat *> *Ai, ///< Inequality constraints LHS that define polyhedra whose convex
 		///< hull is to be found
-		                 const vector<arma::vec *> *bi, ///< Inequality constraints RHS that define
+		                 const std::vector<arma::vec *> *bi, ///< Inequality constraints RHS that define
 		///< polyhedra whose convex hull is to be found
 		                 const arma::sp_mat &Acom,            ///< LHS of the common constraints for all polyhedra
 		                 const arma::vec &bcom ///< RHS of the common constraints for all polyhedra
@@ -196,7 +194,7 @@ void Game::compConvSize (arma::sp_mat &A,             ///< Output parameter
 
 arma::vec Game::LPSolve (const arma::sp_mat &A, ///< The constraint matrix
                          const arma::vec &b,    ///< RHS of the constraint matrix
-                         const arma::vec &c,    ///< If feasible, returns a vector that
+                         const arma::vec &c,    ///< If feasible, returns a std::vector that
 		///< minimizes along this direction
 		                 int &status, ///< Status of the optimization problem. If optimal,
 		///< this will be GRB_OPTIMAL
@@ -225,7 +223,7 @@ arma::vec Game::LPSolve (const arma::sp_mat &A, ///< The constraint matrix
 	GRBConstr a[nR];
 	// Adding Variables
 	for (unsigned int i = 0; i < nC; i++)
-		x[i] = model.addVar (lb, GRB_INFINITY, c.at (i), GRB_CONTINUOUS, "x_" + to_string (i));
+		x[i] = model.addVar (lb, GRB_INFINITY, c.at (i), GRB_CONTINUOUS, "x_" + std::to_string (i));
 	// Adding constraints
 	for (unsigned int i = 0; i < nR; i++) {
 		GRBLinExpr lin{0};
@@ -270,16 +268,16 @@ bool Game::isZero (arma::sp_mat M, double tol) noexcept {
 
 void Game::print (const perps &C) noexcept {
 	for (auto p : C)
-		cout << "<" << p.first << ", " << p.second << ">" << "\t";
+		std::cout << "<" << p.first << ", " << p.second << ">" << "\t";
 }
 
-ostream &operator<< (ostream &ost, const perps &C) {
+std::ostream &operator<< (std::ostream &ost, const perps &C) {
 	for (auto p : C)
 		ost << "<" << p.first << ", " << p.second << ">" << "\t";
 	return ost;
 }
 
-ostream &Game::operator<< (ostream &os, const Game::QP_Param &Q) {
+std::ostream &Game::operator<< (std::ostream &os, const Game::QP_Param &Q) {
 	os << "Quadratic program with linear inequality constraints: " << '\n';
 	os << Q.getNy () << " decision variables parametrized by " << Q.getNx () << " variables" << '\n';
 	os << Q.getb ().n_rows << " linear inequalities" << '\n' << '\n';
@@ -312,9 +310,9 @@ void Game::MP_Param::write (const std::string &filename, bool) const {
 	this->getb ().save (filename + "_b.txt", arma::file_type::arma_ascii);
 }
 
-void Game::QP_Param::write (const string &filename, bool append) const {
-	ofstream file;
-	file.open (filename, append ? ios::app : ios::out);
+void Game::QP_Param::write (const std::string &filename, bool append) const {
+	std::ofstream file;
+	file.open (filename, append ? arma::ios::app : arma::ios::out);
 	file << *this;
 	file << "\n\nOBJECTIVES\n";
 	file << "Q:" << this->getQ ();
@@ -339,22 +337,22 @@ Game::MP_Param &Game::MP_Param::addDummy (unsigned int pars, unsigned int vars, 
 	this->Nx += pars;
 	this->Ny += vars;
 	if (vars) {
-		Q = resizePatch (Q, this->Ny, this->Ny);
-		B = resizePatch (B, this->Ncons, this->Ny);
-		c = resizePatch (c, this->Ny);
+		Q = Utils::resizePatch (Q, this->Ny, this->Ny);
+		B = Utils::resizePatch (B, this->Ncons, this->Ny);
+		c = Utils::resizePatch (c, this->Ny);
 	}
 	switch (position) {
 		case -1:
 			if (pars)
-				A = resizePatch (A, this->Ncons, this->Nx);
+				A = Utils::resizePatch (A, this->Ncons, this->Nx);
 			if (vars || pars)
-				C = resizePatch (C, this->Ny, this->Nx);
+				C = Utils::resizePatch (C, this->Ny, this->Nx);
 			break;
 		case 0:
 			if (pars)
 				A = arma::join_rows (arma::zeros<arma::sp_mat> (this->Ncons, pars), A);
 			if (vars || pars) {
-				C = resizePatch (C, this->Ny, C.n_cols);
+				C = Utils::resizePatch (C, this->Ny, C.n_cols);
 				C = arma::join_rows (arma::zeros<arma::sp_mat> (this->Ny, pars), C);
 			}
 			break;
@@ -369,7 +367,7 @@ Game::MP_Param &Game::MP_Param::addDummy (unsigned int pars, unsigned int vars, 
 				}
 			}
 			if (vars || pars) {
-				C = resizePatch (C, this->Ny, C.n_cols);
+				C = Utils::resizePatch (C, this->Ny, C.n_cols);
 				arma::sp_mat C_temp = arma::join_rows (C.cols (0, position - 1),
 				                                       arma::zeros<arma::sp_mat> (this->Ny, pars));
 				if (static_cast<unsigned int>(position) < C.n_cols) {
@@ -422,12 +420,12 @@ Game::MP_Param::set (arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma:
                      arma::vec &&b)
 /// Faster means to set data. But the input objects might be corrupted now.
 {
-	this->Q = move (Q);
-	this->C = move (C);
-	this->A = move (A);
-	this->B = move (B);
-	this->c = move (c);
-	this->b = move (b);
+	this->Q = std::move (Q);
+	this->C = std::move (C);
+	this->A = std::move (A);
+	this->B = std::move (B);
+	this->c = std::move (c);
+	this->b = std::move (b);
 	if (!finalize ())
 		throw ("Error in MP_Param::set: Invalid data");
 	return *this;
@@ -535,7 +533,7 @@ int Game::QP_Param::makeyQy ()
 		return 0;
 	GRBVar y[this->Ny];
 	for (unsigned int i = 0; i < Ny; i++)
-		y[i] = this->QuadModel.addVar (0, GRB_INFINITY, 0, GRB_CONTINUOUS, "y_" + to_string (i));
+		y[i] = this->QuadModel.addVar (0, GRB_INFINITY, 0, GRB_CONTINUOUS, "y_" + std::to_string (i));
 	GRBQuadExpr yQy{0};
 	for (auto val = Q.begin (); val != Q.end (); ++val) {
 		unsigned int i, j;
@@ -550,7 +548,7 @@ int Game::QP_Param::makeyQy ()
 	return 0;
 }
 
-unique_ptr<GRBModel> Game::QP_Param::solveFixed (arma::vec x ///< Other players' decisions
+std::unique_ptr<GRBModel> Game::QP_Param::solveFixed (arma::vec x ///< Other players' decisions
 )           /**
                  * Given a value for the parameters @f$x@f$ in the definition of QP_Param,
                  * solve           the parameterized quadratic program to  optimality.
@@ -560,11 +558,11 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed (arma::vec x ///< Other players'
                  *
                  */
 {
-	this->makeyQy (); /// @throws GRBException if argument vector size is not
+	this->makeyQy (); /// @throws GRBException if argument std::vector size is not
 	/// compatible with the Game::QP_Param definition.
 	if (x.size () != this->Nx)
-		throw "Game::QP_Param::solveFixed: Invalid argument size: " + to_string (x.size ()) + " != " + to_string (Nx);
-	unique_ptr<GRBModel> model (new GRBModel (this->QuadModel));
+		throw "Game::QP_Param::solveFixed: Invalid argument size: " + std::to_string (x.size ()) + " != " + std::to_string (Nx);
+	std::unique_ptr<GRBModel> model (new GRBModel (this->QuadModel));
 	try {
 		GRBQuadExpr yQy = model->getObjective ();
 		arma::vec Cx, Ax;
@@ -572,7 +570,7 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed (arma::vec x ///< Other players'
 		Ax = this->A * x;
 		GRBVar y[this->Ny];
 		for (unsigned int i = 0; i < this->Ny; i++) {
-			y[i] = model->getVarByName ("y_" + to_string (i));
+			y[i] = model->getVarByName ("y_" + std::to_string (i));
 			yQy += (Cx[i] + c[i]) * y[i];
 		}
 		model->setObjective (yQy, GRB_MINIMIZE);
@@ -586,16 +584,16 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed (arma::vec x ///< Other players'
 		model->set (GRB_IntParam_OutputFlag, 0);
 		model->optimize ();
 	} catch (const char *e) {
-		cerr << " Error in Game::QP_Param::solveFixed: " << e << '\n';
+		std::cerr << " Error in Game::QP_Param::solveFixed: " << e << '\n';
 		throw;
-	} catch (string &e) {
-		cerr << "String: Error in Game::QP_Param::solveFixed: " << e << '\n';
+	} catch (std::string &e) {
+		std::cerr << "String: Error in Game::QP_Param::solveFixed: " << e << '\n';
 		throw;
-	} catch (exception &e) {
-		cerr << "Exception: Error in Game::QP_Param::solveFixed: " << e.what () << '\n';
+	} catch (std::exception &e) {
+		std::cerr << "Exception: Error in Game::QP_Param::solveFixed: " << e.what () << '\n';
 		throw;
 	} catch (GRBException &e) {
-		cerr << "GRBException: Error in Game::QP_Param::solveFixed: " << e.getErrorCode () << "; " << e.getMessage ()
+		std::cerr << "GRBException: Error in Game::QP_Param::solveFixed: " << e.getErrorCode () << "; " << e.getMessage ()
 		     << '\n';
 		throw;
 	}
@@ -620,13 +618,13 @@ Game::QP_Param &Game::QP_Param::addDummy (unsigned int pars, unsigned int vars, 
 	try {
 		MP_Param::addDummy (pars, vars, position);
 	} catch (const char *e) {
-		cerr << " Error in Game::QP_Param::addDummy: " << e << '\n';
+		std::cerr << " Error in Game::QP_Param::addDummy: " << e << '\n';
 		throw;
-	} catch (string &e) {
-		cerr << "String: Error in Game::QP_Param::addDummy: " << e << '\n';
+	} catch (std::string &e) {
+		std::cerr << "String: Error in Game::QP_Param::addDummy: " << e << '\n';
 		throw;
-	} catch (exception &e) {
-		cerr << "Exception: Error in Game::QP_Param::addDummy: " << e.what () << '\n';
+	} catch (std::exception &e) {
+		std::cerr << "Exception: Error in Game::QP_Param::addDummy: " << e.what () << '\n';
 		throw;
 	}
 	return *this;
@@ -667,8 +665,8 @@ Game::QP_Param::set (const arma::sp_mat &Q, const arma::sp_mat &C, const arma::s
 	this->madeyQy = false;
 	try {
 		MP_Param::set (Q, C, A, B, c, b);
-	} catch (string &e) {
-		cerr << "String: " << e << '\n';
+	} catch (std::string &e) {
+		std::cerr << "String: " << e << '\n';
 		throw ("Error in QP_Param::set: Invalid Data");
 	}
 	return *this;
@@ -682,8 +680,8 @@ Game::QP_Param::set (arma::sp_mat &&Q, arma::sp_mat &&C, arma::sp_mat &&A, arma:
 	this->madeyQy = false;
 	try {
 		MP_Param::set (Q, C, A, B, c, b);
-	} catch (string &e) {
-		cerr << "String: " << e << '\n';
+	} catch (std::string &e) {
+		std::cerr << "String: " << e << '\n';
 		throw ("Error in QP_Param::set: Invalid Data");
 	}
 	return *this;
@@ -693,7 +691,7 @@ Game::QP_Param &Game::QP_Param::set (QP_Objective &&obj, QP_Constraints &&cons)
 /// Setting the data with the inputs being a struct Game::QP_Objective and
 /// struct Game::QP_Constraints
 {
-	return this->set (move (obj.Q), move (obj.C), move (cons.A), move (cons.B), move (obj.c), move (cons.b));
+	return this->set (std::move (obj.Q), std::move (obj.C), std::move (cons.A), std::move (cons.B), std::move (obj.c), std::move (cons.b));
 }
 
 Game::QP_Param &Game::QP_Param::set (const QP_Objective &obj, const QP_Constraints &cons) {
@@ -723,22 +721,22 @@ double Game::QP_Param::computeObjective (const arma::vec &y, const arma::vec &x,
 	return obj (0);
 }
 
-void Game::QP_Param::save (const string &filename, bool erase) const {
+void Game::QP_Param::save (const std::string &filename, bool erase) const {
 	/**
 	 * The Game::QP_Param object hence stored can be loaded back using
 	 * Game::QP_Param::load
 	 */
-	Utils::appendSave (string ("QP_Param"), filename, erase);
-	Utils::appendSave (this->Q, filename, string ("QP_Param::Q"), false);
-	Utils::appendSave (this->A, filename, string ("QP_Param::A"), false);
-	Utils::appendSave (this->B, filename, string ("QP_Param::B"), false);
-	Utils::appendSave (this->C, filename, string ("QP_Param::C"), false);
-	Utils::appendSave (this->b, filename, string ("QP_Param::b"), false);
-	Utils::appendSave (this->c, filename, string ("QP_Param::c"), false);
+	Utils::appendSave (std::string ("QP_Param"), filename, erase);
+	Utils::appendSave (this->Q, filename, std::string ("QP_Param::Q"), false);
+	Utils::appendSave (this->A, filename, std::string ("QP_Param::A"), false);
+	Utils::appendSave (this->B, filename, std::string ("QP_Param::B"), false);
+	Utils::appendSave (this->C, filename, std::string ("QP_Param::C"), false);
+	Utils::appendSave (this->b, filename, std::string ("QP_Param::b"), false);
+	Utils::appendSave (this->c, filename, std::string ("QP_Param::c"), false);
 	BOOST_LOG_TRIVIAL(trace) << "Saved QP_Param to file " << filename;
 }
 
-long int Game::QP_Param::load (const string &filename, long int pos) {
+long int Game::QP_Param::load (const std::string &filename, long int pos) {
 	/**
 	 * @details  Before calling this function, use the constructor
 	 * QP_Param::QP_Param(GRBEnv *Env) to initialize.
@@ -758,32 +756,32 @@ long int Game::QP_Param::load (const string &filename, long int pos) {
 	 */
 	arma::sp_mat Q, A, B, C;
 	arma::vec c, b;
-	string headercheck;
+	std::string headercheck;
 	pos = Utils::appendRead (headercheck, filename, pos);
 	if (headercheck != "QP_Param")
 		throw ("Error in QP_Param::load: In valid header - ") + headercheck;
-	pos = Utils::appendRead (Q, filename, pos, string ("QP_Param::Q"));
-	pos = Utils::appendRead (A, filename, pos, string ("QP_Param::A"));
-	pos = Utils::appendRead (B, filename, pos, string ("QP_Param::B"));
-	pos = Utils::appendRead (C, filename, pos, string ("QP_Param::C"));
-	pos = Utils::appendRead (b, filename, pos, string ("QP_Param::b"));
-	pos = Utils::appendRead (c, filename, pos, string ("QP_Param::c"));
+	pos = Utils::appendRead (Q, filename, pos, std::string ("QP_Param::Q"));
+	pos = Utils::appendRead (A, filename, pos, std::string ("QP_Param::A"));
+	pos = Utils::appendRead (B, filename, pos, std::string ("QP_Param::B"));
+	pos = Utils::appendRead (C, filename, pos, std::string ("QP_Param::C"));
+	pos = Utils::appendRead (b, filename, pos, std::string ("QP_Param::b"));
+	pos = Utils::appendRead (c, filename, pos, std::string ("QP_Param::c"));
 	this->set (Q, C, A, B, c, b);
 	return pos;
 }
 
-Game::NashGame::NashGame (GRBEnv *e, vector<shared_ptr<QP_Param>> players, arma::sp_mat MC, arma::vec MCRHS,
+Game::NashGame::NashGame (GRBEnv *e, std::vector<std::shared_ptr<QP_Param>> players, arma::sp_mat MC, arma::vec MCRHS,
                           unsigned int nLeadVar, arma::sp_mat leadA, arma::vec leadRHS) : Env{e},
                                                                                           LeaderConstraints{leadA},
                                                                                           LeaderConstraintsRHS{leadRHS}
 /**
  * @brief
- * Construct a NashGame by giving a vector of pointers to
+ * Construct a NashGame by giving a std::vector of pointers to
  * QP_Param, defining each player's game
  * A set of Market clearing constraints and its RHS
  * And if there are leader variables, the number of leader vars.
  * @details
- * Have a vector of pointers to Game::QP_Param ready such that
+ * Have a std::vector of pointers to Game::QP_Param ready such that
  * the variables are separated in \f$x^{i}\f$ and \f$x^{-i}\f$
  * format.
  *
@@ -802,7 +800,7 @@ Game::NashGame::NashGame (GRBEnv *e, vector<shared_ptr<QP_Param>> players, arma:
 	this->Players = players;
 	this->MarketClearing = MC;
 	this->MCRHS = MCRHS;
-	// Setting the size of class variable vectors
+	// Setting the size of class variable std::vectors
 	this->PrimalPosition.resize (this->NumPlayers + 1);
 	this->DualPosition.resize (this->NumPlayers + 1);
 	this->setPositions ();
@@ -812,26 +810,26 @@ Game::NashGame::NashGame (const NashGame &N) : Env{N.Env}, LeaderConstraints{N.L
                                                LeaderConstraintsRHS{N.LeaderConstraintsRHS}, NumPlayers{N.NumPlayers},
                                                Players{N.Players}, MarketClearing{N.MarketClearing}, MCRHS{N.MCRHS},
                                                numLeaderVar{N.numLeaderVar} {
-	// Setting the size of class variable vectors
+	// Setting the size of class variable std::vectors
 	this->PrimalPosition.resize (this->NumPlayers + 1);
 	this->DualPosition.resize (this->NumPlayers + 1);
 	this->setPositions ();
 }
 
-void Game::NashGame::save (const string &filename, bool erase) const {
-	Utils::appendSave (string ("NashGame"), filename, erase);
-	Utils::appendSave (this->NumPlayers, filename, string ("NashGame::NumPlayers"), false);
+void Game::NashGame::save (const std::string &filename, bool erase) const {
+	Utils::appendSave (std::string ("NashGame"), filename, erase);
+	Utils::appendSave (this->NumPlayers, filename, std::string ("NashGame::NumPlayers"), false);
 	for (unsigned int i = 0; i < this->NumPlayers; ++i)
 		this->Players.at (i)->save (filename, false);
-	Utils::appendSave (this->MarketClearing, filename, string ("NashGame::MarketClearing"), false);
-	Utils::appendSave (this->MCRHS, filename, string ("NashGame::MCRHS"), false);
-	Utils::appendSave (this->LeaderConstraints, filename, string ("NashGame::LeaderConstraints"), false);
-	Utils::appendSave (this->LeaderConstraintsRHS, filename, string ("NashGame::LeaderConstraintsRHS"), false);
-	Utils::appendSave (this->numLeaderVar, filename, string ("NashGame::numLeaderVar"), false);
+	Utils::appendSave (this->MarketClearing, filename, std::string ("NashGame::MarketClearing"), false);
+	Utils::appendSave (this->MCRHS, filename, std::string ("NashGame::MCRHS"), false);
+	Utils::appendSave (this->LeaderConstraints, filename, std::string ("NashGame::LeaderConstraints"), false);
+	Utils::appendSave (this->LeaderConstraintsRHS, filename, std::string ("NashGame::LeaderConstraintsRHS"), false);
+	Utils::appendSave (this->numLeaderVar, filename, std::string ("NashGame::numLeaderVar"), false);
 	BOOST_LOG_TRIVIAL(trace) << "Saved NashGame to file " << filename;
 }
 
-long int Game::NashGame::load (const string &filename, long int pos) {
+long int Game::NashGame::load (const std::string &filename, long int pos) {
 	/**
 	 * @brief Loads the @p NashGame object stored in a file.  Before calling this
 	 * function, use the constructor NashGame::NashGame(GRBEnv *Env) to
@@ -854,37 +852,37 @@ long int Game::NashGame::load (const string &filename, long int pos) {
 	if (!this->Env)
 		throw ("Error in NashGame::load: To load NashGame from file, it has "
 		       "to be constructed using NashGame(GRBEnv*) constructor");
-	string headercheck;
+	std::string headercheck;
 	pos = Utils::appendRead (headercheck, filename, pos);
 	if (headercheck != "NashGame")
 		throw ("Error in NashGame::load: In valid header - ") + headercheck;
 	unsigned int numPlayersLocal = 0;
-	pos = Utils::appendRead (numPlayersLocal, filename, pos, string ("NashGame::NumPlayers"));
-	vector<shared_ptr<QP_Param>> players;
+	pos = Utils::appendRead (numPlayersLocal, filename, pos, std::string ("NashGame::NumPlayers"));
+	std::vector<std::shared_ptr<QP_Param>> players;
 	players.resize (numPlayersLocal);
 	for (unsigned int i = 0; i < numPlayersLocal; ++i) {
 		// Players.at(i) = std::make_shared<Game::QP_Param>(this->Env);
-		auto temp = shared_ptr<Game::QP_Param> (new Game::QP_Param (this->Env));
+		auto temp = std::shared_ptr<Game::QP_Param> (new Game::QP_Param (this->Env));
 		players.at (i) = temp;
 		pos = players.at (i)->load (filename, pos);
 	}
 	arma::sp_mat marketClearing;
-	pos = Utils::appendRead (marketClearing, filename, pos, string ("NashGame::MarketClearing"));
+	pos = Utils::appendRead (marketClearing, filename, pos, std::string ("NashGame::MarketClearing"));
 	arma::vec mcrhs;
-	pos = Utils::appendRead (mcrhs, filename, pos, string ("NashGame::MCRHS"));
+	pos = Utils::appendRead (mcrhs, filename, pos, std::string ("NashGame::MCRHS"));
 	arma::sp_mat leaderConstraints;
-	pos = Utils::appendRead (leaderConstraints, filename, pos, string ("NashGame::LeaderConstraints"));
+	pos = Utils::appendRead (leaderConstraints, filename, pos, std::string ("NashGame::LeaderConstraints"));
 	arma::vec leaderConsRHS;
-	pos = Utils::appendRead (leaderConsRHS, filename, pos, string ("NashGame::LeaderConstraintsRHS"));
+	pos = Utils::appendRead (leaderConsRHS, filename, pos, std::string ("NashGame::LeaderConstraintsRHS"));
 	unsigned int numLeadConstraints = 0;
-	pos = Utils::appendRead (numLeadConstraints, filename, pos, string ("NashGame::numLeaderVar"));
+	pos = Utils::appendRead (numLeadConstraints, filename, pos, std::string ("NashGame::numLeaderVar"));
 	// Setting the class variables
 	this->numLeaderVar = numLeadConstraints;
 	this->Players = players;
 	this->NumPlayers = numPlayersLocal;
 	this->MarketClearing = marketClearing;
 	this->MCRHS = mcrhs;
-	// Setting the size of class variable vectors
+	// Setting the size of class variable std::vectors
 	this->PrimalPosition.resize (this->NumPlayers + 1);
 	this->DualPosition.resize (this->NumPlayers + 1);
 	this->setPositions ();
@@ -925,8 +923,8 @@ const Game::NashGame &Game::NashGame::formulateLCP (arma::sp_mat &M, ///< Where 
                                                     arma::vec &q,    ///< Where the output  q is stored and returned.
                                                     perps &Compl, ///< Says which equations are complementary to which variables
                                                     bool writeToFile,    ///< If  true, writes  M and  q to file.k
-                                                    const string M_name, ///< File name to be used to write  M
-                                                    const string q_name  ///< File name to be used to write  M
+                                                    const std::string M_name, ///< File name to be used to write  M
+                                                    const std::string q_name  ///< File name to be used to write  M
 ) const {
 	/// @brief Formulates the LCP corresponding to the Nash game.
 	/// @warning Does not return the leader constraints. Use
@@ -942,8 +940,8 @@ const Game::NashGame &Game::NashGame::formulateLCP (arma::sp_mat &M, ///< Where 
    */
 
 	// To store the individual KKT conditions for each player.
-	vector<arma::sp_mat> Mi (NumPlayers), Ni (NumPlayers);
-	vector<arma::vec> qi (NumPlayers);
+	std::vector<arma::sp_mat> Mi (NumPlayers), Ni (NumPlayers);
+	std::vector<arma::vec> qi (NumPlayers);
 
 	unsigned int numVarFollow{0}, numVarLead{0};
 	numVarLead = this->DualPosition.back (); // Number of Leader variables (all variables)
@@ -1083,13 +1081,13 @@ arma::sp_mat Game::NashGame::rewriteLeadCons () const
 		}
 		return arma::join_cols (A_out_expl, A_out_MC);
 	} catch (const char *e) {
-		cerr << "Error in NashGame::rewriteLeadCons: " << e << '\n';
+		std::cerr << "Error in NashGame::rewriteLeadCons: " << e << '\n';
 		throw;
-	} catch (string &e) {
-		cerr << "String: Error in NashGame::rewriteLeadCons: " << e << '\n';
+	} catch (std::string &e) {
+		std::cerr << "String: Error in NashGame::rewriteLeadCons: " << e << '\n';
 		throw;
-	} catch (exception &e) {
-		cerr << "Exception: Error in NashGame::rewriteLeadCons: " << e.what () << '\n';
+	} catch (std::exception &e) {
+		std::cerr << "Exception: Error in NashGame::rewriteLeadCons: " << e.what () << '\n';
 		throw;
 	}
 }
@@ -1112,7 +1110,7 @@ Game::NashGame &Game::NashGame::addDummy (unsigned int par, int position)
 		auto nnC = this->LeaderConstraints.n_cols;
 		switch (position) {
 			case -1:
-				this->LeaderConstraints = resizePatch (this->LeaderConstraints, nnR, nnC + par);
+				this->LeaderConstraints = Utils::resizePatch (this->LeaderConstraints, nnR, nnC + par);
 				break;
 			case 0:
 				this->LeaderConstraints = arma::join_rows (arma::zeros<arma::sp_mat> (nnR, par),
@@ -1131,7 +1129,7 @@ Game::NashGame &Game::NashGame::addDummy (unsigned int par, int position)
 		auto nnC = this->MarketClearing.n_cols;
 		switch (position) {
 			case -1:
-				this->MarketClearing = resizePatch (this->MarketClearing, nnR, nnC + par);
+				this->MarketClearing = Utils::resizePatch (this->MarketClearing, nnR, nnC + par);
 				break;
 			default:
 				BOOST_LOG_TRIVIAL(error) << "addDummy at non-final position not implemented";
@@ -1152,20 +1150,20 @@ Game::NashGame &Game::NashGame::addLeadCons (const arma::vec &a, double b)
 	auto nC = this->LeaderConstraints.n_cols;
 	if (a.n_elem != nC)
 		throw ("Error in NashGame::addLeadCons: Leader constraint size "
-		       "incompatible --- ") + to_string (a.n_elem) + string (" != ") + to_string (nC);
+		       "incompatible --- ") + std::to_string (a.n_elem) + std::string (" != ") + std::to_string (nC);
 	auto nR = this->LeaderConstraints.n_rows;
-	this->LeaderConstraints = resizePatch (this->LeaderConstraints, nR + 1, nC);
+	this->LeaderConstraints = Utils::resizePatch (this->LeaderConstraints, nR + 1, nC);
 	// (static_cast<arma::mat>(a)).t();	// Apparently this is not reqd! a.t()
 	// already works in newer versions of armadillo
 	LeaderConstraints.row (nR) = a.t ();
-	this->LeaderConstraintsRHS = resizePatch (this->LeaderConstraintsRHS, nR + 1);
+	this->LeaderConstraintsRHS = Utils::resizePatch (this->LeaderConstraintsRHS, nR + 1);
 	this->LeaderConstraintsRHS (nR) = b;
 	return *this;
 }
 
-void Game::NashGame::write (const string &filename, bool append, bool KKT) const {
-	ofstream file;
-	file.open (filename + ".nash", append ? ios::app : ios::out);
+void Game::NashGame::write (const std::string &filename, bool append, bool KKT) const {
+	std::ofstream file;
+	file.open (filename + ".nash", append ? arma::ios::app : arma::ios::out);
 	file << *this;
 	file << "\n\n\n\n\n\n\n";
 	file << "\nLeaderConstraints: " << this->LeaderConstraints;
@@ -1187,13 +1185,13 @@ void Game::NashGame::write (const string &filename, bool append, bool KKT) const
 	for (const auto &pl : this->Players) {
 		// pl->QP_Param::write(filename+"_Players_"+to_string(count++), append);
 		file << "--------------------------------------------------\n";
-		file.open (filename + ".nash", ios::app);
+		file.open (filename + ".nash", arma::ios::app);
 		file << "\n\n\n\n PLAYER " << count++ << "\n\n";
 		file.close ();
 		pl->QP_Param::write (filename + ".nash", true);
 	}
 
-	file.open (filename + ".nash", ios::app);
+	file.open (filename + ".nash", arma::ios::app);
 	file << "--------------------------------------------------\n";
 	file << "\nPrimal Positions:\t";
 	for (const auto pos : PrimalPosition)
@@ -1223,8 +1221,8 @@ void Game::NashGame::write (const string &filename, bool append, bool KKT) const
 	file.close ();
 }
 
-unique_ptr<GRBModel> Game::NashGame::respond (unsigned int player, ///< Player whose optimal response is to be computed
-                                              const arma::vec &x,  ///< A vector of pure strategies (either for all
+std::unique_ptr<GRBModel> Game::NashGame::respond (unsigned int player, ///< Player whose optimal response is to be computed
+                                              const arma::vec &x,  ///< A std::vector of pure strategies (either for all
 		///< players or all other players)
 		                                      bool fullvec ///< Is @p x strategy of all players? (including player @p
 		///< player)
@@ -1235,7 +1233,7 @@ unique_ptr<GRBModel> Game::NashGame::respond (unsigned int player, ///< Player w
  * @details
  * Given the strategy of each player, returns a Gurobi Model that has the
  * optimal strategy of the player at position @p player.
- * @returns A unique_ptr to GRBModel
+ * @returns A std::unique_ptr to GRBModel
  *
  */
 {
@@ -1262,7 +1260,7 @@ unique_ptr<GRBModel> Game::NashGame::respond (unsigned int player, ///< Player w
 
 double Game::NashGame::respondSol (arma::vec &sol,      ///< [out] Optimal response
                                    unsigned int player, ///< Player whose optimal response is to be computed
-                                   const arma::vec &x,  ///< A vector of pure strategies (either for all
+                                   const arma::vec &x,  ///< A std::vector of pure strategies (either for all
 		///< players or all other players)
 		                           bool fullvec ///< Is @p x strategy of all players? (including player @p
 		///< player)
@@ -1271,7 +1269,7 @@ double Game::NashGame::respondSol (arma::vec &sol,      ///< [out] Optimal respo
 	 * @brief Returns the optimal objective value that is obtainable for the
 	 * player @p player given the decision @p x of all other players.
 	 * @details
-	 * Calls Game::NashGame::respond and obtains the unique_ptr to GRBModel of
+	 * Calls Game::NashGame::respond and obtains the std::unique_ptr to GRBModel of
 	 * best response by player @p player. Then solves the model and returns the
 	 * appropriate objective value.
 	 * @returns The optimal objective value for the player @p player.
@@ -1283,7 +1281,7 @@ double Game::NashGame::respondSol (arma::vec &sol,      ///< [out] Optimal respo
 		unsigned int Nx = this->PrimalPosition.at (player + 1) - this->PrimalPosition.at (player);
 		sol.zeros (Nx);
 		for (unsigned int i = 0; i < Nx; ++i)
-			sol.at (i) = model->getVarByName ("y_" + to_string (i)).get (GRB_DoubleAttr_X);
+			sol.at (i) = model->getVarByName ("y_" + std::to_string (i)).get (GRB_DoubleAttr_X);
 
 		return model->get (GRB_DoubleAttr_ObjVal);
 	} else
@@ -1330,7 +1328,7 @@ bool Game::NashGame::isSolved (const arma::vec &sol, unsigned int &violPlayer, a
 	 * @brief Checks if the Nash game is solved.
 	 * @details
 	 * Checks if the Nash game is solved, if not provides a proof of deviation
-	 * @param[in] sol - The vector of pure strategies for the Nash Game
+	 * @param[in] sol - The std::vector of pure strategies for the Nash Game
 	 * @param[out] violPlayer - Index of the player with profitable deviation
 	 * @param[out] violSol - The pure strategy for that player - which gives a
 	 * profitable deviation
@@ -1382,7 +1380,7 @@ void Game::EPEC::finalize ()
  */
 {
 	if (this->Finalized)
-		cerr << "Warning in Game::EPEC::finalize: Model already Finalized\n";
+		std::cerr << "Warning in Game::EPEC::finalize: Model already Finalized\n";
 
 	this->NumPlayers = this->getNumLeaders ();
 	/// Game::EPEC::preFinalize() can be overridden, and that code will run before
@@ -1394,11 +1392,11 @@ void Game::EPEC::finalize ()
 		this->Stats.FeasiblePolyhedra = std::vector<unsigned int> (this->NumPlayers, 0);
 		this->computeLeaderLocations (this->numMCVariables);
 		// Initialize leader objective and PlayersQP
-		this->LeaderObjective = vector<shared_ptr<Game::QP_Objective>> (NumPlayers);
-		this->LeaderObjectiveConvexHull = vector<shared_ptr<Game::QP_Objective>> (NumPlayers);
-		this->PlayersQP = vector<shared_ptr<Game::QP_Param>> (NumPlayers);
-		this->PlayersLCP = vector<shared_ptr<Game::LCP>> (NumPlayers);
-		this->SizesWithoutHull = vector<unsigned int> (NumPlayers, 0);
+		this->LeaderObjective = std::vector<std::shared_ptr<Game::QP_Objective>> (NumPlayers);
+		this->LeaderObjectiveConvexHull = std::vector<std::shared_ptr<Game::QP_Objective>> (NumPlayers);
+		this->PlayersQP = std::vector<std::shared_ptr<Game::QP_Param>> (NumPlayers);
+		this->PlayersLCP = std::vector<std::shared_ptr<Game::LCP>> (NumPlayers);
+		this->SizesWithoutHull = std::vector<unsigned int> (NumPlayers, 0);
 
 		for (unsigned int i = 0; i < this->NumPlayers; i++) {
 			this->addDummyLead (i);
@@ -1411,16 +1409,16 @@ void Game::EPEC::finalize ()
 		}
 
 	} catch (const char *e) {
-		cerr << e << '\n';
+		std::cerr << e << '\n';
 		throw;
-	} catch (string &e) {
-		cerr << "String in Game::EPEC::finalize : " << e << '\n';
+	} catch (std::string &e) {
+		std::cerr << "String in Game::EPEC::finalize : " << e << '\n';
 		throw;
 	} catch (GRBException &e) {
-		cerr << "GRBException in Game::EPEC::finalize : " << e.getErrorCode () << ": " << e.getMessage () << '\n';
+		std::cerr << "GRBException in Game::EPEC::finalize : " << e.getErrorCode () << ": " << e.getMessage () << '\n';
 		throw;
-	} catch (exception &e) {
-		cerr << "Exception in Game::EPEC::finalize : " << e.what () << '\n';
+	} catch (std::exception &e) {
+		std::cerr << "Exception in Game::EPEC::finalize : " << e.what () << '\n';
 		throw;
 	}
 
@@ -1440,29 +1438,29 @@ void Game::EPEC::addDummyLead (const unsigned int i ///< The leader to whom dumm
 	// this->Locations.at(i).at(Models::LeaderVars::End);
 
 	if (nEPECvars < nThisCountryvars)
-		throw ("String in Game::EPEC::addDummyLead: Invalid variable counts " + to_string (nEPECvars) + " and " +
-		       to_string (nThisCountryvars));
+		throw ("String in Game::EPEC::addDummyLead: Invalid variable counts " + std::to_string (nEPECvars) + " and " +
+		       std::to_string (nThisCountryvars));
 
 	try {
 		this->PlayersLowerLevels.at (i).get ()->addDummy (nEPECvars - nThisCountryvars);
 	} catch (const char *e) {
-		cerr << e << '\n';
+		std::cerr << e << '\n';
 		throw;
-	} catch (string &e) {
-		cerr << "String in Game::EPEC::add_Dummy_All_Lead : " << e << '\n';
+	} catch (std::string &e) {
+		std::cerr << "String in Game::EPEC::add_Dummy_All_Lead : " << e << '\n';
 		throw;
 	} catch (GRBException &e) {
-		cerr << "GRBException in Game::EPEC::add_Dummy_All_Lead : " << e.getErrorCode () << ": " << e.getMessage ()
+		std::cerr << "GRBException in Game::EPEC::add_Dummy_All_Lead : " << e.getErrorCode () << ": " << e.getMessage ()
 		     << '\n';
 		throw;
-	} catch (exception &e) {
-		cerr << "Exception in Game::EPEC::add_Dummy_All_Lead : " << e.what () << '\n';
+	} catch (std::exception &e) {
+		std::cerr << "Exception in Game::EPEC::add_Dummy_All_Lead : " << e.what () << '\n';
 		throw;
 	}
 }
 
 void Game::EPEC::computeLeaderLocations (const unsigned int addSpaceForMC) {
-	this->LeaderLocations = vector<unsigned int> (this->NumPlayers);
+	this->LeaderLocations = std::vector<unsigned int> (this->NumPlayers);
 	this->LeaderLocations.at (0) = 0;
 	for (unsigned int i = 1; i < this->NumPlayers; i++) {
 		this->LeaderLocations.at (i) = this->LeaderLocations.at (i - 1) + *this->LocEnds.at (i - 1);
@@ -1470,7 +1468,7 @@ void Game::EPEC::computeLeaderLocations (const unsigned int addSpaceForMC) {
 	this->NumVariables = this->LeaderLocations.back () + *this->LocEnds.back () + addSpaceForMC;
 }
 
-void EPEC::getXMinusI (const arma::vec &x, const unsigned int &i, arma::vec &solOther) const {
+void Game::EPEC::getXMinusI (const arma::vec &x, const unsigned int &i, arma::vec &solOther) const {
 	const unsigned int nEPECvars = this->NumVariables;
 	const unsigned int nThisCountryvars = *this->LocEnds.at (i);
 	const unsigned int nThisCountryHullVars = this->ConvexHullVariables.at (i);
@@ -1496,7 +1494,7 @@ void EPEC::getXMinusI (const arma::vec &x, const unsigned int &i, arma::vec &sol
 	}
 }
 
-unique_ptr<GRBModel> Game::EPEC::respond (const unsigned int i, const arma::vec &x) const {
+std::unique_ptr<GRBModel> Game::EPEC::respond (const unsigned int i, const arma::vec &x) const {
 	if (!this->Finalized)
 		throw ("Error in Game::EPEC::respond: Model not Finalized");
 
@@ -1511,16 +1509,16 @@ unique_ptr<GRBModel> Game::EPEC::respond (const unsigned int i, const arma::vec 
 
 double Game::EPEC::respondSol (arma::vec &sol,      ///< [out] Optimal response
                                unsigned int player, ///< Player whose optimal response is to be computed
-                               const arma::vec &x, ///< A vector of pure strategies (either for all players
+                               const arma::vec &x, ///< A std::vector of pure strategies (either for all players
 		///< or all other players
 		                       const arma::vec &prevDev = {}
-		//< [in] if any, the vector of previous deviations.
+		//< [in] if any, the std::vector of previous deviations.
 ) const {
 	/**
 	 * @brief Returns the optimal objective value that is obtainable for the
 	 * player @p player given the decision @p x of all other players.
 	 * @details
-	 * Calls Game::EPEC::respond and obtains the unique_ptr to GRBModel of
+	 * Calls Game::EPEC::respond and obtains the std::unique_ptr to GRBModel of
 	 * best response by player @p player. Then solves the model and returns the
 	 * appropriate objective value.
 	 * @returns The optimal objective value for the player @p player.
@@ -1531,7 +1529,7 @@ double Game::EPEC::respondSol (arma::vec &sol,      ///< [out] Optimal response
 		unsigned int Nx = this->PlayersLCP.at (player)->getNumCols ();
 		sol.zeros (Nx);
 		for (unsigned int i = 0; i < Nx; ++i)
-			sol.at (i) = model->getVarByName ("x_" + to_string (i)).get (GRB_DoubleAttr_X);
+			sol.at (i) = model->getVarByName ("x_" + std::to_string (i)).get (GRB_DoubleAttr_X);
 
 		if (status == GRB_UNBOUNDED) {
 			BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::Respondsol: deviation is "
@@ -1556,7 +1554,7 @@ double Game::EPEC::respondSol (arma::vec &sol,      ///< [out] Optimal response
 				while (!improved) {
 					for (unsigned int i = 0; i < Nx; ++i)
 						sol.at (i) =
-								sol.at (i) + model->getVarByName ("x_" + to_string (i)).get (GRB_DoubleAttr_UnbdRay);
+								sol.at (i) + model->getVarByName ("x_" + std::to_string (i)).get (GRB_DoubleAttr_UnbdRay);
 					newobjvalue = sol * objcoeff;
 					if (newobjvalue.at (0) < objvalue.at (0))
 						improved = true;
@@ -1648,12 +1646,8 @@ const void Game::EPEC::makePlayerQP (const unsigned int i)
 
 		this->LeaderObjectiveConvexHull.at (i).reset (
 				new Game::QP_Objective{origLeadObjec.Q, origLeadObjec.C, origLeadObjec.c});
-		if (this->Stats.AlgorithmParam.PolyLcp) {
 			this->PlayersLCP.at (i)->makeQP (*this->LeaderObjectiveConvexHull.at (i).get (),
 			                                 *this->PlayersQP.at (i).get ());
-		} else {
-			//@todo
-		}
 	}
 }
 
@@ -1695,17 +1689,17 @@ void Game::EPEC::makePlayersQPs ()
 				}
 			}
 		} catch (const char *e) {
-			cerr << e << '\n';
+			std::cerr << e << '\n';
 			throw;
-		} catch (string &e) {
-			cerr << "String in Game::EPEC::makePlayerQP : " << e << '\n';
+		} catch (std::string &e) {
+			std::cerr << "String in Game::EPEC::makePlayerQP : " << e << '\n';
 			throw;
 		} catch (GRBException &e) {
-			cerr << "GRBException in Game::EPEC::makePlayerQP : " << e.getErrorCode () << ": " << e.getMessage ()
+			std::cerr << "GRBException in Game::EPEC::makePlayerQP : " << e.getErrorCode () << ": " << e.getMessage ()
 			     << '\n';
 			throw;
-		} catch (exception &e) {
-			cerr << "Exception in Game::EPEC::makePlayerQP : " << e.what () << '\n';
+		} catch (std::exception &e) {
+			std::cerr << "Exception in Game::EPEC::makePlayerQP : " << e.what () << '\n';
 			throw;
 		}
 	}
@@ -1764,7 +1758,7 @@ bool Game::EPEC::computeNashEq (bool pureNE,           ///< True if we search fo
 	}
 	if (this->Stats.AlgorithmParam.BoundPrimals) {
 		for (unsigned int c = 0; c < this->TheNashGame->getNprimals (); c++) {
-			this->LCPModel->getVarByName ("x_" + to_string (c)).set (GRB_DoubleAttr_UB,
+			this->LCPModel->getVarByName ("x_" + std::to_string (c)).set (GRB_DoubleAttr_UB,
 			                                                         this->Stats.AlgorithmParam.BoundBigM);
 		}
 	}
@@ -1775,7 +1769,7 @@ bool Game::EPEC::computeNashEq (bool pureNE,           ///< True if we search fo
 		this->makeThePureLCP ();
 	}
 
-	// this->LCPModel->set(GRB_IntParam_OutputFlag, 1);
+	this->LCPModel->set(GRB_IntParam_OutputFlag, 1);
 	if (check)
 		this->LCPModel->set (GRB_IntParam_SolutionLimit, GRB_MAXINT);
 	this->LCPModel->optimize ();
@@ -1795,7 +1789,7 @@ bool Game::EPEC::computeNashEq (bool pureNE,           ///< True if we search fo
 			BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: number of equilibria is " << scount;
 			for (int k = 0, stop = 0; k < scount && stop == 0; ++k) {
 				this->LCPModel->getEnv ().set (GRB_IntParam_SolutionNumber, k);
-				this->NashEquilibrium = this->TheLCP->extractSols (this->LCPModel.get (), SolutionZ, SolutionX, true);
+				this->NashEquilibrium = this->TheLCP->extractSols (this->LCPModel.get (), this->SolutionZ, this->SolutionX, true);
 				if (this->isSolved ()) {
 					BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: an Equilibrium has been found";
 					stop = 1;
@@ -1803,6 +1797,8 @@ bool Game::EPEC::computeNashEq (bool pureNE,           ///< True if we search fo
 			}
 		} else {
 			this->NashEquilibrium = true;
+			this->SolutionX.save("dat/X.dat", arma::file_type::arma_ascii);
+			this->SolutionZ.save("dat/Z.dat", arma::file_type::arma_ascii);
 			BOOST_LOG_TRIVIAL(info) << "Game::EPEC::computeNashEq: an Equilibrium has been found";
 		}
 
@@ -1877,14 +1873,14 @@ void Game::EPEC::makeThePureLCP (bool indicators) {
 		for (i = 0; i < this->getNumLeaders (); i++) {
 			for (j = 0; j < this->getNumPolyLead (i); ++j) {
 				pure_bin[count] = this->LCPModel->addVar (0, 1, 0, GRB_BINARY,
-				                                          "pureBin_" + to_string (i) + "_" + to_string (j));
+				                                          "pureBin_" + std::to_string (i) + "_" + std::to_string (j));
 				if (indicators) {
 					this->LCPModel->addGenConstrIndicator (pure_bin[count], 1, this->LCPModel->getVarByName (
-							"x_" + to_string (this->getPositionProbab (i, j))), GRB_EQUAL, 0,
-					                                       "Indicator_PNE_" + to_string (count));
+							"x_" + std::to_string (this->getPositionProbab (i, j))), GRB_EQUAL, 0,
+					                                       "Indicator_PNE_" + std::to_string (count));
 				} else {
 					this->LCPModel->addConstr (
-							this->LCPModel->getVarByName ("x_" + to_string (this->getPositionProbab (i, j))),
+							this->LCPModel->getVarByName ("x_" + std::to_string (this->getPositionProbab (i, j))),
 							GRB_GREATER_EQUAL, pure_bin[count]);
 				}
 				objectiveTerm += pure_bin[count];
@@ -1899,7 +1895,7 @@ void Game::EPEC::makeThePureLCP (bool indicators) {
 			BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::makeThePureLCP: using indicator constraints.";
 		}
 	} catch (GRBException &e) {
-		cerr << "GRBException in Game::EPEC::makeThePureLCP : " << e.getErrorCode () << ": " << e.getMessage () << '\n';
+		std::cerr << "GRBException in Game::EPEC::makeThePureLCP : " << e.getErrorCode () << ": " << e.getMessage () << '\n';
 		throw;
 	}
 }
@@ -2140,7 +2136,7 @@ std::vector<unsigned int> Game::EPEC::mixedStrategyPoly (const unsigned int i, c
 			if (probab > tol)
 				polys.push_back (j);
 		}
-		cout << "\n";
+		std::cout << "\n";
 		return polys;
 	} else {
 		BOOST_LOG_TRIVIAL(warning) << "Cannot use Game::EPEC::mixedStrategyPoly with the current "
@@ -2166,14 +2162,14 @@ double Game::EPEC::getValLeadFoll (const unsigned int i, const unsigned int j) c
 	if (!this->LCPModel)
 		throw std::string ("Error in Game::EPEC::getValLeadFoll: "
 		                   "Game::EPEC::LCPModel not made and solved");
-	return this->LCPModel->getVarByName ("x_" + to_string (this->getPositionLeadFoll (i, j))).get (GRB_DoubleAttr_X);
+	return this->LCPModel->getVarByName ("x_" + std::to_string (this->getPositionLeadFoll (i, j))).get (GRB_DoubleAttr_X);
 }
 
 double Game::EPEC::getValLeadLead (const unsigned int i, const unsigned int j) const {
 	if (!this->LCPModel)
 		throw std::string ("Error in Game::EPEC::getValLeadLead: "
 		                   "Game::EPEC::LCPModel not made and solved");
-	return this->LCPModel->getVarByName ("x_" + to_string (this->getPositionLeadLead (i, j))).get (GRB_DoubleAttr_X);
+	return this->LCPModel->getVarByName ("x_" + std::to_string (this->getPositionLeadLead (i, j))).get (GRB_DoubleAttr_X);
 }
 
 double Game::EPEC::getValLeadFollPoly (const unsigned int i, const unsigned int j, const unsigned int k,
@@ -2185,7 +2181,7 @@ double Game::EPEC::getValLeadFollPoly (const unsigned int i, const unsigned int 
 	if (probab > 1 - tol)
 		return this->getValLeadFoll (i, j);
 	else
-		return this->LCPModel->getVarByName ("x_" + to_string (this->getPositionLeadFollPoly (i, j, k))).get (
+		return this->LCPModel->getVarByName ("x_" + std::to_string (this->getPositionLeadFollPoly (i, j, k))).get (
 				GRB_DoubleAttr_X) / probab;
 }
 
@@ -2198,66 +2194,66 @@ double Game::EPEC::getValLeadLeadPoly (const unsigned int i, const unsigned int 
 	if (probab > 1 - tol)
 		return this->getValLeadLead (i, j);
 	else
-		return this->LCPModel->getVarByName ("x_" + to_string (this->getPositionLeadLeadPoly (i, j, k))).get (
+		return this->LCPModel->getVarByName ("x_" + std::to_string (this->getPositionLeadLeadPoly (i, j, k))).get (
 				GRB_DoubleAttr_X) / probab;
 }
 
 std::string std::to_string (const Game::EPECsolveStatus st) {
 	switch (st) {
-		case EPECsolveStatus::NashEqNotFound:
-			return string ("NO_NASH_EQ_FOUND");
-		case EPECsolveStatus::NashEqFound:
-			return string ("NASH_EQ_FOUND");
-		case EPECsolveStatus::TimeLimit:
-			return string ("TIME_LIMIT");
-		case EPECsolveStatus::Uninitialized:
-			return string ("UNINITIALIZED");
-		case EPECsolveStatus::Numerical:
-			return string ("NUMERICAL_ISSUES");
+		case Game::EPECsolveStatus::NashEqNotFound:
+			return std::string ("NO_NASH_EQ_FOUND");
+		case Game::EPECsolveStatus::NashEqFound:
+			return std::string ("NASH_EQ_FOUND");
+		case Game::EPECsolveStatus::TimeLimit:
+			return std::string ("TIME_LIMIT");
+		case Game::EPECsolveStatus::Uninitialized:
+			return std::string ("UNINITIALIZED");
+		case Game::EPECsolveStatus::Numerical:
+			return std::string ("NUMERICAL_ISSUES");
 	}
 }
 
 std::string std::to_string (const Game::EPECalgorithm al) {
 	switch (al) {
-		case EPECalgorithm::FullEnumeration:
-			return string ("FullEnumeration");
-		case EPECalgorithm::InnerApproximation:
-			return string ("InnerApproximation");
-		case EPECalgorithm::CombinatorialPne:
-			return string ("CombinatorialPNE");
-		case EPECalgorithm::OuterApproximation:
-			return string ("OuterApproximation");
+		case Game::EPECalgorithm::FullEnumeration:
+			return std::string ("FullEnumeration");
+		case Game::EPECalgorithm::InnerApproximation:
+			return std::string ("InnerApproximation");
+		case Game::EPECalgorithm::CombinatorialPne:
+			return std::string ("CombinatorialPNE");
+		case Game::EPECalgorithm::OuterApproximation:
+			return std::string ("OuterApproximation");
 		default:
-			return string ("UNKNOWN_ALGORITHM_") + to_string (static_cast<int>(al));
+			return std::string ("UNKNOWN_ALGORITHM_") + std::to_string (static_cast<int>(al));
 	}
 }
 
 std::string std::to_string (const Game::EPECRecoverStrategy strategy) {
 	switch (strategy) {
 		case Game::EPECRecoverStrategy::IncrementalEnumeration:
-			return string ("IncrementalEnumeration");
+			return std::string ("IncrementalEnumeration");
 		case Game::EPECRecoverStrategy::Combinatorial:
-			return string ("Combinatorial");
+			return std::string ("Combinatorial");
 	}
 }
 
 std::string std::to_string (const Game::EPECAddPolyMethod add) {
 	switch (add) {
-		case EPECAddPolyMethod::Sequential:
-			return string ("Sequential");
-		case EPECAddPolyMethod::ReverseSequential:
-			return string ("ReverseSequential");
-		case EPECAddPolyMethod::Random:
-			return string ("Random");
+		case Game::EPECAddPolyMethod::Sequential:
+			return std::string ("Sequential");
+		case Game::EPECAddPolyMethod::ReverseSequential:
+			return std::string ("ReverseSequential");
+		case Game::EPECAddPolyMethod::Random:
+			return std::string ("Random");
 	}
 }
 
 std::string std::to_string (const Game::EPECAlgorithmParams al) {
 	std::stringstream ss;
-	ss << "Algorithm: " << to_string (al.Algorithm) << '\n';
+	ss << "Algorithm: " << std::to_string (al.Algorithm) << '\n';
 	if (al.Algorithm == Game::EPECalgorithm::InnerApproximation) {
 		ss << "Aggressiveness: " << al.Aggressiveness << '\n';
-		ss << "AddPolyMethod: " << to_string (al.AddPolyMethod) << '\n';
+		ss << "AddPolyMethod: " << std::to_string (al.AddPolyMethod) << '\n';
 	}
 	ss << "Time Limit: " << al.TimeLimit << '\n';
 	ss << "Indicators: " << std::boolalpha << al.Indicators;

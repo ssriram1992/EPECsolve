@@ -2,8 +2,6 @@
 #include "lcp/polylcp.h"
 #include <boost/log/trivial.hpp>
 
-using namespace std;
-
 void Algorithms::FullEnumeration::solve() {
   /** @brief Solve the referenced EPEC instance with the full enumeration
    * @p excludelist contains the set of excluded polyhedra combinations.

@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
       "BoundBigM,bbm", po::value<double>(&boundBigM)->default_value(1e5),
       "Set the bounding BigM related to the parameter --bound")(
       "add,ad", po::value<int>(&add)->default_value(0),
-      "Sets the EPECAddPolyMethod for the InnerApproximation. 0: Sequential. "
+      "Sets the Game::EPECAddPolyMethod for the InnerApproximation. 0: Sequential. "
       "1: ReverseSequential. 2:Random.");
 
   po::variables_map vm;
@@ -170,16 +170,16 @@ int main(int argc, char **argv) {
         epec.setAggressiveness(aggressiveness);
       switch (add) {
       case 1:
-        epec.setAddPolyMethod(EPECAddPolyMethod::ReverseSequential);
+        epec.setAddPolyMethod(Game::EPECAddPolyMethod::ReverseSequential);
         break;
       case 2:
-        epec.setAddPolyMethod(EPECAddPolyMethod::Random);
+        epec.setAddPolyMethod(Game::EPECAddPolyMethod::Random);
         break;
       default:
-        epec.setAddPolyMethod(EPECAddPolyMethod::Sequential);
+        epec.setAddPolyMethod(Game::EPECAddPolyMethod::Sequential);
       }
       if (recover != 0)
-        epec.setRecoverStrategy(EPECRecoverStrategy::Combinatorial);
+        epec.setRecoverStrategy(Game::EPECRecoverStrategy::Combinatorial);
       break;
     }
     case 2: {

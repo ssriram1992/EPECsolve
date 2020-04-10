@@ -4,7 +4,7 @@
 #include <boost/log/trivial.hpp>
 #include <gurobi_c++.h>
 
-class My_EPEC_Prob : public EPEC {
+class My_EPEC_Prob : public Game::EPEC {
 public:
   explicit My_EPEC_Prob(GRBEnv *e) : EPEC(e) {}
   void addLeader(std::shared_ptr<Game::NashGame> N, const unsigned int i) {

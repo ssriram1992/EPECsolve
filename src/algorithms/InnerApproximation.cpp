@@ -9,7 +9,6 @@
 #include <set>
 #include <string>
 
-using namespace std;
 void Algorithms::InnerApproximation::solve() {
   /**
    * Wraps the Algorithm with the postSolving operations
@@ -37,12 +36,12 @@ void Algorithms::InnerApproximation::start() {
   std::vector<arma::vec> prevDevns(this->EPECObject->NumPlayers);
   this->EPECObject->Stats.NumIterations = 0;
   if (this->EPECObject->Stats.AlgorithmParam.AddPolyMethod ==
-      EPECAddPolyMethod::Random) {
+      Game::EPECAddPolyMethod::Random) {
     for (unsigned int i = 0; i < this->EPECObject->NumPlayers; ++i) {
       // 42 is the answer, we all know
       long int seed =
           this->EPECObject->Stats.AlgorithmParam.AddPolyMethodSeed < 0
-              ? chrono::high_resolution_clock::now()
+              ? std::chrono::high_resolution_clock::now()
                         .time_since_epoch()
                         .count() +
                     42 + PolyLCP.at(i)->getNumRows()
@@ -59,7 +58,7 @@ void Algorithms::InnerApproximation::start() {
     ++this->EPECObject->Stats.NumIterations;
     BOOST_LOG_TRIVIAL(info)
         << "Algorithms::InnerApproximation::solve: Iteration "
-        << to_string(this->EPECObject->Stats.NumIterations);
+        << std::to_string(this->EPECObject->Stats.NumIterations);
 
     if (addRandPoly) {
       BOOST_LOG_TRIVIAL(info) << "Algorithms::InnerApproximation::solve: using "
@@ -120,14 +119,14 @@ void Algorithms::InnerApproximation::start() {
             << " In Algorithms::InnerApproximation::solve: Not "
                "Solved, but no deviation? Error!\n This might be due to "
                "Numerical issues (tolerances)";
-        this->EPECObject->Stats.Status = EPECsolveStatus::Numerical;
+        this->EPECObject->Stats.Status = Game::EPECsolveStatus::Numerical;
         solved = true;
       }
       if (infeasCheck && this->EPECObject->Stats.NumIterations == 1) {
         BOOST_LOG_TRIVIAL(warning)
             << " In Algorithms::InnerApproximation::solve: Problem is "
                "infeasible";
-        this->EPECObject->Stats.Status = EPECsolveStatus::NashEqNotFound;
+        this->EPECObject->Stats.Status = Game::EPECsolveStatus::NashEqNotFound;
         return;
       }
     }
@@ -251,7 +250,7 @@ unsigned int Algorithms::InnerApproximation::addDeviatedPolyhedron(
     bool &infeasCheck ///< Useful for the first iteration of iterativeNash. If
                       ///< true, at least one player has no polyhedron that can
                       ///< be added. In the first iteration, this translates to
-                      ///< infeasability
+                      ///< x
 ) const {
   /**
    * Given a profitable deviation for each country, adds <i>a</i> polyhedron in

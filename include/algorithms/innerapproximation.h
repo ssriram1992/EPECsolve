@@ -13,7 +13,7 @@ namespace Algorithms {
 class InnerApproximation : public PolyBase {
 
 public:
-  InnerApproximation(GRBEnv *env, EPEC *EPECObject)
+  InnerApproximation(GRBEnv *env, Game::EPEC *EPECObject)
       : PolyBase(env, EPECObject){};
   void solve() override;
 

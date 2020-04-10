@@ -11,7 +11,7 @@ class PolyBase {
 protected:
   std::vector<std::shared_ptr<Game::PolyLCP>> PolyLCP{};
   GRBEnv *Env;
-  EPEC *EPECObject;
+  Game::EPEC *EPECObject;
 
   void postSolving() {
     /**
@@ -26,7 +26,7 @@ protected:
   }
 
 public:
-  PolyBase(GRBEnv *env, EPEC *EPECObject) {
+  PolyBase(GRBEnv *env, Game::EPEC *EPECObject) {
     /*
      *  The method will reassign the LCP fields in the EPEC object to new
      * PolyLCP objects
@@ -37,7 +37,7 @@ public:
     this->PolyLCP =
         std::vector<std::shared_ptr<Game::PolyLCP>>(EPECObject->NumPlayers);
     for (unsigned int i = 0; i < EPECObject->NumPlayers; i++) {
-      this->PolyLCP.at(i) = std::shared_ptr<Game::PolyLCP>(new class PolyLCP(
+      this->PolyLCP.at(i) = std::shared_ptr<Game::PolyLCP>(new class Game::PolyLCP(
           this->Env, *EPECObject->PlayersLowerLevels.at(i).get()));
       EPECObject->PlayersLCP.at(i) = this->PolyLCP.at(i);
     }

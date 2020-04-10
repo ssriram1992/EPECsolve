@@ -18,7 +18,7 @@ struct testInst {
 };
 
 std::vector<Game::EPECAlgorithmParams>
-allAlgo(EPECAlgorithmParams common_params = {}, bool readCommonConfig = false) {
+allAlgo(Game::EPECAlgorithmParams common_params = {}, bool readCommonConfig = false) {
   std::vector<Game::EPECAlgorithmParams> algs;
   Game::EPECAlgorithmParams alg;
   alg.Threads = TEST_NUM_THREADS;

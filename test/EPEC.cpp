@@ -4,6 +4,7 @@
 using namespace std;
 using namespace arma;
 using namespace Models;
+using namespace Game;
 
 BOOST_AUTO_TEST_CASE(LoggingOff) {
   boost::log::core::get()->set_filter(boost::log::trivial::severity >=

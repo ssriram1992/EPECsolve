@@ -1589,7 +1589,7 @@ void Models::EPEC::WriteFollower(const unsigned int i, const unsigned int j,
 
 void Models::EPEC::testLCP(const unsigned int i) {
   auto country = this->get_LowerLevelNash(i);
-  LCP CountryLCP(this->Env, *country);
+  Game::LCP CountryLCP(this->Env, *country);
   CountryLCP.write("dat/LCP_" + to_string(i));
   auto model = CountryLCP.LCPasMIP(true);
   model->write("dat/CountryLCP_" + to_string(i) + ".lp");

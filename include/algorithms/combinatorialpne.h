@@ -13,7 +13,7 @@ namespace Algorithms {
 ///@brief This class is responsible for the Combinatorial pure-nash Equilibrium
 class CombinatorialPNE : public PolyBase {
 public:
-  CombinatorialPNE(GRBEnv *env, EPEC *EPECObject, bool poly = true)
+  CombinatorialPNE(GRBEnv *env, Game::EPEC *EPECObject, bool poly = true)
       : PolyBase(env, EPECObject){};
   ;
   void solve() override {

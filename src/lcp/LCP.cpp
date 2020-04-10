@@ -8,8 +8,6 @@
 #include <set>
 #include <string>
 
-using namespace std;
-using namespace Utils;
 
 void Game::LCP::defConst(GRBEnv *env)
 /**
@@ -39,8 +37,8 @@ Game::LCP::LCP(
   this->Compl = perps(Compl);
   std::sort(
       this->Compl.begin(), this->Compl.end(),
-      [](pair<unsigned int, unsigned int> a,
-         pair<unsigned int, unsigned int> b) { return a.first < b.first; });
+      [](std::pair<unsigned int, unsigned int> a,
+         std::pair<unsigned int, unsigned int> b) { return a.first < b.first; });
   for (auto p : this->Compl)
     if (p.first != p.second) {
       this->LeadStart = p.first;
@@ -80,8 +78,8 @@ Game::LCP::LCP(
   }
   std::sort(
       this->Compl.begin(), this->Compl.end(),
-      [](pair<unsigned int, unsigned int> a,
-         pair<unsigned int, unsigned int> b) { return a.first < b.first; });
+      [](std::pair<unsigned int, unsigned int> a,
+         std::pair<unsigned int, unsigned int> b) { return a.first < b.first; });
 }
 
 Game::LCP::LCP(GRBEnv *env, const NashGame &N)
@@ -109,8 +107,8 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
   defConst(env);
   this->Compl = perps(Compl);
   sort(this->Compl.begin(), this->Compl.end(),
-       [](pair<unsigned int, unsigned int> a,
-          pair<unsigned int, unsigned int> b) { return a.first < b.first; });
+       [](std::pair<unsigned int, unsigned int> a,
+          std::pair<unsigned int, unsigned int> b) { return a.first < b.first; });
   // Delete no more!
   for (auto p : this->Compl) {
     if (p.first != p.second) {
@@ -141,17 +139,17 @@ void Game::LCP::makeRelaxed()
         << "Game::LCP::makeRelaxed: Initializing variables";
     for (unsigned int i = 0; i < nC; i++)
       x[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS,
-                              "x_" + to_string(i));
+                              "x_" + std::to_string(i));
     for (unsigned int i = 0; i < nR; i++)
       z[i] = RlxdModel.addVar(0, GRB_INFINITY, 1, GRB_CONTINUOUS,
-                              "z_" + to_string(i));
+                              "z_" + std::to_string(i));
     BOOST_LOG_TRIVIAL(trace) << "Game::LCP::makeRelaxed: Added variables";
     for (unsigned int i = 0; i < nR; i++) {
       GRBLinExpr expr = 0;
       for (auto v = M.begin_row(i); v != M.end_row(i); ++v)
         expr += (*v) * x[v.col()];
       expr += q(i);
-      RlxdModel.addConstr(expr, GRB_EQUAL, z[i], "z_" + to_string(i) + "_def");
+      RlxdModel.addConstr(expr, GRB_EQUAL, z[i], "z_" + std::to_string(i) + "_def");
     }
     BOOST_LOG_TRIVIAL(trace)
         << "Game::LCP::makeRelaxed: Added equation definitions";
@@ -168,7 +166,7 @@ void Game::LCP::makeRelaxed()
         for (auto a = _A.begin_row(i); a != _A.end_row(i); ++a)
           expr += (*a) * x[a.col()];
         RlxdModel.addConstr(expr, GRB_LESS_EQUAL, _b(i),
-                            "commonCons_" + to_string(i));
+                            "commonCons_" + std::to_string(i));
       }
       BOOST_LOG_TRIVIAL(trace)
           << "Game::LCP::makeRelaxed: Added common constraints";
@@ -176,23 +174,23 @@ void Game::LCP::makeRelaxed()
     RlxdModel.update();
     this->MadeRlxdModel = true;
   } catch (const char *e) {
-    cerr << "Error in Game::LCP::makeRelaxed: " << e << '\n';
+    std::cerr << "Error in Game::LCP::makeRelaxed: " << e << '\n';
     throw;
-  } catch (string &e) {
-    cerr << "String: Error in Game::LCP::makeRelaxed: " << e << '\n';
+  } catch (std::string &e) {
+    std::cerr << "String: Error in Game::LCP::makeRelaxed: " << e << '\n';
     throw;
-  } catch (exception &e) {
-    cerr << "Exception: Error in Game::LCP::makeRelaxed: " << e.what() << '\n';
+  } catch (std::exception &e) {
+    std::cerr << "Exception: Error in Game::LCP::makeRelaxed: " << e.what() << '\n';
     throw;
   } catch (GRBException &e) {
-    cerr << "GRBException: Error in Game::LCP::makeRelaxed: "
+    std::cerr << "GRBException: Error in Game::LCP::makeRelaxed: "
          << e.getErrorCode() << "; " << e.getMessage() << '\n';
     throw;
   }
 }
 
-unique_ptr<GRBModel> Game::LCP::LCPasMIP(
-    vector<short int>
+std::unique_ptr<GRBModel> Game::LCP::LCPasMIP(
+    std::vector<short int>
         Fixes, ///< For each Variable, +1 fixes the equation to equality and -1
                ///< fixes the variable to equality. A value of 0 fixes neither.
     bool solve ///< Whether the model is to be solved before returned
@@ -211,7 +209,7 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
 {
   if (Fixes.size() != this->nR)
     throw("Game::LCP::LCPasMIP: Bad size for Fixes in Game::LCP::LCPasMIP");
-  vector<unsigned int> FixVar, FixEq;
+  std::vector<unsigned int> FixVar, FixEq;
   for (unsigned int i = 0; i < nR; i++) {
     if (Fixes[i] == 1)
       FixEq.push_back(i);
@@ -221,9 +219,9 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
   return this->LCPasMIP(FixEq, FixVar, solve);
 }
 
-unique_ptr<GRBModel> Game::LCP::LCPasMIP(
-    vector<unsigned int> FixEq,  ///< If any equation is to be fixed to equality
-    vector<unsigned int> FixVar, ///< If any variable is to be fixed to equality
+std::unique_ptr<GRBModel> Game::LCP::LCPasMIP(
+    std::vector<unsigned int> FixEq,  ///< If any equation is to be fixed to equality
+    std::vector<unsigned int> FixVar, ///< If any variable is to be fixed to equality
     bool solve ///< Whether the model should be solved in the function before
                ///< returned.
     )
@@ -238,21 +236,21 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
  */
 {
   makeRelaxed();
-  unique_ptr<GRBModel> model{new GRBModel(this->RlxdModel)};
+  std::unique_ptr<GRBModel> model{new GRBModel(this->RlxdModel)};
   // Creating the model
   try {
     GRBVar x[nC], z[nR], u[nR], v[nR];
     // Get hold of the Variables and Eqn Variables
     for (unsigned int i = 0; i < nC; i++)
-      x[i] = model->getVarByName("x_" + to_string(i));
+      x[i] = model->getVarByName("x_" + std::to_string(i));
     for (unsigned int i = 0; i < nR; i++)
-      z[i] = model->getVarByName("z_" + to_string(i));
+      z[i] = model->getVarByName("z_" + std::to_string(i));
     // Define binary variables for BigM
     for (unsigned int i = 0; i < nR; i++)
-      u[i] = model->addVar(0, 1, 0, GRB_BINARY, "u_" + to_string(i));
+      u[i] = model->addVar(0, 1, 0, GRB_BINARY, "u_" + std::to_string(i));
     if (this->UseIndicators)
       for (unsigned int i = 0; i < nR; i++)
-        v[i] = model->addVar(0, 1, 0, GRB_BINARY, "v_" + to_string(i));
+        v[i] = model->addVar(0, 1, 0, GRB_BINARY, "v_" + std::to_string(i));
     // Include ALL Complementarity constraints using BigM
 
     if (this->UseIndicators) {
@@ -271,28 +269,28 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
       if (!this->UseIndicators) {
         expr = BigM * u[p.first];
         model->addConstr(expr, GRB_GREATER_EQUAL, z[p.first],
-                         "z" + to_string(p.first) + "_L_Mu" +
-                             to_string(p.first));
+                         "z" + std::to_string(p.first) + "_L_Mu" +
+                             std::to_string(p.first));
       } else {
         model->addGenConstrIndicator(
             u[p.first], 1, z[p.first], GRB_LESS_EQUAL, 0,
-            "z_ind_" + to_string(p.first) + "_L_Mu_" + to_string(p.first));
+            "z_ind_" + std::to_string(p.first) + "_L_Mu_" + std::to_string(p.first));
       }
       // x[i] <= M(1-u) constraint
       if (!this->UseIndicators) {
         expr = BigM - BigM * u[p.first];
         model->addConstr(expr, GRB_GREATER_EQUAL, x[p.second],
-                         "x" + to_string(p.first) + "_L_MuDash" +
-                             to_string(p.first));
+                         "x" + std::to_string(p.first) + "_L_MuDash" +
+                             std::to_string(p.first));
       } else {
         model->addGenConstrIndicator(
             v[p.first], 1, x[p.second], GRB_LESS_EQUAL, 0,
-            "x_ind_" + to_string(p.first) + "_L_MuDash_" + to_string(p.first));
+            "x_ind_" + std::to_string(p.first) + "_L_MuDash_" + std::to_string(p.first));
       }
 
       if (this->UseIndicators)
         model->addConstr(u[p.first] + v[p.first], GRB_EQUAL, 1,
-                         "uv_sum_" + to_string(p.first));
+                         "uv_sum_" + std::to_string(p.first));
     }
     // If any equation or variable is to be fixed to zero, that happens here!
     for (auto i : FixVar)
@@ -311,16 +309,16 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(
       model->optimize();
     return model;
   } catch (const char *e) {
-    cerr << "Error in Game::LCP::LCPasMIP: " << e << '\n';
+    std::cerr << "Error in Game::LCP::LCPasMIP: " << e << '\n';
     throw;
-  } catch (string &e) {
-    cerr << "String: Error in Game::LCP::LCPasMIP: " << e << '\n';
+  } catch (std::string &e) {
+    std::cerr << "String: Error in Game::LCP::LCPasMIP: " << e << '\n';
     throw;
-  } catch (exception &e) {
-    cerr << "Exception: Error in Game::LCP::LCPasMIP: " << e.what() << '\n';
+  } catch (std::exception &e) {
+    std::cerr << "Exception: Error in Game::LCP::LCPasMIP: " << e.what() << '\n';
     throw;
   } catch (GRBException &e) {
-    cerr << "GRBException: Error in Game::LCP::LCPasMIP: " << e.getErrorCode()
+    std::cerr << "GRBException: Error in Game::LCP::LCPasMIP: " << e.getErrorCode()
          << "; " << e.getMessage() << '\n';
     throw;
   }
@@ -344,14 +342,14 @@ bool Game::LCP::errorCheck(
     if (nR_t + NumberLeader != nC)
       throw "Game::LCP::errorCheck: Inconsistency between number of leader "
             "vars " +
-          to_string(NumberLeader) + ", number of rows " + to_string(nR_t) +
-          " and number of cols " + to_string(nC);
+          std::to_string(NumberLeader) + ", number of rows " + std::to_string(nR_t) +
+          " and number of cols " + std::to_string(nC);
   }
   return (nR_t == q.n_rows && nR_t + NumberLeader == nC_t);
 }
 
 void Game::LCP::print(const std::string end) {
-  cout << "LCP with " << this->nR << " rows and " << this->nC << " columns."
+  std::cout << "LCP with " << this->nR << " rows and " << this->nC << " columns."
        << end;
 }
 
@@ -378,12 +376,12 @@ bool Game::LCP::extractSols(
   if (extractZ)
     z.zeros(nR);
   for (unsigned int i = 0; i < nR; i++) {
-    x[i] = model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
+    x[i] = model->getVarByName("x_" + std::to_string(i)).get(GRB_DoubleAttr_X);
     if (extractZ)
-      z[i] = model->getVarByName("z_" + to_string(i)).get(GRB_DoubleAttr_X);
+      z[i] = model->getVarByName("z_" + std::to_string(i)).get(GRB_DoubleAttr_X);
   }
   for (unsigned int i = nR; i < nC; i++)
-    x[i] = model->getVarByName("x_" + to_string(i)).get(GRB_DoubleAttr_X);
+    x[i] = model->getVarByName("x_" + std::to_string(i)).get(GRB_DoubleAttr_X);
   return true;
 }
 
@@ -403,13 +401,13 @@ std::vector<short int> Game::LCP::solEncode(const arma::vec &x) const
   return this->solEncode(this->M * x + this->q, x);
 }
 
-vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
+std::vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
                                        const arma::vec &x  ///< Variable values
 ) const
 /// @brief Given variable values and equation values, encodes it in 0/+1/-1
 /// format and returns it.
 {
-  vector<short int> solEncoded(nR, 0);
+  std::vector<short int> solEncoded(nR, 0);
   for (const auto p : Compl) {
     unsigned int i, j;
     i = p.first;
@@ -429,10 +427,10 @@ vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
   return solEncoded;
 }
 
-vector<short int> Game::LCP::solEncode(GRBModel *model) const
+std::vector<short int> Game::LCP::solEncode(GRBModel *model) const
 /// @brief Given a Gurobi model, extracts variable values and equation values,
 /// encodes it in 0/+1/-1 format and returns it.
-/// @warning Note that the vector returned by this function might have to be
+/// @warning Note that the std::vector returned by this function might have to be
 /// explicitly deleted using the delete operator. For specific uses in
 /// LCP::BranchAndPrune, this delete is handled by the class destructor.
 {
@@ -443,7 +441,7 @@ vector<short int> Game::LCP::solEncode(GRBModel *model) const
     return this->solEncode(z, x);
 }
 
-unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
+std::unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
 /** @brief Solves the LCP as a QP using Gurobi */
 /** Removes all complementarity constraints from the QP's constraints. Instead,
  * the sum of products of complementarity pairs is minimized. If the optimal
@@ -454,15 +452,15 @@ unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
  * */
 {
   this->makeRelaxed();
-  unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
+  std::unique_ptr<GRBModel> model(new GRBModel(this->RlxdModel));
   GRBQuadExpr obj = 0;
   GRBVar x[this->nR];
   GRBVar z[this->nR];
   for (const auto p : this->Compl) {
     unsigned int i = p.first;
     unsigned int j = p.second;
-    z[i] = model->getVarByName("z_" + to_string(i));
-    x[i] = model->getVarByName("x_" + to_string(j));
+    z[i] = model->getVarByName("z_" + std::to_string(i));
+    x[i] = model->getVarByName("x_" + std::to_string(j));
     obj += x[i] * z[i];
   }
   model->setObjective(obj, GRB_MINIMIZE);
@@ -474,16 +472,16 @@ unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
           model->get(GRB_DoubleAttr_ObjVal) > this->Eps)
         throw "Game::LCP::LCPasQP: LCP infeasible";
     } catch (const char *e) {
-      cerr << "Error in Game::LCP::LCPasQP: " << e << '\n';
+      std::cerr << "Error in Game::LCP::LCPasQP: " << e << '\n';
       throw;
-    } catch (string &e) {
-      cerr << "String: Error in Game::LCP::LCPasQP: " << e << '\n';
+    } catch (std::string &e) {
+      std::cerr << "String: Error in Game::LCP::LCPasQP: " << e << '\n';
       throw;
-    } catch (exception &e) {
-      cerr << "Exception: Error in Game::LCP::LCPasQP: " << e.what() << '\n';
+    } catch (std::exception &e) {
+      std::cerr << "Exception: Error in Game::LCP::LCPasQP: " << e.what() << '\n';
       throw;
     } catch (GRBException &e) {
-      cerr << "GRBException: Error in Game::LCP::LCPasQP: " << e.getErrorCode()
+      std::cerr << "GRBException: Error in Game::LCP::LCPasQP: " << e.getErrorCode()
            << "; " << e.getMessage() << '\n';
       throw;
     }
@@ -491,10 +489,10 @@ unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
   return model;
 }
 
-unique_ptr<GRBModel> Game::LCP::LCPasMIP(bool solve)
+std::unique_ptr<GRBModel> Game::LCP::LCPasMIP(bool solve)
 /**
  * @brief Helps solving an LCP as an MIP using BigM constraints
- * @returns A unique_ptr to GRBModel that has the equivalent MIP
+ * @returns A std::unique_ptr to GRBModel that has the equivalent MIP
  * @details The MIP problem that is returned by this function is equivalent to
  * the LCP problem provided the value of BigM is large enough.
  * @note This solves just the feasibility problem. Should you need  a leader's
@@ -504,12 +502,12 @@ unique_ptr<GRBModel> Game::LCP::LCPasMIP(bool solve)
   return this->LCPasMIP({}, {}, solve);
 }
 
-unique_ptr<GRBModel>
+std::unique_ptr<GRBModel>
 Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
                       const arma::vec &x_minus_i, bool solve)
 /**
  * @brief Helps solving an LCP as an MIP.
- * @returns A unique_ptr to GRBModel that has the equivalent MIP
+ * @returns A std::unique_ptr to GRBModel that has the equivalent MIP
  * @details The MIP problem that is returned by this function is equivalent to
  * the LCP problem. The function
  * differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader
@@ -518,7 +516,7 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
  * refer LCP::MPECasMIQP
  */
 {
-  unique_ptr<GRBModel> model = this->LCPasMIP(true);
+  std::unique_ptr<GRBModel> model = this->LCPasMIP(true);
   // Reset the solution limit. We need to solve to optimality
   model->set(GRB_IntParam_SolutionLimit, GRB_MAXINT);
   if (C.n_cols != x_minus_i.n_rows)
@@ -528,17 +526,17 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   arma::vec Cx(c.n_rows, arma::fill::zeros);
   try {
     Cx = C * x_minus_i;
-  } catch (exception &e) {
-    cerr << "Exception in Game::LCP::MPECasMIQP: " << e.what() << '\n';
+  } catch (std::exception &e) {
+    std::cerr << "Exception in Game::LCP::MPECasMIQP: " << e.what() << '\n';
     throw;
-  } catch (string &e) {
-    cerr << "Exception in Game::LCP::MPECasMIQP: " << e << '\n';
+  } catch (std::string &e) {
+    std::cerr << "Exception in Game::LCP::MPECasMIQP: " << e << '\n';
     throw;
   }
   arma::vec obj = c + Cx;
   GRBLinExpr expr{0};
   for (unsigned int i = 0; i < obj.n_rows; i++)
-    expr += obj.at(i) * model->getVarByName("x_" + to_string(i));
+    expr += obj.at(i) * model->getVarByName("x_" + std::to_string(i));
   model->setObjective(expr, GRB_MINIMIZE);
   model->set(GRB_IntParam_OutputFlag, 0);
   if (solve)
@@ -546,13 +544,13 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   return model;
 }
 
-unique_ptr<GRBModel>
+std::unique_ptr<GRBModel>
 Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
                       const arma::vec &c, const arma::vec &x_minus_i,
                       bool solve)
 /**
  * @brief Helps solving an LCP as an MIQPs.
- * @returns A unique_ptr to GRBModel that has the equivalent MIQP
+ * @returns A std::unique_ptr to GRBModel that has the equivalent MIQP
  * @details The MIQP problem that is returned by this function is equivalent to
  * the LCP problem provided the value of BigM is large enough. The function
  * differs from LCP::LCPasMIP by the fact that, this explicitly takes a leader
@@ -570,8 +568,8 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
     GRBLinExpr linexpr = model->getObjective(0);
     GRBQuadExpr expr{linexpr};
     for (auto it = Q.begin(); it != Q.end(); ++it)
-      expr += (*it) * model->getVarByName("x_" + to_string(it.row())) *
-              model->getVarByName("x_" + to_string(it.col()));
+      expr += (*it) * model->getVarByName("x_" + std::to_string(it.row())) *
+              model->getVarByName("x_" + std::to_string(it.col()));
     model->setObjective(expr, GRB_MINIMIZE);
   }
   if (solve)
@@ -579,8 +577,8 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
   return model;
 }
 
-void Game::LCP::write(string filename, bool append) const {
-  ofstream outfile(filename, append ? ios::app : ios::out);
+void Game::LCP::write(std::string filename, bool append) const {
+  std::ofstream outfile(filename, append ? arma::ios::app : arma::ios::out);
 
   outfile << nR << " rows and " << nC << " columns in the LCP\n";
   outfile << "LeadStart: " << LeadStart << " \nLeadEnd: " << LeadEnd
@@ -597,26 +595,26 @@ void Game::LCP::write(string filename, bool append) const {
   outfile.close();
 }
 
-void Game::LCP::save(string filename, bool erase) const {
-  Utils::appendSave(string("LCP"), filename, erase);
-  Utils::appendSave(this->M, filename, string("LCP::M"), false);
-  Utils::appendSave(this->q, filename, string("LCP::q"), false);
+void Game::LCP::save(std::string filename, bool erase) const {
+  Utils::appendSave(std::string("LCP"), filename, erase);
+  Utils::appendSave(this->M, filename, std::string("LCP::M"), false);
+  Utils::appendSave(this->q, filename, std::string("LCP::q"), false);
 
-  Utils::appendSave(this->LeadStart, filename, string("LCP::LeadStart"), false);
-  Utils::appendSave(this->LeadEnd, filename, string("LCP::LeadEnd"), false);
+  Utils::appendSave(this->LeadStart, filename, std::string("LCP::LeadStart"), false);
+  Utils::appendSave(this->LeadEnd, filename, std::string("LCP::LeadEnd"), false);
 
-  Utils::appendSave(this->_A, filename, string("LCP::_A"), false);
-  Utils::appendSave(this->_b, filename, string("LCP::_b"), false);
+  Utils::appendSave(this->_A, filename, std::string("LCP::_A"), false);
+  Utils::appendSave(this->_b, filename, std::string("LCP::_b"), false);
 
   BOOST_LOG_TRIVIAL(trace) << "Saved LCP to file " << filename;
 }
 
-long int Game::LCP::load(string filename, long int pos) {
+long int Game::LCP::load(std::string filename, long int pos) {
   if (!this->Env)
     throw("Error in LCP::load: To load LCP from file, it has to be "
           "constructed using LCP(GRBEnv*) constructor");
 
-  string headercheck;
+  std::string headercheck;
   pos = Utils::appendRead(headercheck, filename, pos);
   if (headercheck != "LCP")
     throw("Error in LCP::load: In valid header - ") + headercheck;
@@ -624,12 +622,12 @@ long int Game::LCP::load(string filename, long int pos) {
   arma::sp_mat M_t, A;
   arma::vec q_t, b;
   unsigned int LeadStart_t, LeadEnd_t;
-  pos = Utils::appendRead(M_t, filename, pos, string("LCP::M"));
-  pos = Utils::appendRead(q_t, filename, pos, string("LCP::q"));
-  pos = Utils::appendRead(LeadStart_t, filename, pos, string("LCP::LeadStart"));
-  pos = Utils::appendRead(LeadEnd_t, filename, pos, string("LCP::LeadEnd"));
-  pos = Utils::appendRead(A, filename, pos, string("LCP::_A"));
-  pos = Utils::appendRead(b, filename, pos, string("LCP::_b"));
+  pos = Utils::appendRead(M_t, filename, pos, std::string("LCP::M"));
+  pos = Utils::appendRead(q_t, filename, pos, std::string("LCP::q"));
+  pos = Utils::appendRead(LeadStart_t, filename, pos, std::string("LCP::LeadStart"));
+  pos = Utils::appendRead(LeadEnd_t, filename, pos, std::string("LCP::LeadEnd"));
+  pos = Utils::appendRead(A, filename, pos, std::string("LCP::_A"));
+  pos = Utils::appendRead(b, filename, pos, std::string("LCP::_b"));
 
   this->M = M_t;
   this->q = q_t;

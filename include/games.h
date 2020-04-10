@@ -10,7 +10,6 @@
 #include <set>
 #include <string>
 
-using namespace Game;
 
 template <class T>
 std::ostream &operator<<(std::ostream &ost, std::vector<T> v) {
