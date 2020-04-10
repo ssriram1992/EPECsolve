@@ -1,6 +1,6 @@
 # File name and output name
 # EPEC_HOME=/home/sanksrir/Documents/code/EPEC
-EPEC_HOME=/home/sriram/Dropbox/code/EPEC/code
+EPEC_HOME=/home/sriram/code/EPECstuff/EPECsolve
 SRC=$(EPEC_HOME)/src
 OBJ=$(EPEC_HOME)/obj
 BIN=$(EPEC_HOME)/bin
@@ -12,9 +12,11 @@ ARGS=
 
 # Logging
 # BOOST_HOME=/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0
-BOOST_HOME=/home/sriram/Install/boost_1_70_0
+# BOOST_HOME=/home/sriram/Softwares/boost_1_70_0
+BOOST_HOME=/usr/local
 # BOOST_LIB_D=$(BOOST_HOME)/lib/libboost_
-BOOST_LIB_D=$(BOOST_HOME)/stage/lib/libboost_
+# BOOST_LIB_D=$(BOOST_HOME)/stage/lib/libboost_
+BOOST_LIB_D=$(BOOST_HOME)/lib/libboost_
 # BOOSTLIB=$(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a  -lpthread $(BOOST_LIB_D)prg_exec_monitor.a
 BOOSTLIB=$(BOOST_LIB_D)unit_test_framework.a $(BOOST_LIB_D)program_options.a  $(BOOST_LIB_D)log.a $(BOOST_LIB_D)log_setup.a $(BOOST_LIB_D)system.a $(BOOST_LIB_D)thread.a $(BOOST_LIB_D)chrono.a  -lpthread $(BOOST_LIB_D)prg_exec_monitor.a
 # BOOSTOPT=-I $(BOOST_HOME)/include $(BOOSTLIB) 
@@ -22,25 +24,19 @@ BOOSTOPT=-I $(BOOST_HOME)
 
 # Armadillo stuff
 ARMA=/opt/armadillo-code
-# ARMAINC=-I $(ARMA)/include
 ARMAINC=
-# ARMALIB=-lblas -llapack
 ARMALIB=-larmadillo
 ARMAOPT=$(ARMAINC) 
 
 # Gurobi stuff
-GUR=/opt/gurobi811/linux64
-# GUR=/home/gurobi/8.1.0/linux64
-# GUR=/opt/gurobi/gurobi801/linux64
+GUR=/opt/gurobi901/linux64
 GURINC=-I $(GUR)/include 
-# GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi80 -lm 
-GURLIB= $(GUR)/lib/libgurobi_c++.a $(GUR)/lib/libgurobi81.so -lm  
-# GURLIB=-L $(GUR)/lib -lgurobi_c++ -lgurobi81 -lm 
+GURLIB= $(GUR)/lib/libgurobi_c++.a $(GUR)/lib/libgurobi90.so -lm  
 GUROPT=$(GURINC)
 
 # Generic objects not requiring changes
 # GCC=g++
-GCC=g++-4.8
+GCC=g++
 #OTHEROPTS= -O2 -std=c++11 -I include/
 OTHEROPTS= -O3 -std=c++11 -I include/ #-Wall -Wextra -Wpedantic #-Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wconversion 
 OPTS= $(GUROPT) $(ARMAOPT) $(OTHEROPTS) $(BOOSTOPT) 
