@@ -819,7 +819,7 @@ WARN_LOGFILE           = docs/DocError.txt
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = README.md src/epecsolve.h src/games.h src/lcptolp.h src/models.h src/EPEC.cpp src/Games.cpp src/LCPtoLP.cpp/ src/Models.cpp src/utils.h src/Utils.cpp test/EPEC.cpp src/example.cpp src/QP_Param.doc src/NashLCP.doc src/LCP.doc src/EPEC.doc
+INPUT                  = README.md include/epecsolve.h include/lcp/lcp.h include/lcp/outerlcp.h include/lcp/polylcp.h include/algorithms/algorithms.h include/algorithms/combinatorialpne.h include/algorithms/fullenumeration.h include/algorithms/innerapproximation.h include/algorithms/outerapproximation.h include/algorithms/polybase.h include/games.h include/models.h include/utils.h include/version.h src/CommandLineInterface.cpp src/Games.cpp src/Models.cpp src/Utils.cpp src/algorithms/CombinatorialPNE.cpp src/algorithms/FullEnumeration.cpp src/algorithms/InnerApproximation.cpp src/algorithms/OuterApproximation.cpp src/lcp/LCP.cpp src/lcp/OuterLCP.cpp
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1688,7 +1688,7 @@ EXTRA_SEARCH_MAPPINGS  =
 # If the GENERATE_LATEX tag is set to YES, doxygen will generate LaTeX output.
 # The default value is: YES.
 
-GENERATE_LATEX         = YES
+GENERATE_LATEX         = NO
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put. If a
 # relative path is entered the value of OUTPUT_DIRECTORY will be put in front of
