@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
   string resFile, instanceFile, logFile;
   int writeLevel = 0, nThreads = 0, verbosity = 0, bigM = 0, algorithm = 0,
       aggressiveness = 0, add{0}, recover = 0;
-  double timeLimit = NAN, boundBigM = NAN;
+  double timeLimit = NAN, boundBigM = NAN, devtol = NAN;
   bool bound = 0, pure = 0;
 
   po::options_description desc("EPEC: Allowed options");
@@ -63,10 +63,13 @@ int main(int argc, char **argv) {
       "of Random polyhedra added if no deviation is found. (int)")(
       "bound,bo", po::value<bool>(&bound)->default_value(false),
       "Decides whether primal variables should be bounded or not.")(
+      "devtol,dt", po::value<double>(&devtol)->default_value(-1.0),
+      "Sets the deviation tolerance.")(
       "BoundBigM,bbm", po::value<double>(&boundBigM)->default_value(1e5),
       "Set the bounding BigM related to the parameter --bound")(
       "add,ad", po::value<int>(&add)->default_value(0),
-      "Sets the Game::EPECAddPolyMethod for the InnerApproximation. 0: Sequential. "
+      "Sets the Game::EPECAddPolyMethod for the InnerApproximation. 0: "
+      "Sequential. "
       "1: ReverseSequential. 2:Random.");
 
   po::variables_map vm;
@@ -83,7 +86,8 @@ int main(int argc, char **argv) {
     int major = 0, minor = 0, technical = 0;
     string M, m, p;
     EPECVersion(M, m, p);
-    BOOST_LOG_TRIVIAL(info) << "EPEC Solve Version: " << M << "." << m << "." << p;
+    BOOST_LOG_TRIVIAL(info)
+        << "EPEC Solve Version: " << M << "." << m << "." << p;
     BOOST_LOG_TRIVIAL(info) << "Dependencies:";
     BOOST_LOG_TRIVIAL(info) << "\tARMAdillo: " << ver.as_string();
     GRBversion(&major, &minor, &technical);
@@ -160,6 +164,8 @@ int main(int argc, char **argv) {
       epec.setBoundPrimals(true);
       epec.setBoundBigM(boundBigM);
     }
+    if (devtol > 0)
+      epec.setDeviationTolerance(devtol);
 
     // Algorithm
 

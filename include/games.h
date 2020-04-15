@@ -10,7 +10,6 @@
 #include <set>
 #include <string>
 
-
 template <class T>
 std::ostream &operator<<(std::ostream &ost, std::vector<T> v) {
   for (auto elem : v)
@@ -40,6 +39,7 @@ void compConvSize(arma::sp_mat &A, unsigned int nFinCons, unsigned int nFinVar,
                   const std::vector<arma::sp_mat *> *Ai,
                   const std::vector<arma::vec *> *bi, const arma::sp_mat &Acom,
                   const arma::vec &bcom);
+
 bool isZero(arma::mat M, double tol = 1e-6) noexcept;
 
 bool isZero(arma::sp_mat M, double tol = 1e-6) noexcept;
@@ -67,8 +67,11 @@ protected:
   arma::vec c, b;
   // Object for sizes and integrity check
   unsigned int Nx, Ny, Ncons;
+
   const unsigned int size();
+
   bool dataCheck(bool forceSymmetry = true) const;
+
   virtual inline bool finalize() {
     this->size();
     return this->dataCheck();
@@ -221,6 +224,7 @@ public: // Constructors
   /// a parameterizing vector @p x
   double computeObjective(const arma::vec &y, const arma::vec &x,
                           bool checkFeas = true, double tol = 1e-6) const;
+
   inline bool isPlayable(const QP_Param &P) const
   /// Checks if the current object can play a game with another Game::QP_Param
   /// object @p P.
@@ -231,13 +235,17 @@ public: // Constructors
     b3 = this->Ny <= P.getNx();
     return b1 && b2 && b3;
   }
+
   QP_Param &addDummy(unsigned int pars, unsigned int vars = 0,
                      int position = -1) override;
+
   /// @brief  Writes a given parameterized Mathematical program to a set of
   /// files.
   void write(const std::string &filename, bool append) const override;
+
   /// @brief Saves the @p Game::QP_Param object in a loadable file.
   void save(const std::string &filename, bool erase = true) const;
+
   /// @brief Loads the @p Game::QP_Param object stored in a file.
   long int load(const std::string &filename, long int pos = 0);
 };
@@ -283,15 +291,18 @@ private:
   void setPositions();
 
 public: // Constructors
-        /// To be used only when NashGame is being loaded from a file.
+  /// To be used only when NashGame is being loaded from a file.
   explicit NashGame(GRBEnv *e) noexcept : Env{e} {};
+
   /// Constructing a NashGame from a set of Game::QP_Param, Market clearing
   /// constraints
   explicit NashGame(GRBEnv *e, std::vector<std::shared_ptr<QP_Param>> players,
                     arma::sp_mat MC, arma::vec MCRHS, unsigned int nLeadVar = 0,
                     arma::sp_mat leadA = {}, arma::vec leadRHS = {});
+
   // Copy constructor
   NashGame(const NashGame &N);
+
   ~NashGame() = default;
 
   // Verbose declaration
@@ -335,6 +346,7 @@ public: // Constructors
    * with any equation.
    */
   inline unsigned int getNumLeaderVars() const { return this->numLeaderVar; }
+
   /// @brief Gets the number of dual variables in the problem
   inline unsigned int getNumDualVars() const {
     /**
@@ -352,10 +364,13 @@ public: // Constructors
   inline unsigned int getPrimalLoc(unsigned int i = 0) const {
     return PrimalPosition.at(i);
   }
+
   /// Gets the position where the Market-clearing dual variables start
   inline unsigned int getMCDualLoc() const { return MC_DualPosition; }
+
   /// Gets the position where the Leader  variables start
   inline unsigned int getLeaderLoc() const { return LeaderPosition; }
+
   /// Gets the location where the dual variables start
   inline unsigned int getDualLoc(unsigned int i = 0) const {
     return DualPosition.at(i);
@@ -366,8 +381,11 @@ public: // Constructors
                                bool writeToFile = false,
                                std::string M_name = "dat/LCP.txt",
                                std::string q_name = "dat/q.txt") const;
+
   arma::sp_mat rewriteLeadCons() const;
+
   inline arma::vec getLeadRHS() const { return this->LeaderConstraintsRHS; }
+
   inline arma::vec getMCLeadRHS() const {
     return arma::join_cols(
         arma::join_cols(this->LeaderConstraintsRHS, this->MCRHS), -this->MCRHS);
@@ -376,20 +394,28 @@ public: // Constructors
   // Check solution and correctness
   std::unique_ptr<GRBModel> respond(unsigned int player, const arma::vec &x,
                                     bool fullvec = true) const;
+
   double respondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
                     bool fullvec = true) const;
+
   arma::vec computeQPObjectiveValues(const arma::vec &x,
                                      bool checkFeas = false) const;
+
   bool isSolved(const arma::vec &sol, unsigned int &violPlayer,
                 arma::vec &violSol, double tol = 1e-4) const;
+
   //  Modify NashGame members
   NashGame &addDummy(unsigned int par = 0, int position = -1);
+
   NashGame &addLeadCons(const arma::vec &a, double b);
+
   // Read/Write Nashgame functions
   void write(const std::string &filename, bool append = true,
              bool KKT = false) const;
+
   /// @brief Saves the @p Game::NashGame object in a loadable file.
   void save(const std::string &filename, bool erase = true) const;
+
   /// @brief Loads the @p Game::NashGame object stored in a file.
   long int load(const std::string &filename, long int pos = 0);
 };
@@ -416,12 +442,12 @@ enum class EPECsolveStatus {
 };
 
 enum class EPECalgorithm {
-  FullEnumeration,    ///< Completely enumerate the set of polyhedra for all
-                      ///< followers
+  FullEnumeration, ///< Completely enumerate the set of polyhedra for all
+  ///< followers
   InnerApproximation, ///< Perform increasingly better inner approximations in
   ///< iterations
   CombinatorialPne, ///< Perform a Combinatorial-based search strategy to find a
-                    ///< pure NE
+  ///< pure NE
   OuterApproximation ///< Perform an increasingly improving outer approximation
                      ///< of the feasible region of each leader
 };
@@ -440,14 +466,16 @@ struct EPECAlgorithmParams {
       EPECRecoverStrategy::IncrementalEnumeration;
   bool PolyLcp{
       true}; ///< True if the Algorithm extends the LCP to PolyLCP. Namely, true
-             ///< if the Algorithm uses the polyhedral class for the LCP
+  ///< if the Algorithm uses the polyhedral class for the LCP
   Game::EPECAddPolyMethod AddPolyMethod = Game::EPECAddPolyMethod::Sequential;
   bool BoundPrimals{false}; ///< If true, each QP param is bounded with an
-                            ///< arbitrary large BigM constant
+  ///< arbitrary large BigM constant
   double BoundBigM{1e5}; ///< Bounding upper value if @p BoundPrimals is true.
+  double DeviationTolerance{
+      51e-4}; ///< Tolerance parameter for profitable deviations.
   long int AddPolyMethodSeed{
       -1}; ///< Random seed for the Random selection of polyhedra. If -1, a
-           ///< default computed value will be seeded.
+  ///< default computed value will be seeded.
   bool Indicators{true}; ///< Controls the flag @p UseIndicators in Game::LCP.
   ///< Uses @p BigM if @p false.
   double TimeLimit{
@@ -459,7 +487,7 @@ struct EPECAlgorithmParams {
   ///< in EPEC::iterativeNash
   bool PureNashEquilibrium{
       false}; ///< If true, the Algorithm will tend to search for pure
-  ///< NE. If none exists, it will return a MNE (if exists)
+              ///< NE. If none exists, it will return a MNE (if exists)
 };
 
 /// @brief Stores statistics for a (solved) EPEC instance
@@ -467,18 +495,18 @@ struct EPECStatistics {
   Game::EPECsolveStatus Status = Game::EPECsolveStatus::Uninitialized;
   int NumVar = {-1};        ///< Number of variables in findNashEq model
   int NumIterations = {-1}; ///< Number of iteration of the Algorithm (not valid
-                            ///< for FullEnumeration)
+  ///< for FullEnumeration)
   int NumConstraints = {-1}; ///< Number of constraints in findNashEq model
   int NumNonZero = {-1}; ///< Number of non-zero coefficients in the constraint
   ///< matrix of findNashEq model
   int LostIntermediateEq = {0}; ///< Numer of times InnerApproximation cannot
-                                ///< add polyhedra basing on deviations
+  ///< add polyhedra basing on deviations
   bool NumericalIssues = {
       false}; ///< True if there have been some Numerical issues during the
-              ///< iteration of the InnerApproximation
+  ///< iteration of the InnerApproximation
   std::vector<unsigned int> FeasiblePolyhedra =
       {}; ///< Vector containing the number of non-void polyhedra, indexed by
-          ///< leader (country)
+  ///< leader (country)
   double WallClockTime = {0};
   bool PureNashEquilibrium{false}; ///< True if the equilibrium is a pure NE.
   EPECAlgorithmParams AlgorithmParam =
@@ -495,7 +523,7 @@ private:
       LCPModel; ///< A Gurobi mode object of the LCP form of EPEC
   std::unique_ptr<GRBModel>
       LCPModelBase; ///< A Gurobi mode object of the LCP form of EPEC. If
-                    ///< we are searching for a pure NE,
+  ///< we are searching for a pure NE,
   ///< the LCP which is indifferent to pure or mixed NE is stored in this
   ///< object.
   unsigned int NumVariables{0};
@@ -511,7 +539,7 @@ protected: // Datafields
       LeaderObjective{}; ///< Objective of each leader
   std::vector<std::shared_ptr<Game::QP_Objective>>
       LeaderObjectiveConvexHull{}; ///< Objective of each leader, given the
-                                   ///< convex hull computation
+  ///< convex hull computation
 
   std::unique_ptr<Game::NashGame> TheNashGame; ///< The EPEC nash game
 
@@ -528,8 +556,8 @@ protected: // Datafields
   bool Finalized{false};
   bool NashEquilibrium{
       false}; ///< True if computeNashEq returned an equilibrium. Note that this
-              ///< can be the equilibrium of an approximation, and not to the
-              ///< original game
+  ///< can be the equilibrium of an approximation, and not to the
+  ///< original game
   std::chrono::high_resolution_clock::time_point InitTime;
   EPECStatistics Stats{};      ///< Store run time information
   arma::vec SolutionZ,         ///< Solution equation values
@@ -539,14 +567,18 @@ protected: // Datafields
 private:
   void addDummyLead(unsigned int i); ///< Add Dummy variables for the leaders
   const void makePlayerQP(unsigned int i);
+
   void makePlayersQPs();
+
   void makeTheLCP();
 
   void makeThePureLCP(bool indicators = false);
+
   void computeLeaderLocations(unsigned int addSpaceForMC = 0);
 
   void getXMinusI(const arma::vec &x, const unsigned int &i,
                   arma::vec &solOther) const;
+
   bool computeNashEq(bool pureNE = false, double localTimeLimit = -1.0,
                      bool check = false);
 
@@ -560,10 +592,12 @@ protected: // functions
 
   // virtual function to be optionally implemented by the inheritor.
   virtual void preFinalize();
+
   virtual void postFinalize();
+
   virtual void
   updateLocations() = 0; // If any location tracking system is implemented, that
-                         // can be called from in here.
+  // can be called from in here.
   virtual void makeMCConstraints(arma::sp_mat &MC, arma::vec &RHS) const {
     MC.zeros();
     RHS.zeros();
@@ -572,79 +606,120 @@ protected: // functions
 public: // functions
   // Friends algorithmic classes
   friend class Algorithms::PolyBase;
+
   friend class Algorithms::InnerApproximation;
+
   friend class Algorithms::OuterApproximation;
+
   friend class Algorithms::CombinatorialPNE;
+
   friend class Algorithms::FullEnumeration;
+
   EPEC() = delete;       // No default constructor
   EPEC(EPEC &) = delete; // Abstract class - no copy constructor
   ~EPEC() = default;     // Destructor to free data
 
   void finalize();
+
   const void findNashEq();
 
   std::unique_ptr<GRBModel> respond(const unsigned int i,
                                     const arma::vec &x) const;
-  double respondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
-                    const arma::vec &prevDev) const;
-  bool isSolved(unsigned int *countryNumber, arma::vec *profitableDeviation,
-                double tol = 51e-4) const;
 
-  bool isSolved(double tol = 51e-4) const;
+  double respondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
+                    const arma::vec &prevDev = {}) const;
+
+  bool isSolved(unsigned int *countryNumber, arma::vec *profitableDeviation,
+                double tol = -1) const;
+
+  bool isSolved(double tol = -1) const;
 
   const arma::vec getX() const { return this->SolutionX; }
+
   void reset() { this->SolutionX.ones(); }
+
   const arma::vec getZ() const { return this->SolutionZ; }
+
   ///@brief Get the EPECStatistics object for the current instance
   const EPECStatistics getStatistics() const { return this->Stats; }
+
   void setAlgorithm(Game::EPECalgorithm algorithm);
+
   Game::EPECalgorithm getAlgorithm() const {
     return this->Stats.AlgorithmParam.Algorithm;
   }
+
   void setRecoverStrategy(Game::EPECRecoverStrategy strategy);
+
   Game::EPECRecoverStrategy getRecoverStrategy() const {
     return this->Stats.AlgorithmParam.RecoverStrategy;
   }
+
   void setAggressiveness(unsigned int a) {
     this->Stats.AlgorithmParam.Aggressiveness = a;
   }
+
   unsigned int getAggressiveness() const {
     return this->Stats.AlgorithmParam.Aggressiveness;
   }
+
   void setNumThreads(unsigned int t) {
     this->Stats.AlgorithmParam.Threads = t;
     this->Env->set(GRB_IntParam_Threads, t);
   }
+
   unsigned int getNumThreads() const {
     return this->Stats.AlgorithmParam.Threads;
   }
+
   void setAddPolyMethodSeed(unsigned int t) {
     this->Stats.AlgorithmParam.AddPolyMethodSeed = t;
   }
+
   unsigned long getAddPolyMethodSeed() const {
     return this->Stats.AlgorithmParam.AddPolyMethodSeed;
   }
+
   void setIndicators(bool val) { this->Stats.AlgorithmParam.Indicators = val; }
+
   bool getIndicators() const { return this->Stats.AlgorithmParam.Indicators; }
+
   void setPureNashEquilibrium(bool val) {
     this->Stats.AlgorithmParam.PureNashEquilibrium = val;
   }
+
   bool getPureNashEquilibrium() const {
     return this->Stats.AlgorithmParam.PureNashEquilibrium;
   }
+
   void setBoundPrimals(bool val) {
     this->Stats.AlgorithmParam.BoundPrimals = val;
   }
+
   bool getBoundPrimals() const {
     return this->Stats.AlgorithmParam.BoundPrimals;
   }
+
   void setBoundBigM(double val) { this->Stats.AlgorithmParam.BoundBigM = val; }
+
   double getBoundBigM() const { return this->Stats.AlgorithmParam.BoundBigM; }
+
+  void setDeviationTolerance(double val) {
+    this->Stats.AlgorithmParam.DeviationTolerance = val;
+  }
+
+  double getDeviationTolerance() const {
+    return this->Stats.AlgorithmParam.DeviationTolerance;
+  }
+
   void setTimeLimit(double val) { this->Stats.AlgorithmParam.TimeLimit = val; }
+
   double getTimeLimit() const { return this->Stats.AlgorithmParam.TimeLimit; }
+
   void setAddPolyMethod(Game::EPECAddPolyMethod add) {
     this->Stats.AlgorithmParam.AddPolyMethod = add;
   }
+
   Game::EPECAddPolyMethod getAddPolyMethod() const {
     return this->Stats.AlgorithmParam.AddPolyMethod;
   }
@@ -652,31 +727,44 @@ public: // functions
   // Methods to get positions of variables
   // The below are all const functions which return an unsigned int.
   int getNumVar() const noexcept { return this->NumVariables; }
+
   unsigned int getNumLeaders() const noexcept {
     return static_cast<int>(this->PlayersLowerLevels.size());
   }
+
   unsigned int getPositionLeadFoll(unsigned int i, unsigned int j) const;
+
   unsigned int getPositionLeadLead(unsigned int i, unsigned int j) const;
+
   unsigned int getPositionLeadFollPoly(unsigned int i, unsigned int j,
                                        unsigned int k) const;
+
   unsigned int getPositionLeadLeadPoly(unsigned int i, unsigned int j,
                                        unsigned int k) const;
+
   unsigned int getNumPolyLead(unsigned int i) const;
+
   unsigned int getPositionProbab(unsigned int i, unsigned int k) const;
 
   // The following obtain the variable values
   double getValLeadFoll(unsigned int i, unsigned int j) const;
+
   double getValLeadLead(unsigned int i, unsigned int j) const;
+
   double getValLeadFollPoly(unsigned int i, unsigned int j, unsigned int k,
                             double tol = 1e-5) const;
+
   double getValLeadLeadPoly(unsigned int i, unsigned int j, unsigned int k,
                             double tol = 1e-5) const;
+
   double getValProbab(unsigned int i, unsigned int k) const;
 
   // The following checks if the returned strategy leader is a pure strategy
   // for a leader or appropriately retrieve mixed-strategies
   bool isPureStrategy(unsigned int i, double tol = 1e-5) const;
+
   bool isPureStrategy(double tol = 1e-5) const;
+
   std::vector<unsigned int> mixedStrategyPoly(unsigned int i,
                                               double tol = 1e-5) const;
 
@@ -684,23 +772,35 @@ public: // functions
   /// problem or to prove non-existence of Nash equilibrium. Object is returned
   /// using constant reference.
   const LCP &getLCPDescription() const { return *this->TheLCP.get(); }
+
   /// Get the GRBModel solved in the last iteration to solve the problem or to
   /// prove non-existence of Nash equilibrium. Object is returned using constant
   /// reference.
   const GRBModel &getLCPModel() const { return *this->LCPModel.get(); }
+
   /// Writes the GRBModel solved in the last iteration to solve the problem or
   /// to prove non-existence of Nash equilibrium to a file.
   void writeLCPModel(const std::string &filename) const {
     this->LCPModel->write(filename);
   }
+
+  void getXofI(const arma::vec &x, const unsigned int &i,
+               arma::vec &solI) const;
+
+  void getXWithoutHull(const arma::vec &x, const unsigned int &i,
+                       arma::vec &xWithoutHull) const;
 };
 } // namespace Game
 
 namespace std {
 string to_string(Game::EPECsolveStatus st);
+
 string to_string(Game::EPECalgorithm al);
+
 string to_string(Game::EPECRecoverStrategy st);
+
 string to_string(Game::EPECAlgorithmParams al);
+
 string to_string(Game::EPECAddPolyMethod add);
 }; // namespace std
 
