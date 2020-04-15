@@ -70,13 +70,14 @@ The following I/O options are available:
 
 Algorithmic parameters:
 
-* `-a (--Algorithm) intValue`: Specifies the type of Algorithm employed to solve the instance. *0* is **FullEnumeration**, *1* is **InnerApproximation**, *2* is **CombinatorialPNE**. Note that the latter only works with pure equilibria.
+* `-a (--Algorithm) intValue`: Specifies the type of Algorithm employed to solve the instance. *0* is **FullEnumeration**, *1* is **InnerApproximation**, *2* is **CombinatorialPNE**, *3* is **OuterApproximation**. Note that the latter only works with pure equilibria.
 * `-p (--pure) intValue`: Specifies whether the Algorithm should seek for a pure equilibrium or not (note that **CombinatorialPNE** will always seek for a pure solution) . *0* no requirement (either pure or mixed), *1* only pure.
 * `-BigM intValue`: Specifies the whether LCP problems should be formulated with a LCP. *0* (default) for indicator constraints, *1* for BigM formulation.
 * `-b (--bound) intValue`: Specifies if the final LCP model should be bounded by a *BigM* constant (see option `-BoundBigM`) in their primal variables. *0* no bounding, *1* bounding with *BigM*.
 * `-BoundBigM intValue`: Specifies the *BigM* constant for the above param (see option `-b (--bound)`.
 * `-t (--Threads) intValue`: Specifies the number of Threads Gurobi uses.
 * `-tl (--timelimit) intValue`: Specifies the TimeLimit (in seconds) for running the whole algorithmic procedure.
+* `-dt (--devtol) doubleValue`: Specifies the tolerance parameter to assess whether a deviation exists or not.
 
 Algorithmic parameters tailored on **InnerApproximation**:
 
