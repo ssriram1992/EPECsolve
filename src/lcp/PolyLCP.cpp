@@ -127,7 +127,7 @@ Game::PolyLCP &Game::PolyLCP::addPolyFromX(const arma::vec &x, bool &ret)
 		if (i == 0)
 			++i;
 	}
-	// And then add the relevant polyhedra
+	// And then add the relevant polyhedron
 	ret = this->addPolyFromEncoding(encoding, false);
 	// ret = true;
 	return *this;

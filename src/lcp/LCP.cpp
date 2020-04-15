@@ -401,6 +401,10 @@ std::vector<short int> Game::LCP::solEncode(const arma::vec &x) const
   return this->solEncode(this->M * x + this->q, x);
 }
 
+arma::vec Game::LCP::zFromX(const arma::vec x){
+	return (this->M * x + this->q);
+}
+
 std::vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
                                        const arma::vec &x  ///< Variable values
 ) const

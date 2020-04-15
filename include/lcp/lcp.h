@@ -59,8 +59,6 @@ namespace Game {
 
 		inline std::vector<short int> solEncode (GRBModel *model) const;
 
-		std::vector<short int> solEncode (const arma::vec &x) const;
-
 	public:
 		long double BigM{1e7}; ///< BigM used to rewrite the LCP as MIP
 		double Eps{1e-6}; ///< The threshold for optimality and feasability tolerances
@@ -135,6 +133,10 @@ namespace Game {
 		long int load (std::string filename, long int pos = 0);
 
 		virtual void makeQP (Game::QP_Objective &QP_obj, Game::QP_Param &QP) {}
+
+		std::vector<short int> solEncode (const arma::vec &x) const;
+
+		arma::vec zFromX (const arma::vec x);
 	};
 } // namespace Game
 
