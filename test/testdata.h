@@ -26,6 +26,8 @@ allAlgo(Game::EPECAlgorithmParams common_params = {}, bool readCommonConfig = fa
   algs.push_back(alg);
   alg.Algorithm = Game::EPECalgorithm::CombinatorialPne;
   algs.push_back(alg);
+  alg.Algorithm = Game::EPECalgorithm::OuterApproximation;
+  algs.push_back(alg);
 
   for (int i = 0; i < 2; i++) {
     Game::EPECAlgorithmParams alg_in;

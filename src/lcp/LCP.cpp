@@ -421,7 +421,7 @@ std::vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation va
     if (isZero(x(j)))
       solEncoded.at(i)--;
     if (!isZero(x(j)) && !isZero(z(i)))
-      BOOST_LOG_TRIVIAL(error) << "Infeasible point given! Stay alert! " << x(j)
+      BOOST_LOG_TRIVIAL(trace) << "Infeasible point given! Stay alert! " << x(j)
                                << " " << z(i) << " with i=" << i;
   };
   // std::stringstream enc_str;
