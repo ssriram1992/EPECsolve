@@ -152,7 +152,6 @@ ostream &Models::operator<<(ostream &ost, const Models::LeaderVars l) {
   return ost;
 }
 
-
 bool Models::EPEC::ParamValid(
     const LeadAllPar &Params ///< Object whose validity is to be tested
 ) const
@@ -263,7 +262,7 @@ void Models::EPEC::make_LL_LeadCons(
     ///< exist or no limit?
     const unsigned int
         activeTaxCaps ///< Number of active Tax Caps constraints. If strictly
-    ///< positive, tax cap constraint(s) will be enforced
+                      ///< positive, tax cap constraint(s) will be enforced
 ) const noexcept
 /**
  * Makes the leader level constraints for a country.

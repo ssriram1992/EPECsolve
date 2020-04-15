@@ -37,8 +37,9 @@ public:
     this->PolyLCP =
         std::vector<std::shared_ptr<Game::PolyLCP>>(EPECObject->NumPlayers);
     for (unsigned int i = 0; i < EPECObject->NumPlayers; i++) {
-      this->PolyLCP.at(i) = std::shared_ptr<Game::PolyLCP>(new class Game::PolyLCP(
-          this->Env, *EPECObject->PlayersLowerLevels.at(i).get()));
+      this->PolyLCP.at(i) =
+          std::shared_ptr<Game::PolyLCP>(new class Game::PolyLCP(
+              this->Env, *EPECObject->PlayersLowerLevels.at(i).get()));
       EPECObject->PlayersLCP.at(i) = this->PolyLCP.at(i);
     }
   }

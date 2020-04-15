@@ -9,7 +9,6 @@
 #include <fstream>
 #include <set>
 
-
 namespace Utils {
 arma::sp_mat resizePatch(const arma::sp_mat &mat, const unsigned int nR,
                          const unsigned int nC);
@@ -65,6 +64,5 @@ unsigned long int vecToNum(std::vector<short int> binary);
 std::vector<short int> numToVec(unsigned long int number,
                                 const unsigned long nCompl);
 } // namespace Utils
-
 
 // namespace Utils

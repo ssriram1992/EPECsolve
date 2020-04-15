@@ -4,7 +4,6 @@
 #include <gurobi_c++.h>
 #include <set>
 
-
 void Algorithms::CombinatorialPNE::solveWithExcluded(
     const std::vector<std::set<unsigned long int>> &excludeList) {
   /** @brief Solve the referenced EPEC instance with the Combinatorial

@@ -8,7 +8,6 @@
 #include <set>
 #include <string>
 
-
 void Game::LCP::defConst(GRBEnv *env)
 /**
  * @brief Assign default values to LCP attributes
@@ -35,10 +34,11 @@ Game::LCP::LCP(
 {
   defConst(env);
   this->Compl = perps(Compl);
-  std::sort(
-      this->Compl.begin(), this->Compl.end(),
-      [](std::pair<unsigned int, unsigned int> a,
-         std::pair<unsigned int, unsigned int> b) { return a.first < b.first; });
+  std::sort(this->Compl.begin(), this->Compl.end(),
+            [](std::pair<unsigned int, unsigned int> a,
+               std::pair<unsigned int, unsigned int> b) {
+              return a.first < b.first;
+            });
   for (auto p : this->Compl)
     if (p.first != p.second) {
       this->LeadStart = p.first;
@@ -76,10 +76,11 @@ Game::LCP::LCP(
     unsigned int count = i < leadStart ? i : i + NumberLeader;
     this->Compl.push_back({i, count});
   }
-  std::sort(
-      this->Compl.begin(), this->Compl.end(),
-      [](std::pair<unsigned int, unsigned int> a,
-         std::pair<unsigned int, unsigned int> b) { return a.first < b.first; });
+  std::sort(this->Compl.begin(), this->Compl.end(),
+            [](std::pair<unsigned int, unsigned int> a,
+               std::pair<unsigned int, unsigned int> b) {
+              return a.first < b.first;
+            });
 }
 
 Game::LCP::LCP(GRBEnv *env, const NashGame &N)
@@ -108,7 +109,9 @@ Game::LCP::LCP(GRBEnv *env, const NashGame &N)
   this->Compl = perps(Compl);
   sort(this->Compl.begin(), this->Compl.end(),
        [](std::pair<unsigned int, unsigned int> a,
-          std::pair<unsigned int, unsigned int> b) { return a.first < b.first; });
+          std::pair<unsigned int, unsigned int> b) {
+         return a.first < b.first;
+       });
   // Delete no more!
   for (auto p : this->Compl) {
     if (p.first != p.second) {
@@ -149,7 +152,8 @@ void Game::LCP::makeRelaxed()
       for (auto v = M.begin_row(i); v != M.end_row(i); ++v)
         expr += (*v) * x[v.col()];
       expr += q(i);
-      RlxdModel.addConstr(expr, GRB_EQUAL, z[i], "z_" + std::to_string(i) + "_def");
+      RlxdModel.addConstr(expr, GRB_EQUAL, z[i],
+                          "z_" + std::to_string(i) + "_def");
     }
     BOOST_LOG_TRIVIAL(trace)
         << "Game::LCP::makeRelaxed: Added equation definitions";
@@ -180,11 +184,12 @@ void Game::LCP::makeRelaxed()
     std::cerr << "String: Error in Game::LCP::makeRelaxed: " << e << '\n';
     throw;
   } catch (std::exception &e) {
-    std::cerr << "Exception: Error in Game::LCP::makeRelaxed: " << e.what() << '\n';
+    std::cerr << "Exception: Error in Game::LCP::makeRelaxed: " << e.what()
+              << '\n';
     throw;
   } catch (GRBException &e) {
     std::cerr << "GRBException: Error in Game::LCP::makeRelaxed: "
-         << e.getErrorCode() << "; " << e.getMessage() << '\n';
+              << e.getErrorCode() << "; " << e.getMessage() << '\n';
     throw;
   }
 }
@@ -219,12 +224,14 @@ std::unique_ptr<GRBModel> Game::LCP::LCPasMIP(
   return this->LCPasMIP(FixEq, FixVar, solve);
 }
 
-std::unique_ptr<GRBModel> Game::LCP::LCPasMIP(
-    std::vector<unsigned int> FixEq,  ///< If any equation is to be fixed to equality
-    std::vector<unsigned int> FixVar, ///< If any variable is to be fixed to equality
-    bool solve ///< Whether the model should be solved in the function before
-               ///< returned.
-    )
+std::unique_ptr<GRBModel>
+Game::LCP::LCPasMIP(std::vector<unsigned int>
+                        FixEq, ///< If any equation is to be fixed to equality
+                    std::vector<unsigned int>
+                        FixVar, ///< If any variable is to be fixed to equality
+                    bool solve  ///< Whether the model should be solved in the
+                               ///< function before returned.
+                    )
 /**
  * Uses the big M method to solve the complementarity problem. The variables and
  * equations to be set to equality can be given in FixVar and FixEq.
@@ -272,9 +279,10 @@ std::unique_ptr<GRBModel> Game::LCP::LCPasMIP(
                          "z" + std::to_string(p.first) + "_L_Mu" +
                              std::to_string(p.first));
       } else {
-        model->addGenConstrIndicator(
-            u[p.first], 1, z[p.first], GRB_LESS_EQUAL, 0,
-            "z_ind_" + std::to_string(p.first) + "_L_Mu_" + std::to_string(p.first));
+        model->addGenConstrIndicator(u[p.first], 1, z[p.first], GRB_LESS_EQUAL,
+                                     0,
+                                     "z_ind_" + std::to_string(p.first) +
+                                         "_L_Mu_" + std::to_string(p.first));
       }
       // x[i] <= M(1-u) constraint
       if (!this->UseIndicators) {
@@ -285,7 +293,8 @@ std::unique_ptr<GRBModel> Game::LCP::LCPasMIP(
       } else {
         model->addGenConstrIndicator(
             v[p.first], 1, x[p.second], GRB_LESS_EQUAL, 0,
-            "x_ind_" + std::to_string(p.first) + "_L_MuDash_" + std::to_string(p.first));
+            "x_ind_" + std::to_string(p.first) + "_L_MuDash_" +
+                std::to_string(p.first));
       }
 
       if (this->UseIndicators)
@@ -315,11 +324,12 @@ std::unique_ptr<GRBModel> Game::LCP::LCPasMIP(
     std::cerr << "String: Error in Game::LCP::LCPasMIP: " << e << '\n';
     throw;
   } catch (std::exception &e) {
-    std::cerr << "Exception: Error in Game::LCP::LCPasMIP: " << e.what() << '\n';
+    std::cerr << "Exception: Error in Game::LCP::LCPasMIP: " << e.what()
+              << '\n';
     throw;
   } catch (GRBException &e) {
-    std::cerr << "GRBException: Error in Game::LCP::LCPasMIP: " << e.getErrorCode()
-         << "; " << e.getMessage() << '\n';
+    std::cerr << "GRBException: Error in Game::LCP::LCPasMIP: "
+              << e.getErrorCode() << "; " << e.getMessage() << '\n';
     throw;
   }
   return nullptr;
@@ -342,15 +352,15 @@ bool Game::LCP::errorCheck(
     if (nR_t + NumberLeader != nC)
       throw "Game::LCP::errorCheck: Inconsistency between number of leader "
             "vars " +
-          std::to_string(NumberLeader) + ", number of rows " + std::to_string(nR_t) +
-          " and number of cols " + std::to_string(nC);
+          std::to_string(NumberLeader) + ", number of rows " +
+          std::to_string(nR_t) + " and number of cols " + std::to_string(nC);
   }
   return (nR_t == q.n_rows && nR_t + NumberLeader == nC_t);
 }
 
 void Game::LCP::print(const std::string end) {
-  std::cout << "LCP with " << this->nR << " rows and " << this->nC << " columns."
-       << end;
+  std::cout << "LCP with " << this->nR << " rows and " << this->nC
+            << " columns." << end;
 }
 
 bool Game::LCP::extractSols(
@@ -378,7 +388,8 @@ bool Game::LCP::extractSols(
   for (unsigned int i = 0; i < nR; i++) {
     x[i] = model->getVarByName("x_" + std::to_string(i)).get(GRB_DoubleAttr_X);
     if (extractZ)
-      z[i] = model->getVarByName("z_" + std::to_string(i)).get(GRB_DoubleAttr_X);
+      z[i] =
+          model->getVarByName("z_" + std::to_string(i)).get(GRB_DoubleAttr_X);
   }
   for (unsigned int i = nR; i < nC; i++)
     x[i] = model->getVarByName("x_" + std::to_string(i)).get(GRB_DoubleAttr_X);
@@ -401,12 +412,13 @@ std::vector<short int> Game::LCP::solEncode(const arma::vec &x) const
   return this->solEncode(this->M * x + this->q, x);
 }
 
-arma::vec Game::LCP::zFromX(const arma::vec x){
-	return (this->M * x + this->q);
+arma::vec Game::LCP::zFromX(const arma::vec x) {
+  return (this->M * x + this->q);
 }
 
-std::vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation values
-                                       const arma::vec &x  ///< Variable values
+std::vector<short int>
+Game::LCP::solEncode(const arma::vec &z, ///< Equation values
+                     const arma::vec &x  ///< Variable values
 ) const
 /// @brief Given variable values and equation values, encodes it in 0/+1/-1
 /// format and returns it.
@@ -434,8 +446,8 @@ std::vector<short int> Game::LCP::solEncode(const arma::vec &z, ///< Equation va
 std::vector<short int> Game::LCP::solEncode(GRBModel *model) const
 /// @brief Given a Gurobi model, extracts variable values and equation values,
 /// encodes it in 0/+1/-1 format and returns it.
-/// @warning Note that the std::vector returned by this function might have to be
-/// explicitly deleted using the delete operator. For specific uses in
+/// @warning Note that the std::vector returned by this function might have to
+/// be explicitly deleted using the delete operator. For specific uses in
 /// LCP::BranchAndPrune, this delete is handled by the class destructor.
 {
   arma::vec x, z;
@@ -482,11 +494,12 @@ std::unique_ptr<GRBModel> Game::LCP::LCPasQP(bool solve)
       std::cerr << "String: Error in Game::LCP::LCPasQP: " << e << '\n';
       throw;
     } catch (std::exception &e) {
-      std::cerr << "Exception: Error in Game::LCP::LCPasQP: " << e.what() << '\n';
+      std::cerr << "Exception: Error in Game::LCP::LCPasQP: " << e.what()
+                << '\n';
       throw;
     } catch (GRBException &e) {
-      std::cerr << "GRBException: Error in Game::LCP::LCPasQP: " << e.getErrorCode()
-           << "; " << e.getMessage() << '\n';
+      std::cerr << "GRBException: Error in Game::LCP::LCPasQP: "
+                << e.getErrorCode() << "; " << e.getMessage() << '\n';
       throw;
     }
   }
@@ -604,8 +617,10 @@ void Game::LCP::save(std::string filename, bool erase) const {
   Utils::appendSave(this->M, filename, std::string("LCP::M"), false);
   Utils::appendSave(this->q, filename, std::string("LCP::q"), false);
 
-  Utils::appendSave(this->LeadStart, filename, std::string("LCP::LeadStart"), false);
-  Utils::appendSave(this->LeadEnd, filename, std::string("LCP::LeadEnd"), false);
+  Utils::appendSave(this->LeadStart, filename, std::string("LCP::LeadStart"),
+                    false);
+  Utils::appendSave(this->LeadEnd, filename, std::string("LCP::LeadEnd"),
+                    false);
 
   Utils::appendSave(this->_A, filename, std::string("LCP::_A"), false);
   Utils::appendSave(this->_b, filename, std::string("LCP::_b"), false);
@@ -628,8 +643,10 @@ long int Game::LCP::load(std::string filename, long int pos) {
   unsigned int LeadStart_t, LeadEnd_t;
   pos = Utils::appendRead(M_t, filename, pos, std::string("LCP::M"));
   pos = Utils::appendRead(q_t, filename, pos, std::string("LCP::q"));
-  pos = Utils::appendRead(LeadStart_t, filename, pos, std::string("LCP::LeadStart"));
-  pos = Utils::appendRead(LeadEnd_t, filename, pos, std::string("LCP::LeadEnd"));
+  pos = Utils::appendRead(LeadStart_t, filename, pos,
+                          std::string("LCP::LeadStart"));
+  pos =
+      Utils::appendRead(LeadEnd_t, filename, pos, std::string("LCP::LeadEnd"));
   pos = Utils::appendRead(A, filename, pos, std::string("LCP::_A"));
   pos = Utils::appendRead(b, filename, pos, std::string("LCP::_b"));
 

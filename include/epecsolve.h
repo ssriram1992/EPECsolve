@@ -9,8 +9,6 @@
 #include <memory>
 #include <vector>
 
-
-
 using perps = std::vector<std::pair<unsigned int, unsigned int>>;
 std::ostream &operator<<(std::ostream &ost, perps C);
 template <class T>
