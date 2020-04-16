@@ -35,7 +35,7 @@ bool operator<(std::vector<short int> encoding1,
  *  	Either the same value as the grand child, or has 0 in that location
  *
  *  \b Grandchild:
- *  	Same val as grand parent in every location, except anumVariablesY val
+ *  	Same val as grand parent in every location, except any val
  * allowed, if grandparent is 0
  * @warning Might be deprecated, as it pollutes global namespaces
  * @returns @p true if encoding1 is (grand) child of encoding2
@@ -94,11 +94,8 @@ unsigned int Game::PolyLCP::convexHull(
 }
 Game::PolyLCP &Game::PolyLCP::addPolyFromX(const arma::vec &x, bool &ret)
 /**
- * Given a <i> feasible </i> point @p x, checks if anumVariablesY polyhedron
- * that contains
- * @p x is already a part of this->Ai and this-> bi. If it is, then this does
- * nothing, except for printing a log message. If not, it adds a polyhedron
- * containing this vector.
+ * Given a <i> feasible </i> point @p x, checks if a polyhedron
+ * that contains  @p x is already a part of this->Ai and this-> bi. If it is, then this does nothing, except for printing a log message. If not, it adds a polyhedron containing this vector.
  */
 {
   const auto numCompl = this->Compl.size();
@@ -123,7 +120,7 @@ Game::PolyLCP &Game::PolyLCP::addPolyFromX(const arma::vec &x, bool &ret)
   BOOST_LOG_TRIVIAL(trace)
       << "Game::PolyLCP::addPolyFromX: New encoding not in All Polyhedra! ";
   // If it is not in AllPolyhedra
-  // First change anumVariablesY zero indices of encoding to 1
+  // First change any zero indices of encoding to 1
   for (short &i : encoding) {
     if (i == 0)
       ++i;
@@ -273,7 +270,8 @@ Game::PolyLCP &Game::PolyLCP::addPoliesFromEncoding(
   return *this;
 }
 
-unsigned long int Game::PolyLCP::getNextPoly(Game::EPECAddPolyMethod method) {
+unsigned long int Game::PolyLCP::getNextPoly(Game::EPECAddPolyMethod method ///< The method used to add the next polyedron
+		) {
   /**
    * Returns a polyhedron (in its decimal encoding) that is neither already
    * known to be infeasible, nor already added in the inner approximation
@@ -457,6 +455,10 @@ void Game::PolyLCP::makeQP(
 }
 
 std::string Game::PolyLCP::feasabilityDetailString() const {
+	/**
+	 * Returns a string that has the decimal encoding of all polyhedra
+	 * which are part of Game::PolyLCP::AllPolyhedra
+	 */
   std::stringstream ss;
   ss << "\tProven feasible: ";
   for (auto vv : this->AllPolyhedra)
@@ -528,6 +530,17 @@ bool Game::PolyLCP::checkPolyFeas(
         &encoding ///< A vector of +1 and -1 referring to which
     ///< equations and variables are taking 0 value.)
 ) {
+	/**
+	 * Check whether the given polyhedron is or is not feasible.
+	 * @detail Given a +1/-1 encoding of a polyhedron, first checks 
+	 * if the polyhedron is a previously known feasible polyhedron
+	 * or previously known infeasible polyhedron. If yes, returns the 
+	 * result appropriately. If not, solves a linear program to 
+	 * decide the feasibility of the given polyhedra.
+	 *
+	 * Not @p const because it could update Game::PolyLCP::InfeasiblePoly
+	 * and Game::PolyLCP::FeasiblePoly.
+	 */
 
   unsigned long int encodingNumber = Utils::vecToNum(encoding);
 
