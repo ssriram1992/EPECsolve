@@ -230,7 +230,7 @@ Game::LCP::LCPasMIP(std::vector<unsigned int>
                     std::vector<unsigned int>
                         FixVar, ///< If any variable is to be fixed to equality
                     bool solve  ///< Whether the model should be solved in the
-                               ///< function before returned.
+                                ///< function before returned.
                     )
 /**
  * Uses the big M method to solve the complementarity problem. The variables and

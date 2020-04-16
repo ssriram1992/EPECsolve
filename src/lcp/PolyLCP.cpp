@@ -95,7 +95,9 @@ unsigned int Game::PolyLCP::convexHull(
 Game::PolyLCP &Game::PolyLCP::addPolyFromX(const arma::vec &x, bool &ret)
 /**
  * Given a <i> feasible </i> point @p x, checks if a polyhedron
- * that contains  @p x is already a part of this->Ai and this-> bi. If it is, then this does nothing, except for printing a log message. If not, it adds a polyhedron containing this vector.
+ * that contains  @p x is already a part of this->Ai and this-> bi. If it is,
+ * then this does nothing, except for printing a log message. If not, it adds a
+ * polyhedron containing this vector.
  */
 {
   const auto numCompl = this->Compl.size();
@@ -270,8 +272,10 @@ Game::PolyLCP &Game::PolyLCP::addPoliesFromEncoding(
   return *this;
 }
 
-unsigned long int Game::PolyLCP::getNextPoly(Game::EPECAddPolyMethod method ///< The method used to add the next polyedron
-		) {
+unsigned long int Game::PolyLCP::getNextPoly(
+    Game::EPECAddPolyMethod
+        method ///< The method used to add the next polyedron
+) {
   /**
    * Returns a polyhedron (in its decimal encoding) that is neither already
    * known to be infeasible, nor already added in the inner approximation
@@ -428,7 +432,7 @@ void Game::PolyLCP::makeQP(
         &QP_obj, ///< The objective function of the QP to be returned. @warning
     ///< Size of this parameter might change!
     Game::QP_Param &QP ///< The output parameter where the final Game::QP_Param
-    ///< object is stored
+                       ///< object is stored
 
 ) {
   // Original sizes
@@ -455,10 +459,10 @@ void Game::PolyLCP::makeQP(
 }
 
 std::string Game::PolyLCP::feasabilityDetailString() const {
-	/**
-	 * Returns a string that has the decimal encoding of all polyhedra
-	 * which are part of Game::PolyLCP::AllPolyhedra
-	 */
+  /**
+   * Returns a string that has the decimal encoding of all polyhedra
+   * which are part of Game::PolyLCP::AllPolyhedra
+   */
   std::stringstream ss;
   ss << "\tProven feasible: ";
   for (auto vv : this->AllPolyhedra)
@@ -528,19 +532,19 @@ bool Game::PolyLCP::checkPolyFeas(
 bool Game::PolyLCP::checkPolyFeas(
     const std::vector<short int>
         &encoding ///< A vector of +1 and -1 referring to which
-    ///< equations and variables are taking 0 value.)
+                  ///< equations and variables are taking 0 value.)
 ) {
-	/**
-	 * Check whether the given polyhedron is or is not feasible.
-	 * @detail Given a +1/-1 encoding of a polyhedron, first checks 
-	 * if the polyhedron is a previously known feasible polyhedron
-	 * or previously known infeasible polyhedron. If yes, returns the 
-	 * result appropriately. If not, solves a linear program to 
-	 * decide the feasibility of the given polyhedra.
-	 *
-	 * Not @p const because it could update Game::PolyLCP::InfeasiblePoly
-	 * and Game::PolyLCP::FeasiblePoly.
-	 */
+  /**
+   * Check whether the given polyhedron is or is not feasible.
+   * @detail Given a +1/-1 encoding of a polyhedron, first checks
+   * if the polyhedron is a previously known feasible polyhedron
+   * or previously known infeasible polyhedron. If yes, returns the
+   * result appropriately. If not, solves a linear program to
+   * decide the feasibility of the given polyhedra.
+   *
+   * Not @p const because it could update Game::PolyLCP::InfeasiblePoly
+   * and Game::PolyLCP::FeasiblePoly.
+   */
 
   unsigned long int encodingNumber = Utils::vecToNum(encoding);
 

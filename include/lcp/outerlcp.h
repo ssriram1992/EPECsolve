@@ -12,7 +12,7 @@ namespace Game {
 class OuterLCP : public LCP {
   // using LCP::LCP;
   /**
-   * @brief Inheritor Class to handle the outer approximation for the LCP class
+   * @brief Inheritor Class to handle the outer approximation of the LCP class
    */
 public:
   OuterLCP(GRBEnv *env, const NashGame &N) : LCP(env, N) {
@@ -45,7 +45,8 @@ private:
   std::unique_ptr<vec_Vec>
       bi; ///< Vector to contain the RHS of inner approx polyhedra
   std::set<unsigned long int> Approximation =
-      {}; ///< Decimal encoding of polyhedra that have been enumerated
+      {}; ///< Decimal encoding of polyhedra that have been enumerated.
+          ///< Analogous to Game::PolyLCP::AllPolyhedra
   std::set<unsigned long int> FeasibleComponents =
       {}; ///< Decimal encoding of polyhedra that have been enumerated
   std::set<unsigned long int> InfeasibleComponents =

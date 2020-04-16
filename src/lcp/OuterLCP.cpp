@@ -7,7 +7,9 @@ unsigned int Game::OuterLCP::convexHull(
     arma::vec &b)    ///< Convex hull inequality description RHS
 ///< to be stored here
 /**
- * Computes the convex hull of the feasible region of the LCP
+ * Computes the convex hull of the feasible region of the LCP.
+ * @internal A copy of Game::PolyLCP::convexHull verbatim
+ * @todo To migrate to a non redundant code setting
  */
 {
   const std::vector<arma::sp_mat *> tempAi = [](spmat_Vec &uv) {
@@ -38,8 +40,19 @@ unsigned int Game::OuterLCP::convexHull(
     return Game::convexHull(&tempAi, &tempbi, A, b, A_common, b_common);
 }
 
-void Game::OuterLCP::makeQP(Game::QP_Objective &QP_obj, Game::QP_Param &QP) {
-
+void Game::OuterLCP::makeQP(
+    Game::QP_Objective &QP_obj, ///< [in/out] Objective function of the final QP
+                                ///< that has to be made
+    Game::QP_Param &QP ///< [out] This is the Game::QP_Param that results from
+                       ///< the input objective and the convex hull of the
+                       ///< region defined by Game::OuterLCP
+) {
+  /**
+   * Given that the Game::OuterLCP stores an approximation to the LCP feasible
+   * region, calls Game::OuterLCP::convexHull to construct the convex hull. The
+   * polyhedral convex hull and the given objective are combinaed to create the
+   * output Game::QP_Param.
+   */
   // Original sizes
   if (this->Ai->empty())
     return;
@@ -89,6 +102,23 @@ void Game::OuterLCP::outerApproximate(const std::vector<bool> encoding,
 }
 
 void Game::OuterLCP::addChildComponents(const std::vector<short int> encoding) {
+  /**
+   * @param encoding - Each element is either 0, 1, -1 or 2 in this std::vector
+   * of size equal to Game::OuterLCP::nR.
+   *
+   * 0 implies it is an unprocessed complementarity condition, and don't process
+   * it now. +1/-1 implies it is a processed complementarity condition, nothing
+   * more has to be done. 2 implies it is an unprocessed complementarity
+   * condition and process it now.
+   *
+   * So, if given an input, which has 2s, adds the polyhedra corresponding to
+   * those parameters which were set to 2 into +1 and -1 now. So, if there are k
+   * 2s in the input, this will add @f$2^k@f$ polyhedra by calling
+   * Game::OuterLCP::addComponent.
+   *
+   * @internal Analogous to Game::PolyLCP::addPoliesFromEncoding
+   *
+   */
   std::vector<short int> localEncoding(encoding);
   unsigned int i = 0;
   bool flag = false;
@@ -109,7 +139,7 @@ void Game::OuterLCP::addChildComponents(const std::vector<short int> encoding) {
 
 bool Game::OuterLCP::addComponent(
     const std::vector<short int>
-        encoding, ///< A vector of +1,-1 and zeros referring to which
+        encoding, ///< A vector of +1,-1 and 0 referring to which
                   ///< equations and variables are taking 0 value. +1 means
                   ///< equation set to zero, -1 variable, and zero  none of the
                   ///< two
@@ -120,7 +150,14 @@ bool Game::OuterLCP::addComponent(
     spmat_Vec *custAi, ///< If custom polyhedra vector is used, pointer to the
                        ///< LHS matrix
     vec_Vec *custbi ///< If custom polyhedra vector is used, pointer to the RHS
-    ///< vector
+                    ///< vector
+		/**
+		 * Given an encoding with +1, -1 and 0s optionally checks its feasibility, and adds the appropriate polyhedron for outer approximation to Game::OuterLCP::Ai and Game::OuterLCP::bi (or @p custAi and @p custbi).
+		 *
+		 * As a note to remember, 0 means, no branching is done on the said complementarity condition.
+		 *
+		 * @internal Analogous to Game::PolyLCP::addPolyFromEncoding
+		 */
 ) {
   unsigned long fixNumber = Utils::vecToNum(encoding);
   BOOST_LOG_TRIVIAL(trace)
@@ -133,8 +170,8 @@ bool Game::OuterLCP::addComponent(
 
   if (eval) {
     this->feasApprox = true;
-    if (!custom && !Approximation.empty()) {
-      if (Approximation.find(fixNumber) != Approximation.end()) {
+    if (!custom && !this->Approximation.empty()) {
+      if (this->Approximation.find(fixNumber) != this->Approximation.end()) {
         BOOST_LOG_TRIVIAL(trace)
             << "Game::OuterLCP::addComponent: Previously added polyhedron #"
             << fixNumber;
@@ -175,7 +212,7 @@ bool Game::OuterLCP::addComponent(
       custAi->push_back(std::move(Aii));
       custbi->push_back(std::move(bii));
     } else {
-      Approximation.insert(fixNumber);
+      this->Approximation.insert(fixNumber);
       this->Ai->push_back(std::move(Aii));
       this->bi->push_back(std::move(bii));
     }
@@ -188,7 +225,21 @@ bool Game::OuterLCP::addComponent(
 }
 
 bool Game::OuterLCP::checkComponentFeas(
-    const std::vector<short int> &encoding) {
+    const std::vector<short int> &encoding ///< An encoding with -1/0/+1 whose
+                                           ///< feasibility has to be checked
+) {
+  /**
+   * Checks the feasibility of a given encoding's polyhedron
+   * @detail First, checks if this polyhedra is already known to be infeasible.
+   * Then, checks if it is already known to be feasible. Finally it checks, if a
+   * parent polyhedron, i.e., a polyhedron with fewer variables/equations fixed
+   * is already infeasible. If none of those give the required details, solves a
+   * linear program to check feasibility.
+   *
+   * @internal Not const because it could change
+   * Game::OuterLCP::FeasibleComponents and Game::OuterLCP::InfeasibleComponents
+   */
+
   unsigned long int fixNumber = Utils::vecToNum(encoding);
   if (InfeasibleComponents.find(fixNumber) != InfeasibleComponents.end()) {
     BOOST_LOG_TRIVIAL(trace)
@@ -211,7 +262,8 @@ bool Game::OuterLCP::checkComponentFeas(
       BOOST_LOG_TRIVIAL(trace)
           << "Game::OuterLCP::checkComponentFeas: #" << fixNumber
           << " is a child "
-             "of an infeasible polyhedron";
+             "of the infeasible polyhedron: "
+          << element;
       return false;
     }
   }
