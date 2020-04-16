@@ -759,8 +759,6 @@ public: // functions
 
   double getValProbab(unsigned int i, unsigned int k) const;
 
-  // The following checks if the returned strategy leader is a pure strategy
-  // for a leader or appropriately retrieve mixed-strategies
   bool isPureStrategy(unsigned int i, double tol = 1e-5) const;
 
   bool isPureStrategy(double tol = 1e-5) const;

@@ -1610,7 +1610,7 @@ void Game::EPEC::getXMinusI(const arma::vec &x, const unsigned int &i,
 
 void Game::EPEC::getXofI(const arma::vec &x, const unsigned int &i,
                          arma::vec &solI) const {
-  /*
+  /**
    * Given the player id @p i and the solution @p x, the method returns in @p
    * xWithoutHull the x vector for the given player, with the convex-hull's
    * variables.
@@ -1628,7 +1628,7 @@ void Game::EPEC::getXofI(const arma::vec &x, const unsigned int &i,
 
 void Game::EPEC::getXWithoutHull(const arma::vec &x, const unsigned int &i,
                                  arma::vec &xWithoutHull) const {
-  /*
+  /**
    * Given the player id @p i and the solution @p x, the method returns in @p
    * xWithoutHull the x vector for the given player, without the convex-hull's
    * variables.
@@ -2204,7 +2204,7 @@ void Game::EPEC::setRecoverStrategy(Game::EPECRecoverStrategy strategy)
 unsigned int Game::EPEC::getPositionLeadFoll(const unsigned int i,
                                              const unsigned int j) const {
   /**
-   * Get the position of the j-th Follower variable in the i-th leader
+   * Get the position of the j-th variable in the i-th leader
    * Querying Game::EPEC::LCPModel for x[return-value] variable gives the
    * appropriate variable
    */
@@ -2370,6 +2370,10 @@ std::vector<unsigned int> Game::EPEC::mixedStrategyPoly(const unsigned int i,
 
 double Game::EPEC::getValProbab(const unsigned int i,
                                 const unsigned int k) const {
+  /**
+   * Get the probability associated with the k-th polyhedron
+   * (k-th pure strategy) of the i-th leader. 
+   */
   if (this->Stats.AlgorithmParam.PolyLcp) {
     const unsigned int varname{this->getPositionProbab(i, k)};
     if (varname == 0)
@@ -2386,6 +2390,9 @@ double Game::EPEC::getValProbab(const unsigned int i,
 
 double Game::EPEC::getValLeadFoll(const unsigned int i,
                                   const unsigned int j) const {
+	/** 
+	 * Get the value of the j-th variable in i-th leader
+	 */
   if (!this->LCPModel)
     throw std::string("Error in Game::EPEC::getValLeadFoll: "
                       "Game::EPEC::LCPModel not made and solved");
@@ -2396,6 +2403,9 @@ double Game::EPEC::getValLeadFoll(const unsigned int i,
 
 double Game::EPEC::getValLeadLead(const unsigned int i,
                                   const unsigned int j) const {
+	/** 
+	 * Get the value of the j-th non-follower variable in i-th leader
+	 */
   if (!this->LCPModel)
     throw std::string("Error in Game::EPEC::getValLeadLead: "
                       "Game::EPEC::LCPModel not made and solved");
@@ -2408,6 +2418,9 @@ double Game::EPEC::getValLeadFollPoly(const unsigned int i,
                                       const unsigned int j,
                                       const unsigned int k,
                                       const double tol) const {
+	/**
+	 * For the i-th leader, gets the k-th pure strategy for i-th leader at position j
+	 */
   if (!this->LCPModel)
     throw std::string("Error in Game::EPEC::getValLeadFollPoly: "
                       "Game::EPEC::LCPModel not made and solved");
@@ -2427,6 +2440,9 @@ double Game::EPEC::getValLeadLeadPoly(const unsigned int i,
                                       const unsigned int j,
                                       const unsigned int k,
                                       const double tol) const {
+	/**
+	 * For the i-th leader, gets the k-th pure strategy for i-th leader at non-follower leader position j
+	 */
   if (!this->LCPModel)
     throw std::string("Error in Game::EPEC::getValLeadLeadPoly: "
                       "Game::EPEC::LCPModel not made and solved");
