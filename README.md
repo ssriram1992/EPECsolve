@@ -14,7 +14,7 @@ Code to compute mixed-equilibrium in linear EPECs.
 	* ARPACK
 	* LAPACK
 - [Gurobi](https://www.gurobi.com/registration/download-reg) (Version 8.1 or later)
-- [gcc/g++](https://gcc.gnu.org/) (Tested on version 4.8. Must support C++11 and be compatible with your version of Gurobi) `sudo apt install gcc ` will install gcc/g++ on an Ubuntu machine.
+- [gcc/g++](https://gcc.gnu.org/) (Tested on version 4.8. Must support C++11, but we recommend C++14. The compiler should be [compatible with your version of Gurobi](https://www.gurobi.com/products/gurobi-optimizer/supported-platforms/)) `sudo apt install gcc ` will install gcc/g++ on an Ubuntu machine.
 - [GNU make](https://www.gnu.org/software/make/) `sudo apt install make` will install GNU make on an Ubuntu machine.
 - [Boost](https://www.boost.org/) Required for logging, commandline interface to solve files etc. Can produce a boost-free version if there is significant interest.
 
