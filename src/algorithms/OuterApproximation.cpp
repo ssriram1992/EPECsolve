@@ -14,6 +14,8 @@ void Algorithms::OuterApproximation::solve() {
   // Set the initial point for all countries as 0 and solve the respective LCPs?
   this->EPECObject->SolutionX.zeros(this->EPECObject->NumVariables);
   bool solved = {false};
+  if (this->EPECObject->Stats.AlgorithmParam.TimeLimit > 0)
+    this->EPECObject->InitTime = std::chrono::high_resolution_clock::now();
 
   this->EPECObject->Stats.NumIterations = 0;
   if (this->EPECObject->Stats.AlgorithmParam.TimeLimit > 0)
@@ -26,7 +28,6 @@ void Algorithms::OuterApproximation::solve() {
   for (unsigned int i = 0; i < this->EPECObject->NumPlayers; i++) {
     Trees.at(i) = new OuterTree(this->outerLCP.at(i)->getNumRows());
     incumbent.at(i) = Trees.at(i)->getRoot();
-    BOOST_LOG_TRIVIAL(warning) << this->outerLCP.at(i)->getNumRows();
   }
 
   bool rightFeas, leftFeas;
@@ -133,15 +134,40 @@ void Algorithms::OuterApproximation::solve() {
       solved = true;
       break;
     }
+
     this->printCurrentApprox();
     this->EPECObject->makePlayersQPs();
+    if (this->EPECObject->Stats.AlgorithmParam.TimeLimit > 0) {
+      const std::chrono::duration<double> timeElapsed =
+          std::chrono::high_resolution_clock::now() -
+          this->EPECObject->InitTime;
+      const double timeRemaining =
+          this->EPECObject->Stats.AlgorithmParam.TimeLimit -
+          timeElapsed.count();
+      this->EPECObject->computeNashEq(
+          this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium, timeRemaining);
+    }
     this->EPECObject->computeNashEq(
         this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium);
+
+
     if (this->EPECObject->isSolved()) {
       this->EPECObject->Stats.Status = Game::EPECsolveStatus::NashEqFound;
       BOOST_LOG_TRIVIAL(info)
           << "Algorithms::OuterApproximation::solve: Solved";
       break;
+    }
+    if (this->EPECObject->Stats.AlgorithmParam.TimeLimit > 0) {
+      const std::chrono::duration<double> timeElapsed =
+          std::chrono::high_resolution_clock::now() -
+          this->EPECObject->InitTime;
+      const double timeRemaining =
+          this->EPECObject->Stats.AlgorithmParam.TimeLimit -
+          timeElapsed.count();
+      if (timeRemaining <= 0) {
+          this->EPECObject->Stats.Status = Game::EPECsolveStatus::TimeLimit;
+          return;
+      }
     }
   }
 }
