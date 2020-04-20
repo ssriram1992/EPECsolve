@@ -102,8 +102,12 @@ instance:
 	$(OUTPUT) -i dat/Instance -m 1 -w 2
 
 format:
-	@clang-format-8 -style=llvm -i src/*.cpp
-	@clang-format-8 -style=llvm -i src/*.h
+	@clang-format-9 -style=llvm -i src/lcp/*.cpp
+	@clang-format-9 -style=llvm -i include/lcp/*.h
+	@clang-format-9 -style=llvm -i src/algorithms/*.cpp
+	@clang-format-9 -style=llvm -i include/algorithms/*.h
+	@clang-format-9 -style=llvm -i src/*.cpp
+	@clang-format-9 -style=llvm -i include/*.h
 
 docSimple:
 	doxygen docs/refConf
@@ -115,7 +119,7 @@ edit:
 	vim -p src/epecsolve.h src/Games.cpp src/LCPtoLP.cpp  src/Models.cpp src/Utils.cpp src/EPEC.cpp
 
 tag:
-	ctags src/*.cpp src/*.h
+	ctags src/*.cpp include/*.h include/algorithms/*.h src/algorithms/*.cpp
 	@echo "All tags done. Use Ctrl+] to follow a tag in vim and Ctrl+O to go back"
 
 install:

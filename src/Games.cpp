@@ -1311,7 +1311,7 @@ std::unique_ptr<GRBModel> Game::NashGame::respond(
     const arma::vec &x,  ///< A std::vector of pure strategies (either for all
                          ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
-    ///< player)
+                 ///< player)
 ) const
 /**
  * @brief Given the decision of other players, find the optimal response for
@@ -1355,7 +1355,7 @@ double Game::NashGame::respondSol(
     const arma::vec &x,  ///< A std::vector of pure strategies (either for all
                          ///< players or all other players)
     bool fullvec ///< Is @p x strategy of all players? (including player @p
-    ///< player)
+                 ///< player)
 ) const {
   /**
    * @brief Returns the optimal objective value that is obtainable for the
@@ -1672,9 +1672,8 @@ std::unique_ptr<GRBModel> Game::EPEC::respond(const unsigned int i,
 double Game::EPEC::respondSol(
     arma::vec &sol,      ///< [out] Optimal response
     unsigned int player, ///< Player whose optimal response is to be computed
-    const arma::vec
-        &x, ///< A std::vector of pure strategies (either for all players
-            ///< or all other players
+    const arma::vec &x,  ///< A std::vector of pure strategies (either for all
+                         ///< players or all other players
     const arma::vec &prevDev
     //< [in] if any, the std::vector of previous deviations.
 ) const {
@@ -1925,8 +1924,8 @@ bool Game::EPEC::computeNashEq(
     bool pureNE,           ///< True if we search for a PNE
     double localTimeLimit, ///< Allowed time limit to run this function
     bool check ///< If true, the Algorithm will seek for the maximum number of
-    ///< NE. Then, it will check they are equilibria for the original
-    ///< problem
+               ///< NE. Then, it will check they are equilibria for the original
+               ///< problem
 ) {
   /**
    * Given that Game::EPEC::PlayersQP are all filled with a each country's
@@ -2372,7 +2371,7 @@ double Game::EPEC::getValProbab(const unsigned int i,
                                 const unsigned int k) const {
   /**
    * Get the probability associated with the k-th polyhedron
-   * (k-th pure strategy) of the i-th leader. 
+   * (k-th pure strategy) of the i-th leader.
    */
   if (this->Stats.AlgorithmParam.PolyLcp) {
     const unsigned int varname{this->getPositionProbab(i, k)};
@@ -2390,9 +2389,9 @@ double Game::EPEC::getValProbab(const unsigned int i,
 
 double Game::EPEC::getValLeadFoll(const unsigned int i,
                                   const unsigned int j) const {
-	/** 
-	 * Get the value of the j-th variable in i-th leader
-	 */
+  /**
+   * Get the value of the j-th variable in i-th leader
+   */
   if (!this->LCPModel)
     throw std::string("Error in Game::EPEC::getValLeadFoll: "
                       "Game::EPEC::LCPModel not made and solved");
@@ -2403,9 +2402,9 @@ double Game::EPEC::getValLeadFoll(const unsigned int i,
 
 double Game::EPEC::getValLeadLead(const unsigned int i,
                                   const unsigned int j) const {
-	/** 
-	 * Get the value of the j-th non-follower variable in i-th leader
-	 */
+  /**
+   * Get the value of the j-th non-follower variable in i-th leader
+   */
   if (!this->LCPModel)
     throw std::string("Error in Game::EPEC::getValLeadLead: "
                       "Game::EPEC::LCPModel not made and solved");
@@ -2418,9 +2417,10 @@ double Game::EPEC::getValLeadFollPoly(const unsigned int i,
                                       const unsigned int j,
                                       const unsigned int k,
                                       const double tol) const {
-	/**
-	 * For the i-th leader, gets the k-th pure strategy for i-th leader at position j
-	 */
+  /**
+   * For the i-th leader, gets the k-th pure strategy for i-th leader at
+   * position j
+   */
   if (!this->LCPModel)
     throw std::string("Error in Game::EPEC::getValLeadFollPoly: "
                       "Game::EPEC::LCPModel not made and solved");
@@ -2440,9 +2440,10 @@ double Game::EPEC::getValLeadLeadPoly(const unsigned int i,
                                       const unsigned int j,
                                       const unsigned int k,
                                       const double tol) const {
-	/**
-	 * For the i-th leader, gets the k-th pure strategy for i-th leader at non-follower leader position j
-	 */
+  /**
+   * For the i-th leader, gets the k-th pure strategy for i-th leader at
+   * non-follower leader position j
+   */
   if (!this->LCPModel)
     throw std::string("Error in Game::EPEC::getValLeadLeadPoly: "
                       "Game::EPEC::LCPModel not made and solved");
