@@ -11,6 +11,7 @@ var searchData=
   ['epecalgorithm',['EPECalgorithm',['../namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1d',1,'Game']]],
   ['epecalgorithmparams',['EPECAlgorithmParams',['../structGame_1_1EPECAlgorithmParams.html',1,'Game']]],
   ['epecinstance',['EPECInstance',['../structModels_1_1EPECInstance.html',1,'Models::EPECInstance'],['../structModels_1_1EPECInstance.html#a3f4f3e937cc617a809040c035b8ddae0',1,'Models::EPECInstance::EPECInstance(std::string filename)'],['../structModels_1_1EPECInstance.html#a4dfd3b98d5ce7b325b0b6f345186169c',1,'Models::EPECInstance::EPECInstance(std::vector&lt; Models::LeadAllPar &gt; Countries_, arma::sp_mat Transp_)']]],
+  ['epecrecoverstrategy',['EPECRecoverStrategy',['../namespaceGame.html#ad391a76e36d878e9924a5e00ed89f439',1,'Game']]],
   ['epecsolve_2eh',['epecsolve.h',['../epecsolve_8h.html',1,'']]],
   ['epecsolvestatus',['EPECsolveStatus',['../namespaceGame.html#a53e08a4809a9d264b892591653a15374',1,'Game']]],
   ['epecstatistics',['EPECStatistics',['../structGame_1_1EPECStatistics.html',1,'Game']]],

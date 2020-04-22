@@ -66,8 +66,11 @@ $(function() {
 <div class="textblock"><p><a href="https://www.gnu.org/licenses/gpl-3.0"></a></p>
 <h1><a class="anchor" id="autotoc_md0"></a>
 EPECsolve</h1>
-<p>Code to compute mixed-equilibrium in linear EPECs. Code available on <a href="https://github.com/ssriram1992/EPECsolve/">Github</a>.</p>
-<p><em>Manuscript in preparation. Link will be shared once ready</em></p>
+<p>Code to compute mixed-equilibrium in linear EPECs.</p><ul>
+<li><a href="https://github.com/ssriram1992/EPECsolve/">Code</a></li>
+<li><a href="https://github.com/ds4dm/EPECInstances">Instances</a> with detailed <a href="https://github.com/ds4dm/EPECInstances/blob/master/Description.pdf">mathematical description</a></li>
+<li><a href="https://arxiv.org/abs/1910.06452">arXiv</a> pre-print</li>
+</ul>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Prerequisites</h1>
 <h2><a class="anchor" id="autotoc_md2"></a>
@@ -125,6 +128,33 @@ CMake</h2>
 <li>Set <code>GUROBI_PATH_OS</code> to your local gurobi path (and version). Note that OS corresponds to your local (or remote) operatin system.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md8"></a>
+Command-line interface</h1>
+<p>EPECSolve has a command line interface built on top of the standard modeling paradigm (see documentation for <a class="el" href="Models_8cpp.html">src/Models.cpp</a>). Once the executable is compiled via <code>make compileEPEC</code>, the user can run EPECSolve with: <code>./EPEC $options</code>.</p>
+<p>The following I/O options are available:</p>
+<ul>
+<li><code>-i (--input) PathToInstance</code>: This <b>required</b> option specifies the path to the JSON instance file. Extension .json is automatically appended to the argument.</li>
+<li><code>-s (--solution) PathAndFile</code>: Sets the output (path) filename of the JSON solution file, if any (see option <code>-w. (writelevel)</code>. If a JSON output is required, extension .json is automatically appended to the argument.</li>
+<li><code>-l (--log) PathAndFile</code>: Sets the output path/filename of the log file.</li>
+<li><code>-w (--writelevel) intValue</code>: Sets the verbosity parameter for the output solution file. <em>0</em>: output only a JSON solution file (if any). <em>1</em> Only a human readable file. <em>2</em> Both.</li>
+<li><code>-m (--message) intValue</code>: Sets the verbosity parameter for the program itself. <em>1</em>: only info messages, <em>2</em> info and debug, <em>3</em> info, debug and trace messages.</li>
+</ul>
+<p>Algorithmic parameters:</p>
+<ul>
+<li><code>-a (--algorithm) intValue</code>: Specifies the type of algorithm employed to solve the instance. <em>0</em> is <b>fullEnumeration</b>, <em>1</em> is <b>innerApproximation</b>, <em>2</em> is <b>combinatorialPNE</b>. Note that the latter only works with pure equilibria.</li>
+<li><code>-p (--pure) intValue</code>: Specifies whether the algorithm should seek for a pure equilibrium or not (note that <b>combinatorialPNE</b> will always seek for a pure solution) . <em>0</em> no requirement (either pure or mixed), <em>1</em> only pure.</li>
+<li><code>-bigM intValue</code>: Specifies the whether LCP problems should be formulated with a LCP. <em>0</em> (default) for indicator constraints, <em>1</em> for bigM formulation.</li>
+<li><code>-b (--bound) intValue</code>: Specifies if the final LCP model should be bounded by a <em>bigM</em> constant (see option <code>-boundBigM</code>) in their primal variables. <em>0</em> no bounding, <em>1</em> bounding with <em>bigM</em>.</li>
+<li><code>-boundBigM intValue</code>: Specifies the <em>bigM</em> constant for the above param (see option <code>-b (--bound)</code>.</li>
+<li><code>-t (--threads) intValue</code>: Specifies the number of threads Gurobi uses.</li>
+<li><code>-tl (--timelimit) intValue</code>: Specifies the timeLimit (in seconds) for running the whole algorithmic procedure.</li>
+</ul>
+<p>Algorithmic parameters tailored on <b>innerApproximation</b>:</p>
+<ul>
+<li><code>-ad (--add) intValue</code>: Specifies the <em>EPECAddPolyMethod</em> strategy employed to expand the inner approximation when no information about deviations is available. <em>0</em> add polyhedra in lexographic order, <em>1</em> reverse lexographic, <em>2</em> random.</li>
+<li><code>-ag (--aggr) intValue</code>: Specifies the <em>EPECAddPolyMethod</em> aggressivity (see option <code>-ad (--add)</code>). <em>int</em> specifies the number of lower-level polyhedra to be added to each Stackelberg leader at each iteration in which <em>EPECAddPolyMethod</em> is triggered.</li>
+<li><code>-r (--recover) intValue</code>: Specifies the recover stragegy for the <b>innerApproximation</b> method. When the algorithm finds a mixed equilibrium and the parameter <code>-p (--pure)</code> is set to <em>1</em>, the algorithm will search for a pure equilibrium either by randomly expanding the inner approximation (<em>EPECAddPolyMethod</em>) or by triggering a <b>combinatorialPNE</b> procedure warmstarted with the current information. <em>0</em> sets the recover strategy to <em>incrementalEnumeration</em>, <em>1</em> sets it to <em>combinatorial</em>.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md9"></a>
 Maintenance</h1>
 <p><a href="https://github.com/ssriram1992/"></a> - Contact: <a href="#" onclick="location.href='mai'+'lto:'+'sri'+'ra'+'m.s'+'an'+'kar'+'an'+'ara'+'ya'+'nan'+'@p'+'oly'+'mt'+'l.c'+'a'; return false;">sriram.sankaranarayanan@polymtl.ca</a></p>
 <p><a href="https://github.com/gdragotto"></a> - Contact: <a href="#" onclick="location.href='mai'+'lto:'+'gab'+'ri'+'ele'+'.d'+'rag'+'ot'+'to@'+'po'+'lym'+'tl'+'.ca'; return false;">gabriele.dragotto@polymtl.ca</a> </p>

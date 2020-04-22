@@ -187,7 +187,7 @@ Models::FollPar operator+(const Models::FollPar &F1,
 
 bool Models::EPEC::ParamValid(
     const LeadAllPar &Params ///< Object whose validity is to be tested
-    ) const
+) const
 /**
  * @brief Checks the Validity of Models::LeadAllPar object
  * @details Checks the following:
@@ -225,7 +225,7 @@ void Models::EPEC::make_LL_QP(
         *Foll, ///< Non-owning pointer to the Follower QP_Param object
     const Models::LeadLocs
         &Loc ///< LeadLocs object for accessing different leader locations.
-    ) const noexcept
+) const noexcept
 /**
  * @brief Makes Lower Level Quadratic Programs
  * @details Sets the constraints and objective for the lower level problem
@@ -296,7 +296,7 @@ void Models::EPEC::make_LL_LeadCons(
     const unsigned int
         activeTaxCaps ///< Number of active Tax Caps constraints. If strictly
     ///< positive, tax cap constraint(s) will be enforced
-    ) const noexcept
+) const noexcept
 /**
  * Makes the leader level constraints for a country.
  * The constraints added are as follows:
@@ -879,7 +879,7 @@ bool Models::EPEC::dataCheck(
         chkLeaderLocations, ///< Checks if Models::EPEC::LeaderLocations has
     ///< size @p n and Models::EPEC::nVarinEPEC is set
     const bool chkLeadObjec ///< Checks if Models::EPEC::LeadObjec has size @p n
-    ) const
+) const
 /**
  * Checks the data in Models::EPEC object, based on checking flags, @p n is the
  * number of countries in the Models::EPEC object.

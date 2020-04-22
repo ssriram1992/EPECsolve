@@ -530,11 +530,12 @@ private:
   void resetLCP();
   void iterativeNash();
   void fullEnumerationNash();
-  void combinatorial_pure_NE(const std::vector<long int> combination,
-                        const std::vector<std::set<unsigned long int>> &excludeList);
-  void
-  combinatorialPNE(const std::vector<long int> combination = {},
-                   const std::vector<std::set<unsigned long int>> &excludeList = {});
+  void combinatorial_pure_NE(
+      const std::vector<long int> combination,
+      const std::vector<std::set<unsigned long int>> &excludeList);
+  void combinatorialPNE(
+      const std::vector<long int> combination = {},
+      const std::vector<std::set<unsigned long int>> &excludeList = {});
   void make_pure_LCP(bool indicators = false);
   void computeLeaderLocations(const unsigned int addSpaceForMC = 0);
 
@@ -544,7 +545,8 @@ private:
                                      bool &infeasCheck) const;
   void get_x_minus_i(const arma::vec &x, const unsigned int &i,
                      arma::vec &solOther) const;
-  bool computeNashEq(bool pureNE = false, double localTimeLimit = -1.0, bool check = false);
+  bool computeNashEq(bool pureNE = false, double localTimeLimit = -1.0,
+                     bool check = false);
   bool addRandomPoly2All(unsigned int aggressiveLevel = 1,
                          bool stopOnSingleInfeasibility = false);
 

@@ -126,9 +126,14 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="separator:a53e08a4809a9d264b892591653a15374"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09f076906bd963c7e558c8f1a9506d1d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1d">EPECalgorithm</a> { <a class="el" href="namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1daef3c61c75dd7e43756d440993059dfe5">EPECalgorithm::fullEnumeration</a>, 
-<a class="el" href="namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1da917a285f0c43ed809f7a3016574d71a9">EPECalgorithm::innerApproximation</a>
+<a class="el" href="namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1da917a285f0c43ed809f7a3016574d71a9">EPECalgorithm::innerApproximation</a>, 
+<a class="el" href="namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1dacf25e38ddf78c6575e5d2cb4d9957f00">EPECalgorithm::combinatorialPNE</a>
  }</td></tr>
 <tr class="separator:a09f076906bd963c7e558c8f1a9506d1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad391a76e36d878e9924a5e00ed89f439"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGame.html#ad391a76e36d878e9924a5e00ed89f439">EPECRecoverStrategy</a> { <a class="el" href="namespaceGame.html#ad391a76e36d878e9924a5e00ed89f439adcab0b81b63ef8e664daba41a8e0015b">EPECRecoverStrategy::incrementalEnumeration</a>, 
+<a class="el" href="namespaceGame.html#ad391a76e36d878e9924a5e00ed89f439a934c896d81cc59ffeaa2e8fdd5534dbe">EPECRecoverStrategy::combinatorial</a>
+ }</td></tr>
+<tr class="separator:ad391a76e36d878e9924a5e00ed89f439"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -239,11 +244,44 @@ Functions</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a09f076906bd963c7e558c8f1a9506d1daef3c61c75dd7e43756d440993059dfe5"></a>fullEnumeration&#160;</td><td class="fielddoc"><p>Completely enumerate the set of polyhedra for all followers </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a09f076906bd963c7e558c8f1a9506d1da917a285f0c43ed809f7a3016574d71a9"></a>innerApproximation&#160;</td><td class="fielddoc"><p>Perfrorm increasingly better inner approximations in iterations </p>
+<tr><td class="fieldname"><a id="a09f076906bd963c7e558c8f1a9506d1da917a285f0c43ed809f7a3016574d71a9"></a>innerApproximation&#160;</td><td class="fielddoc"><p>iterations </p>
+<p>Perfrorm increasingly better inner approximations in </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a09f076906bd963c7e558c8f1a9506d1dacf25e38ddf78c6575e5d2cb4d9957f00"></a>combinatorialPNE&#160;</td><td class="fielddoc"><p>Perform a combinatorial-based search strategy to find a pure NE </p>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00406">406</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00408">408</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+
+</div>
+</div>
+<a id="ad391a76e36d878e9924a5e00ed89f439"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad391a76e36d878e9924a5e00ed89f439">&#9670;&nbsp;</a></span>EPECRecoverStrategy</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespaceGame.html#ad391a76e36d878e9924a5e00ed89f439">Game::EPECRecoverStrategy</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ad391a76e36d878e9924a5e00ed89f439adcab0b81b63ef8e664daba41a8e0015b"></a>incrementalEnumeration&#160;</td><td class="fielddoc"><p>Add random polyhedra in each iteration. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ad391a76e36d878e9924a5e00ed89f439a934c896d81cc59ffeaa2e8fdd5534dbe"></a>combinatorial&#160;</td><td class="fielddoc"><p>Triggers the combinatorialPNE with additional information from innerApproximation </p>
+</td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00418">418</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -280,7 +318,7 @@ Functions</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00395">395</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00397">397</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>

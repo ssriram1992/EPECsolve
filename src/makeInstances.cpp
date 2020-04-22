@@ -1,6 +1,6 @@
 #include "models.h"
-#include <random>
 #include <chrono>
+#include <random>
 #define NUM_THREADS 8
 #define HARD_THRESHOLD 8
 using namespace std;
@@ -137,7 +137,9 @@ price_limit = (price_limit < 0)? a*price_lim:price_limit;
   price_limit = price_lim * a;
   unsigned int tax_paradigm = intRandom(give) % 3;
   unsigned int tax_revenue = binaryRandom(give);
-  std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::milliseconds ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::system_clock::now().time_since_epoch());
   Models::LeadAllPar Country(
       F.capacities.size(),
       "Country_" + to_string(country++) + "_" +

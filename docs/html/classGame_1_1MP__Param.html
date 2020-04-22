@@ -93,6 +93,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa4be3148e505ff9012f47c9966a1475b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51f2d17e5151e8da6361c0382f62758f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#a51f2d17e5151e8da6361c0382f62758f">MP_Param</a> (const <a class="el" href="classGame_1_1MP__Param.html">MP_Param</a> &amp;M)=default</td></tr>
 <tr class="separator:a51f2d17e5151e8da6361c0382f62758f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accedfcfbff360a9f0176ed1b325209ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#accedfcfbff360a9f0176ed1b325209ad">bound</a> (double bigM, unsigned int primals)</td></tr>
+<tr class="separator:accedfcfbff360a9f0176ed1b325209ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2db5cff1ae7f287200f82e3c729121b"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ac2db5cff1ae7f287200f82e3c729121b">getQ</a> () const</td></tr>
 <tr class="memdesc:ac2db5cff1ae7f287200f82e3c729121b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to the private variable Q.  <a href="#ac2db5cff1ae7f287200f82e3c729121b">More...</a><br /></td></tr>
 <tr class="separator:ac2db5cff1ae7f287200f82e3c729121b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -191,7 +193,7 @@ Protected Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>class to handle parameterized mathematical programs(MP) </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00051">51</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00052">52</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa4be3148e505ff9012f47c9966a1475b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa4be3148e505ff9012f47c9966a1475b">&#9670;&nbsp;</a></span>MP_Param() <span class="overload">[1/2]</span></h2>
@@ -289,6 +291,34 @@ Protected Attributes</h2></td></tr>
 <p>Reimplemented in <a class="el" href="classGame_1_1QP__Param.html#a5313f28073ba60f90ca422e2da6a369a">Game::QP_Param</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00101">101</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+
+</div>
+</div>
+<a id="accedfcfbff360a9f0176ed1b325209ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accedfcfbff360a9f0176ed1b325209ad">&#9670;&nbsp;</a></span>bound()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Game::MP_Param::bound </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>bigM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>primals</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -407,7 +437,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Finalize the <a class="el" href="classGame_1_1MP__Param.html" title="class to handle parameterized mathematical programs(MP) ">MP_Param</a> object. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00060">60</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00061">61</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -436,7 +466,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Read-only access to the private variable A. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00078">78</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00080">80</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -465,7 +495,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Read-only access to the private variable B. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00081">81</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00083">83</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -494,7 +524,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Read-only access to the private variable b. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00087">87</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00089">89</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -523,7 +553,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Read-only access to the private variable C. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00075">75</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00077">77</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -552,7 +582,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Read-only access to the private variable c. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00084">84</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00086">86</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -581,7 +611,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Read-only access to the private variable Nx. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00090">90</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00092">92</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -610,7 +640,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Read-only access to the private variable Ny. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00093">93</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00095">95</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -639,7 +669,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Read-only access to the private variable Q. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00072">72</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00074">74</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -881,7 +911,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Set the private variable A. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00105">105</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00107">107</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -911,7 +941,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Set the private variable B. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00109">109</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00111">111</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -941,7 +971,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Set the private variable b. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00117">117</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00119">119</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -971,7 +1001,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Set the private variable C. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00101">101</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00103">103</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1001,7 +1031,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Set the private variable c. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00113">113</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00115">115</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1031,7 +1061,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Set the private variable Q. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00097">97</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00099">99</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1131,7 +1161,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00054">54</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1155,7 +1185,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00054">54</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1179,7 +1209,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00056">56</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1203,7 +1233,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00054">54</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1227,7 +1257,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00056">56</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1251,7 +1281,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00057">57</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00058">58</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1275,7 +1305,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00057">57</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00058">58</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1299,7 +1329,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00057">57</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00058">58</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1323,7 +1353,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00054">54</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>

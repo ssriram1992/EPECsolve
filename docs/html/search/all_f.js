@@ -10,5 +10,6 @@ var searchData=
   ['price_5flimit',['price_limit',['../structModels_1_1LeadPar.html#a7b7a2d7ccc4d246c261728f347d23263',1,'Models::LeadPar']]],
   ['primal_5fposition',['primal_position',['../classGame_1_1NashGame.html#a677a7c875e1c3c8b7786b7328e136be9',1,'Game::NashGame']]],
   ['print',['print',['../classGame_1_1LCP.html#adcbcfabbca28ce76afaa12de54dd4b06',1,'Game::LCP::print()'],['../namespaceGame.html#ae10005492ee312cb7baba9b3d09c77d3',1,'Game::print()']]],
-  ['prn',['prn',['../namespaceModels.html#a54b54aa6ddb1d9e337f9fea85a2d0ceb',1,'Models']]]
+  ['prn',['prn',['../namespaceModels.html#a54b54aa6ddb1d9e337f9fea85a2d0ceb',1,'Models']]],
+  ['purene',['pureNE',['../structGame_1_1EPECAlgorithmParams.html#af340216acbbcae81389de03f9a426fd9',1,'Game::EPECAlgorithmParams::pureNE()'],['../structGame_1_1EPECStatistics.html#adfb8cd86e75c4f5ff47d711dbdad1cee',1,'Game::EPECStatistics::pureNE()']]]
 ];

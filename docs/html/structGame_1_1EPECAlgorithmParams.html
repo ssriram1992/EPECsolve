@@ -79,8 +79,16 @@ $(function() {
 Data Fields</h2></td></tr>
 <tr class="memitem:a3b95f97a760d4d406599f3147084f8b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1d">Game::EPECalgorithm</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#a3b95f97a760d4d406599f3147084f8b1">algorithm</a> = <a class="el" href="namespaceGame.html#a09f076906bd963c7e558c8f1a9506d1daef3c61c75dd7e43756d440993059dfe5">Game::EPECalgorithm::fullEnumeration</a></td></tr>
 <tr class="separator:a3b95f97a760d4d406599f3147084f8b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c840d25ba0f354f4cb2070fb019b8ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceGame.html#ad391a76e36d878e9924a5e00ed89f439">Game::EPECRecoverStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#a7c840d25ba0f354f4cb2070fb019b8ba">recoverStrategy</a></td></tr>
+<tr class="memdesc:a7c840d25ba0f354f4cb2070fb019b8ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies the method by which innerApproximation should seek for a PNE.  <a href="#a7c840d25ba0f354f4cb2070fb019b8ba">More...</a><br /></td></tr>
+<tr class="separator:a7c840d25ba0f354f4cb2070fb019b8ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7daf75c4d6ca6330d91497e24d82fec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066">Game::EPECAddPolyMethod</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#ac7daf75c4d6ca6330d91497e24d82fec">addPolyMethod</a> = <a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a6ec7489017b25b5fff20d353b6d2162e">Game::EPECAddPolyMethod::sequential</a></td></tr>
 <tr class="separator:ac7daf75c4d6ca6330d91497e24d82fec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6efe9f1f8f538620067c594b7c874e74"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#a6efe9f1f8f538620067c594b7c874e74">boundPrimals</a> {false}</td></tr>
+<tr class="separator:a6efe9f1f8f538620067c594b7c874e74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05cde7f5c6c104e4817d41a0aa29fd58"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#a05cde7f5c6c104e4817d41a0aa29fd58">boundBigM</a> {1e5}</td></tr>
+<tr class="memdesc:a05cde7f5c6c104e4817d41a0aa29fd58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bounding upper value if <code>BoundPrimals</code> is true.  <a href="#a05cde7f5c6c104e4817d41a0aa29fd58">More...</a><br /></td></tr>
+<tr class="separator:a05cde7f5c6c104e4817d41a0aa29fd58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e954eddae02ee736c88766a859671d3"><td class="memItemLeft" align="right" valign="top">long int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#a6e954eddae02ee736c88766a859671d3">addPolyMethodSeed</a></td></tr>
 <tr class="separator:a6e954eddae02ee736c88766a859671d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51dda40f9ba113ad934865f835eff8a9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#a51dda40f9ba113ad934865f835eff8a9">indicators</a> {true}</td></tr>
@@ -95,11 +103,14 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a4ba154784baf4d453333b9628da64ad3"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#a4ba154784baf4d453333b9628da64ad3">aggressiveness</a></td></tr>
 <tr class="memdesc:a4ba154784baf4d453333b9628da64ad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">in <a class="el" href="classGame_1_1EPEC.html#a9065435971acda21cc00b4e8546fe36f">EPEC::iterativeNash</a>  <a href="#a4ba154784baf4d453333b9628da64ad3">More...</a><br /></td></tr>
 <tr class="separator:a4ba154784baf4d453333b9628da64ad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af340216acbbcae81389de03f9a426fd9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGame_1_1EPECAlgorithmParams.html#af340216acbbcae81389de03f9a426fd9">pureNE</a> {false}</td></tr>
+<tr class="memdesc:af340216acbbcae81389de03f9a426fd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">NE. If none exists, it will return a MNE (if exists)  <a href="#af340216acbbcae81389de03f9a426fd9">More...</a><br /></td></tr>
+<tr class="separator:af340216acbbcae81389de03f9a426fd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Stores the configuration for <a class="el" href="classGame_1_1EPEC.html" title="Class to handle a Nash game between leaders of Stackelberg games. ">EPEC</a> algorithms. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00414">414</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00425">425</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="ac7daf75c4d6ca6330d91497e24d82fec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac7daf75c4d6ca6330d91497e24d82fec">&#9670;&nbsp;</a></span>addPolyMethod</h2>
@@ -113,7 +124,7 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00416">416</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00430">430</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -128,9 +139,9 @@ Data Fields</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">      -1}</div></div><!-- fragment --><p>Random seed for the random selection of polyhedra. If -1, a default computed value will seeded. </p>
+<b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">      -1}</div></div><!-- fragment --><p>Random seed for the random selection of polyhedra. If -1, a default computed value will be seeded. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00417">417</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00434">434</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -149,7 +160,7 @@ Data Fields</h2></td></tr>
 <p>in <a class="el" href="classGame_1_1EPEC.html#a9065435971acda21cc00b4e8546fe36f">EPEC::iterativeNash</a> </p>
 <p>Controls the number of random polyhedra added at each iteration </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00426">426</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00443">443</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -165,7 +176,42 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00415">415</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00426">426</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+
+</div>
+</div>
+<a id="a05cde7f5c6c104e4817d41a0aa29fd58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05cde7f5c6c104e4817d41a0aa29fd58">&#9670;&nbsp;</a></span>boundBigM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Game::EPECAlgorithmParams::boundBigM {1e5}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bounding upper value if <code>BoundPrimals</code> is true. </p>
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00433">433</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+
+</div>
+</div>
+<a id="a6efe9f1f8f538620067c594b7c874e74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6efe9f1f8f538620067c594b7c874e74">&#9670;&nbsp;</a></span>boundPrimals</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Game::EPECAlgorithmParams::boundPrimals {false}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>If true, each QP param is bounded with an arbitrary large bigM constant </p>
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00431">431</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -184,7 +230,44 @@ Data Fields</h2></td></tr>
 <p>Uses <code>bigM</code> if <code>false</code>. </p>
 <p>Controls the flag <code>useIndicators</code> in <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">Game::LCP</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00420">420</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00437">437</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+
+</div>
+</div>
+<a id="af340216acbbcae81389de03f9a426fd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af340216acbbcae81389de03f9a426fd9">&#9670;&nbsp;</a></span>pureNE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Game::EPECAlgorithmParams::pureNE {false}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>NE. If none exists, it will return a MNE (if exists) </p>
+<p>If true, the algorithm will tend to search for pure </p>
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00446">446</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+
+</div>
+</div>
+<a id="a7c840d25ba0f354f4cb2070fb019b8ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c840d25ba0f354f4cb2070fb019b8ba">&#9670;&nbsp;</a></span>recoverStrategy</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceGame.html#ad391a76e36d878e9924a5e00ed89f439">Game::EPECRecoverStrategy</a> Game::EPECAlgorithmParams::recoverStrategy</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">      <a class="code" href="namespaceGame.html#ad391a76e36d878e9924a5e00ed89f439adcab0b81b63ef8e664daba41a8e0015b">EPECRecoverStrategy::incrementalEnumeration</a></div></div><!-- fragment -->
+<p>Specifies the method by which innerApproximation should seek for a PNE. </p>
+
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00427">427</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -202,7 +285,7 @@ Data Fields</h2></td></tr>
 <b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">      0}</div></div><!-- fragment -->
 <p>Controls the number of threads Gurobi exploits. Default 0 (auto) </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00424">424</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00441">441</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -220,7 +303,7 @@ Data Fields</h2></td></tr>
 <b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">      -1}</div></div><!-- fragment -->
 <p>Controls the timelimit for solve in <a class="el" href="classGame_1_1EPEC.html#a8cee65238bc4128123eb9b8ee8452e23">Game::EPEC::findNashEq</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00422">422</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00439">439</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>

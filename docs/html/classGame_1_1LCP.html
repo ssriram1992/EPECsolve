@@ -94,10 +94,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad05015288e6d7ae561cea30233128840"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ad05015288e6d7ae561cea30233128840">LCP</a> (GRBEnv *<a class="el" href="classGame_1_1LCP.html#a18d477d37ce57a334c7707a9a6b89e07">env</a>, const <a class="el" href="classGame_1_1NashGame.html">Game::NashGame</a> &amp;N)</td></tr>
 <tr class="memdesc:ad05015288e6d7ae561cea30233128840"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructer given a <a class="el" href="classGame_1_1NashGame.html" title="Class to model Nash-cournot games with each player playing a QP. ">NashGame</a>.  <a href="#ad05015288e6d7ae561cea30233128840">More...</a><br /></td></tr>
 <tr class="separator:ad05015288e6d7ae561cea30233128840"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abdb1c5a1bf0a9bbabc5685125397ecf9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#abdb1c5a1bf0a9bbabc5685125397ecf9">LCP</a> (const <a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;)=default</td></tr>
-<tr class="separator:abdb1c5a1bf0a9bbabc5685125397ecf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6038bef0cb23930f6d94b51ac35b93b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a6038bef0cb23930f6d94b51ac35b93b6">operator=</a> (const <a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;)=default</td></tr>
-<tr class="separator:a6038bef0cb23930f6d94b51ac35b93b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afff596de30da4147b00612b500a99d68"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#afff596de30da4147b00612b500a99d68">~LCP</a> ()</td></tr>
 <tr class="memdesc:afff596de30da4147b00612b500a99d68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a>.  <a href="#afff596de30da4147b00612b500a99d68">More...</a><br /></td></tr>
 <tr class="separator:afff596de30da4147b00612b500a99d68"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,14 +144,26 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6b43f4114a04d877bfde5d2f93541e00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade47b2e25c07d2dce66f175eeeae9036"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ade47b2e25c07d2dce66f175eeeae9036">conv_Npoly</a> () const</td></tr>
 <tr class="separator:ade47b2e25c07d2dce66f175eeeae9036"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3de8d6a1018407c41555c593aeb3fba"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ac3de8d6a1018407c41555c593aeb3fba">conv_PolyPosition</a> (const unsigned int i) const</td></tr>
-<tr class="separator:ac3de8d6a1018407c41555c593aeb3fba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4f62d83b107f7fdfdadd3a479216ca2"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#aa4f62d83b107f7fdfdadd3a479216ca2">conv_PolyWt</a> (const unsigned int i) const</td></tr>
-<tr class="separator:aa4f62d83b107f7fdfdadd3a479216ca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c4c010ce32a53320d76a21083e58fb8"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a4c4c010ce32a53320d76a21083e58fb8">conv_PolyPosition</a> (const unsigned long int i) const</td></tr>
+<tr class="separator:a4c4c010ce32a53320d76a21083e58fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a756eb1689e8778597db52aba32b167ab"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a756eb1689e8778597db52aba32b167ab">conv_PolyWt</a> (const unsigned long int i) const</td></tr>
+<tr class="separator:a756eb1689e8778597db52aba32b167ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99c37700318608e6133c0c15a0fab9ec"><td class="memItemLeft" align="right" valign="top">std::set&lt; unsigned long int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a99c37700318608e6133c0c15a0fab9ec">getAllPolyhedra</a> () const</td></tr>
+<tr class="separator:a99c37700318608e6133c0c15a0fab9ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a973f1ce2078a82d8051de51acb49a516"><td class="memItemLeft" align="right" valign="top">unsigned long int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a973f1ce2078a82d8051de51acb49a516">getNumTheoreticalPoly</a> () const noexcept</td></tr>
+<tr class="separator:a973f1ce2078a82d8051de51acb49a516"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af75f1aff19db27fd43b33f53cc3ce9e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#af75f1aff19db27fd43b33f53cc3ce9e2">makeQP</a> (<a class="el" href="structGame_1_1QP__objective.html">Game::QP_objective</a> &amp;QP_obj, <a class="el" href="classGame_1_1QP__Param.html">Game::QP_Param</a> &amp;QP)</td></tr>
 <tr class="separator:af75f1aff19db27fd43b33f53cc3ce9e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a320735237ebe0055b70c873b48ce27"><td class="memItemLeft" align="right" valign="top">std::set&lt; std::vector&lt; short int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a1a320735237ebe0055b70c873b48ce27">addAPoly</a> (unsigned int nPoly=1, <a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066">Game::EPECAddPolyMethod</a> method=<a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a6ec7489017b25b5fff20d353b6d2162e">Game::EPECAddPolyMethod::sequential</a>, std::set&lt; std::vector&lt; short int &gt;&gt; Polys={})</td></tr>
-<tr class="separator:a1a320735237ebe0055b70c873b48ce27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00eb2bdc14f4c2970b99bf6ef3a923f0"><td class="memItemLeft" align="right" valign="top">std::set&lt; std::vector&lt; short int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a00eb2bdc14f4c2970b99bf6ef3a923f0">addAPoly</a> (unsigned long int nPoly=1, <a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066">Game::EPECAddPolyMethod</a> method=<a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066a6ec7489017b25b5fff20d353b6d2162e">Game::EPECAddPolyMethod::sequential</a>, std::set&lt; std::vector&lt; short int &gt;&gt; Polys={})</td></tr>
+<tr class="separator:a00eb2bdc14f4c2970b99bf6ef3a923f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28f7b8fc5ea7f8464bc581ec3c105c8a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a28f7b8fc5ea7f8464bc581ec3c105c8a">addThePoly</a> (const unsigned long int &amp;decimalEncoding)</td></tr>
+<tr class="separator:a28f7b8fc5ea7f8464bc581ec3c105c8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1774bd75c62722871ee0d34739a2d4e5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a1774bd75c62722871ee0d34739a2d4e5">checkPolyFeas</a> (const unsigned long int &amp;decimalEncoding)</td></tr>
+<tr class="separator:a1774bd75c62722871ee0d34739a2d4e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e8557221cf4431531feb15182767e29"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3e8557221cf4431531feb15182767e29">checkPolyFeas</a> (const std::vector&lt; short int &gt; &amp;Fix)</td></tr>
+<tr class="separator:a3e8557221cf4431531feb15182767e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa90ba919c5fba15913b4c595c273e5ae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#aa90ba919c5fba15913b4c595c273e5ae">clearPolyhedra</a> ()</td></tr>
+<tr class="separator:aa90ba919c5fba15913b4c595c273e5ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f46a74c5c8ad96837849ad6adfd5275"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a5f46a74c5c8ad96837849ad6adfd5275">addPolyFromX</a> (const arma::vec &amp;x, bool &amp;ret)</td></tr>
 <tr class="separator:a5f46a74c5c8ad96837849ad6adfd5275"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c2c3b795af93989d978776cefeae17b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3c2c3b795af93989d978776cefeae17b">EnumerateAll</a> (bool solveLP=true)</td></tr>
@@ -233,8 +241,8 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:add51fe0545d75f61c72b2904495701b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#add51fe0545d75f61c72b2904495701b0">FixToPolies</a> (const std::vector&lt; short int &gt; Fix, bool checkFeas=false, bool custom=false, <a class="el" href="classGame_1_1LCP.html#a1d2ffea8464a9bdfc47e4b5f8db57c05">spmat_Vec</a> *custAi={}, <a class="el" href="classGame_1_1LCP.html#aa19074243c64fd63ca9d4f3c0fa83676">vec_Vec</a> *custbi={})</td></tr>
 <tr class="memdesc:add51fe0545d75f61c72b2904495701b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the equation of the feasibility polyhedron corresponding to the given <code>Fix</code>.  <a href="#add51fe0545d75f61c72b2904495701b0">More...</a><br /></td></tr>
 <tr class="separator:add51fe0545d75f61c72b2904495701b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ac69d38cf82799bdf76ead36f4e5bfa"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a6ac69d38cf82799bdf76ead36f4e5bfa">getNextPoly</a> (<a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066">Game::EPECAddPolyMethod</a> method) const</td></tr>
-<tr class="separator:a6ac69d38cf82799bdf76ead36f4e5bfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5efc79a96e1ca2ba12ddcb4be3e1ec46"><td class="memItemLeft" align="right" valign="top">unsigned long int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a5efc79a96e1ca2ba12ddcb4be3e1ec46">getNextPoly</a> (<a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066">Game::EPECAddPolyMethod</a> method)</td></tr>
+<tr class="separator:a5efc79a96e1ca2ba12ddcb4be3e1ec46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -271,17 +279,21 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a74669843d4f553736ab00df512bdba51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa44b55bd6f0c0a44f215c4e622cc580c"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#aa44b55bd6f0c0a44f215c4e622cc580c">feasiblePolyhedra</a> {0}</td></tr>
 <tr class="separator:aa44b55bd6f0c0a44f215c4e622cc580c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8514a10ebd770b826069ff7edd27b1ac"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a8514a10ebd770b826069ff7edd27b1ac">sequentialPolyCounter</a> {0}</td></tr>
+<tr class="separator:a8514a10ebd770b826069ff7edd27b1ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bb2ba792bb9b8c63aff1405bafc25e7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a3bb2ba792bb9b8c63aff1405bafc25e7">reverseSequentialPolyCounter</a> {0}</td></tr>
+<tr class="separator:a3bb2ba792bb9b8c63aff1405bafc25e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd13c8420e780d5d9a11ceb9e52ccb69"><td class="memItemLeft" align="right" valign="top">std::set&lt; unsigned long int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#afd13c8420e780d5d9a11ceb9e52ccb69">AllPolyhedra</a></td></tr>
 <tr class="memdesc:afd13c8420e780d5d9a11ceb9e52ccb69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decimal encoding of polyhedra that have been enumerated.  <a href="#afd13c8420e780d5d9a11ceb9e52ccb69">More...</a><br /></td></tr>
 <tr class="separator:afd13c8420e780d5d9a11ceb9e52ccb69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfb93a5eecec95cef3bd5a480be77f74"><td class="memItemLeft" align="right" valign="top">std::set&lt; unsigned long int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#adfb93a5eecec95cef3bd5a480be77f74">feasiblePoly</a></td></tr>
+<tr class="memdesc:adfb93a5eecec95cef3bd5a480be77f74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decimal encoding of polyhedra that have been enumerated.  <a href="#adfb93a5eecec95cef3bd5a480be77f74">More...</a><br /></td></tr>
+<tr class="separator:adfb93a5eecec95cef3bd5a480be77f74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d7090f9822992b0eca4c5edfcc6fa98"><td class="memItemLeft" align="right" valign="top">std::set&lt; unsigned long int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a9d7090f9822992b0eca4c5edfcc6fa98">knownInfeas</a></td></tr>
 <tr class="memdesc:a9d7090f9822992b0eca4c5edfcc6fa98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decimal encoding of polyhedra known to be infeasible.  <a href="#a9d7090f9822992b0eca4c5edfcc6fa98">More...</a><br /></td></tr>
 <tr class="separator:a9d7090f9822992b0eca4c5edfcc6fa98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d84400ec46c291abdad4ad4d64795cf"><td class="memItemLeft" align="right" valign="top">std::set&lt; unsigned long int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a7d84400ec46c291abdad4ad4d64795cf">notProcessed</a></td></tr>
-<tr class="memdesc:a7d84400ec46c291abdad4ad4d64795cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decimal encoding of polyhedra to be processed.  <a href="#a7d84400ec46c291abdad4ad4d64795cf">More...</a><br /></td></tr>
-<tr class="separator:a7d84400ec46c291abdad4ad4d64795cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1daad91494cb60c8e7a144897de1901"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ae1daad91494cb60c8e7a144897de1901">maxTheoreticalPoly</a> {0}</td></tr>
-<tr class="separator:ae1daad91494cb60c8e7a144897de1901"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab75621baeb2b754debcbccf3fa1c58b3"><td class="memItemLeft" align="right" valign="top">unsigned long int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#ab75621baeb2b754debcbccf3fa1c58b3">maxTheoreticalPoly</a> {0}</td></tr>
+<tr class="separator:ab75621baeb2b754debcbccf3fa1c58b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f71d6ee194330de1441c3911b74bff6"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classGame_1_1LCP.html#a1d2ffea8464a9bdfc47e4b5f8db57c05">spmat_Vec</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1LCP.html#a8f71d6ee194330de1441c3911b74bff6">Ai</a></td></tr>
 <tr class="memdesc:a8f71d6ee194330de1441c3911b74bff6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector to contain the LHS of inner approx polyhedra.  <a href="#a8f71d6ee194330de1441c3911b74bff6">More...</a><br /></td></tr>
 <tr class="separator:a8f71d6ee194330de1441c3911b74bff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -347,7 +359,7 @@ Private Attributes</h2></td></tr>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8f354ec1846b682d4e8d526c4408e702"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f354ec1846b682d4e8d526c4408e702">&#9670;&nbsp;</a></span>LCP() <span class="overload">[1/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f354ec1846b682d4e8d526c4408e702">&#9670;&nbsp;</a></span>LCP() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -375,7 +387,7 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <a id="affd1945600584a97ee0b95a803e70a93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#affd1945600584a97ee0b95a803e70a93">&#9670;&nbsp;</a></span>LCP() <span class="overload">[2/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#affd1945600584a97ee0b95a803e70a93">&#9670;&nbsp;</a></span>LCP() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -398,12 +410,12 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00129">129</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00132">132</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
 <a id="a0e210b1a1e440f17ee2bb05e91b846a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e210b1a1e440f17ee2bb05e91b846a0">&#9670;&nbsp;</a></span>LCP() <span class="overload">[3/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e210b1a1e440f17ee2bb05e91b846a0">&#9670;&nbsp;</a></span>LCP() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -478,7 +490,7 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <a id="a26af85e6c2bca5744cf2148da9539f31"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26af85e6c2bca5744cf2148da9539f31">&#9670;&nbsp;</a></span>LCP() <span class="overload">[4/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a26af85e6c2bca5744cf2148da9539f31">&#9670;&nbsp;</a></span>LCP() <span class="overload">[4/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -543,7 +555,7 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <a id="ad05015288e6d7ae561cea30233128840"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad05015288e6d7ae561cea30233128840">&#9670;&nbsp;</a></span>LCP() <span class="overload">[5/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad05015288e6d7ae561cea30233128840">&#9670;&nbsp;</a></span>LCP() <span class="overload">[5/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -575,32 +587,6 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="abdb1c5a1bf0a9bbabc5685125397ecf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abdb1c5a1bf0a9bbabc5685125397ecf9">&#9670;&nbsp;</a></span>LCP() <span class="overload">[6/6]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Game::LCP::LCP </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="afff596de30da4147b00612b500a99d68"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afff596de30da4147b00612b500a99d68">&#9670;&nbsp;</a></span>~LCP()</h2>
 
@@ -625,8 +611,8 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a1a320735237ebe0055b70c873b48ce27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a320735237ebe0055b70c873b48ce27">&#9670;&nbsp;</a></span>addAPoly()</h2>
+<a id="a00eb2bdc14f4c2970b99bf6ef3a923f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00eb2bdc14f4c2970b99bf6ef3a923f0">&#9670;&nbsp;</a></span>addAPoly()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -634,7 +620,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">std::set&lt; std::vector&lt; short int &gt; &gt; Game::LCP::addAPoly </td>
           <td>(</td>
-          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramtype">unsigned long int&#160;</td>
           <td class="paramname"><em>nPoly</em> = <code>1</code>, </td>
         </tr>
         <tr>
@@ -658,7 +644,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Tries to add at most <code>nPoly</code> number of polyhedra to the inner approximation representation of the current <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a>. The set of added polyhedra (+1/-1 encoding) is appended to <code>Polys</code> and returned. The only reason fewer polyhedra might be added is that the fewer polyhedra already represent the feasible region of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a>. <code>method</code> is casted from Game::EPEC::EPECAddPolyMethod</p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01142">1142</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01169">1169</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -693,6 +679,97 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a28f7b8fc5ea7f8464bc581ec3c105c8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28f7b8fc5ea7f8464bc581ec3c105c8a">&#9670;&nbsp;</a></span>addThePoly()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Game::LCP::addThePoly </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned long int &amp;&#160;</td>
+          <td class="paramname"><em>decimalEncoding</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01224">1224</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a1774bd75c62722871ee0d34739a2d4e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1774bd75c62722871ee0d34739a2d4e5">&#9670;&nbsp;</a></span>checkPolyFeas() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Game::LCP::checkPolyFeas </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned long int &amp;&#160;</td>
+          <td class="paramname"><em>decimalEncoding</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">decimalEncoding</td><td>Decimal encoding for the polyhedron </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00990">990</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3e8557221cf4431531feb15182767e29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e8557221cf4431531feb15182767e29">&#9670;&nbsp;</a></span>checkPolyFeas() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Game::LCP::checkPolyFeas </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; short int &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Fix</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa90ba919c5fba15913b4c595c273e5ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa90ba919c5fba15913b4c595c273e5ae">&#9670;&nbsp;</a></span>clearPolyhedra()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Game::LCP::clearPolyhedra </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00207">207</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+
+</div>
+</div>
 <a id="ade47b2e25c07d2dce66f175eeeae9036"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ade47b2e25c07d2dce66f175eeeae9036">&#9670;&nbsp;</a></span>conv_Npoly()</h2>
 
@@ -709,12 +786,12 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>To be used in interaction with <a class="el" href="classGame_1_1LCP.html#a6b43f4114a04d877bfde5d2f93541e00">Game::LCP::ConvexHull</a>. Gives the number of polyhedra in the current inner approximation of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> feasible region.</p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01491">1491</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01518">1518</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ac3de8d6a1018407c41555c593aeb3fba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3de8d6a1018407c41555c593aeb3fba">&#9670;&nbsp;</a></span>conv_PolyPosition()</h2>
+<a id="a4c4c010ce32a53320d76a21083e58fb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c4c010ce32a53320d76a21083e58fb8">&#9670;&nbsp;</a></span>conv_PolyPosition()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -722,7 +799,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">unsigned int Game::LCP::conv_PolyPosition </td>
           <td>(</td>
-          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramtype">const unsigned long int&#160;</td>
           <td class="paramname"><em>i</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -730,12 +807,12 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>For the convex hull of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> feasible region computed, a bunch of variables are added for extended formulation and the added variables c</p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01500">1500</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01527">1527</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aa4f62d83b107f7fdfdadd3a479216ca2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa4f62d83b107f7fdfdadd3a479216ca2">&#9670;&nbsp;</a></span>conv_PolyWt()</h2>
+<a id="a756eb1689e8778597db52aba32b167ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a756eb1689e8778597db52aba32b167ab">&#9670;&nbsp;</a></span>conv_PolyWt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -743,7 +820,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">unsigned int Game::LCP::conv_PolyWt </td>
           <td>(</td>
-          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramtype">const unsigned long int&#160;</td>
           <td class="paramname"><em>i</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -752,7 +829,7 @@ Private Attributes</h2></td></tr>
 <p>To be used in interaction with <a class="el" href="classGame_1_1LCP.html#a6b43f4114a04d877bfde5d2f93541e00">Game::LCP::ConvexHull</a>. Gives the position of the variable, which assigns the convex weight to the i-th polyhedron.</p>
 <p>However, if the inner approximation has exactly one polyhedron, then returns 0.</p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01516">1516</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01543">1543</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -850,7 +927,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01210">1210</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01237">1237</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -959,7 +1036,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01479">1479</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01506">1506</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1018,7 +1095,7 @@ Private Attributes</h2></td></tr>
 <p>Computes the equation of the feasibility polyhedron corresponding to the given <code>Fix</code>. </p>
 <p>The computed polyhedron are always pushed into a vector of <code>arma::sp_mat</code> and <code>arma::vec</code> If <code>custom</code> is false, this is the internal attribute of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a>, which are <a class="el" href="classGame_1_1LCP.html#a8f71d6ee194330de1441c3911b74bff6" title="Vector to contain the LHS of inner approx polyhedra. ">LCP::Ai</a> and <a class="el" href="classGame_1_1LCP.html#afcae3294d6a3492d4a1b77a1d72ccf60" title="Vector to contain the RHS of inner approx polyhedra. ">LCP::bi</a>. Otherwise, the vectors can be provided as arguments. <code>true</code> value to <code>checkFeas</code> ensures that <em>each</em> polyhedron that is pushed is feasible. not meant for high level code. Instead use <a class="el" href="classGame_1_1LCP.html#add51fe0545d75f61c72b2904495701b0" title="Computes the equation of the feasibility polyhedron corresponding to the given Fix. ">LCP::FixToPolies</a>. </p><dl class="section note"><dt>Note</dt><dd>A value of 0 in <code>*Fix</code> implies that polyhedron corresponding to fixing the corresponding variable as well as the equation become candidates to pushed into the vector. Hence this is preferred over <a class="el" href="classGame_1_1LCP.html#a3457209477a1e327915b0387d0b7606e" title="Computes the equation of the feasibility polyhedron corresponding to the given Fix. ">LCP::FixToPoly</a> for high-level usage. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01054">1054</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01061">1061</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1078,7 +1155,34 @@ Private Attributes</h2></td></tr>
 <p>The computed polyhedron is always pushed into a vector of <code>arma::sp_mat</code> and <code>arma::vec</code> If <code>custom</code> is false, this is the internal attribute of <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a>, which are <a class="el" href="classGame_1_1LCP.html#a8f71d6ee194330de1441c3911b74bff6" title="Vector to contain the LHS of inner approx polyhedra. ">LCP::Ai</a> and <a class="el" href="classGame_1_1LCP.html#afcae3294d6a3492d4a1b77a1d72ccf60" title="Vector to contain the RHS of inner approx polyhedra. ">LCP::bi</a>. Otherwise, the vectors can be provided as arguments. <code>true</code> value to <code>checkFeas</code> ensures that the polyhedron is pushed <em>only</em> if it is feasible. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if successfully added, else false </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Does not entertain 0 in the elements of *Fix. Only +1/-1 are allowed to not encounter undefined behavior. As a result, not meant for high level code. Instead use <a class="el" href="classGame_1_1LCP.html#add51fe0545d75f61c72b2904495701b0" title="Computes the equation of the feasibility polyhedron corresponding to the given Fix. ">LCP::FixToPolies</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00912">912</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l00900">900</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a99c37700318608e6133c0c15a0fab9ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99c37700318608e6133c0c15a0fab9ec">&#9670;&nbsp;</a></span>getAllPolyhedra()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::set&lt;unsigned long int&gt; Game::LCP::getAllPolyhedra </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00191">191</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1107,7 +1211,7 @@ Private Attributes</h2></td></tr>
 
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a6dbcd747d3b7a82fcd9079916da001df" title="Compl stores data in &lt;Eqn, Var&gt; form. ">LCP::Compl</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00161">161</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00164">164</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1134,7 +1238,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00197">197</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00215">215</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1163,7 +1267,7 @@ Private Attributes</h2></td></tr>
 
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a5842889dd444dceda535c0e464775d80">LCP::LeadEnd</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00158">158</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00161">161</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1192,7 +1296,7 @@ Private Attributes</h2></td></tr>
 
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a3626cacccb0d8ab0e1a88f8f1a3659f9">LCP::LeadStart</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00155">155</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00158">158</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1222,7 +1326,7 @@ Private Attributes</h2></td></tr>
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4" title="M in  that defines the LCP. ">LCP::M</a>. </p>
 <p>Return data and address </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00147">147</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00150">150</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1251,7 +1355,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reference access to <a class="el" href="classGame_1_1LCP.html#a220ce78f11a0e9550cec63d65411c5f4" title="M in  that defines the LCP. ">LCP::M</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00148">148</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00151">151</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1278,12 +1382,12 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00165">165</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00168">168</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
-<a id="a6ac69d38cf82799bdf76ead36f4e5bfa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ac69d38cf82799bdf76ead36f4e5bfa">&#9670;&nbsp;</a></span>getNextPoly()</h2>
+<a id="a5efc79a96e1ca2ba12ddcb4be3e1ec46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5efc79a96e1ca2ba12ddcb4be3e1ec46">&#9670;&nbsp;</a></span>getNextPoly()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1292,11 +1396,11 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned int Game::LCP::getNextPoly </td>
+          <td class="memname">unsigned long int Game::LCP::getNextPoly </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespaceGame.html#a1575f114564e7083eaa22c1ae0b2e066">Game::EPECAddPolyMethod</a>&#160;</td>
           <td class="paramname"><em>method</em></td><td>)</td>
-          <td> const</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -1307,7 +1411,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Returns a polyhedron (in its decimal encoding) that is neither already known to be infeasible, nor already added in the inner approximation representation.</p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01102">1102</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01109">1109</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1334,7 +1438,34 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00167">167</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00170">170</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+
+</div>
+</div>
+<a id="a973f1ce2078a82d8051de51acb49a516"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a973f1ce2078a82d8051de51acb49a516">&#9670;&nbsp;</a></span>getNumTheoreticalPoly()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long int Game::LCP::getNumTheoreticalPoly </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00194">194</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1363,7 +1494,7 @@ Private Attributes</h2></td></tr>
 
 <p>Read-only access to <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356" title="q in  that defines the LCP ">LCP::q</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00151">151</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00154">154</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1392,7 +1523,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reference access to <a class="el" href="classGame_1_1LCP.html#afffdded2f61d6dee34f312c8a2e4b356" title="q in  that defines the LCP ">LCP::q</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00152">152</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00155">155</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1419,7 +1550,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00079">79</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00082">82</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1449,7 +1580,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00096">96</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00099">99</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -1637,7 +1768,7 @@ template&lt;class T &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel that has the equivalent MIP</dd></dl>
 <p>The MIP problem that is returned by this function is equivalent to the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> problem provided the value of bigM is large enough. </p><dl class="section note"><dt>Note</dt><dd>This solves just the feasibility problem. Should you need a leader's objective function, use <a class="el" href="classGame_1_1LCP.html#a7e41da234589d7b25c11579566f2c1dc" title="Helps solving an LCP as an MIP. ">LCP::MPECasMILP</a> or <a class="el" href="classGame_1_1LCP.html#a36fbc1c8fdaaa40fb583c6d98a82c418" title="Helps solving an LCP as an MIQPs. ">LCP::MPECasMIQP</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01316">1316</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01343">1343</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1660,7 +1791,7 @@ template&lt;class T &gt; </div>
 <p>Solves the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> as a QP using Gurobi. </p>
 <p>Removes all complementarity constraints from the QP's constraints. Instead, the sum of products of complementarity pairs is minimized. If the optimal value turns out to be 0, then it is actually a solution of the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a>. Else the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> is infeasible. </p><dl class="section warning"><dt>Warning</dt><dd>Solves the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> feasibility problem. Not the MPEC optimization problem. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01268">1268</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01295">1295</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1690,7 +1821,7 @@ template&lt;class T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01436">1436</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01463">1463</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1733,7 +1864,7 @@ template&lt;class T &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01238">1238</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01265">1265</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1809,7 +1940,7 @@ template&lt;class T &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A unique_ptr to GRBModel that has the equivalent MIP</dd></dl>
 <p>The MIP problem that is returned by this function is equivalent to the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> problem. The function differs from <a class="el" href="classGame_1_1LCP.html#a6ff524eb77ff44492107f0863fe1ed00">LCP::LCPasMIP</a> by the fact that, this explicitly takes a leader objective, and returns an object with this objective. </p><dl class="section note"><dt>Note</dt><dd>The leader's objective has to be linear here. For quadratic objectives, refer <a class="el" href="classGame_1_1LCP.html#a36fbc1c8fdaaa40fb583c6d98a82c418" title="Helps solving an LCP as an MIQPs. ">LCP::MPECasMIQP</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01330">1330</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01357">1357</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1862,33 +1993,7 @@ template&lt;class T &gt; </div>
 <p>The MIQP problem that is returned by this function is equivalent to the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> problem provided the value of bigM is large enough. The function differs from <a class="el" href="classGame_1_1LCP.html#a6ff524eb77ff44492107f0863fe1ed00">LCP::LCPasMIP</a> by the fact that, this explicitly takes a leader objective, and returns an object with this objective. This allows quadratic leader objective. If you are aware that the leader's objective is linear, use the faster method <a class="el" href="classGame_1_1LCP.html#a7e41da234589d7b25c11579566f2c1dc" title="Helps solving an LCP as an MIP. ">LCP::MPECasMILP</a> </p>
 <p>Note that if the matrix Q is a zero matrix, then this returns a Gurobi MILP model as opposed to MIQP model. This enables Gurobi to use its much advanced MIP solver </p>
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01372">1372</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a6038bef0cb23930f6d94b51ac35b93b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6038bef0cb23930f6d94b51ac35b93b6">&#9670;&nbsp;</a></span>operator=()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classGame_1_1LCP.html">LCP</a>&amp; Game::LCP::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classGame_1_1LCP.html">LCP</a> &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01399">1399</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -1940,7 +2045,7 @@ template&lt;class T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01422">1422</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01449">1449</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -2084,7 +2189,7 @@ template&lt;class T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01404">1404</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LCPtoLP_8cpp_source.html#l01431">1431</a> of file <a class="el" href="LCPtoLP_8cpp_source.html">LCPtoLP.cpp</a>.</p>
 
 </div>
 </div>
@@ -2151,7 +2256,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= {</div><div class="line">      -1}</div></div><!-- fragment --><p>Seeds the random generator for the random polyhedra selection. Should be a positive value </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00121">121</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00124">124</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2177,7 +2282,7 @@ template&lt;class T &gt; </div>
 
 <p>Vector to contain the LHS of inner approx polyhedra. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00070">70</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00073">73</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2204,7 +2309,7 @@ template&lt;class T &gt; </div>
 <p>Decimal encoding of polyhedra that have been enumerated. </p>
 <p><a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> feasible region is a union of polyhedra. Keeps track which of those inequalities are fixed to equality to get the individual polyhedra </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00062">62</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00065">65</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2230,7 +2335,7 @@ template&lt;class T &gt; </div>
 
 <p>Vector to contain the RHS of inner approx polyhedra. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00072">72</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00075">75</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2248,7 +2353,7 @@ template&lt;class T &gt; </div>
 
 <p>bigM used to rewrite the <a class="el" href="classGame_1_1LCP.html" title="Class to handle and solve linear complementarity problems. ">LCP</a> as MIP </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00113">113</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00116">116</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2318,7 +2423,7 @@ template&lt;class T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">      1e-6}</div></div><!-- fragment -->
 <p>The threshold for optimality and feasability tollerances. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00114">114</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00117">117</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2335,7 +2440,33 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 <p>The threshold, below which a number would be considered to be zero. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00116">116</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00119">119</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+
+</div>
+</div>
+<a id="adfb93a5eecec95cef3bd5a480be77f74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfb93a5eecec95cef3bd5a480be77f74">&#9670;&nbsp;</a></span>feasiblePoly</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::set&lt;unsigned long int&gt; Game::LCP::feasiblePoly</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">      {}</div></div><!-- fragment -->
+<p>Decimal encoding of polyhedra that have been enumerated. </p>
+
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00067">67</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2359,7 +2490,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00059">59</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00060">60</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2385,7 +2516,7 @@ template&lt;class T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">      {}</div></div><!-- fragment -->
 <p>Decimal encoding of polyhedra known to be infeasible. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00064">64</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00069">69</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2489,8 +2620,8 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="ae1daad91494cb60c8e7a144897de1901"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae1daad91494cb60c8e7a144897de1901">&#9670;&nbsp;</a></span>maxTheoreticalPoly</h2>
+<a id="ab75621baeb2b754debcbccf3fa1c58b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab75621baeb2b754debcbccf3fa1c58b3">&#9670;&nbsp;</a></span>maxTheoreticalPoly</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2499,7 +2630,7 @@ template&lt;class T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned int Game::LCP::maxTheoreticalPoly {0}</td>
+          <td class="memname">unsigned long int Game::LCP::maxTheoreticalPoly {0}</td>
         </tr>
       </table>
   </td>
@@ -2509,7 +2640,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00068">68</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00071">71</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2561,32 +2692,6 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="a7d84400ec46c291abdad4ad4d64795cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7d84400ec46c291abdad4ad4d64795cf">&#9670;&nbsp;</a></span>notProcessed</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::set&lt;unsigned long int&gt; Game::LCP::notProcessed</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">      {}</div></div><!-- fragment -->
-<p>Decimal encoding of polyhedra to be processed. </p>
-
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00066">66</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
-
-</div>
-</div>
 <a id="aa209e8dc6b817bff5750b1f98f1a6a6d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa209e8dc6b817bff5750b1f98f1a6a6d">&#9670;&nbsp;</a></span>nR</h2>
 
@@ -2631,7 +2736,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00058">58</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00059">59</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2661,6 +2766,30 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a3bb2ba792bb9b8c63aff1405bafc25e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bb2ba792bb9b8c63aff1405bafc25e7">&#9670;&nbsp;</a></span>reverseSequentialPolyCounter</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Game::LCP::reverseSequentialPolyCounter {0}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00062">62</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+
+</div>
+</div>
 <a id="a187fe2df5192bc2354944d807a361333"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a187fe2df5192bc2354944d807a361333">&#9670;&nbsp;</a></span>RlxdModel</h2>
 
@@ -2682,7 +2811,31 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 <p>A gurobi model with all complementarity constraints removed. </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00073">73</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00076">76</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+
+</div>
+</div>
+<a id="a8514a10ebd770b826069ff7edd27b1ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8514a10ebd770b826069ff7edd27b1ac">&#9670;&nbsp;</a></span>sequentialPolyCounter</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Game::LCP::sequentialPolyCounter {0}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00061">61</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>
@@ -2701,7 +2854,7 @@ template&lt;class T &gt; </div>
 <p>constraints. BigM formulation otherwise </p>
 <p>If true, complementarities will be handled with indicator </p>
 
-<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00118">118</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lcptolp_8h_source.html#l00121">121</a> of file <a class="el" href="lcptolp_8h_source.html">lcptolp.h</a>.</p>
 
 </div>
 </div>

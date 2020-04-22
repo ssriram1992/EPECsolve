@@ -132,6 +132,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a41840543b82947500d6351539378de49"><td class="memItemLeft" align="right" valign="top">long int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1QP__Param.html#a41840543b82947500d6351539378de49">load</a> (std::string filename, long int pos=0)</td></tr>
 <tr class="memdesc:a41840543b82947500d6351539378de49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads the <code><a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP) ">Game::QP_Param</a></code> object stored in a file.  <a href="#a41840543b82947500d6351539378de49">More...</a><br /></td></tr>
 <tr class="separator:a41840543b82947500d6351539378de49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accedfcfbff360a9f0176ed1b325209ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#accedfcfbff360a9f0176ed1b325209ad">bound</a> (double bigM, unsigned int primals)</td></tr>
+<tr class="separator:accedfcfbff360a9f0176ed1b325209ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2db5cff1ae7f287200f82e3c729121b"><td class="memItemLeft" align="right" valign="top">arma::sp_mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGame_1_1MP__Param.html#ac2db5cff1ae7f287200f82e3c729121b">getQ</a> () const</td></tr>
 <tr class="memdesc:ac2db5cff1ae7f287200f82e3c729121b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only access to the private variable Q.  <a href="#ac2db5cff1ae7f287200f82e3c729121b">More...</a><br /></td></tr>
 <tr class="separator:ac2db5cff1ae7f287200f82e3c729121b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -237,7 +239,7 @@ Private Attributes</h2></td></tr>
 <img class="formulaDsp" alt="\begin{eqnarray} Ax + By &amp;\leq&amp; b \\ y &amp;\geq&amp; 0 \end{eqnarray}" src="form_1.png"/>
 </p>
  
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00144">144</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00146">146</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aca8de136cfd5597acf66de448dce9edd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aca8de136cfd5597acf66de448dce9edd">&#9670;&nbsp;</a></span>QP_Param() <span class="overload">[1/3]</span></h2>
@@ -265,7 +267,7 @@ Private Attributes</h2></td></tr>
 
 <p>Initialize only the size. Everything else is empty (can be updated later) </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00167">167</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00169">169</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -335,7 +337,7 @@ Private Attributes</h2></td></tr>
 
 <p>Set data at construct time. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00173">173</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00175">175</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -365,7 +367,7 @@ Private Attributes</h2></td></tr>
 
 <p>Copy constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00184">184</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00186">186</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -416,6 +418,42 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 <p>Reimplemented from <a class="el" href="classGame_1_1MP__Param.html#adf8d38d835f6cb716b7ea661d2fd4a7d">Game::MP_Param</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="Games_8cpp_source.html#l00386">386</a> of file <a class="el" href="Games_8cpp_source.html">Games.cpp</a>.</p>
+
+</div>
+</div>
+<a id="accedfcfbff360a9f0176ed1b325209ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accedfcfbff360a9f0176ed1b325209ad">&#9670;&nbsp;</a></span>bound()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Game::MP_Param::bound </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>bigM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>primals</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -583,7 +621,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Finalize the <a class="el" href="classGame_1_1MP__Param.html" title="class to handle parameterized mathematical programs(MP) ">MP_Param</a> object. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00060">60</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00061">61</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -612,7 +650,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Read-only access to the private variable A. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00078">78</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00080">80</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -641,7 +679,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Read-only access to the private variable B. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00081">81</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00083">83</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -670,7 +708,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Read-only access to the private variable b. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00087">87</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00089">89</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -699,7 +737,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Read-only access to the private variable C. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00075">75</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00077">77</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -728,7 +766,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Read-only access to the private variable c. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00084">84</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00086">86</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -757,7 +795,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Read-only access to the private variable Nx. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00090">90</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00092">92</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -786,7 +824,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Read-only access to the private variable Ny. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00093">93</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00095">95</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -815,7 +853,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Read-only access to the private variable Q. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00072">72</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00074">74</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -844,7 +882,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </div><div class="memdoc">
 <p>Checks if the current object can play a game with another <a class="el" href="classGame_1_1QP__Param.html" title="Class to handle parameterized quadratic programs(QP) ">Game::QP_Param</a> object <code>P</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00213">213</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00215">215</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1241,7 +1279,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Set the private variable A. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00105">105</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00107">107</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1271,7 +1309,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Set the private variable B. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00109">109</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00111">111</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1301,7 +1339,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Set the private variable b. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00117">117</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00119">119</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1331,7 +1369,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Set the private variable C. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00101">101</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00103">103</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1361,7 +1399,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Set the private variable c. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00113">113</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00115">115</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1391,7 +1429,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 
 <p>Set the private variable Q. </p>
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00097">97</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00099">99</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1518,7 +1556,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00054">54</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1542,7 +1580,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00054">54</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1566,7 +1604,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00056">56</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1590,7 +1628,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00054">54</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1614,7 +1652,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00056">56</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1638,7 +1676,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00159">159</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00161">161</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1662,7 +1700,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00161">161</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00163">163</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1686,7 +1724,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00057">57</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00058">58</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1710,7 +1748,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00057">57</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00058">58</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1734,7 +1772,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00057">57</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00058">58</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1758,7 +1796,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00054">54</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00055">55</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>
@@ -1782,7 +1820,7 @@ This implies you might have to rerun <a class="el" href="classGame_1_1NashGame.h
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00160">160</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="games_8h_source.html#l00162">162</a> of file <a class="el" href="games_8h_source.html">games.h</a>.</p>
 
 </div>
 </div>

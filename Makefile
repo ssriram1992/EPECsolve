@@ -98,8 +98,8 @@ instance:
 	$(OUTPUT) -i dat/Instance -m 1 -w 2
 
 format:
-	@clang-format-8 -style=llvm -i src/*.cpp
-	@clang-format-8 -style=llvm -i src/*.h
+	@clang-format-9 -style=llvm -i src/*.cpp
+	@clang-format-9 -style=llvm -i src/*.h
 
 docSimple:
 	doxygen docs/refConf
