@@ -1244,6 +1244,7 @@ void Game::EPEC::finalize()
 
   try {
     this->convexHullVariables = std::vector<unsigned int>(this->nCountr, 0);
+    BOOST_LOG_TRIVIAL(trace) << "Finalizing...";
     this->Stats.feasiblePolyhedra = std::vector<unsigned int>(this->nCountr, 0);
     this->computeLeaderLocations(this->n_MCVar);
     // Initialize leader objective and country_QP
@@ -1254,6 +1255,7 @@ void Game::EPEC::finalize()
     this->countries_LCP = vector<unique_ptr<Game::LCP>>(nCountr);
     this->SizesWithoutHull = vector<unsigned int>(nCountr, 0);
     for (unsigned int i = 0; i < this->nCountr; i++) {
+      BOOST_LOG_TRIVIAL(trace) << "Finalizing country " << i;
       this->add_Dummy_Lead(i);
       this->LeadObjec.at(i) = std::make_shared<Game::QP_objective>();
       this->LeadObjec_ConvexHull.at(i) = std::make_shared<Game::QP_objective>();
@@ -1262,6 +1264,7 @@ void Game::EPEC::finalize()
           new LCP(this->env, *this->countries_LL.at(i).get()));
       this->SizesWithoutHull.at(i) = *this->LocEnds.at(i);
     }
+    BOOST_LOG_TRIVIAL(trace) << "Finalized";
 
   } catch (const char *e) {
     cerr << e << '\n';
@@ -1353,9 +1356,11 @@ void EPEC::get_x_minus_i(const arma::vec &x, const unsigned int &i,
       count += current;
     }
     // We need to keep track of MC_vars also for this country
+  }
+  for (unsigned int j = 0; j < this->n_MCVar; j++)
     solOther.at(solOther.n_rows - this->n_MCVar + j) =
         x.at(this->nVarinEPEC - this->n_MCVar + j);
-  }
+  BOOST_LOG_TRIVIAL(debug) << "EPEC::get_x_minus_i: Over";
 }
 
 unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
@@ -1471,6 +1476,8 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
     double val = this->RespondSol(*ProfDevn, i, this->sol_x);
     if (val == GRB_INFINITY)
       return false;
+    BOOST_LOG_TRIVIAL(debug) << "EPEC::isSolved: " << i << " Devnval: " << val
+                             << " Obj Val: " << objvals.at(i);
     if (abs(val - objvals.at(i)) > tol) {
       *countryNumber = i;
       // cout << "Proof - deviation: "<<*ProfDevn; //Sane
@@ -1484,7 +1491,7 @@ bool Game::EPEC::isSolved(unsigned int *countryNumber, arma::vec *ProfDevn,
 bool Game::EPEC::isSolved(double tol) const {
   unsigned int countryNumber;
   arma::vec ProfDevn;
-  bool ret = this->isSolved(&countryNumber, &ProfDevn);
+  bool ret = this->isSolved(&countryNumber, &ProfDevn, tol);
   return ret;
 }
 
@@ -1602,8 +1609,10 @@ bool Game::EPEC::getAllDevns(
 
   for (unsigned int i = 0; i < this->nCountr; ++i) { // For each country
     // If we cannot compute a deviation, it means model is infeasible!
-    if (this->RespondSol(devns.at(i), i, guessSol, prevDev.at(i)) ==
-        GRB_INFINITY)
+    double objVal{0};
+    objVal = this->RespondSol(devns.at(i), i, guessSol, prevDev.at(i));
+    BOOST_LOG_TRIVIAL(debug) << "EPEC::getAllDevns: " << i << " " << objVal;
+    if (objVal == GRB_INFINITY)
       return false;
     // cout << "Game::EPEC::getAllDevns: devns(i): " <<devns.at(i);
   }
@@ -1636,9 +1645,9 @@ unsigned int Game::EPEC::addDeviatedPolyhedron(
     if (!devns.at(i).empty())
       this->countries_LCP.at(i)->addPolyFromX(devns.at(i), ret);
     if (ret) {
-      BOOST_LOG_TRIVIAL(trace)
+      BOOST_LOG_TRIVIAL(debug)
           << "Game::EPEC::addDeviatedPolyhedron: added polyhedron for player "
-          << i;
+          << i << " " << added;
       ++added;
     } else {
       infeasCheck = true;
@@ -1737,10 +1746,12 @@ void Game::EPEC::iterativeNash() {
     } else { // else we are in the case of finding deviations.
       unsigned int deviatedCountry{0};
       arma::vec countryDeviation{};
-      if (this->isSolved(&deviatedCountry, &countryDeviation)) {
+      if (this->isSolved(&deviatedCountry, &countryDeviation, 20)) {
         this->Stats.status = Game::EPECsolveStatus::nashEqFound;
         this->Stats.pureNE = this->isPureStrategy();
         if ((this->Stats.AlgorithmParam.pureNE && !this->Stats.pureNE)) {
+          BOOST_LOG_TRIVIAL(info)
+              << "Game::EPEC::iterativeNash: pureNE control ";
           // We are seeking for a pure strategy. Then, here we switch between an
           // incremental
           // enumeration or combinations of pure strategies.
@@ -1758,7 +1769,7 @@ void Game::EPEC::iterativeNash() {
             // strategies, except the ones between polyhedra we already tested.
             std::vector<std::set<unsigned long int>> excludeList;
             std::vector<long int> start;
-            for (int j = 0; j < this->nCountr; ++j) {
+            for (unsigned int j = 0; j < this->nCountr; ++j) {
               excludeList.push_back(
                   this->countries_LCP.at(j)->getAllPolyhedra());
               start.push_back(-1);
@@ -1782,9 +1793,11 @@ void Game::EPEC::iterativeNash() {
         BOOST_LOG_TRIVIAL(error)
             << " In Game::EPEC::iterativeNash: Not "
                "Solved, but no deviation? Error!\n This might be due to "
-               "numerical issues (tollerances)";
+               "numerical issues (tollerances) "
+            << addedPoly;
         this->Stats.status = EPECsolveStatus::numerical;
         solved = true;
+        return;
       }
       if (infeasCheck && this->Stats.numIteration == 1) {
         BOOST_LOG_TRIVIAL(warning)
@@ -1802,9 +1815,9 @@ void Game::EPEC::iterativeNash() {
           std::chrono::high_resolution_clock::now() - this->initTime;
       const double timeRemaining =
           this->Stats.AlgorithmParam.timeLimit - timeElapsed.count();
-      addRandPoly =
-          !this->computeNashEq(this->Stats.AlgorithmParam.pureNE, timeRemaining) &&
-          !incrementalEnumeration;
+      addRandPoly = !this->computeNashEq(this->Stats.AlgorithmParam.pureNE,
+                                         timeRemaining) &&
+                    !incrementalEnumeration;
     } else {
       // No Time Limit
       addRandPoly = !this->computeNashEq(this->Stats.AlgorithmParam.pureNE) &&
@@ -1813,8 +1826,8 @@ void Game::EPEC::iterativeNash() {
     if (addRandPoly)
       this->Stats.lostIntermediateEq++;
     for (unsigned int i = 0; i < this->nCountr; ++i) {
-      BOOST_LOG_TRIVIAL(info)
-          << "Country " << i << this->countries_LCP.at(i)->feas_detail_str();
+      BOOST_LOG_TRIVIAL(info) << "Game::EPEC::iterativeNash: Country " << i
+                              << this->countries_LCP.at(i)->feas_detail_str();
     }
     // This might be reached when a NashEq is found, and need to be verified.
     // Anyway, we are over the timeLimit and we should stop
@@ -1890,7 +1903,7 @@ void Game::EPEC::combinatorial_pure_NE(
       BOOST_LOG_TRIVIAL(trace)
           << "Game::EPEC::combinatorial_pure_NE: considering a "
              "FEASIBLE combination of polyhedra.";
-      for (int j = 0; j < this->getNcountries(); ++j) {
+      for (unsigned int j = 0; j < this->getNcountries(); ++j) {
         this->countries_LCP.at(j)->clearPolyhedra();
         this->countries_LCP.at(j)->addThePoly(childCombination.at(j));
       }
@@ -1906,7 +1919,7 @@ void Game::EPEC::combinatorial_pure_NE(
         res = this->computeNashEq(false, -1.0, true);
 
       if (res) {
-        if (this->isSolved()) {
+        if (this->isSolved(20)) {
           // Check that the equilibrium is a pure strategy
           if ((this->isPureStrategy())) {
             BOOST_LOG_TRIVIAL(info)
@@ -2020,7 +2033,7 @@ bool Game::EPEC::computeNashEq(
         this->lcpmodel->getEnv().set(GRB_IntParam_SolutionNumber, k);
         this->nashEq =
             this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
-        if (this->isSolved()) {
+        if (this->isSolved(20)) {
           BOOST_LOG_TRIVIAL(info)
               << "Game::EPEC::computeNashEq: an Equilibrium has been found";
           stop = 1;
@@ -2157,7 +2170,7 @@ void Game::EPEC::combinatorialPNE(
   }
   if (combination.empty()) {
     std::vector<long int> start;
-    for (int j = 0; j < this->nCountr; ++j)
+    for (unsigned int j = 0; j < this->nCountr; ++j)
       start.push_back(-1);
     this->combinatorial_pure_NE(start, excludeList);
   } else
@@ -2191,18 +2204,18 @@ void Game::EPEC::findNashEq() {
   switch (this->Stats.AlgorithmParam.algorithm) {
 
   case Game::EPECalgorithm::innerApproximation:
-    final_msg << "Inner approximation algorithm completed. ";
     this->iterativeNash();
+    final_msg << "Inner approximation algorithm completed. ";
     break;
 
   case Game::EPECalgorithm::combinatorialPNE:
-    final_msg << "CombinatorialPNE algorithm completed. ";
     this->combinatorialPNE();
+    final_msg << "CombinatorialPNE algorithm completed. ";
     break;
 
   case Game::EPECalgorithm::fullEnumeration:
-    final_msg << "Full enumeration algorithm completed. ";
     this->fullEnumerationNash();
+    final_msg << "Full enumeration algorithm completed. ";
     break;
   }
   // Handing EPECStatistics object to track performance of algorithm
@@ -2216,10 +2229,10 @@ void Game::EPEC::findNashEq() {
   case Game::EPECsolveStatus::nashEqNotFound:
     final_msg << "No Nash equilibrium exists.";
     break;
-  case Game::EPECsolveStatus::nashEqFound: {
+  case Game::EPECsolveStatus::nashEqFound:
     final_msg << "Found a Nash equilibrium ("
               << (this->Stats.pureNE == 0 ? "MNE" : "PNE") << ").";
-  } break;
+    break;
   case Game::EPECsolveStatus::timeLimit:
     final_msg << "Nash equilibrium not found. Time limit attained";
     break;
@@ -2239,13 +2252,23 @@ void Game::EPEC::fullEnumerationNash() {
   this->make_country_QP();
   BOOST_LOG_TRIVIAL(trace)
       << "Game::EPEC::findNashEq: Starting fullEnumeration search";
+  BOOST_LOG_TRIVIAL(debug) << "EPEC::fullEnumerationNash: "
+                           << "Time limit: "
+                           << this->Stats.AlgorithmParam.timeLimit;
   this->computeNashEq(this->Stats.AlgorithmParam.pureNE,
                       this->Stats.AlgorithmParam.timeLimit);
-  if (this->isSolved()) {
+  BOOST_LOG_TRIVIAL(debug) << "EPEC::fullEnumerationNash: "
+                           << "computeNashEq completed "
+                           << std::to_string(this->Stats.status);
+  // if (this->isSolved(200))
+  {
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
     if (this->isPureStrategy())
       this->Stats.pureNE = true;
   }
+  BOOST_LOG_TRIVIAL(debug) << "EPEC::fullEnumerationNash: "
+                           << "computeNashEq completed "
+                           << std::to_string(this->Stats.status);
 }
 
 void Game::EPEC::setAlgorithm(Game::EPECalgorithm algorithm)
