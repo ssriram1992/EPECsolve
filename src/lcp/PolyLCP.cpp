@@ -56,42 +56,8 @@ bool operator>(std::vector<int> encoding1, std::vector<int> encoding2) {
   return (encoding2 < encoding1);
 }
 
-unsigned int Game::PolyLCP::convexHull(
-    arma::sp_mat &A, ///< Convex hull inequality description
-    ///< LHS to be stored here
-    arma::vec &b) ///< Convex hull inequality description RHS
-///< to be stored here
-/**
- * Computes the convex hull of the feasible region of the LCP
- */
-{
-  const std::vector<arma::sp_mat *> tempAi = [](spmat_Vec &uv) {
-    std::vector<arma::sp_mat *> v{};
-    for (const auto &x : uv)
-      v.push_back(x.get());
-    return v;
-  }(*this->Ai);
-  const std::vector<arma::vec *> tempbi = [](vec_Vec &uv) {
-    std::vector<arma::vec *> v{};
-    std::for_each(uv.begin(), uv.end(),
-                  [&v](const std::unique_ptr<arma::vec> &ptr) {
-                    v.push_back(ptr.get());
-                  });
-    return v;
-  }(*this->bi);
-  arma::sp_mat A_common;
-  A_common = arma::join_cols(this->_A, -this->M);
-  arma::vec b_common = arma::join_cols(this->_b, this->q);
-  if (Ai->size() == 1) {
-    A.zeros(Ai->at(0)->n_rows + A_common.n_rows,
-            Ai->at(0)->n_cols + A_common.n_cols);
-    b.zeros(bi->at(0)->n_rows + b_common.n_rows);
-    A = arma::join_cols(*Ai->at(0), A_common);
-    b = arma::join_cols(*bi->at(0), b_common);
-    return 1;
-  } else
-    return Game::convexHull(&tempAi, &tempbi, A, b, A_common, b_common);
-}
+
+
 Game::PolyLCP &Game::PolyLCP::addPolyFromX(const arma::vec &x, bool &ret)
 /**
  * Given a <i> feasible </i> point @p x, checks if a polyhedron
@@ -425,37 +391,6 @@ Game::PolyLCP &Game::PolyLCP::enumerateAll(
     this->bi->push_back(std::move(b));
   }
   return *this;
-}
-
-void Game::PolyLCP::makeQP(
-    Game::QP_Objective
-        &QP_obj, ///< The objective function of the QP to be returned. @warning
-    ///< Size of this parameter might change!
-    Game::QP_Param &QP ///< The output parameter where the final Game::QP_Param
-                       ///< object is stored
-
-) {
-  // Original sizes
-  if (this->Ai->empty())
-    return;
-  const unsigned int oldNumVariablesX{
-      static_cast<unsigned int>(QP_obj.C.n_cols)};
-
-  Game::QP_Constraints QP_cons;
-  this->FeasiblePolyhedra = this->convexHull(QP_cons.B, QP_cons.b);
-  BOOST_LOG_TRIVIAL(trace) << "PolyLCP::makeQP: No. feasible polyhedra: "
-                           << this->FeasiblePolyhedra;
-  // Updated size after convex hull has been computed.
-  const unsigned int numConstraints{
-      static_cast<unsigned int>(QP_cons.B.n_rows)};
-  const unsigned int numVariablesY{static_cast<unsigned int>(QP_cons.B.n_cols)};
-  // Resizing entities.
-  QP_cons.A.zeros(numConstraints, oldNumVariablesX);
-  QP_obj.c = Utils::resizePatch(QP_obj.c, numVariablesY, 1);
-  QP_obj.C = Utils::resizePatch(QP_obj.C, numVariablesY, oldNumVariablesX);
-  QP_obj.Q = Utils::resizePatch(QP_obj.Q, numVariablesY, numVariablesY);
-  // Setting the QP_Param object
-  QP.set(QP_obj, QP_cons);
 }
 
 std::string Game::PolyLCP::feasabilityDetailString() const {

@@ -29,10 +29,6 @@ private:
   std::set<unsigned long int> InfeasiblePoly =
       {}; ///< Decimal encoding of polyhedra known to be infeasible
   unsigned long int MaxTheoreticalPoly{0};
-  std::unique_ptr<spmat_Vec>
-      Ai; ///< Vector to contain the LHS of inner approx polyhedra
-  std::unique_ptr<vec_Vec>
-      bi; ///< Vector to contain the RHS of inner approx polyhedra
   void initializeNotProcessed() {
     const auto numCompl = this->Compl.size();
     // 2^n - the number of polyhedra theoretically
@@ -59,7 +55,6 @@ public:
       -1}; ///< Seeds the Random generator for the Random polyhedra selection.
   ///< Should be a positive value
   /* Convex hull computation */
-  unsigned int convexHull(arma::sp_mat &A, arma::vec &b);
   unsigned long convNumPoly() const;
   unsigned int convPolyPosition(unsigned long int i) const;
   unsigned int convPolyWeight(unsigned long int i) const;
@@ -86,6 +81,5 @@ public:
   PolyLCP &enumerateAll(bool solveLP = true);
   std::string feasabilityDetailString() const;
   unsigned int getFeasiblePolyhedra() const { return this->FeasiblePolyhedra; }
-  void makeQP(Game::QP_Objective &QP_obj, Game::QP_Param &QP) override;
 };
 } // namespace Game

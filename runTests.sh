@@ -1,8 +1,8 @@
 dataFolder="dat"
-instanceFolder=${dataFolder}/Instances_H
-resultsFolder=${dataFolder}/results_InstancesH
+instanceFolder=${dataFolder}/Instances_345
+resultsFolder=${dataFolder}/results_Instances345_Outer
 logFile=${resultsFolder}/results.csv
-numThreads=8
+numThreads=4
 mkdir ${resultsFolder}
 for ex in $(ls ${instanceFolder}/*.json); do
       instanceName=${ex/.json/}
@@ -11,15 +11,17 @@ for ex in $(ls ${instanceFolder}/*.json); do
       #Skip full enumeration with the first argument
       if [ ! $1 ]; then
         #echo "--------Full Enumeration"
-        ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_Full_${instanceNumber} --timelimit 1800 -a 0
-        ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_${instanceNumber} --timelimit 1800 -a 1 --pure 1 --aggr 3 --add 1 --recover 1
-        ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_${instanceNumber} --timelimit 1800 -a 2 --pure 1
+        #./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_Full_${instanceNumber} --timelimit 1800 -a 0
+        #./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_FullPure_${instanceNumber} --timelimit 1800 -a 0 --pure 1
+        #./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_${instanceNumber} --timelimit 1800 -a 1 --pure 1 --aggr 3 --add 1 --recover 1
+        #./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_${instanceNumber} --timelimit 1800 -a 2 --pure 1
+        ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_OuterPreliminary_${instanceNumber} --timelimit 1800 -a 3
       fi
-      for aggressiveness in {1,3,5}; do
-        for addPolyMethod in {0,1,2}; do
+      for Aggressiveness in {1,3,5}; do
+        for AddPolyMethod in {0,1,2}; do
           #echo "--------Inner Approximation"
           echo ""
-          ./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_Inner_${instanceNumber}_aggr${aggressiveness}_method${addPolyMethod} --timelimit 1800 -a 1 --aggr $aggressiveness --add $addPolyMethod
+          #./EPEC -i ${ex//.json/} -t ${numThreads} -w 2 -l ${logFile} -s ${resultsFolder}/Solution_Inner_${instanceNumber}_aggr${Aggressiveness}_method${AddPolyMethod} --timelimit 1800 -a 1 --aggr $Aggressiveness --add $AddPolyMethod
         done
       done
       printf "\n\n"
