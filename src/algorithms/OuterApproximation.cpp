@@ -285,7 +285,7 @@ std::vector<int> Algorithms::OuterApproximation::getNextBranchLocation(
 }
 
 void Algorithms::OuterApproximation::printCurrentApprox() {
-  /*
+  /**
    * Returns a log message containing the encoding at the current outer
    * approximation iteration
    */
@@ -302,7 +302,7 @@ void Algorithms::OuterApproximation::printCurrentApprox() {
 }
 
 OuterTree::Node::Node(Node &parent, unsigned int idComp, unsigned long int id) {
-  /*
+  /**
    * Given the parent node address @param parent, the @param idComp to branch
    * on, and the @param id, creates a new node
    */
@@ -316,7 +316,7 @@ OuterTree::Node::Node(Node &parent, unsigned int idComp, unsigned long int id) {
 }
 
 OuterTree::Node::Node(unsigned int encSize) {
-  /*
+  /**
    * Constructor for the root node, given the encoding size, namely the number
    * of complementarity equations
    */
@@ -327,7 +327,7 @@ OuterTree::Node::Node(unsigned int encSize) {
 
 void OuterTree::denyBranchingLocation(OuterTree::Node &node,
                                       const unsigned int &location) {
-  /*
+  /**
    * If a complementarity equation @param location  has proven to be infeasible
    * or it isn't a candidate for branching, this method prevents any further
    * branching on it for the node @param node.
@@ -342,7 +342,7 @@ void OuterTree::denyBranchingLocation(OuterTree::Node &node,
 
 void OuterTree::denyBranchingLocations(OuterTree::Node &node,
                                        const std::vector<int> &locations) {
-  /*
+  /**
    * If a complementarity equation @param location  has proven to be infeasible
    * or it isn't a candidate for branching, this method prevents any further
    * branching on it for the node @param node.
@@ -356,7 +356,7 @@ void OuterTree::denyBranchingLocations(OuterTree::Node &node,
 
 std::vector<long int> OuterTree::singleBranch(const unsigned int idComp,
                                               OuterTree::Node &t) {
-  /*
+  /**
    * Given the @param idComp and the parent node @param t, creates a single
    * child by branching on @param idComp.
    */
@@ -376,7 +376,7 @@ std::vector<long int> OuterTree::singleBranch(const unsigned int idComp,
 
 std::vector<long int> OuterTree::multipleBranch(const std::vector<int> idsComp,
                                                 Node &t) {
-  /*
+  /**
    * Given the @param idComp and the parent node @param t, creates a single
    * child by branching on @param idComp.
    */
@@ -398,7 +398,7 @@ std::vector<long int> OuterTree::multipleBranch(const std::vector<int> idsComp,
 
 OuterTree::Node::Node(Node &parent, std::vector<int> idsComp,
                       unsigned long int id) {
-  /*
+  /**
    * Given the parent node address @param parent, the @param idsComp to branch
    * on (containing all the complementarities ids), and the @param id, creates a
    * new node
