@@ -444,7 +444,8 @@ struct EPECAlgorithmParams {
       1}; ///< Controls the number of random polyhedra added at each iteration
   ///< in EPEC::iterativeNash
   bool pureNE{false}; ///< If true, the algorithm will tend to search for pure
-  ///< NE. If none exists, it will return a MNE (if exists)
+                      ///< NE. If none exists, it will return a MNE (if exists)
+  double solvedTol{0.01};
 };
 
 /// @brief Stores statistics for a (solved) EPEC instance
@@ -614,6 +615,12 @@ public:                  // functions
   void setNumThreads(unsigned int t) {
     this->Stats.AlgorithmParam.threads = t;
     this->env->set(GRB_IntParam_Threads, t);
+  }
+  inline void setSolvedTol(double tol) {
+    this->Stats.AlgorithmParam.solvedTol = tol;
+  }
+  inline double getSolvedTol() const {
+    return this->Stats.AlgorithmParam.solvedTol;
   }
   unsigned int getNumThreads() const {
     return this->Stats.AlgorithmParam.threads;

@@ -1746,7 +1746,8 @@ void Game::EPEC::iterativeNash() {
     } else { // else we are in the case of finding deviations.
       unsigned int deviatedCountry{0};
       arma::vec countryDeviation{};
-      if (this->isSolved(&deviatedCountry, &countryDeviation, 20)) {
+      if (this->isSolved(&deviatedCountry, &countryDeviation,
+                         this->Stats.AlgorithmParam.solvedTol)) {
         this->Stats.status = Game::EPECsolveStatus::nashEqFound;
         this->Stats.pureNE = this->isPureStrategy();
         if ((this->Stats.AlgorithmParam.pureNE && !this->Stats.pureNE)) {
@@ -1919,7 +1920,7 @@ void Game::EPEC::combinatorial_pure_NE(
         res = this->computeNashEq(false, -1.0, true);
 
       if (res) {
-        if (this->isSolved(20)) {
+        if (this->isSolved(this->Stats.AlgorithmParam.solvedTol)) {
           // Check that the equilibrium is a pure strategy
           if ((this->isPureStrategy())) {
             BOOST_LOG_TRIVIAL(info)
@@ -2033,7 +2034,7 @@ bool Game::EPEC::computeNashEq(
         this->lcpmodel->getEnv().set(GRB_IntParam_SolutionNumber, k);
         this->nashEq =
             this->lcp->extractSols(this->lcpmodel.get(), sol_z, sol_x, true);
-        if (this->isSolved(20)) {
+        if (this->isSolved(this->Stats.AlgorithmParam.solvedTol)) {
           BOOST_LOG_TRIVIAL(info)
               << "Game::EPEC::computeNashEq: an Equilibrium has been found";
           stop = 1;
@@ -2260,8 +2261,7 @@ void Game::EPEC::fullEnumerationNash() {
   BOOST_LOG_TRIVIAL(debug) << "EPEC::fullEnumerationNash: "
                            << "computeNashEq completed "
                            << std::to_string(this->Stats.status);
-  // if (this->isSolved(200))
-  {
+  if (this->isSolved(this->Stats.AlgorithmParam.solvedTol)) {
     this->Stats.status = Game::EPECsolveStatus::nashEqFound;
     if (this->isPureStrategy())
       this->Stats.pureNE = true;
