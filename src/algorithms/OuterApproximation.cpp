@@ -146,9 +146,11 @@ void Algorithms::OuterApproximation::solve() {
           timeElapsed.count();
       this->EPECObject->computeNashEq(
           this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium, timeRemaining);
+    } else {
+      this->EPECObject->computeNashEq(
+          this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium);
     }
-    this->EPECObject->computeNashEq(
-        this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium);
+
 
 
     if (this->EPECObject->isSolved()) {
