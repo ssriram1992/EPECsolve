@@ -1602,10 +1602,12 @@ void Game::EPEC::getXMinusI(const arma::vec &x, const unsigned int &i,
                    this->LeaderLocations.at(j) + current - 1);
       count += current;
     }
-    // We need to keep track of MC_vars also for this country
+  }
+  // We need to keep track of MC_vars also for this country
+  for (unsigned int j = 0; j < this->numMCVariables; j++)
     solOther.at(solOther.n_rows - this->numMCVariables + j) =
         x.at(this->NumVariables - this->numMCVariables + j);
-  }
+  BOOST_LOG_TRIVIAL(debug) << "EPEC::get_x_minus_i: Over";
 }
 
 void Game::EPEC::getXofI(const arma::vec &x, const unsigned int &i,
