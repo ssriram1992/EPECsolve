@@ -577,14 +577,16 @@ int Game::QP_Param::makeyQy()
 }
 
 std::unique_ptr<GRBModel> Game::QP_Param::solveFixed(
-    arma::vec x ///< Other players' decisions
-    )           /**
-                 * Given a value for the parameters @f$x@f$ in the definition of QP_Param,
-                 * solve           the parameterized quadratic program to  optimality.
+    arma::vec x,
+    bool solve) /**
+                 * Given a value for the parameters @f$x@f$ in the
+                 * definition of QP_Param, solve           the
+                 * parameterized quadratic program to  optimality.
                  *
-                 * In terms of game theory, this can be viewed as <i>the best response</i>
-                 * for a           set of decisions by other players.
-                 *
+                 * In terms of game theory, this can be viewed as
+                 * <i>the best response</i> for a           set of
+                 * decisions by other players.
+                 *@p solve decides whether the model has to be optimized or not
                  */
 {
   this->makeyQy(); /// @throws GRBException if argument std::vector size is not
@@ -612,7 +614,8 @@ std::unique_ptr<GRBModel> Game::QP_Param::solveFixed(
     }
     model->update();
     model->set(GRB_IntParam_OutputFlag, 0);
-    model->optimize();
+    if (solve)
+      model->optimize();
   } catch (const char *e) {
     std::cerr << " Error in Game::QP_Param::solveFixed: " << e << '\n';
     throw;
@@ -630,6 +633,7 @@ std::unique_ptr<GRBModel> Game::QP_Param::solveFixed(
   }
   return model;
 }
+
 
 Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars,
                                          int position)
@@ -1346,7 +1350,7 @@ std::unique_ptr<GRBModel> Game::NashGame::respond(
                                1); // Discard any dual variables in x
   }
 
-  return this->Players.at(player)->solveFixed(solOther);
+  return this->Players.at(player)->solveFixed(solOther, true);
 }
 
 double Game::NashGame::respondSol(
@@ -1592,7 +1596,7 @@ void Game::EPEC::getXMinusI(const arma::vec &x, const unsigned int &i,
                  nConvexHullVars + // We don't want any convex hull variables
                  nThisCountryHullVars); // We subtract the hull variables
                                         // associated to the ith player
-  // convex hull vars
+  // convex hull vars, since we double subtracted
 
   for (unsigned int j = 0, count = 0, current = 0; j < this->NumPlayers; ++j) {
     if (i != j) {
@@ -1607,33 +1611,38 @@ void Game::EPEC::getXMinusI(const arma::vec &x, const unsigned int &i,
   for (unsigned int j = 0; j < this->numMCVariables; j++)
     solOther.at(solOther.n_rows - this->numMCVariables + j) =
         x.at(this->NumVariables - this->numMCVariables + j);
-  BOOST_LOG_TRIVIAL(debug) << "EPEC::get_x_minus_i: Over";
 }
 
 void Game::EPEC::getXofI(const arma::vec &x, const unsigned int &i,
-                         arma::vec &solI) const {
+                         arma::vec &solI, bool hull) const {
   /**
    * Given the player id @p i and the solution @p x, the method returns in @p
    * xWithoutHull the x vector for the given player, with the convex-hull's
-   * variables.
+   * variables in case @p hull is false. Also, no MC variables are included
    */
   const unsigned int nThisCountryvars = *this->LocEnds.at(i);
   const unsigned int nThisCountryHullVars = this->ConvexHullVariables.at(i);
 
-  unsigned int vars = nThisCountryvars - nThisCountryHullVars;
+  unsigned int vars = 0, current = 0;
+  if (hull) {
+    vars = nThisCountryvars;
+    current = *this->LocEnds.at(i);
+  } else {
+    vars = nThisCountryvars - nThisCountryHullVars;
+    current = *this->LocEnds.at(i) - this->ConvexHullVariables.at(i);
+  }
   solI.zeros(vars);
-
-  unsigned int current = *this->LocEnds.at(i) - this->ConvexHullVariables.at(i);
   solI.subvec(0, vars - 1) = x.subvec(
       this->LeaderLocations.at(i), this->LeaderLocations.at(i) + current - 1);
 }
 
-void Game::EPEC::getXWithoutHull(const arma::vec &x, const unsigned int &i,
+void Game::EPEC::getXWithoutHull(const arma::vec &x,
                                  arma::vec &xWithoutHull) const {
   /**
-   * Given the player id @p i and the solution @p x, the method returns in @p
-   * xWithoutHull the x vector for the given player, without the convex-hull's
-   * variables.
+   * Given the the solution @p x, the method returns in @p
+   * xWithoutHull the x vector without the convex-hull's
+   * variables.  Also, no MC variables are included
+   *
    */
   const unsigned int nEPECvars = this->NumVariables;
   const unsigned int nConvexHullVars = static_cast<const unsigned int>(
@@ -1642,7 +1651,7 @@ void Game::EPEC::getXWithoutHull(const arma::vec &x, const unsigned int &i,
 
   xWithoutHull.zeros(nEPECvars -       // All variables in EPEC
                      nConvexHullVars); // We subtract the hull variables
-                                       // associated to the convex hull
+  // associated to the convex hull
   // convex hull vars
 
   for (unsigned int j = 0, count = 0, current = 0; j < this->NumPlayers; ++j) {
@@ -1650,9 +1659,6 @@ void Game::EPEC::getXWithoutHull(const arma::vec &x, const unsigned int &i,
     xWithoutHull.subvec(count, count + current - 1) = x.subvec(
         this->LeaderLocations.at(j), this->LeaderLocations.at(j) + current - 1);
     count += current;
-    // We need to keep track of MC_vars also for this country
-    xWithoutHull.at(xWithoutHull.n_rows - this->numMCVariables + j) =
-        x.at(this->NumVariables - this->numMCVariables + j);
   }
 }
 

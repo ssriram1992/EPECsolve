@@ -218,7 +218,7 @@ public: // Constructors
   // Other methods
   unsigned int KKT(arma::sp_mat &M, arma::sp_mat &N, arma::vec &q) const;
 
-  std::unique_ptr<GRBModel> solveFixed(arma::vec x);
+  std::unique_ptr<GRBModel> solveFixed(arma::vec x, bool solve);
 
   /// Computes the objective value, given a vector @p y and
   /// a parameterizing vector @p x
@@ -782,11 +782,9 @@ public: // functions
     this->LCPModel->write(filename);
   }
 
-  void getXofI(const arma::vec &x, const unsigned int &i,
-               arma::vec &solI) const;
-
-  void getXWithoutHull(const arma::vec &x, const unsigned int &i,
-                       arma::vec &xWithoutHull) const;
+  void getXWithoutHull(const arma::vec &x, arma::vec &xWithoutHull) const;
+  void getXofI(const arma::vec &x, const unsigned int &i, arma::vec &solI,
+               bool hull = false) const;
 };
 } // namespace Game
 
