@@ -6,6 +6,8 @@ if (ROSSOBIANCO)
     set(BOOST_ROOT "/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0")
     set(ARMA_PATH "/home/draggabr/.local/armadillo")
     set(ARMA_LIB "${ARMA_PATH}/lib64/libarmadillo.so")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -gdwarf-3")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -gdwarf-3")
 ELSE ()
     set(BOOST_ROOT "/usr/local/boost-1.70.0/")
     set(ARMA_PATH "/usr/local")
@@ -17,6 +19,7 @@ set(GUROBI_PATH_LINUX "/home/gurobi/9.0.0/linux64")
 set(GUROBI_PATH_MAC "/Library/gurobi900/mac64")
 set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi900\\win64")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 ############################################
