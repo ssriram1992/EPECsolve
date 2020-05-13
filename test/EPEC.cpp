@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(QPParam_test) {
   arma::vec x(2);
   x(0) = -1;
   x(1) = 0.5;
-  auto FixedModel = q2.solveFixed(x);
+  auto FixedModel = q2.solveFixed(x, true);
   arma::vec sol(3);
   sol << 0.5417 << endr << 5.9861 << endr
       << 3.4722; // Hard-coding the solution as calculated outside
