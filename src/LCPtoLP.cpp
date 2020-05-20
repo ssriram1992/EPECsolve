@@ -1378,10 +1378,10 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   try {
     Cx = C * x_minus_i;
   } catch (exception &e) {
-    cerr << "Exception in Game::LCP::MPECasMIQP: " << e.what() << '\n';
+    cerr << "Exception in Game::LCP::MPECasMILP: " << e.what() << '\n';
     throw;
   } catch (string &e) {
-    cerr << "Exception in Game::LCP::MPECasMIQP: " << e << '\n';
+    cerr << "Exception in Game::LCP::MPECasMILP: " << e << '\n';
     throw;
   }
   arma::vec obj = c + Cx;
@@ -1392,6 +1392,7 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   model->set(GRB_IntParam_OutputFlag, VERBOSE);
   if (solve)
     model->optimize();
+	model->update();
   return model;
 }
 
@@ -1416,10 +1417,9 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
   /// advanced MIP solver
   if (Q.n_nonzero != 0) // If Q is zero, then just solve MIP as opposed to MIQP!
   {
-    GRBLinExpr linexpr = model->getObjective(0);
-    GRBQuadExpr expr{linexpr};
+    GRBQuadExpr expr{model->getObjective()};
     for (auto it = Q.begin(); it != Q.end(); ++it)
-      expr += (*it) * model->getVarByName("x_" + to_string(it.row())) *
+      expr += 0.5* (*it) * model->getVarByName("x_" + to_string(it.row())) *
               model->getVarByName("x_" + to_string(it.col()));
     model->setObjective(expr, GRB_MINIMIZE);
   }

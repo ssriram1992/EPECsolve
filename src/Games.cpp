@@ -507,7 +507,7 @@ double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
     if (y.min() <= -tol) // if infeasible
       return GRB_INFINITY;
   }
-  arma::vec obj = 0.5 * y.t() * Q * y + (C * x).t() * y + c.t() * y;
+  arma::vec obj = 0.5* y.t() * Q * y + (C * x).t() * y + c.t() * y;
   return obj(0);
 }
 
@@ -1118,6 +1118,7 @@ double Game::NashGame::RespondSol(
     for (unsigned int i = 0; i < Nx; ++i)
       sol.at(i) =
           model->getVarByName("y_" + to_string(i)).get(GRB_DoubleAttr_X);
+		BOOST_LOG_TRIVIAL(trace) << "Game::NashGame::RespondSol: Player" << player;
 
     return model->get(GRB_DoubleAttr_ObjVal);
   } else
@@ -1360,7 +1361,6 @@ void EPEC::get_x_minus_i(const arma::vec &x, const unsigned int &i,
   for (unsigned int j = 0; j < this->n_MCVar; j++)
     solOther.at(solOther.n_rows - this->n_MCVar + j) =
         x.at(this->nVarinEPEC - this->n_MCVar + j);
-  BOOST_LOG_TRIVIAL(debug) << "EPEC::get_x_minus_i: Over";
 }
 
 unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
@@ -1373,8 +1373,8 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
 
   arma::vec solOther;
   this->get_x_minus_i(x, i, solOther);
-  return this->countries_LCP.at(i).get()->MPECasMILP(
-      this->LeadObjec.at(i).get()->C, this->LeadObjec.at(i).get()->c, solOther,
+  return this->countries_LCP.at(i).get()->MPECasMIQP( this->LeadObjec.at(i)->Q,
+      this->LeadObjec.at(i)->C, this->LeadObjec.at(i)->c, solOther,
       true);
 }
 double Game::EPEC::RespondSol(
@@ -1395,6 +1395,8 @@ double Game::EPEC::RespondSol(
    * @returns The optimal objective value for the player @p player.
    */
   auto model = this->Respond(player, x);
+	BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::RespondSol: Writing dat/RespondSol" + std::to_string(player)+".lp to disk";
+	model -> write("dat/RespondSol"+std::to_string(player)+".lp");
   const int status = model->get(GRB_IntAttr_Status);
   if (status == GRB_UNBOUNDED || status == GRB_OPTIMAL) {
     unsigned int Nx = this->countries_LCP.at(player)->getNcol();
@@ -1611,7 +1613,6 @@ bool Game::EPEC::getAllDevns(
     // If we cannot compute a deviation, it means model is infeasible!
     double objVal{0};
     objVal = this->RespondSol(devns.at(i), i, guessSol, prevDev.at(i));
-    BOOST_LOG_TRIVIAL(debug) << "EPEC::getAllDevns: " << i << " " << objVal;
     if (objVal == GRB_INFINITY)
       return false;
     // cout << "Game::EPEC::getAllDevns: devns(i): " <<devns.at(i);
