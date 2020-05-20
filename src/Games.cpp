@@ -634,7 +634,6 @@ std::unique_ptr<GRBModel> Game::QP_Param::solveFixed(
   return model;
 }
 
-
 Game::QP_Param &Game::QP_Param::addDummy(unsigned int pars, unsigned int vars,
                                          int position)
 /**
@@ -1381,6 +1380,7 @@ double Game::NashGame::respondSol(
       sol.at(i) =
           model->getVarByName("y_" + std::to_string(i)).get(GRB_DoubleAttr_X);
 
+    BOOST_LOG_TRIVIAL(trace) << "Game::NashGame::RespondSol: Player" << player;
     return model->get(GRB_DoubleAttr_ObjVal);
   } else
     return GRB_INFINITY;
@@ -1672,9 +1672,9 @@ std::unique_ptr<GRBModel> Game::EPEC::respond(const unsigned int i,
 
   arma::vec solOther;
   this->getXMinusI(x, i, solOther);
-  return this->PlayersLCP.at(i).get()->MPECasMILP(
-      this->LeaderObjective.at(i).get()->C,
-      this->LeaderObjective.at(i).get()->c, solOther, true);
+  return this->PlayersLCP..at(i).get()->MPECasMIQP(
+      this->LeaderObjective.at(i)->Q, this->LeaderObjective.at(i)->C,
+      this->LeaderObjective.at(i)->c, solOther, true);
 }
 
 double Game::EPEC::respondSol(
@@ -1695,6 +1695,9 @@ double Game::EPEC::respondSol(
    * @returns The optimal objective value for the player @p player.
    */
   auto model = this->respond(player, x);
+  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::RespondSol: Writing dat/RespondSol" +
+                                  std::to_string(player) + ".lp to disk";
+  model->write("dat/RespondSol" + std::to_string(player) + ".lp");
   const int status = model->get(GRB_IntAttr_Status);
   if (status == GRB_UNBOUNDED || status == GRB_OPTIMAL) {
     unsigned int Nx = this->PlayersLCP.at(player)->getNumCols();

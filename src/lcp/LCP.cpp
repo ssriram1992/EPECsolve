@@ -544,10 +544,10 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   try {
     Cx = C * x_minus_i;
   } catch (std::exception &e) {
-    std::cerr << "Exception in Game::LCP::MPECasMIQP: " << e.what() << '\n';
+    std::cerr << "Exception in Game::LCP::MPECasMILP: " << e.what() << '\n';
     throw;
   } catch (std::string &e) {
-    std::cerr << "Exception in Game::LCP::MPECasMIQP: " << e << '\n';
+    std::cerr << "Exception in Game::LCP::MPECasMILP: " << e << '\n';
     throw;
   }
   arma::vec obj = c + Cx;
@@ -558,6 +558,7 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   model->set(GRB_IntParam_OutputFlag, 0);
   if (solve)
     model->optimize();
+  model->update();
   return model;
 }
 
@@ -582,11 +583,10 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
   /// advanced MIP solver
   if (Q.n_nonzero != 0) // If Q is zero, then just solve MIP as opposed to MIQP!
   {
-    GRBLinExpr linexpr = model->getObjective(0);
-    GRBQuadExpr expr{linexpr};
+    GRBQuadExpr expr{model->getObjective()};
     for (auto it = Q.begin(); it != Q.end(); ++it)
-      expr += (*it) * model->getVarByName("x_" + std::to_string(it.row())) *
-              model->getVarByName("x_" + std::to_string(it.col()));
+      expr += 0.5 * (*it) * model->getVarByName("x_" + to_string(it.row())) *
+              model->getVarByName("x_" + to_string(it.col()));
     model->setObjective(expr, GRB_MINIMIZE);
   }
   if (solve)
@@ -672,10 +672,10 @@ long int Game::LCP::load(std::string filename, long int pos) {
   return pos;
 }
 
-unsigned int Game::LCP::convexHull(
-    arma::sp_mat &A, ///< Convex hull inequality description
-    ///< LHS to be stored here
-    arma::vec &b)    ///< Convex hull inequality description RHS
+unsigned int
+Game::LCP::convexHull(arma::sp_mat &A, ///< Convex hull inequality description
+                      ///< LHS to be stored here
+                      arma::vec &b) ///< Convex hull inequality description RHS
 ///< to be stored here
 /**
  * Computes the convex hull of the feasible region of the LCP.
@@ -713,8 +713,8 @@ void Game::LCP::makeQP(
     Game::QP_Objective &QP_obj, ///< [in/out] Objective function of the final QP
     ///< that has to be made
     Game::QP_Param &QP ///< [out] This is the Game::QP_Param that results from
-    ///< the input objective and the convex hull of the
-    ///< region defined by Game::OuterLCP
+                       ///< the input objective and the convex hull of the
+                       ///< region defined by Game::OuterLCP
 ) {
   /**
    * Given that the Game::LCP stores a description of the LCP feasible
