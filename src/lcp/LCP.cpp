@@ -585,8 +585,9 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
   {
     GRBQuadExpr expr{model->getObjective()};
     for (auto it = Q.begin(); it != Q.end(); ++it)
-      expr += 0.5 * (*it) * model->getVarByName("x_" + to_string(it.row())) *
-              model->getVarByName("x_" + to_string(it.col()));
+      expr += 0.5 * (*it) *
+              model->getVarByName("x_" + std::to_string(it.row())) *
+              model->getVarByName("x_" + std::to_string(it.col()));
     model->setObjective(expr, GRB_MINIMIZE);
   }
   if (solve)
@@ -672,11 +673,10 @@ long int Game::LCP::load(std::string filename, long int pos) {
   return pos;
 }
 
-unsigned int
-Game::LCP::convexHull(arma::sp_mat &A, ///< Convex hull inequality description
-                      ///< LHS to be stored here
-                      arma::vec &b) ///< Convex hull inequality description RHS
-///< to be stored here
+unsigned int Game::LCP::convexHull(
+    arma::sp_mat &A, ///< Convex hull inequality description
+                     ///< LHS to be stored here
+    arma::vec &b)///< Convex hull inequality description RHS
 /**
  * Computes the convex hull of the feasible region of the LCP.
  */
@@ -697,16 +697,17 @@ Game::LCP::convexHull(arma::sp_mat &A, ///< Convex hull inequality description
   }(*this->bi);
   arma::sp_mat A_common;
   A_common = arma::join_cols(this->_A, -this->M);
-  arma::vec b_common = arma::join_cols(this->_b, this->q);
+  arma::vec bCommon = arma::join_cols(this->_b, this->q);
+
   if (Ai->size() == 1) {
     A.zeros(Ai->at(0)->n_rows + A_common.n_rows,
             Ai->at(0)->n_cols + A_common.n_cols);
-    b.zeros(bi->at(0)->n_rows + b_common.n_rows);
+    b.zeros(bi->at(0)->n_rows + bCommon.n_rows);
     A = arma::join_cols(*Ai->at(0), A_common);
-    b = arma::join_cols(*bi->at(0), b_common);
+    b = arma::join_cols(*bi->at(0), bCommon);
     return 1;
   } else
-    return Game::convexHull(&tempAi, &tempbi, A, b, A_common, b_common);
+    return Game::convexHull(&tempAi, &tempbi, A, b, A_common, bCommon);
 }
 
 void Game::LCP::makeQP(
@@ -719,7 +720,7 @@ void Game::LCP::makeQP(
   /**
    * Given that the Game::LCP stores a description of the LCP feasible
    * region, calls Game::LCP::convexHull to construct the convex hull. The
-   * polyhedral convex hull and the given objective are combinaed to create the
+   * polyhedral convex hull and the given objective are combined to create the
    * output Game::QP_Param.
    */
   // Original sizes
@@ -744,4 +745,21 @@ void Game::LCP::makeQP(
   QP_obj.Q = Utils::resizePatch(QP_obj.Q, oldNumVariablesY, oldNumVariablesY);
   // Setting the QP_Param object
   QP.set(QP_obj, QP_cons);
+}
+void Game::LCP::addCustomCuts(
+    const arma::sp_mat A, ///< [in] The LHS of the added cuts
+    const arma::vec b     ///< [in] The RHS of the added cuts
+) {
+  /**
+   * Given that the Game::LCP stores a description of the new cuts of @p A (and
+   * RHS @p b) in LCP::_A and LCP::_b
+   */
+
+  if (this->_A.n_cols != A.n_cols)
+    throw("Error in LCP::addCustomCuts: mismatch of A columns");
+  if (b.size() != A.n_rows)
+    throw("Error in LCP::addCustomCuts: mismatch of A rows and b columns");
+
+  this->_A = arma::join_cols(this->_A, A);
+  this->_b = arma::join_cols(this->_b, b);
 }

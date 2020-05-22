@@ -35,9 +35,9 @@ protected:
   arma::sp_mat _A = {};
   arma::vec _b = {}; ///< Apart from @f$0 \le x \perp Mx+q\ge 0@f$, one needs@f$
   ///< Ax\le b@f$ too!
-  // Temporary data
   bool MadeRlxdModel{false}; ///< Keep track if LCP::RlxdModel is made
   unsigned int nR, nC;
+
 
   GRBModel RlxdModel; ///< A gurobi model with all complementarity constraints
   ///< removed.
@@ -58,9 +58,11 @@ protected:
   }
 
   std::unique_ptr<spmat_Vec>
-      Ai; ///< Vector to contain the LHSs of a description (either exact or approximated) of the LCP's feasible region
+      Ai; ///< Vector to contain the LHSs of a description (either exact or
+          ///< approximated) of the LCP's feasible region
   std::unique_ptr<vec_Vec>
-      bi; ///< Vector to contain the RHSs of a description (either exact or approximated) of the LCP's feasible region
+      bi; ///< Vector to contain the RHSs of a description (either exact or
+          ///< approximated) of the LCP's feasible region
 
   inline std::vector<short int> solEncode(GRBModel *model) const;
 
@@ -150,11 +152,13 @@ public:
 
   virtual void makeQP(Game::QP_Objective &QP_obj, Game::QP_Param &QP);
 
-  std::vector<short int> solEncode(const arma::vec &x) const;
+  void addCustomCuts(const arma::sp_mat A, const arma::vec b);
 
-  arma::vec zFromX(const arma::vec x);
-};
-} // namespace Game
+    std::vector<short int> solEncode(const arma::vec &x) const;
 
-#include "lcp/outerlcp.h"
-#include "lcp/polylcp.h"
+    arma::vec zFromX(const arma::vec x);
+  };
+  } // namespace Game
+
+  #include "lcp/outerlcp.h"
+  #include "lcp/polylcp.h"
