@@ -248,6 +248,7 @@ public: // Constructors
 
   /// @brief Loads the @p Game::QP_Param object stored in a file.
   long int load(const std::string &filename, long int pos = 0);
+  double computeObjectiveWithoutOthers(const arma::vec &y) const;
 };
 
 /**
@@ -418,6 +419,7 @@ public: // Constructors
 
   /// @brief Loads the @p Game::NashGame object stored in a file.
   long int load(const std::string &filename, long int pos = 0);
+  arma::vec computeQPObjectiveValuesWithoutOthers(const arma::vec &x) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const QP_Param &Q);

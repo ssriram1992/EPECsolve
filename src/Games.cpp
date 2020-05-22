@@ -695,6 +695,9 @@ unsigned int Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N,
   return M.n_rows;
 }
 
+
+
+
 Game::QP_Param &
 Game::QP_Param::set(const arma::sp_mat &Q, const arma::sp_mat &C,
                     const arma::sp_mat &A, const arma::sp_mat &B,
@@ -742,7 +745,7 @@ Game::QP_Param &Game::QP_Param::set(const QP_Objective &obj,
 double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
                                         bool checkFeas, double tol) const {
   /**
-   * Computes @f$\frac{1}{2} y^TQy + (Cx)^Ty @f$ given the input values @p y and
+   * Computes @f$\frac{1}{2} y^TQy + (Cx)^Ty + c^Ty@f$ given the input values @p y and
    * @p x.
    * @param checkFeas if @p true, checks if the given @f$(x,y)@f$ satisfies the
    * constraints of the problem, namely @f$Ax + By \leq b@f$.
@@ -760,6 +763,16 @@ double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
       return GRB_INFINITY;
   }
   arma::vec obj = 0.5 * y.t() * Q * y + (C * x).t() * y + c.t() * y;
+  return obj(0);
+}
+
+double Game::QP_Param::computeObjectiveWithoutOthers(const arma::vec &y) const {
+  /**
+   * Computes @f$\frac{1}{2} y^TQy + c^Ty @f$ given the input values @p y;
+   */
+  if (y.n_rows != this->getNy())
+    throw("Error in QP_Param::computeObjectiveWithoutOthers: Invalid size of y");
+  arma::vec obj = 0.5 * y.t() * Q * y + c.t() * y;
   return obj(0);
 }
 
@@ -1424,6 +1437,43 @@ arma::vec Game::NashGame::computeQPObjectiveValues(const arma::vec &x,
   return vals;
 }
 
+arma::vec Game::NashGame::computeQPObjectiveValuesWithoutOthers(const arma::vec &x) const {
+  /**
+   * @brief Computes players' objective without the part dependent on other players variable
+   * @details
+   * Computes the objective value of <i> each </i> player in the Game::NashGame where the objective related to other players is fixed to zero
+   * object.
+   * @returns An arma::vec with the objective values.
+   */
+  arma::vec vals;
+  vals.zeros(this->NumPlayers);
+  for (unsigned int i = 0; i < this->NumPlayers; ++i) {
+    unsigned int nVar{this->getNprimals() + this->getNumShadow() +
+                      this->getNumLeaderVars()};
+    unsigned int nStart, nEnd;
+    nStart = this->PrimalPosition.at(i);
+    nEnd = this->PrimalPosition.at(i + 1);
+
+    arma::vec x_i, x_minus_i;
+
+    x_minus_i.zeros(nVar - nEnd + nStart);
+    if (nStart > 0) {
+      x_minus_i.subvec(0, nStart - 1) = x.subvec(0, nStart - 1);
+    }
+    if (nEnd < nVar) {
+      x_minus_i.subvec(nStart, nVar + nStart - nEnd - 1) =
+          x.subvec(nEnd, nVar - 1); // Discard any dual variables in x
+    }
+
+    x_i = x.subvec(nStart, nEnd - 1);
+
+    vals.at(i) =
+        this->Players.at(i)->computeObjectiveWithoutOthers(x_i);
+  }
+
+  return vals;
+}
+
 bool Game::NashGame::isSolved(const arma::vec &sol, unsigned int &violPlayer,
                               arma::vec &violSol, double tol) const {
   /**
@@ -1672,7 +1722,7 @@ std::unique_ptr<GRBModel> Game::EPEC::respond(const unsigned int i,
 
   arma::vec solOther;
   this->getXMinusI(x, i, solOther);
-  return this->PlayersLCP..at(i).get()->MPECasMIQP(
+  return this->PlayersLCP.at(i).get()->MPECasMIQP(
       this->LeaderObjective.at(i)->Q, this->LeaderObjective.at(i)->C,
       this->LeaderObjective.at(i)->c, solOther, true);
 }
