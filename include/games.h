@@ -623,6 +623,7 @@ public: // functions
   void finalize();
 
   const void findNashEq();
+   bool isSolved(double tol=1e-5) const;
 
   std::unique_ptr<GRBModel> respond(const unsigned int i,
                                     const arma::vec &x) const;

@@ -1971,7 +1971,8 @@ bool Game::EPEC::computeNashEq(
         << " Game::EPEC::computeNashEq: (PureNashEquilibrium flag is "
            "true) Searching for a pure NE.";
     if (this->Stats.AlgorithmParam.PolyLcp)
-      dynamic_cast<Algorithms::PolyBase *>(this->Algorithm.get())->makeThePureLCP(this->Stats.AlgorithmParam.Indicators);
+      dynamic_cast<Algorithms::PolyBase *>(this->Algorithm.get())
+          ->makeThePureLCP(this->Stats.AlgorithmParam.Indicators);
   }
 
   this->LCPModel->set(GRB_IntParam_OutputFlag, 1);
@@ -2060,8 +2061,19 @@ bool Game::EPEC::warmstart(const arma::vec x) { //@todo complete implementation
   /// @todo Game::EPEC::warmstart - to complete implementation?
   return true;
 }
-bool Game::EPEC::isPureStrategy(double tol) const{
+bool Game::EPEC::isPureStrategy(double tol) const {
+  /**
+   * @brief Call the delegated Algorithm and return true if the equilibrium is
+   * pure
+   */
   return this->Algorithm->isPureStrategy(tol);
+}
+bool Game::EPEC::isSolved(double tol) const {
+  /**
+   * @brief Call the delegated Algorithm and return true if the EPEC has been
+   * solved.
+   */
+  return this->Algorithm->isSolved(tol);
 }
 
 const void Game::EPEC::findNashEq() {

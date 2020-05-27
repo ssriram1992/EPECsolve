@@ -74,3 +74,7 @@ public:
   unsigned int getPositionProbab(unsigned int i, unsigned int k) const;
 };
 } // namespace Algorithms
+
+#include "algorithms/combinatorialpne.h"
+#include "algorithms/innerapproximation.h"
+#include "algorithms/fullenumeration.h"

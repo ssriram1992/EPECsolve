@@ -1,4 +1,5 @@
 #include "epectests.h"
+#include "algorithms/algorithms.h"
 
 
 using namespace std;

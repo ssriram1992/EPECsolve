@@ -105,6 +105,7 @@ add_library(EPECSolve
             src/lcp/PolyLCP.cpp
             src/Utils.cpp
             src/Models.cpp
+            src/algorithms/PolyBase.cpp
             src/algorithms/InnerApproximation.cpp
             src/algorithms/CombinatorialPNE.cpp
             src/algorithms/FullEnumeration.cpp
@@ -119,7 +120,7 @@ target_link_libraries(EPECSolve
                       ${GUROBI_LIBRARIES}
                       ${ARMA_LIB})
 add_executable(EPEC
-               src/CommandLineInterface.cpp src/algorithms/PolyBase.cpp)
+               src/CommandLineInterface.cpp)
 add_executable(EPECInstances
                instances/makeInstances.cpp)
 add_executable(EPECChileArgentina
