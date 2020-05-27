@@ -1,8 +1,10 @@
 #pragma once
 #include "epecsolve.h"
+#include "algorithms.h"
+#include <boost/log/trivial.hpp>
 
 namespace Algorithms {
-class PolyBase {
+class PolyBase : public Algorithm {
   /*
    *  @brief This is the abstract class of Algorithms for full enumeration,
    * inner approximation, and Combinatorial PNE. It provides a constructor where
@@ -10,8 +12,6 @@ class PolyBase {
    */
 protected:
   std::vector<std::shared_ptr<Game::PolyLCP>> PolyLCP{};
-  GRBEnv *Env;
-  Game::EPEC *EPECObject;
 
   void postSolving() {
     /**
@@ -23,6 +23,7 @@ protected:
     for (unsigned int i = 0; i < this->EPECObject->NumPlayers; i++)
       this->EPECObject->Stats.FeasiblePolyhedra.at(i) =
           this->PolyLCP.at(i)->getFeasiblePolyhedra();
+    this->EPECObject->Stats.PureNashEquilibrium = this->isPureStrategy();
   }
 
 public:
@@ -43,6 +44,33 @@ public:
       EPECObject->PlayersLCP.at(i) = this->PolyLCP.at(i);
     }
   }
-  virtual void solve() = 0;
+  bool isSolved(unsigned int *countryNumber, arma::vec *profitableDeviation,
+                double tol=-1) const;
+  bool isSolved(double tol=-1) const override;
+  void makeThePureLCP(bool indicators);
+
+  double getValLeadFollPoly(unsigned int i, unsigned int j, unsigned int k,
+                            double tol = 1e-5) const;
+
+  double getValLeadLeadPoly(unsigned int i, unsigned int j, unsigned int k,
+                            double tol = 1e-5) const;
+
+  double getValProbab(unsigned int i, unsigned int k) const;
+
+  bool isPureStrategy(unsigned int i, double tol = 1e-5) const;
+
+  bool isPureStrategy(double tol = 1e-5) const override;
+
+  std::vector<unsigned int> mixedStrategyPoly(unsigned int i,
+                                              double tol = 1e-5) const;
+  unsigned int getPositionLeadFollPoly(unsigned int i, unsigned int j,
+                                       unsigned int k) const;
+
+  unsigned int getPositionLeadLeadPoly(unsigned int i, unsigned int j,
+                                       unsigned int k) const;
+
+  unsigned int getNumPolyLead(unsigned int i) const;
+
+  unsigned int getPositionProbab(unsigned int i, unsigned int k) const;
 };
 } // namespace Algorithms

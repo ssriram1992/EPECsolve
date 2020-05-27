@@ -1,7 +1,9 @@
 #include "games.h"
+#include "algorithms/algorithms.h"
 #include "algorithms/combinatorialpne.h"
 #include "algorithms/fullenumeration.h"
 #include "algorithms/innerapproximation.h"
+#include "algorithms/outerapproximation.h"
 #include <algorithm>
 #include <armadillo>
 #include <array>
@@ -695,9 +697,6 @@ unsigned int Game::QP_Param::KKT(arma::sp_mat &M, arma::sp_mat &N,
   return M.n_rows;
 }
 
-
-
-
 Game::QP_Param &
 Game::QP_Param::set(const arma::sp_mat &Q, const arma::sp_mat &C,
                     const arma::sp_mat &A, const arma::sp_mat &B,
@@ -745,7 +744,8 @@ Game::QP_Param &Game::QP_Param::set(const QP_Objective &obj,
 double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
                                         bool checkFeas, double tol) const {
   /**
-   * Computes @f$\frac{1}{2} y^TQy + (Cx)^Ty + c^Ty@f$ given the input values @p y and
+   * Computes @f$\frac{1}{2} y^TQy + (Cx)^Ty + c^Ty@f$ given the input values @p
+   * y and
    * @p x.
    * @param checkFeas if @p true, checks if the given @f$(x,y)@f$ satisfies the
    * constraints of the problem, namely @f$Ax + By \leq b@f$.
@@ -771,7 +771,8 @@ double Game::QP_Param::computeObjectiveWithoutOthers(const arma::vec &y) const {
    * Computes @f$\frac{1}{2} y^TQy + c^Ty @f$ given the input values @p y;
    */
   if (y.n_rows != this->getNy())
-    throw("Error in QP_Param::computeObjectiveWithoutOthers: Invalid size of y");
+    throw(
+        "Error in QP_Param::computeObjectiveWithoutOthers: Invalid size of y");
   arma::vec obj = 0.5 * y.t() * Q * y + c.t() * y;
   return obj(0);
 }
@@ -1437,12 +1438,14 @@ arma::vec Game::NashGame::computeQPObjectiveValues(const arma::vec &x,
   return vals;
 }
 
-arma::vec Game::NashGame::computeQPObjectiveValuesWithoutOthers(const arma::vec &x) const {
+arma::vec Game::NashGame::computeQPObjectiveValuesWithoutOthers(
+    const arma::vec &x) const {
   /**
-   * @brief Computes players' objective without the part dependent on other players variable
+   * @brief Computes players' objective without the part dependent on other
+   * players variable
    * @details
-   * Computes the objective value of <i> each </i> player in the Game::NashGame where the objective related to other players is fixed to zero
-   * object.
+   * Computes the objective value of <i> each </i> player in the Game::NashGame
+   * where the objective related to other players is fixed to zero object.
    * @returns An arma::vec with the objective values.
    */
   arma::vec vals;
@@ -1467,8 +1470,7 @@ arma::vec Game::NashGame::computeQPObjectiveValuesWithoutOthers(const arma::vec 
 
     x_i = x.subvec(nStart, nEnd - 1);
 
-    vals.at(i) =
-        this->Players.at(i)->computeObjectiveWithoutOthers(x_i);
+    vals.at(i) = this->Players.at(i)->computeObjectiveWithoutOthers(x_i);
   }
 
   return vals;
@@ -1722,9 +1724,14 @@ std::unique_ptr<GRBModel> Game::EPEC::respond(const unsigned int i,
 
   arma::vec solOther;
   this->getXMinusI(x, i, solOther);
-  return this->PlayersLCP.at(i).get()->MPECasMIQP(
-      this->LeaderObjective.at(i)->Q, this->LeaderObjective.at(i)->C,
-      this->LeaderObjective.at(i)->c, solOther, true);
+  if (this->LeaderObjective.at(i)->Q.n_nonzero > 0)
+    return this->PlayersLCP.at(i).get()->MPECasMIQP(
+        this->LeaderObjective.at(i)->Q, this->LeaderObjective.at(i)->C,
+        this->LeaderObjective.at(i)->c, solOther, true);
+  else
+    return this->PlayersLCP.at(i).get()->MPECasMILP(
+        this->LeaderObjective.at(i)->C, this->LeaderObjective.at(i)->c,
+        solOther, true);
 }
 
 double Game::EPEC::respondSol(
@@ -1745,7 +1752,7 @@ double Game::EPEC::respondSol(
    * @returns The optimal objective value for the player @p player.
    */
   auto model = this->respond(player, x);
-  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::RespondSol: Writing dat/RespondSol" +
+  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::respondSol: Writing dat/RespondSol" +
                                   std::to_string(player) + ".lp to disk";
   model->write("dat/RespondSol" + std::to_string(player) + ".lp");
   const int status = model->get(GRB_IntAttr_Status);
@@ -1757,7 +1764,7 @@ double Game::EPEC::respondSol(
           model->getVarByName("x_" + std::to_string(i)).get(GRB_DoubleAttr_X);
 
     if (status == GRB_UNBOUNDED) {
-      BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::Respondsol: deviation is "
+      BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::respondSol: deviation is "
                                     "unbounded.";
       GRBLinExpr obj = 0;
       model->setObjective(obj);
@@ -1799,57 +1806,6 @@ double Game::EPEC::respondSol(
     return GRB_INFINITY;
   }
   return GRB_INFINITY;
-}
-
-bool Game::EPEC::isSolved(unsigned int *countryNumber,
-                          arma::vec *profitableDeviation, double tol) const
-/**
- * @briefs Checks if Game::EPEC is solved, otherwise it returns a proof.
- * @details
- * Analogous to Game::NashGame::isSolved but checks if the given Game::EPEC is
- * solved. If it is solved, then retruns true. If not, it returns the country
- * which has a profitable deviation in @p countryNumber and the profitable
- * deviation in @p profitableDeviation. @p tol is the tolerance for the check.
- * If the <i> improved objective </i> after the deviation is less than @p tol,
- * then it is not considered as a profitable deviation.
- *
- * Thus we check if the given point is an @f$\epsilon@f$-equilibrium. Value of
- * @f$\epsilon @f$ can be chosen sufficiently close to 0.
- *
- * @warning Setting @p tol = 0 might even reject a real solution as not solved.
- * This is due to Numerical issues arising from the LCP solver (Gurobi).
- */
-{
-  if (!this->TheNashGame)
-    return false;
-  if (!this->NashEquilibrium)
-    return false;
-  if (tol < 0)
-    tol = this->Stats.AlgorithmParam.DeviationTolerance;
-  this->TheNashGame->isSolved(this->SolutionX, *countryNumber,
-                              *profitableDeviation, tol);
-  arma::vec objvals =
-      this->TheNashGame->computeQPObjectiveValues(this->SolutionX, true);
-  for (unsigned int i = 0; i < this->NumPlayers; ++i) {
-    double val = this->respondSol(*profitableDeviation, i, this->SolutionX);
-    if (val == GRB_INFINITY)
-      return false;
-    if (std::abs(val - objvals.at(i)) > tol) {
-      *countryNumber = i;
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::isSolved: deviation for player " << i << " -- of "
-          << std::abs(val - objvals.at(i));
-      return false;
-    }
-  }
-  return true;
-}
-
-bool Game::EPEC::isSolved(double tol) const {
-  unsigned int countryNumber;
-  arma::vec ProfDevn;
-  bool ret = this->isSolved(&countryNumber, &ProfDevn, tol);
-  return ret;
 }
 
 const void Game::EPEC::makePlayerQP(const unsigned int i)
@@ -2014,7 +1970,8 @@ bool Game::EPEC::computeNashEq(
     BOOST_LOG_TRIVIAL(info)
         << " Game::EPEC::computeNashEq: (PureNashEquilibrium flag is "
            "true) Searching for a pure NE.";
-    this->makeThePureLCP();
+    if (this->Stats.AlgorithmParam.PolyLcp)
+      dynamic_cast<Algorithms::PolyBase *>(this->Algorithm.get())->makeThePureLCP(this->Stats.AlgorithmParam.Indicators);
   }
 
   this->LCPModel->set(GRB_IntParam_OutputFlag, 1);
@@ -2042,7 +1999,7 @@ bool Game::EPEC::computeNashEq(
         this->LCPModel->getEnv().set(GRB_IntParam_SolutionNumber, k);
         this->NashEquilibrium = this->TheLCP->extractSols(
             this->LCPModel.get(), this->SolutionZ, this->SolutionX, true);
-        if (this->isSolved()) {
+        if (this->Algorithm->isSolved()) {
           BOOST_LOG_TRIVIAL(info)
               << "Game::EPEC::computeNashEq: an Equilibrium has been found";
           stop = 1;
@@ -2068,7 +2025,7 @@ bool Game::EPEC::computeNashEq(
   return this->NashEquilibrium;
 }
 
-bool Game::EPEC::warmstart(const arma::vec x) {
+bool Game::EPEC::warmstart(const arma::vec x) { //@todo complete implementation
 
   if (x.size() < this->getNumVar()) {
     BOOST_LOG_TRIVIAL(error)
@@ -2093,7 +2050,7 @@ bool Game::EPEC::warmstart(const arma::vec x) {
 
   arma::vec devn;
 
-  if (this->isSolved())
+  if (this->Algorithm->isSolved())
     BOOST_LOG_TRIVIAL(warning) << "Game::EPEC::warmstart: "
                                   "The loaded solution is optimal.";
   else
@@ -2103,68 +2060,8 @@ bool Game::EPEC::warmstart(const arma::vec x) {
   /// @todo Game::EPEC::warmstart - to complete implementation?
   return true;
 }
-
-void Game::EPEC::makeThePureLCP(bool indicators) {
-  /**
-   * Given that Game::EPEC::LCPModel is filled with the final LCP,
-   * directs the search toward a pure nash EQ. If such an equilibrium does not
-   * exist, then the model will return anyway a MNE. The original LCP is
-   * stored in the field Game::EPEC::LCPModelBase. @p Indicators dictates
-   * whether the resulting LCP should use indicator constraints instead of
-   * general binaries. In general, there are advantages in using the binary
-   * variables instead of such constraints, since there is no BigM involved in
-   * the formulation.
-   */
-  try {
-    BOOST_LOG_TRIVIAL(trace)
-        << "Game::EPEC::makeThePureLCP: editing the LCP model.";
-    this->LCPModelBase = std::unique_ptr<GRBModel>(new GRBModel(*LCPModel));
-    const unsigned int nPolyLead = [this]() {
-      unsigned int ell = 0;
-      for (unsigned int i = 0; i < this->getNumLeaders(); ++i)
-        ell += (this->getNumPolyLead(i));
-      return ell;
-    }();
-
-    // Add a binary variable for each polyhedron of each leader
-    GRBVar pure_bin[nPolyLead];
-    GRBLinExpr objectiveTerm{0};
-    unsigned int count{0}, i, j;
-    for (i = 0; i < this->getNumLeaders(); i++) {
-      for (j = 0; j < this->getNumPolyLead(i); ++j) {
-        pure_bin[count] = this->LCPModel->addVar(
-            0, 1, 0, GRB_BINARY,
-            "pureBin_" + std::to_string(i) + "_" + std::to_string(j));
-        if (indicators) {
-          this->LCPModel->addGenConstrIndicator(
-              pure_bin[count], 1,
-              this->LCPModel->getVarByName(
-                  "x_" + std::to_string(this->getPositionProbab(i, j))),
-              GRB_EQUAL, 0, "Indicator_PNE_" + std::to_string(count));
-        } else {
-          this->LCPModel->addConstr(
-              this->LCPModel->getVarByName(
-                  "x_" + std::to_string(this->getPositionProbab(i, j))),
-              GRB_GREATER_EQUAL, pure_bin[count]);
-        }
-        objectiveTerm += pure_bin[count];
-        count++;
-      }
-    }
-    if (indicators) {
-      this->LCPModel->setObjective(objectiveTerm, GRB_MAXIMIZE);
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::makeThePureLCP: using indicator constraints.";
-    } else {
-      this->LCPModel->setObjective(objectiveTerm, GRB_MINIMIZE);
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::makeThePureLCP: using indicator constraints.";
-    }
-  } catch (GRBException &e) {
-    std::cerr << "GRBException in Game::EPEC::makeThePureLCP : "
-              << e.getErrorCode() << ": " << e.getMessage() << '\n';
-    throw;
-  }
+bool Game::EPEC::isPureStrategy(double tol) const{
+  return this->Algorithm->isPureStrategy(tol);
 }
 
 const void Game::EPEC::findNashEq() {
@@ -2192,26 +2089,30 @@ const void Game::EPEC::findNashEq() {
 
   case Game::EPECalgorithm::InnerApproximation: {
     final_msg << "Inner approximation Algorithm completed. ";
-    Algorithms::InnerApproximation innerApp(this->Env, this);
-    innerApp.solve();
+    this->Algorithm = std::shared_ptr<Algorithms::Algorithm>(
+        new class Algorithms::InnerApproximation(this->Env, this));
+    this->Algorithm->solve();
   } break;
 
   case Game::EPECalgorithm::CombinatorialPne: {
     final_msg << "CombinatorialPNE Algorithm completed. ";
-    Algorithms::CombinatorialPNE combPNE(this->Env, this);
-    combPNE.solve();
+    this->Algorithm = std::shared_ptr<Algorithms::Algorithm>(
+        new class Algorithms::CombinatorialPNE(this->Env, this));
+    this->Algorithm->solve();
   } break;
 
   case Game::EPECalgorithm::OuterApproximation: {
     final_msg << "Outer approximation Algorithm completed. ";
-    Algorithms::OuterApproximation outerApp(this->Env, this);
-    outerApp.solve();
+    this->Algorithm = std::shared_ptr<Algorithms::Algorithm>(
+        new class Algorithms::OuterApproximation(this->Env, this));
+    this->Algorithm->solve();
   } break;
 
   case Game::EPECalgorithm::FullEnumeration: {
     final_msg << "Full enumeration Algorithm completed. ";
-    Algorithms::FullEnumeration fullEnum(this->Env, this);
-    fullEnum.solve();
+    this->Algorithm = std::shared_ptr<Algorithms::Algorithm>(
+        new class Algorithms::FullEnumeration(this->Env, this));
+    this->Algorithm->solve();
   } break;
   }
   // Handing EPECStatistics object to track performance of algorithm
@@ -2283,171 +2184,6 @@ unsigned int Game::EPEC::getPositionLeadLead(const unsigned int i,
   return LeaderStart + this->PlayersLCP.at(i)->getLStart() + j;
 }
 
-unsigned int Game::EPEC::getPositionLeadFollPoly(const unsigned int i,
-                                                 const unsigned int j,
-                                                 const unsigned int k) const {
-  /**
-   * Get the position of the k-th follower variable of the i-th leader, in the
-   * j-th feasible polyhedron.
-   *
-   * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNumPolyLead(i)
-   */
-  if (this->Stats.AlgorithmParam.PolyLcp) {
-    const auto LeaderStart = this->TheNashGame->getPrimalLoc(i);
-    const auto FollPoly =
-        dynamic_cast<Game::PolyLCP *>(this->PlayersLCP.at(i).get())
-            ->convPolyPosition(k);
-    return LeaderStart + FollPoly + j;
-  } else {
-    BOOST_LOG_TRIVIAL(warning)
-        << "Cannot use Game::EPEC::getPositionLeadFollPoly with the current "
-           "Algorithm. Returning 0";
-    return 0;
-  }
-}
-
-unsigned int Game::EPEC::getPositionLeadLeadPoly(const unsigned int i,
-                                                 const unsigned int j,
-                                                 const unsigned int k) const {
-  /**
-   * Get the position of the k-th leader variable of the i-th leader, in the
-   * j-th feasible polyhedron.
-   *
-   * Indeed it should hold that @f$ j < @f$ Game::EPEC::getNumPolyLead(i)
-   */
-  if (this->Stats.AlgorithmParam.PolyLcp) {
-    const auto LeaderStart = this->TheNashGame->getPrimalLoc(i);
-    const auto FollPoly =
-        dynamic_cast<Game::PolyLCP *>(this->PlayersLCP.at(i).get())
-            ->convPolyPosition(k);
-    return LeaderStart + FollPoly + this->PlayersLCP.at(i)->getLStart() + j;
-  } else {
-    BOOST_LOG_TRIVIAL(warning)
-        << "Cannot use Game::EPEC::getPositionLeadLeadPoly with the current "
-           "Algorithm. Returning 0";
-    return 0;
-  }
-}
-
-unsigned int Game::EPEC::getNumPolyLead(const unsigned int i) const {
-  /**
-   * Get the number of polyhedra used in the inner approximation of the
-   * feasible region of the i-th leader.*
-   */
-  if (this->Stats.AlgorithmParam.PolyLcp) {
-    return dynamic_cast<Game::PolyLCP *>(this->PlayersLCP.at(i).get())
-        ->convNumPoly();
-  } else {
-    BOOST_LOG_TRIVIAL(warning)
-        << "Cannot use Game::EPEC::getNumPolyLead with the current "
-           "Algorithm. Returning 0";
-    return 0;
-  }
-}
-
-unsigned int Game::EPEC::getPositionProbab(const unsigned int i,
-                                           const unsigned int k) const {
-  /**
-   * Get the position of the probability associated with the k-th polyhedron
-   * (k-th pure strategy) of the i-th leader. However, if the leader has an
-   * inner approximation with exactly 1 polyhedron, it returns 0;
-   */
-  if (this->Stats.AlgorithmParam.PolyLcp) {
-    const auto PolyProbab =
-        dynamic_cast<Game::PolyLCP *>(this->PlayersLCP.at(i).get())
-            ->convPolyWeight(k);
-    if (PolyProbab == 0)
-      return 0;
-    const auto LeaderStart = this->TheNashGame->getPrimalLoc(i);
-    return LeaderStart + PolyProbab;
-  } else {
-    BOOST_LOG_TRIVIAL(warning)
-        << "Cannot use Game::EPEC::getNumPolyLead with the current "
-           "Algorithm. Returning 0";
-    return 0;
-  }
-}
-
-bool Game::EPEC::isPureStrategy(const double tol) const {
-  /**
-   * Checks if the returned strategy leader is a pure strategy for the leader
-   * i. The strategy is considered a pure strategy, if it is played with a
-   * probability greater than 1 - tol;
-   */
-  for (unsigned int i = 0; i < this->getNumLeaders(); ++i) {
-    if (!isPureStrategy(i, tol))
-      return false;
-  }
-  return true;
-}
-
-bool Game::EPEC::isPureStrategy(const unsigned int i, const double tol) const {
-  /**
-   * Checks if the returned strategy leader is a pure strategy for the leader
-   * i. The strategy is considered a pure strategy, if it is played with a
-   * probability greater than 1 - tol;
-   */
-  if (this->Stats.AlgorithmParam.PolyLcp) {
-    const unsigned int nPoly = this->getNumPolyLead(i);
-    for (unsigned int j = 0; j < nPoly; j++) {
-      const double probab = this->getValProbab(i, j);
-      if (probab > 1 - tol) // Current Strategy is a pure strategy!
-        return true;
-    }
-    return false;
-  } else {
-    BOOST_LOG_TRIVIAL(warning)
-        << "Cannot use Game::EPEC::isPureStrategy with the current "
-           "Algorithm. Returning 0";
-    return false;
-  }
-}
-
-std::vector<unsigned int> Game::EPEC::mixedStrategyPoly(const unsigned int i,
-                                                        const double tol) const
-/**
- * Returns the indices of polyhedra feasible for the leader, from which
- * strategies are played with probability greater than tol.
- */
-{
-  if (this->Stats.AlgorithmParam.PolyLcp) {
-    std::vector<unsigned int> polys{};
-    const unsigned int nPoly = this->getNumPolyLead(i);
-    for (unsigned int j = 0; j < nPoly; j++) {
-      const double probab = this->getValProbab(i, j);
-      if (probab > tol)
-        polys.push_back(j);
-    }
-    std::cout << "\n";
-    return polys;
-  } else {
-    BOOST_LOG_TRIVIAL(warning)
-        << "Cannot use Game::EPEC::mixedStrategyPoly with the current "
-           "Algorithm. Returning null";
-    return std::vector<unsigned int>{};
-  }
-}
-
-double Game::EPEC::getValProbab(const unsigned int i,
-                                const unsigned int k) const {
-  /**
-   * Get the probability associated with the k-th polyhedron
-   * (k-th pure strategy) of the i-th leader.
-   */
-  if (this->Stats.AlgorithmParam.PolyLcp) {
-    const unsigned int varname{this->getPositionProbab(i, k)};
-    if (varname == 0)
-      return 1;
-    return this->LCPModel->getVarByName("x_" + std::to_string(varname))
-        .get(GRB_DoubleAttr_X);
-  } else {
-    BOOST_LOG_TRIVIAL(warning)
-        << "Cannot use Game::EPEC::mixedStrategyPoly with the current "
-           "Algorithm. Returning 0";
-    return 0;
-  }
-}
-
 double Game::EPEC::getValLeadFoll(const unsigned int i,
                                   const unsigned int j) const {
   /**
@@ -2472,52 +2208,6 @@ double Game::EPEC::getValLeadLead(const unsigned int i,
   return this->LCPModel
       ->getVarByName("x_" + std::to_string(this->getPositionLeadLead(i, j)))
       .get(GRB_DoubleAttr_X);
-}
-
-double Game::EPEC::getValLeadFollPoly(const unsigned int i,
-                                      const unsigned int j,
-                                      const unsigned int k,
-                                      const double tol) const {
-  /**
-   * For the i-th leader, gets the k-th pure strategy for i-th leader at
-   * position j
-   */
-  if (!this->LCPModel)
-    throw std::string("Error in Game::EPEC::getValLeadFollPoly: "
-                      "Game::EPEC::LCPModel not made and solved");
-  const double probab = this->getValProbab(i, k);
-  if (probab > 1 - tol)
-    return this->getValLeadFoll(i, j);
-  else
-    return this->LCPModel
-               ->getVarByName(
-                   "x_" +
-                   std::to_string(this->getPositionLeadFollPoly(i, j, k)))
-               .get(GRB_DoubleAttr_X) /
-           probab;
-}
-
-double Game::EPEC::getValLeadLeadPoly(const unsigned int i,
-                                      const unsigned int j,
-                                      const unsigned int k,
-                                      const double tol) const {
-  /**
-   * For the i-th leader, gets the k-th pure strategy for i-th leader at
-   * non-follower leader position j
-   */
-  if (!this->LCPModel)
-    throw std::string("Error in Game::EPEC::getValLeadLeadPoly: "
-                      "Game::EPEC::LCPModel not made and solved");
-  const double probab = this->getValProbab(i, k);
-  if (probab > 1 - tol)
-    return this->getValLeadLead(i, j);
-  else
-    return this->LCPModel
-               ->getVarByName(
-                   "x_" +
-                   std::to_string(this->getPositionLeadLeadPoly(i, j, k)))
-               .get(GRB_DoubleAttr_X) /
-           probab;
 }
 
 std::string std::to_string(const Game::EPECsolveStatus st) {

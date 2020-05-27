@@ -16,7 +16,7 @@ public:
   CombinatorialPNE(GRBEnv *env, Game::EPEC *EPECObject, bool poly = true)
       : PolyBase(env, EPECObject){};
   ;
-  void solve() override {
+  void solve() {
     this->solveWithExcluded(std::vector<std::set<unsigned long int>>{});
   }
   void solveWithExcluded(

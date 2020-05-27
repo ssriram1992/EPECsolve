@@ -1,5 +1,6 @@
 #pragma once
 #include "algorithms/algorithms.h"
+#include "algorithms/polybase.h"
 #include <armadillo>
 #include <gurobi_c++.h>
 #include <iostream>
@@ -15,7 +16,7 @@ class InnerApproximation : public PolyBase {
 public:
   InnerApproximation(GRBEnv *env, Game::EPEC *EPECObject)
       : PolyBase(env, EPECObject){};
-  void solve() override;
+  void solve();
 
 private:
   void start();

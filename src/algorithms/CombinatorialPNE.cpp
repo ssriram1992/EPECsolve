@@ -106,9 +106,9 @@ void Algorithms::CombinatorialPNE::combPNE(
         res = this->EPECObject->computeNashEq(false, -1.0, true);
 
       if (res) {
-        if (this->EPECObject->isSolved()) {
+        if (this->isSolved()) {
           // Check that the equilibrium is a pure strategy
-          if ((this->EPECObject->isPureStrategy())) {
+          if ((this->isPureStrategy())) {
             BOOST_LOG_TRIVIAL(info) << "Algorithms::CombinatorialPNE::combPNE: "
                                        "found a pure strategy.";
             this->EPECObject->Stats.Status = Game::EPECsolveStatus::NashEqFound;

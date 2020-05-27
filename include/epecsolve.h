@@ -38,11 +38,12 @@ enum class EPECAddPolyMethod {
 } // namespace Game
 namespace Algorithms {
 // Forward declarations
+class Algorithm;
+class PolyBase;
 class FullEnumeration;
 class InnerApproximation;
 class CombinatorialPNE;
 class OuterApproximation;
-class PolyBase;
 } // namespace Algorithms
 #include "games.h"
 #include "lcp/lcp.h"

@@ -1,5 +1,6 @@
 #pragma once
 #include "algorithms/algorithms.h"
+#include "algorithms/polybase.h"
 
 namespace Algorithms {
 
@@ -8,6 +9,6 @@ class FullEnumeration : public PolyBase {
 public:
   FullEnumeration(GRBEnv *env, Game::EPEC *EPECObject)
       : PolyBase(env, EPECObject){};
-  void solve() override;
+  void solve();
 };
 } // namespace Algorithms

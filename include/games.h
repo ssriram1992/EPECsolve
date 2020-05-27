@@ -530,6 +530,7 @@ private:
   ///< object.
   unsigned int NumVariables{0};
   unsigned int NumPlayers{0};
+  std::shared_ptr<Algorithms::Algorithm> Algorithm{};
 
 protected: // Datafields
   std::vector<std::shared_ptr<Game::NashGame>> PlayersLowerLevels{};
@@ -573,8 +574,6 @@ private:
   void makePlayersQPs();
 
   void makeTheLCP();
-
-  void makeThePureLCP(bool indicators = false);
 
   void computeLeaderLocations(unsigned int addSpaceForMC = 0);
 
@@ -631,16 +630,13 @@ public: // functions
   double respondSol(arma::vec &sol, unsigned int player, const arma::vec &x,
                     const arma::vec &prevDev = {}) const;
 
-  bool isSolved(unsigned int *countryNumber, arma::vec *profitableDeviation,
-                double tol = -1) const;
-
-  bool isSolved(double tol = -1) const;
-
   const arma::vec getX() const { return this->SolutionX; }
 
   void reset() { this->SolutionX.ones(); }
 
   const arma::vec getZ() const { return this->SolutionZ; }
+
+  bool isPureStrategy(double tol = 1e-5) const; ///< Return a bool indicating whether the equilibrium is a pure strategy
 
   ///@brief Get the EPECStatistics object for the current instance
   const EPECStatistics getStatistics() const { return this->Stats; }
@@ -738,35 +734,10 @@ public: // functions
 
   unsigned int getPositionLeadLead(unsigned int i, unsigned int j) const;
 
-  unsigned int getPositionLeadFollPoly(unsigned int i, unsigned int j,
-                                       unsigned int k) const;
-
-  unsigned int getPositionLeadLeadPoly(unsigned int i, unsigned int j,
-                                       unsigned int k) const;
-
-  unsigned int getNumPolyLead(unsigned int i) const;
-
-  unsigned int getPositionProbab(unsigned int i, unsigned int k) const;
-
   // The following obtain the variable values
   double getValLeadFoll(unsigned int i, unsigned int j) const;
 
   double getValLeadLead(unsigned int i, unsigned int j) const;
-
-  double getValLeadFollPoly(unsigned int i, unsigned int j, unsigned int k,
-                            double tol = 1e-5) const;
-
-  double getValLeadLeadPoly(unsigned int i, unsigned int j, unsigned int k,
-                            double tol = 1e-5) const;
-
-  double getValProbab(unsigned int i, unsigned int k) const;
-
-  bool isPureStrategy(unsigned int i, double tol = 1e-5) const;
-
-  bool isPureStrategy(double tol = 1e-5) const;
-
-  std::vector<unsigned int> mixedStrategyPoly(unsigned int i,
-                                              double tol = 1e-5) const;
 
   /// Get the Game::LCP object solved in the last iteration either to solve the
   /// problem or to prove non-existence of Nash equilibrium. Object is returned

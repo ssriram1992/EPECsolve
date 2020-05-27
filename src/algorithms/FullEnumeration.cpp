@@ -14,9 +14,9 @@ void Algorithms::FullEnumeration::solve() {
   this->EPECObject->computeNashEq(
       this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium,
       this->EPECObject->Stats.AlgorithmParam.TimeLimit);
-  if (this->EPECObject->isSolved()) {
+  if (this->isSolved()) {
     this->EPECObject->Stats.Status = Game::EPECsolveStatus::NashEqFound;
-    if (this->EPECObject->isPureStrategy())
+    if (this->isPureStrategy())
       this->EPECObject->Stats.PureNashEquilibrium = true;
   }
   // Post Solving

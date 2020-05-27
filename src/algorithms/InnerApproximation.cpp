@@ -73,10 +73,10 @@ void Algorithms::InnerApproximation::start() {
     } else { // else we are in the case of finding deviations.
       unsigned int deviatedCountry{0};
       arma::vec countryDeviation{};
-      if (this->EPECObject->isSolved(&deviatedCountry, &countryDeviation)) {
+      if (this->isSolved(&deviatedCountry, &countryDeviation)) {
         this->EPECObject->Stats.Status = Game::EPECsolveStatus::NashEqFound;
         this->EPECObject->Stats.PureNashEquilibrium =
-            this->EPECObject->isPureStrategy();
+            this->isPureStrategy();
         if ((this->EPECObject->Stats.AlgorithmParam.PureNashEquilibrium &&
              !this->EPECObject->Stats.PureNashEquilibrium)) {
           // We are seeking for a pure strategy. Then, here we switch between an

@@ -119,7 +119,7 @@ target_link_libraries(EPECSolve
                       ${GUROBI_LIBRARIES}
                       ${ARMA_LIB})
 add_executable(EPEC
-               src/CommandLineInterface.cpp)
+               src/CommandLineInterface.cpp src/algorithms/PolyBase.cpp)
 add_executable(EPECInstances
                instances/makeInstances.cpp)
 add_executable(EPECChileArgentina
