@@ -489,6 +489,7 @@ private:
   ///< object.
   unsigned int nVarinEPEC{0};
   unsigned int nCountr{0};
+  bool warmStarted{false}; ///< Flag that checks if warmstarting is done.
 
 protected: // Datafields
   std::vector<std::shared_ptr<Game::NashGame>> countries_LL{};
@@ -528,6 +529,7 @@ private:
   void make_country_QP(const unsigned int i);
   void make_country_QP();
   void make_country_LCP();
+  virtual GRBQuadExpr make_lcp_objective(GRBModel *);
   void resetLCP();
   void iterativeNash();
   void fullEnumerationNash();

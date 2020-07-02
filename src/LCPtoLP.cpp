@@ -1392,7 +1392,7 @@ Game::LCP::MPECasMILP(const arma::sp_mat &C, const arma::vec &c,
   model->set(GRB_IntParam_OutputFlag, VERBOSE);
   if (solve)
     model->optimize();
-	model->update();
+  model->update();
   return model;
 }
 
@@ -1419,7 +1419,7 @@ Game::LCP::MPECasMIQP(const arma::sp_mat &Q, const arma::sp_mat &C,
   {
     GRBQuadExpr expr{model->getObjective()};
     for (auto it = Q.begin(); it != Q.end(); ++it)
-      expr += 0.5* (*it) * model->getVarByName("x_" + to_string(it.row())) *
+      expr += 0.5 * (*it) * model->getVarByName("x_" + to_string(it.row())) *
               model->getVarByName("x_" + to_string(it.col()));
     model->setObjective(expr, GRB_MINIMIZE);
   }
@@ -1531,8 +1531,10 @@ unsigned int Game::LCP::conv_PolyPosition(const unsigned long int i) const {
    */
   const unsigned int nPoly = this->conv_Npoly();
   if (i > nPoly) {
-    BOOST_LOG_TRIVIAL(error) << "Error in Game::LCP::conv_PolyPosition: "
-                                "Invalid argument. Out of bounds for i";
+    BOOST_LOG_TRIVIAL(error)
+        << "Error in Game::LCP::conv_PolyPosition: "
+           "Invalid argument. Out of bounds for polyhedron "
+        << i << " while total nPoly: " << nPoly;
     throw std::string("Error in Game::LCP::conv_PolyPosition: Invalid "
                       "argument. Out of bounds for i");
   }

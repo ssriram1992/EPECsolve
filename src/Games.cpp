@@ -507,7 +507,7 @@ double Game::QP_Param::computeObjective(const arma::vec &y, const arma::vec &x,
     if (y.min() <= -tol) // if infeasible
       return GRB_INFINITY;
   }
-  arma::vec obj = 0.5* y.t() * Q * y + (C * x).t() * y + c.t() * y;
+  arma::vec obj = 0.5 * y.t() * Q * y + (C * x).t() * y + c.t() * y;
   return obj(0);
 }
 
@@ -1118,7 +1118,7 @@ double Game::NashGame::RespondSol(
     for (unsigned int i = 0; i < Nx; ++i)
       sol.at(i) =
           model->getVarByName("y_" + to_string(i)).get(GRB_DoubleAttr_X);
-		BOOST_LOG_TRIVIAL(trace) << "Game::NashGame::RespondSol: Player" << player;
+    BOOST_LOG_TRIVIAL(trace) << "Game::NashGame::RespondSol: Player" << player;
 
     return model->get(GRB_DoubleAttr_ObjVal);
   } else
@@ -1373,9 +1373,9 @@ unique_ptr<GRBModel> Game::EPEC::Respond(const unsigned int i,
 
   arma::vec solOther;
   this->get_x_minus_i(x, i, solOther);
-  return this->countries_LCP.at(i).get()->MPECasMIQP( this->LeadObjec.at(i)->Q,
-      this->LeadObjec.at(i)->C, this->LeadObjec.at(i)->c, solOther,
-      true);
+  return this->countries_LCP.at(i).get()->MPECasMIQP(
+      this->LeadObjec.at(i)->Q, this->LeadObjec.at(i)->C,
+      this->LeadObjec.at(i)->c, solOther, true);
 }
 double Game::EPEC::RespondSol(
     arma::vec &sol,      ///< [out] Optimal response
@@ -1395,8 +1395,9 @@ double Game::EPEC::RespondSol(
    * @returns The optimal objective value for the player @p player.
    */
   auto model = this->Respond(player, x);
-	BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::RespondSol: Writing dat/RespondSol" + std::to_string(player)+".lp to disk";
-	model -> write("dat/RespondSol"+std::to_string(player)+".lp");
+  BOOST_LOG_TRIVIAL(trace) << "Game::EPEC::RespondSol: Writing dat/RespondSol" +
+                                  std::to_string(player) + ".lp to disk";
+  model->write("dat/RespondSol" + std::to_string(player) + ".lp");
   const int status = model->get(GRB_IntAttr_Status);
   if (status == GRB_UNBOUNDED || status == GRB_OPTIMAL) {
     unsigned int Nx = this->countries_LCP.at(player)->getNcol();
@@ -1699,7 +1700,8 @@ bool Game::EPEC::addRandomPoly2All(unsigned int aggressiveLevel,
 void Game::EPEC::iterativeNash() {
 
   // Set the initial point for all countries as 0 and solve the respective LCPs?
-  this->sol_x.zeros(this->nVarinEPEC);
+  if (!this->warmStarted)
+    this->sol_x.zeros(this->nVarinEPEC);
 
   bool solved = {false};
   bool addRandPoly{false};
@@ -1975,6 +1977,8 @@ void ::Game::EPEC::make_country_LCP() {
   BOOST_LOG_TRIVIAL(trace) << *nashgame;
 }
 
+GRBQuadExpr Game::EPEC::make_lcp_objective(GRBModel *) { return 0; }
+
 bool Game::EPEC::computeNashEq(
     bool pureNE,           ///< True if we search for a PNE
     double localTimeLimit, ///< Allowed time limit to run this function
@@ -2008,9 +2012,15 @@ bool Game::EPEC::computeNashEq(
     BOOST_LOG_TRIVIAL(info) << " Game::EPEC::computeNashEq: (pureNE flag is "
                                "true) Searching for a pure NE.";
     this->make_pure_LCP();
-  }
+  } else
+    this->lcpmodel->setObjective(GRBLinExpr{0});
 
-  // this->lcpmodel->set(GRB_IntParam_OutputFlag, 1);
+  this->lcpmodel->update();
+  GRBQuadExpr obj = this->make_lcp_objective(this->lcpmodel.get()) +
+                    this->lcpmodel->getObjective();
+  this->lcpmodel->setObjective(obj);
+
+  this->lcpmodel->set(GRB_IntParam_OutputFlag, 1);
   if (check)
     this->lcpmodel->set(GRB_IntParam_SolutionLimit, GRB_MAXINT);
   this->lcpmodel->optimize();
@@ -2078,6 +2088,7 @@ bool Game::EPEC::warmstart(const arma::vec x) {
   }
 
   this->sol_x = x;
+  this->warmStarted = true;
   std::vector<arma::vec> devns = std::vector<arma::vec>(this->nCountr);
   std::vector<arma::vec> prevDevns = std::vector<arma::vec>(this->nCountr);
   this->getAllDevns(devns, this->sol_x, prevDevns);
@@ -2130,7 +2141,7 @@ void Game::EPEC::make_pure_LCP(bool indicators) {
                                                      "_" + to_string(j));
         if (indicators) {
           this->lcpmodel->addGenConstrIndicator(
-              pure_bin[count], 1,
+              pure_bin[count], 0,
               this->lcpmodel->getVarByName(
                   "x_" + to_string(this->getPosition_Probab(i, j))),
               GRB_EQUAL, 0, "Indicator_PNE_" + to_string(count));
@@ -2138,21 +2149,17 @@ void Game::EPEC::make_pure_LCP(bool indicators) {
           this->lcpmodel->addConstr(
               this->lcpmodel->getVarByName(
                   "x_" + to_string(this->getPosition_Probab(i, j))),
-              GRB_GREATER_EQUAL, pure_bin[count]);
+              GRB_LESS_EQUAL, pure_bin[count], "PNE_" + to_string(count));
         }
         objectiveTerm += pure_bin[count];
         count++;
       }
     }
-    if (indicators) {
-      this->lcpmodel->setObjective(objectiveTerm, GRB_MAXIMIZE);
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::make_pure_LCP: using indicator constraints.";
-    } else {
+    if (indicators)
       this->lcpmodel->setObjective(objectiveTerm, GRB_MINIMIZE);
-      BOOST_LOG_TRIVIAL(trace)
-          << "Game::EPEC::make_pure_LCP: using indicator constraints.";
-    }
+    else
+      this->lcpmodel->setObjective(objectiveTerm, GRB_MINIMIZE);
+
   } catch (GRBException &e) {
     cerr << "GRBException in Game::EPEC::make_pure_LCP : " << e.getErrorCode()
          << ": " << e.getMessage() << '\n';
