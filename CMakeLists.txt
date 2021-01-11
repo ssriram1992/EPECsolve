@@ -1,15 +1,12 @@
+project(EPECsolve)
 ############################################
 ################ CONFIGURATION #############
 #### Here yoy can edit with your paths #####
 ############################################
 if (ROSSOBIANCO)
     set(BOOST_ROOT "/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0")
-    set(ARMA_PATH "/home/draggabr/.local/armadillo")
-    set(ARMA_LIB "${ARMA_PATH}/lib64/libarmadillo.so")
 ELSE ()
     set(BOOST_ROOT "/usr/local/boost-1.70.0/")
-    set(ARMA_PATH "/usr/local")
-    set(ARMA_LIB "/usr/local/lib/libarmadillo.dylib")
 ENDIF ()
 set(GUROBI_PATH_LINUX "/home/gurobi/9.0.0/linux64")
 set(GUROBI_PATH_MAC "/Library/gurobi900/mac64")
@@ -24,10 +21,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 ################ DO NOT MODIFY #############
 ############################################
 cmake_minimum_required(VERSION 3.10)
-project(EPECsolve)
 add_compile_options(-std=c++11)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_SHARED_LINKER_FLAGS "-lgurobi_c++ -lgurobi90 -lm -lpthread -O2 -lopenblas -llapack -lpthread")
+set(CMAKE_SHARED_LINKER_FLAGS "-lm -lpthread")
 
 #From https://github.com/LiangliangNan/PolyFit/blob/master/cmake/FindGUROBI.cmake
 if (NOT GUROBI_FOUND)
@@ -78,13 +74,14 @@ if (NOT GUROBI_FOUND)
 endif ()
 include(FindPackageHandleStandardArgs)
 SET(Boost_USE_STATIC_LIBS ON)
+find_package(Armadillo REQUIRED)
 find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options unit_test_framework log log_setup)
 find_package_handle_standard_args(GUROBI DEFAULT_MSG GUROBI_INCLUDE_DIRS)
 find_package_handle_standard_args(GUROBI DEFAULT_MSG GUROBI_LIBRARIES)
 mark_as_advanced(GUROBI_LIBRARIES GUROBI_INCLUDE_DIRS GUROBI_INCLUDE_DIR)
 include_directories(${GUROBI_INCLUDE_DIR})
 include_directories(${BOOST_ROOT}/include)
-include_directories(${ARMA_PATH}/include)
+include_directories(${ARMADILLO_INCLUDE_DIRS})
 include_directories("src")
 include_directories("include")
 add_executable(EPEC
@@ -141,15 +138,18 @@ add_executable(EPECtest
                src/Models.cpp
                src/models.h
                test/EPEC.cpp)
-target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECExample Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPEC Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
-target_link_libraries(EPECtest Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMA_LIB})
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
+target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
+target_link_libraries(EPECExample Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
+target_link_libraries(EPEC Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
+target_link_libraries(EPECtest Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
 message("\n\nEPEC Cmake configuration terminated:")
 message("\tWorking directory: ${CMAKE_CURRENT_SOURCE_DIR}")
-message("\tArmadillo (lib): ${ARMA_PATH}/include")
-message("\tArmadillo (include): ${ARMA_LIB}")
+message("\tArmadillo (lib): ${ARMADILLO_INCLUDE_DIRS}")
+message("\tArmadillo (include): ${ARMADILLO_LIBRARIES}")
 message("\tGurobi (lib): ${GUROBI_LIBRARIES}")
 message("\tGurobi (include): ${GUROBI_INCLUDE_DIRS}")
 message("\tBoost (include): ${BOOST_ROOT}/include")
