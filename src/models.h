@@ -64,6 +64,9 @@ struct LeadPar {
   double price_limit =
       -1; ///< Government does not want the price to exceed this limit
 
+  bool tradeAllowed =
+      true; ///< False if the country cannot trade with other countries.
+
   Models::TaxType tax_type =
       Models::TaxType::StandardTax; ///< 0 For standard, 1 for constant tax, 2
                                     ///< for carbon tax
@@ -75,9 +78,10 @@ struct LeadPar {
   // : import_limit{imp_lim}, export_limit{exp_lim},
   // price_limit{price_limit},tax_type{tax_type_}, tax_revenue{tax_revenue} {}
   LeadPar(double imp_lim = -1, double exp_lim = -1, double price_limit = -1,
-          bool tax_revenue = false, unsigned int tax_type_ = 0)
+          bool tax_revenue = false, unsigned int tax_type_ = 0,
+          bool tradeBool = true)
       : import_limit{imp_lim}, export_limit{exp_lim}, price_limit{price_limit},
-        tax_revenue{tax_revenue} {
+        tax_revenue{tax_revenue}, tradeAllowed{tradeBool} {
     switch (tax_type_) {
     case 0:
       tax_type = Models::TaxType::StandardTax;
@@ -111,6 +115,7 @@ struct LeadAllPar {
 
 /// @brief Stores a single Instance
 struct EPECInstance {
+  EPECInstance();
   std::vector<Models::LeadAllPar> Countries = {}; ///< LeadAllPar vector
   arma::sp_mat TransportationCosts = {}; ///< Transportation costs matrix
 
@@ -219,7 +224,8 @@ private:
                         const unsigned int import_lim_cons = 1,
                         const unsigned int export_lim_cons = 1,
                         const unsigned int price_lim_cons = 1,
-                        const unsigned int activeTaxCaps = 0) const noexcept;
+                        const unsigned int activeTaxCaps = 0,
+                        const unsigned int disableTrade = true) const noexcept;
 
   void add_Leaders_tradebalance_constraints(const unsigned int i);
 

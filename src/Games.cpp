@@ -363,6 +363,7 @@ unique_ptr<GRBModel> Game::QP_Param::solveFixed(
       model->addConstr(LHS, GRB_LESS_EQUAL, b[i] - Ax[i]);
     }
     model->update();
+    model->set(GRB_IntParam_NonConvex, 2);
     model->set(GRB_IntParam_OutputFlag, 0);
     model->optimize();
   } catch (const char *e) {

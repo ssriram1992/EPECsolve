@@ -294,8 +294,10 @@ void Models::EPEC::make_LL_LeadCons(
     const unsigned int price_lim_cons, ///< Does a constraint on price limit
     ///< exist or no limit?
     const unsigned int
-        activeTaxCaps ///< Number of active Tax Caps constraints. If strictly
-                      ///< positive, tax cap constraint(s) will be enforced
+        activeTaxCaps, ///< Number of active Tax Caps constraints. If strictly
+                       ///< positive, tax cap constraint(s) will be enforced
+    const unsigned int disableTrade ///< If greater than zero, the quantity of
+                                    ///< exported goods will be forced to zero
 ) const noexcept
 /**
  * Makes the leader level constraints for a country.
@@ -335,9 +337,11 @@ void Models::EPEC::make_LL_LeadCons(
   // Export - import <= Local Production
   // (28b)
   for (unsigned int i = 0; i < Params.n_followers; i++)
-    LeadCons.at(Params.n_followers, i) = -1;
+    LeadCons.at(activeTaxCaps, i) = -1;
   LeadCons.at(activeTaxCaps, Loc.at(Models::LeaderVars::NetExport)) = 1;
   LeadCons.at(activeTaxCaps, Loc.at(Models::LeaderVars::NetImport)) = -1;
+
+
   // Import limit - In more precise terms, everything that comes in minus
   // everything that goes out should satisfy this limit (28c)
   if (import_lim_cons) {
@@ -373,6 +377,14 @@ void Models::EPEC::make_LL_LeadCons(
                export_lim_cons) =
         Params.LeaderParam.price_limit - Params.DemandParam.alpha;
   }
+
+  if (disableTrade > 0) {
+    LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons +
+                    export_lim_cons + disableTrade,
+                Loc.at(Models::LeaderVars::NetExport)) = 1;
+    LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons +
+               export_lim_cons + disableTrade) = 0;
+  }
   // revenue tax
   if (Params.LeaderParam.tax_revenue) {
 
@@ -395,41 +407,41 @@ void Models::EPEC::make_LL_LeadCons(
           (carbonTax == 1) ? Params.FollowerParam.emission_costs.at(i) : 1;
       // -u_i + \bar{q}_it_i + \bar{t}_iq_i \le \bar{t}_i \bar{q}_i
       LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                      export_lim_cons + i * 3 + 1,
+                      export_lim_cons + disableTrade + i * 3 + 1,
                   Loc.at(Models::LeaderVars::TaxQuad) + i) = -1;
       LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                      export_lim_cons + i * 3 + 1,
+                      export_lim_cons + disableTrade + i * 3 + 1,
                   Loc.at(Models::LeaderVars::Tax) + i * standardTax) =
           Params.FollowerParam.capacities.at(i) * carbonCorrection;
       LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                      export_lim_cons + i * 3 + 1,
+                      export_lim_cons + disableTrade + i * 3 + 1,
                   Loc.at(Models::LeaderVars::FollowerStart) + i) =
           t_cap * carbonCorrection;
       LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                 export_lim_cons + i * 3 + 1) =
+                 export_lim_cons + disableTrade + i * 3 + 1) =
           t_cap * Params.FollowerParam.capacities.at(i) * carbonCorrection;
 
       // -u_i + \bar{q}_it_i  \le 0
       LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                      export_lim_cons + i * 3 + 2,
+                      export_lim_cons + disableTrade + i * 3 + 2,
                   Loc.at(Models::LeaderVars::TaxQuad) + i) = -1;
       LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                      export_lim_cons + i * 3 + 2,
+                      export_lim_cons + disableTrade + i * 3 + 2,
                   Loc.at(Models::LeaderVars::Tax) + i * standardTax) =
           Params.FollowerParam.capacities.at(i) * carbonCorrection;
       LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                 export_lim_cons + i * 3 + 2) = 0;
+                 export_lim_cons + disableTrade + i * 3 + 2) = 0;
 
       // -u_i + \bar{t}_iq_i  \le 0
       LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                      export_lim_cons + i * 3 + 3,
+                      export_lim_cons + disableTrade + i * 3 + 3,
                   Loc.at(Models::LeaderVars::TaxQuad) + i) = -1;
       LeadCons.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                      export_lim_cons + i * 3 + 3,
+                      export_lim_cons + disableTrade + i * 3 + 3,
                   Loc.at(Models::LeaderVars::FollowerStart) + i) =
           t_cap * carbonCorrection;
       LeadRHS.at(activeTaxCaps + price_lim_cons + import_lim_cons +
-                 export_lim_cons + i * 3 + 3) = 0;
+                 export_lim_cons + disableTrade + i * 3 + 3) = 0;
     }
   }
   BOOST_LOG_TRIVIAL(trace) << "********** Price Limit constraint: "
@@ -440,6 +452,8 @@ void Models::EPEC::make_LL_LeadCons(
                            << export_lim_cons;
   BOOST_LOG_TRIVIAL(trace) << "********** Tax Limit constraints: "
                            << activeTaxCaps << "\n\t";
+  BOOST_LOG_TRIVIAL(trace) << "********** Trade disabled: "
+                           << ((disableTrade > 0) ? "True" : "False") << "\n\t";
 }
 
 Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
@@ -503,10 +517,16 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
 
   // Basing on the taxation paradigm, allocate the right number of taxVars in
   // the class
+  unsigned int activeTaxCaps = 0;
   if (Params.LeaderParam.tax_type == Models::TaxType::StandardTax) {
     BOOST_LOG_TRIVIAL(trace)
         << "Country " << Params.name << " has a standard tax paradigm.";
     this->taxVars = Params.n_followers;
+    // Since we have a standard taxation paradigm, we have to consider all
+    // different tax caps
+    activeTaxCaps = count_if(Params.FollowerParam.tax_caps.begin(),
+                             Params.FollowerParam.tax_caps.end(),
+                             [](double i) { return i >= 0; });
   } else {
     if (Params.LeaderParam.tax_type == Models::TaxType::SingleTax) {
       BOOST_LOG_TRIVIAL(trace)
@@ -516,11 +536,26 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
           << "Country " << Params.name << " has a carbon tax paradigm.";
     }
     this->taxVars = 1;
+    // There is no standard taxation paradigm (so we have carbon or single).
+    // Hence we want to consider just one caps, arbitrary the first
+    activeTaxCaps = count_if(Params.FollowerParam.tax_caps.begin(),
+                             Params.FollowerParam.tax_caps.end(),
+                             [](double i) { return i >= 0; });
+    if (activeTaxCaps >= 0) {
+      if (!std::equal(Params.FollowerParam.tax_caps.begin() + 1,
+                      Params.FollowerParam.tax_caps.end(),
+                      Params.FollowerParam.tax_caps.begin())) {
+        BOOST_LOG_TRIVIAL(warning)
+            << "Tax caps are not equal within a non-standard tax framework. "
+               "Using the first value as tax limit.";
+      }
+      activeTaxCaps = 1;
+    }
   }
 
   const unsigned int LeadVars =
-      2 + (1 + Params.LeaderParam.tax_revenue) * Params.n_followers + taxVars +
-      addnlLeadVars;
+      2 + (1 + Params.LeaderParam.tax_revenue) * Params.n_followers +
+      this->taxVars + addnlLeadVars;
   // 2 for quantity imported and exported, n for imposed cap, taxVars for taxes
   // and n for bilinear taxes.
 
@@ -540,48 +575,29 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
   }
 
   // Leader Constraints
-  short int import_lim_cons{0}, export_lim_cons{0}, price_lim_cons{0};
+  short int import_lim_cons{0}, export_lim_cons{0}, price_lim_cons{0},
+      trade_allow_cons{0};
   if (Params.LeaderParam.import_limit >= 0)
     import_lim_cons = 1;
   if (Params.LeaderParam.export_limit >= 0)
     export_lim_cons = 1;
   if (Params.LeaderParam.price_limit >= 0)
     price_lim_cons = 1;
-  unsigned int activeTaxCaps = 0;
-  if (Params.LeaderParam.tax_type == Models::TaxType::StandardTax) {
-    // Since we have a standard taxation paradigm, we have to consider all
-    // different tax caps
-    activeTaxCaps = count_if(Params.FollowerParam.tax_caps.begin(),
-                             Params.FollowerParam.tax_caps.end(),
-                             [](double i) { return i >= 0; });
-  } else {
-    // There is no standard taxation paradigm (so we have carbon or single).
-    // Hence we want to consider just one caps, arbitrary the first
-    activeTaxCaps = count_if(Params.FollowerParam.tax_caps.begin(),
-                             Params.FollowerParam.tax_caps.end(),
-                             [](double i) { return i >= 0; });
-    if (activeTaxCaps >= 0) {
-      if (!std::equal(Params.FollowerParam.tax_caps.begin() + 1,
-                      Params.FollowerParam.tax_caps.end(),
-                      Params.FollowerParam.tax_caps.begin())) {
-        BOOST_LOG_TRIVIAL(warning)
-            << "Tax caps are not equal within a non-standard tax framework. "
-               "Using the first value as tax limit.";
-      }
-      activeTaxCaps = 1;
-    }
-  }
+  if (Params.LeaderParam.tradeAllowed == false)
+    trade_allow_cons = 1;
 
-  arma::sp_mat LeadCons(import_lim_cons +     // Import limit constraint
-                            export_lim_cons + // Export limit constraint
-                            price_lim_cons +  // Price limit constraint
-                            activeTaxCaps +   // Tax limit constraints
+  arma::sp_mat LeadCons(activeTaxCaps + // Tax limit constraints
+                            1+ // Export - import <= Domestic production
+                        import_lim_cons +      // Import limit constraint
+                            export_lim_cons +  // Export limit constraint
+                            price_lim_cons +   // Price limit constraint
+                            trade_allow_cons + // Trade Switch constraint
                             Params.n_followers * 3 *
-                                Params.LeaderParam.tax_revenue + // revenue tax
-                            1, // Export - import <= Domestic production
+                                Params.LeaderParam.tax_revenue, // revenue ta
                         Loc[Models::LeaderVars::End]);
   arma::vec LeadRHS(
       import_lim_cons + export_lim_cons + price_lim_cons + activeTaxCaps +
+          trade_allow_cons +
           Params.n_followers * 3 * Params.LeaderParam.tax_revenue + 1,
       arma::fill::zeros);
 
@@ -595,7 +611,8 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
     }
     // Make Leader Constraints
     this->make_LL_LeadCons(LeadCons, LeadRHS, Params, Loc, import_lim_cons,
-                           export_lim_cons, price_lim_cons, activeTaxCaps);
+                           export_lim_cons, price_lim_cons, activeTaxCaps,
+                           trade_allow_cons);
   } catch (const char *e) {
     cerr << e << '\n';
     throw;
@@ -1451,6 +1468,9 @@ void Models::EPECInstance::load(string filename) {
     cerr << "Exception in Models::load : file instance not found." << '\n';
     throw;
   }
+}
+Models::EPECInstance::EPECInstance() {
+  //empty constructor
 }
 
 void Models::EPEC::WriteCountry(const unsigned int i, const string filename,
