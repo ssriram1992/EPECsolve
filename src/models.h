@@ -225,7 +225,7 @@ private:
                         const unsigned int export_lim_cons = 1,
                         const unsigned int price_lim_cons = 1,
                         const unsigned int activeTaxCaps = 0,
-                        const unsigned int disableTrade = true) const noexcept;
+                        const unsigned int disableTrade = 0) const noexcept;
 
   void add_Leaders_tradebalance_constraints(const unsigned int i);
 
