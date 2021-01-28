@@ -1,10 +1,27 @@
+#include "boost/filesystem.hpp"
 #include "models.h"
 #include <chrono>
+#include <iostream>
 #include <random>
-#define NUM_THREADS 8
-#define HARD_THRESHOLD 8
-using namespace std;
 
+#define NUM_THREADS 12
+#define HARD_THRESHOLD 3
+using namespace std;
+void recursive_copy(const boost::filesystem::path &src,
+                    const boost::filesystem::path &dst) {
+  if (boost::filesystem::is_directory(src)) {
+    if (!boost::filesystem::is_directory(dst))
+      boost::filesystem::create_directories(dst);
+    for (boost::filesystem::directory_entry &item :
+         boost::filesystem::directory_iterator(src)) {
+      recursive_copy(item.path(), dst / item.path().filename());
+    }
+  } else if (boost::filesystem::is_regular_file(src)) {
+    boost::filesystem::copy(src, dst);
+  } else {
+    throw std::runtime_error(dst.generic_string() + " not dir or file");
+  }
+}
 // Global variables
 vector<Models::FollPar> C, G,
     S; // Mnemonics for coal-like, gas-like and solar-like followers.
@@ -152,6 +169,75 @@ price_limit = (price_limit < 0)? a*price_lim:price_limit;
   return Country;
 }
 
+Models::LeadAllPar makeLeaderThreeFollowers(unsigned int cc, unsigned int gg,
+                                            unsigned int ss, int cC = 5,
+                                            int gC = 5, int sC = 5,
+                                            double price_lim = 0.9) {
+  static int country = 0;
+  bool madeFirst{false};
+  Models::FollPar F;
+  int costParam = intRandom(give) % (lincos.size() - 2);
+  for (unsigned int n = 0; n < cc; ++n) {
+    if (!madeFirst) {
+      F = makeFollPar(costParam, 2, cC);
+      madeFirst = true;
+    } else
+      F = F + makeFollPar(costParam, 1, gC);
+  }
+
+  if (gg)
+    costParam++;
+  for (unsigned int n = 0; n < gg; ++n) {
+    if (!madeFirst) {
+      F = makeFollPar(costParam, 1, gC);
+      madeFirst = true;
+    } else
+      F = F + makeFollPar(costParam, 1, gC);
+  }
+
+  if (ss)
+    costParam++;
+  for (unsigned int n = 0; n < ss; ++n) {
+    if (!madeFirst) {
+      F = makeFollPar(costParam, 0, sC);
+      madeFirst = true;
+    } else
+      F = F + makeFollPar(costParam, 0, sC);
+  }
+
+  double a = demand_a[intRandom(give) % demand_a.size()];
+  double b = demand_b[intRandom(give) % demand_b.size()];
+
+  double total_cap{0}, price_limit;
+  for (auto v : F.capacities)
+    if (v == capacities.back())
+      total_cap += capacities[4];
+    else
+      total_cap += v;
+  /*
+price_limit = (a - b*total_cap)/price_lim;
+
+price_limit = price_limit > a*1.05? a * price_lim:price_limit;
+price_limit = (price_limit < 0)? a*price_lim:price_limit;
+*/
+  price_limit = price_lim * a;
+  unsigned int tax_paradigm = intRandom(give) % 3;
+  unsigned int tax_revenue = binaryRandom(give);
+  std::chrono::milliseconds ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::system_clock::now().time_since_epoch());
+  Models::LeadAllPar Country(
+      F.capacities.size(),
+      "Country_" + to_string(country++) + "_" +
+          names[intRandom(give) % names.size()] + "_" +
+          std::to_string(ms.count()),
+      F, {a, b},
+      {-1, -1, price_limit, static_cast<bool>(tax_revenue), tax_paradigm});
+  LeadersVec.push_back(Country);
+
+  return Country;
+}
+
 void MakeCountry() {
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++) {
@@ -173,6 +259,22 @@ void MakeCountry() {
   }
 }
 
+void MakeCountryThreeFollowers() {
+  for (double perclim = 0.8; perclim <= 0.95; perclim += 0.05) {
+    makeLeaderThreeFollowers(1, 1, 1, intRandom(give), intRandom(give),
+                             intRandom(give), perclim);
+    makeLeaderThreeFollowers(2, 1, 0, intRandom(give), intRandom(give),
+                             intRandom(give), perclim);
+    makeLeaderThreeFollowers(2, 0, 1, intRandom(give), intRandom(give),
+                             intRandom(give), perclim);
+    makeLeaderThreeFollowers(0, 1, 2, intRandom(give), intRandom(give),
+                             intRandom(give), perclim);
+    makeLeaderThreeFollowers(1, 0, 2, intRandom(give), intRandom(give),
+                             intRandom(give), perclim);
+    makeLeaderThreeFollowers(0, 0, 3, intRandom(give), intRandom(give),
+                             intRandom(give), perclim);
+  }
+}
 bool MakeInstance(int nCountries = 2) {
   static int count{0};
   MakeCountry();
@@ -213,10 +315,62 @@ bool MakeInstance(int nCountries = 2) {
   }
   Game::EPECStatistics stat = epec.getStatistics();
   if (stat.status == Game::EPECsolveStatus::timeLimit) {
-    Inst.save("dat/Instances_H/Instance_HS_" + to_string(count++));
+    Inst.save("dat/Instances_Insights/Instance_Insights_" + to_string(count++));
     return true;
   }
   return false;
+}
+
+Models::EPECInstance
+makeInstanceInsights(const unsigned int maxTimeSeconds = 10) {
+
+  while (true) {
+    unsigned int nCountries = 2;
+    static int count{0};
+    MakeCountryThreeFollowers();
+    int nNet = LeadersVec.size();
+    vector<Models::LeadAllPar> cVec;
+    cout << "Instance " << count << " with ";
+    for (int i = 0; i < nCountries; i++) {
+      auto val = intRandom(give) % nNet;
+      cVec.push_back(LeadersVec[val]);
+      cout << val << "\t";
+    }
+    cout << endl;
+    arma::sp_mat TrCo(nCountries, nCountries);
+    for (int i = 0; i < nCountries; i++)
+      for (int j = 0; j < nCountries; j++)
+        if (i != j)
+          TrCo(i, j) = 1;
+        else
+          TrCo(i, j) = 0;
+
+    Models::EPECInstance Inst(cVec, TrCo);
+    if (Inst.Countries.at(0).n_followers != 3 ||
+        Inst.Countries.at(1).n_followers != 3)
+      throw "Error: Different number of followers";
+    Models::EPEC epec(&env);
+    epec.setNumThreads(NUM_THREADS);
+    epec.setTimeLimit(maxTimeSeconds);
+    epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+    for (unsigned int j = 0; j < Inst.Countries.size(); ++j)
+      epec.addCountry(Inst.Countries.at(j));
+    epec.addTranspCosts(Inst.TransportationCosts);
+    epec.finalize();
+    try {
+      epec.findNashEq();
+    } catch (string &s) {
+      std::cerr << "Error while finding Nash equilibrium: " << s << '\n';
+      ;
+    } catch (exception &e) {
+      std::cerr << "Error while finding Nash equilibrium: " << e.what() << '\n';
+      ;
+    }
+    Game::EPECStatistics stat = epec.getStatistics();
+    if (stat.status == Game::EPECsolveStatus::nashEqFound) {
+      return Inst;
+    }
+  }
 }
 
 void makeInstancesGreatAgain() {
@@ -245,22 +399,97 @@ void makeInstancesGreatAgain() {
         }
         Instance.Countries.at(i).LeaderParam.tax_type = tax_type;
       }
-      Instance.save("dat/Instance_345_Harder/" + line);
+      Instance.save("dat/Instances_H/" + line);
     }
     file.close();
   }
 }
 
+void solveStrategicInstances(bool generate = false) {
+
+  const int numInstances = 50, timeLimit = 20;
+  unsigned int count = 0;
+  const string path = "dat/Instances_Insights";
+
+  while (count < numInstances) {
+    Models::EPECInstance Inst;
+    if (generate)
+      Inst = makeInstanceInsights(timeLimit);
+    else
+      Inst = Models::EPECInstance("dat/Instances_Insights/Instance_I_" +
+                                  std::to_string(count));
+    boost::filesystem::remove_all(path + "/results/tmp/");
+    boost::filesystem::create_directories(path + "/results/tmp/");
+    unsigned int success = 0;
+    bool skipInstance = false;
+
+    for (unsigned int tax = 0; tax < 2 && !skipInstance;
+         ++tax) { // 0 if no tax in the objective, 1 otherwise
+      for (unsigned int trade = 0; trade < 2 && !skipInstance;
+           ++trade) { // 0 if no trade, 1 otherwise
+
+        // UPDATE Params in the instance
+        Inst.Countries.at(0).LeaderParam.tradeAllowed = trade;
+        Inst.Countries.at(1).LeaderParam.tradeAllowed = trade;
+        Inst.Countries.at(0).LeaderParam.tax_revenue = tax;
+        Inst.Countries.at(1).LeaderParam.tax_revenue = tax;
+        if (tax > 0) {
+          Inst.Countries.at(0).LeaderParam.tax_type =
+              Models::TaxType::CarbonTax;
+          Inst.Countries.at(1).LeaderParam.tax_type =
+              Models::TaxType::CarbonTax;
+        }
+
+        Models::EPEC epec(&env);
+        epec.setNumThreads(NUM_THREADS);
+        epec.setTimeLimit(timeLimit);
+        epec.setAlgorithm(Game::EPECalgorithm::innerApproximation);
+        for (unsigned int j = 0; j < Inst.Countries.size(); ++j)
+          epec.addCountry(Inst.Countries.at(j));
+        epec.addTranspCosts(Inst.TransportationCosts);
+        epec.finalize();
+        try {
+          epec.findNashEq();
+        } catch (string &s) {
+          std::cerr << "Error while finding Nash equilibrium: " << s << '\n';
+          ;
+        } catch (exception &e) {
+          std::cerr << "Error while finding Nash equilibrium: " << e.what()
+                    << '\n';
+          ;
+        }
+        Game::EPECStatistics stat = epec.getStatistics();
+        if (stat.status == Game::EPECsolveStatus::nashEqFound) {
+          epec.writeSolution(2, path + "/results/tmp/Instance_I_" +
+                                    std::to_string(count) + "_Tax-" +
+                                    std::to_string(tax) + "_Trade-" +
+                                    std::to_string(trade));
+          ++success;
+        }
+        else
+          skipInstance=true;
+      } // close trade
+    }   // close tax
+
+    if (success == 4) {
+      if (generate)
+        Inst.save(path + "/Instance_I_" + std::to_string(count));
+      recursive_copy(path + "/results/tmp", path + "/results");
+      ++count;
+    }
+  }
+}
 int main() {
 
   // for (int i = 0; i < 50; ++i)
   //  MakeInstance(3);
   // for (int i = 0; i < 50; ++i)
   //  MakeInstance(4);
-  unsigned int count = 0;
-  while (count < 50)
-    count += MakeInstance(7);
+  // unsigned int count = 0;
+  // while (count < 50)
+  // count += MakeInstance(2);
   // makeInstancesGreatAgain();
 
+  solveStrategicInstances(true);
   return 0;
 }
