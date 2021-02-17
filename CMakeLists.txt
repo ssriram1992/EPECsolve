@@ -8,9 +8,9 @@ if (ROSSOBIANCO)
 ELSE ()
     set(BOOST_ROOT "/usr/local/boost-1.70.0/")
 ENDIF ()
-set(GUROBI_PATH_LINUX "/home/gurobi/9.0.0/linux64")
-set(GUROBI_PATH_MAC "/Library/gurobi900/mac64")
-set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi900\\win64")
+set(GUROBI_PATH_LINUX "/home/gurobi/9.1.1/linux64")
+set(GUROBI_PATH_MAC "/Library/gurobi910/mac64")
+set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi910\\win64")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 
@@ -37,7 +37,6 @@ if (NOT GUROBI_FOUND)
 
     set(SEARCH_PATHS_FOR_LIBRARIES
         "$ENV{GUROBI_HOME}/lib"
-		"/opt/gurobi900/linux64/lib"
         "${GUROBI_PATH_MAC}/lib"
         "${GUROBI_PATH_LINUX}/lib"
         "${GUROBI_PATH_WINDOWS}/lib"
@@ -49,7 +48,7 @@ if (NOT GUROBI_FOUND)
 
 
     find_library(GUROBI_C_LIBRARY
-                 NAMES gurobi90
+                 NAMES gurobi91
                  PATHS ${SEARCH_PATHS_FOR_LIBRARIES}
                  )
 
