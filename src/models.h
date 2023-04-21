@@ -297,6 +297,7 @@ public:                        // Attributes
   const EPECInstance getInstance() const {
     return EPECInstance(this->AllLeadPars, this->TranspCosts);
   }
+  void writePrograms(std::string basePath);
 };
 
 } // namespace Models

@@ -1143,7 +1143,7 @@ unsigned long int Game::LCP::getNextPoly(Game::EPECAddPolyMethod method) {
     return this->maxTheoreticalPoly;
   } break;
   case Game::EPECAddPolyMethod::random: {
-    static std::mt19937 engine{this->addPolyMethodSeed};
+    static std::mt19937 engine{static_cast<std::mt19937>(this->addPolyMethodSeed)};
     std::uniform_int_distribution<unsigned long int> dist(
         0, this->maxTheoreticalPoly - 1);
     if ((knownInfeas.size() + AllPolyhedra.size()) == this->maxTheoreticalPoly)

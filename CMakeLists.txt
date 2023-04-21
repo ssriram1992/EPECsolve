@@ -6,10 +6,12 @@ project(EPECsolve)
 if (ROSSOBIANCO)
     set(BOOST_ROOT "/home/x86_64-unknown-linux_ol7-gnu/boost-1.70.0")
 ELSE ()
-    set(BOOST_ROOT "/usr/local/boost-1.70.0/")
+    set(BOOST_ROOT "/opt/homebrew/Cellar/boost/1.78.0_1")
 ENDIF ()
+#set(CMAKE_OSX_ARCHITECTURES "x86_64")
+set(CMAKE_OSX_ARCHITECTURES "arm64")
 set(GUROBI_PATH_LINUX "/home/gurobi/9.1.1/linux64")
-set(GUROBI_PATH_MAC "/Library/gurobi910/mac64")
+set(GUROBI_PATH_MAC "/Library/gurobi950/macos_universal2")
 set(GUROBI_PATH_WINDOWS "C:\\dev\\gurobi910\\win64")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -48,7 +50,7 @@ if (NOT GUROBI_FOUND)
 
 
     find_library(GUROBI_C_LIBRARY
-                 NAMES gurobi91
+                 NAMES gurobi95
                  PATHS ${SEARCH_PATHS_FOR_LIBRARIES}
                  )
 
@@ -72,7 +74,7 @@ if (NOT GUROBI_FOUND)
 
 endif ()
 include(FindPackageHandleStandardArgs)
-SET(Boost_USE_STATIC_LIBS ON)
+SET(Boost_USE_STATIC_LIBS OFF)
 find_package(Armadillo REQUIRED)
 find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options unit_test_framework log log_setup)
 find_package_handle_standard_args(GUROBI DEFAULT_MSG GUROBI_INCLUDE_DIRS)
@@ -116,6 +118,17 @@ add_executable(EPECChileArgentina
                src/Utils.cpp
                src/Models.cpp
                src/models.h)
+add_executable(EPECSGM
+               src/SGM.cpp
+               src/epecsolve.h
+               src/Games.cpp
+               src/games.h
+               src/LCPtoLP.cpp
+               src/lcptolp.h
+               src/utils.h
+               src/Utils.cpp
+               src/Models.cpp
+               src/models.h)
 add_executable(EPECExample
                src/example.cpp
                src/epecsolve.h
@@ -142,6 +155,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(EPECInstances Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
 target_link_libraries(EPECChileArgentina Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
+target_link_libraries(EPECSGM Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
 target_link_libraries(EPECExample Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
 target_link_libraries(EPEC Boost::program_options Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})
 target_link_libraries(EPECtest Boost::program_options Boost::unit_test_framework Boost::log Boost::log_setup ${GUROBI_LIBRARIES} ${ARMADILLO_LIBRARIES})

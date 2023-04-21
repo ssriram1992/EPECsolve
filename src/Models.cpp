@@ -341,7 +341,6 @@ void Models::EPEC::make_LL_LeadCons(
   LeadCons.at(activeTaxCaps, Loc.at(Models::LeaderVars::NetExport)) = 1;
   LeadCons.at(activeTaxCaps, Loc.at(Models::LeaderVars::NetImport)) = -1;
 
-
   // Import limit - In more precise terms, everything that comes in minus
   // everything that goes out should satisfy this limit (28c)
   if (import_lim_cons) {
@@ -587,8 +586,8 @@ Models::EPEC &Models::EPEC::addCountry(Models::LeadAllPar Params,
     trade_allow_cons = 1;
 
   arma::sp_mat LeadCons(activeTaxCaps + // Tax limit constraints
-                            1+ // Export - import <= Domestic production
-                        import_lim_cons +      // Import limit constraint
+                            1 + // Export - import <= Domestic production
+                            import_lim_cons +  // Import limit constraint
                             export_lim_cons +  // Export limit constraint
                             price_lim_cons +   // Price limit constraint
                             trade_allow_cons + // Trade Switch constraint
@@ -1032,6 +1031,29 @@ unique_ptr<GRBModel> Models::EPEC::Respond(const string name,
   return this->Game::EPEC::Respond(this->name2nos.at(name), x);
 }
 
+void Models::EPEC::writePrograms(const string basePath) {
+
+  for (int i = 0; i < this->getNcountries(); ++i) {
+    auto LCP = this->Game::EPEC::countries_LCP.at(i).get();
+    LCP->LCPasMIP(false)->write(basePath + "_" + std::to_string(i) + ".mps");
+    LCP->LCPasMIP(false)->write(basePath + "_" + std::to_string(i) + ".lp");
+    this->Game::EPEC::LeadObjec.at(i)->Q.save(
+        basePath + "-Q_" + std::to_string(i) + ".mat", csv_ascii);
+    this->Game::EPEC::LeadObjec.at(i)->C.save(
+        basePath + "-C_" + std::to_string(i) + ".mat", csv_ascii);
+    this->Game::EPEC::LeadObjec.at(i)->c.save(
+        basePath + "-clin_" + std::to_string(i) + ".mat", csv_ascii);
+    std::cout << "Num variables: "
+              << this->Game::EPEC::LeadObjec.at(i)->c.size() << "\n";
+    std::cout << "C Shape: " << this->Game::EPEC::LeadObjec.at(i)->C.n_rows
+              << " " << this->Game::EPEC::LeadObjec.at(i)->C.n_cols << "\n";
+  }
+  ofstream instanceFile;
+  instanceFile.open(basePath + ".txt");
+  for (unsigned i = 0; i < this->getNcountries(); i++)
+    instanceFile << this->AllLeadPars.at(i).n_followers << " ";
+  instanceFile.close();
+}
 void Models::EPEC::updateLocs()
 /**
  * This function is called after make_country_QP()
@@ -1470,7 +1492,7 @@ void Models::EPECInstance::load(string filename) {
   }
 }
 Models::EPECInstance::EPECInstance() {
-  //empty constructor
+  // empty constructor
 }
 
 void Models::EPEC::WriteCountry(const unsigned int i, const string filename,

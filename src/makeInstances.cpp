@@ -4,10 +4,10 @@
 #include <iostream>
 #include <random>
 
-#define NUM_THREADS 12
-#define HARD_THRESHOLD 3
+#define NUM_THREADS 8
+#define HARD_THRESHOLD 2
 using namespace std;
-void recursive_copy(const boost::filesystem::path &src,
+/*void recursive_copy(const boost::filesystem::path &src,
                     const boost::filesystem::path &dst) {
   if (boost::filesystem::is_directory(src)) {
     if (!boost::filesystem::is_directory(dst))
@@ -22,6 +22,7 @@ void recursive_copy(const boost::filesystem::path &src,
     throw std::runtime_error(dst.generic_string() + " not dir or file");
   }
 }
+ */
 // Global variables
 vector<Models::FollPar> C, G,
     S; // Mnemonics for coal-like, gas-like and solar-like followers.
@@ -275,9 +276,25 @@ void MakeCountryThreeFollowers() {
                              intRandom(give), perclim);
   }
 }
+
+void MakeHardCountry() {
+  for (double perclim = 0.8; perclim <= 0.95; perclim += 0.05) {
+    for (unsigned int i = 0; i < 7; ++i) {
+      unsigned int n1 = intRandom(give) % 7;
+      unsigned int n2 = intRandom(give) % (7 - n1);
+      unsigned int n3 = 7 - n1 - n2;
+      makeLeaderThreeFollowers(n1, n2, n3, intRandom(give), intRandom(give),
+                               intRandom(give), perclim);
+    }
+  }
+}
+
 bool MakeInstance(int nCountries = 2) {
   static int count{0};
-  MakeCountry();
+  if (nCountries == 7)
+    MakeHardCountry();
+  else
+    MakeCountry();
   int nNet = LeadersVec.size();
   vector<Models::LeadAllPar> cVec;
   cout << "Instance " << count << " with ";
@@ -296,6 +313,7 @@ bool MakeInstance(int nCountries = 2) {
         TrCo(i, j) = 0;
 
   Models::EPECInstance Inst(cVec, TrCo);
+  /*
   Models::EPEC epec(&env);
   epec.setNumThreads(NUM_THREADS);
   epec.setTimeLimit(HARD_THRESHOLD);
@@ -304,6 +322,7 @@ bool MakeInstance(int nCountries = 2) {
     epec.addCountry(Inst.Countries.at(j));
   epec.addTranspCosts(Inst.TransportationCosts);
   epec.finalize();
+
   try {
     epec.findNashEq();
   } catch (string &s) {
@@ -313,11 +332,14 @@ bool MakeInstance(int nCountries = 2) {
     std::cerr << "Error while finding Nash equilibrium: " << e.what() << '\n';
     ;
   }
+
   Game::EPECStatistics stat = epec.getStatistics();
   if (stat.status == Game::EPECsolveStatus::timeLimit) {
-    Inst.save("dat/Instances_Insights/Instance_Insights_" + to_string(count++));
+    Inst.save("Instance_H7_" + to_string(count++));
     return true;
   }
+   */
+  Inst.save("Instance_H7_" + to_string(count++));
   return false;
 }
 
@@ -465,16 +487,15 @@ void solveStrategicInstances(bool generate = false) {
                                     std::to_string(tax) + "_Trade-" +
                                     std::to_string(trade));
           ++success;
-        }
-        else
-          skipInstance=true;
+        } else
+          skipInstance = true;
       } // close trade
     }   // close tax
 
     if (success == 4) {
       if (generate)
         Inst.save(path + "/Instance_I_" + std::to_string(count));
-      recursive_copy(path + "/results/tmp", path + "/results");
+      //recursive_copy(path + "/results/tmp", path + "/results");
       ++count;
     }
   }
@@ -490,6 +511,8 @@ int main() {
   // count += MakeInstance(2);
   // makeInstancesGreatAgain();
 
-  solveStrategicInstances(true);
+  //solveStrategicInstances(true);
+  for (int i = 0; i < 50; ++i)
+    MakeInstance(7);
   return 0;
 }
