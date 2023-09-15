@@ -85,7 +85,7 @@ Algorithmic parameters tailored on **innerApproximation**:
 * `-r (--recover) intValue`: Specifies the recover stragegy for the **innerApproximation** method. When the algorithm finds a mixed equilibrium and the parameter `-p (--pure)` is set to *1*, the algorithm will search for a pure equilibrium either by randomly expanding the inner approximation (*EPECAddPolyMethod*) or by triggering a **combinatorialPNE** procedure warmstarted with the current information. *0* sets the recover strategy to *incrementalEnumeration*, *1* sets it to *combinatorial*.
 
 # Maintenance
-[@ssriram1992](https://github.com/ssriram1992/) - Contact: [sriram.sankaranarayanan@polymtl.ca](mailto:sriram.sankaranarayanan@polymtl.ca)
+[@ssriram1992](https://github.com/ssriram1992/) - Contact: [srirams@iima.ac.in](mailto:srirams@iima.ac.in)
 
-[@gdragotto](https://github.com/gdragotto) - Contact: [gabriele.dragotto@polymtl.ca](mailto:gabriele.dragotto@polymtl.ca)
+[@gdragotto](https://github.com/gdragotto) - Contact: [gdragotto@princeton.edu](mailto:gdragotto@princeton.edu)
 
